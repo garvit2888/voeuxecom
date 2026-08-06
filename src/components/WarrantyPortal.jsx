@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Loader2, Mail, CheckCircle2 } from 'lucide-react';
 
 export const WarrantyPortal = () => {
-  // Google Apps Script Web App URL endpoint (Connects to Google Sheet ID: 1HrCZRT2DyDmBkj1Z2RT3s7hgiwN47xWhNxiyHpGg8wA)
-  const GOOGLE_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwhlGRnIatNnNH0PaI74IWqEGAVHvD40kchaUz26rur0zObvQgnPc5YC9uA0eOgpP7n/exec';
+  // Google Apps Script Web App URL endpoint (voeuxexperience@gmail.com)
+  const GOOGLE_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
   const [formData, setFormData] = useState({
     name: '',
