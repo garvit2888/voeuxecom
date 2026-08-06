@@ -92,7 +92,7 @@ export const WarrantyPortal = () => {
             WARRANTY REGISTRATION PORTAL
           </h1>
           <p className="text-gray-500 text-xs font-medium">
-            VOEUX® Electronics • Official 1-Year Doorstep Replacement Warranty Activation
+            VOEUX® Electronics • Official 1-Year Domestic Warranty Activation
           </p>
         </div>
 

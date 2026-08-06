@@ -91,7 +91,7 @@ export const PRODUCTS = [
       'Audio System': '2.1 Channel with External Bass Subwoofer',
       'Connectivity': 'Bluetooth 5.0, HDMI ARC, Optical, Aux 3.5mm, Coaxial, USB',
       'Sound Modes': '3D Surround Sound, 10 Sound Effects Presets',
-      'Warranty': '1 Year VOEUX Doorstep Warranty'
+      'Warranty': '1 Year VOEUX Warranty'
     },
     compatibility: ['Smart TVs, Home Theater & Car 12V/220V Audio Systems'],
     description: 'The ultimate versatile 160W soundbar. Features a 2-in-1 separable design that transforms from a single sleek horizontal soundbar into twin vertical tower speakers with a powerful dedicated subwoofer.',
@@ -131,7 +131,7 @@ export const PRODUCTS = [
       'Frequency Control': 'Variable Crossover (40Hz - 200Hz) & Volume Gain Knobs',
       'Input Modes': 'RCA Audio In/Out, High Level Input, 3.5mm MP3 Aux',
       'Protection': '25A Heavy Duty Blade Fuse, Heat-sink Thermal Protection',
-      'Warranty': '1 Year VOEUX Doorstep Replacement Warranty'
+      'Warranty': '1 Year VOEUX Warranty'
     },
     compatibility: ['Car Basstubes, Subwoofers & High-Output Door Speakers (12V System)'],
     description: 'High-performance 150W Mono Class AB car amplifier board. Designed for driving basstubes and subwoofers with deep punchy bass, featuring built-in crossover controls, gain adjustment, and 25A fuse safety.',

@@ -10,7 +10,7 @@ export const SupportFAQ = () => {
       a: 'No. VOEUX® Android players come with 100% direct OEM coupler-to-coupler plug and play wiring harnesses. Zero wire cutting is involved.'
     },
     {
-      q: 'How does the 1-Year Doorstep Express Replacement Warranty work?',
+      q: 'How does the 1-Year Official Warranty work?',
       a: 'If any issue arises, raise a ticket on our Warranty Portal. Our technician will visit your address to provide an instant doorstep unit replacement.'
     },
     {
