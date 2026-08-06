@@ -41,6 +41,7 @@ const MainContent = () => {
       case 'support':
         return <SupportFAQ />;
       case 'warranty':
+      case 'warranty-registration':
         return <WarrantyPortal />;
       case 'warranty-policy':
         return <WarrantyPolicyPage />;
