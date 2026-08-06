@@ -13,6 +13,26 @@ export const ShopProvider = ({ children }) => {
     return hash;
   };
 
+  const [selectedProductModal, _setSelectedProductModal] = useState(null);
+  const [productsList, setProductsList] = useState(PRODUCTS);
+
+  useEffect(() => {
+    try {
+      (PRODUCTS || []).forEach(async (p) => {
+        if (p && p.flipkartUrl) {
+          try {
+            const live = await fetchLiveFlipkartPrice(p.flipkartUrl);
+            if (live && live.price) {
+              setProductsList(prev => (prev || []).map(item =>
+                item && item.id === p.id ? { ...item, price: live.price, originalPrice: live.originalPrice || item.originalPrice } : item
+              ));
+            }
+          } catch (err) {}
+        }
+      });
+    } catch (e) {}
+  }, []);
+
   const [activePage, _setActivePageState] = useState(() => getPageFromHash());
 
   const setActivePage = (page, skipHistory = false) => {
