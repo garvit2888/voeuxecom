@@ -1,20 +1,13 @@
 /**
  * VOEUX® Google Apps Script
- * - doPost: Saves warranty registrations
+ * - doPost: Saves warranty registrations to Sheet & emails Warranty Certificate to customer with exact Expiry Date
  * - doGet:  Returns live Flipkart price (server-side, no CORS)
- * - refreshPrice(): Auto-fetches price, stores in Sheet cell B1 (for fallback)
- *
- * SETUP STEPS:
- * 1. Paste this code in Apps Script editor
- * 2. Click Run > refreshPrice() once to authorize external URL access
- * 3. Click Review Permissions > Allow
- * 4. Deploy as Web App (Execute as: Me, Access: Anyone) - New Version
- * 5. Optional: Set up a time trigger on refreshPrice() every 30 minutes
+ * - refreshPrice(): Auto-fetches price
  */
 
 var FLIPKART_URL = 'https://www.flipkart.com/voeux-premium-x80-series-dual-knob-10-1-android-stereo-ahd-camera-4gb-64gb-car/p/itmac82d9bb03bba?pid=CDPHJTY3R9RNTTGT';
 
-// ========== LIVE PRICE FETCHER (called by doGet & trigger) ==========
+// ========== LIVE PRICE FETCHER ==========
 function fetchFlipkartPrice() {
   try {
     var options = {
@@ -23,8 +16,7 @@ function fetchFlipkartPrice() {
       'followRedirects': true,
       'headers': {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-IN,en;q=0.9',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        'Accept-Language': 'en-IN,en;q=0.9'
       }
     };
 
@@ -34,59 +26,32 @@ function fetchFlipkartPrice() {
     var price = null;
     var originalPrice = null;
 
-    // Pattern 1: finalPrice in JS bundle (most reliable)
     var m1 = html.match(/"finalPrice"\s*:\s*\{[^}]*"value"\s*:\s*(\d+)/);
     if (m1) price = parseInt(m1[1]);
 
-    // Pattern 2: effectivePrice
     if (!price) {
       var m2 = html.match(/"effectivePrice"\s*:\s*(\d+)/);
       if (m2) price = parseInt(m2[1]);
     }
 
-    // Pattern 3: Generic "price" JSON-LD
     if (!price) {
       var m3 = html.match(/"price"\s*:\s*"?(\d{3,6})"?/);
       if (m3) price = parseInt(m3[1]);
     }
 
-    // Pattern 4: Flipkart price HTML class  
-    if (!price) {
-      var m4 = html.match(/₹([\d,]+)<\/div>\s*<div[^>]*>(?:[\d]+%)/);
-      if (m4) price = parseInt(m4[1].replace(/,/g, ''));
-    }
-
-    // MRP / Original Price
     var mrp1 = html.match(/"mrp"\s*:\s*(\d+)/);
     if (mrp1) originalPrice = parseInt(mrp1[1]);
 
-    if (!originalPrice) {
-      var mrp2 = html.match(/"totalMrpValue"\s*:\s*(\d+)/);
-      if (mrp2) originalPrice = parseInt(mrp2[1]);
-    }
-
     if (price && price > 500) {
-      // Store in Sheet row 1 as a price cache
-      try {
-        var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1') 
-                    || SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-        // Use row 1 col 10 (J1) as price cache — won't interfere with warranty data
-        sheet.getRange('J1').setValue(price);
-        sheet.getRange('K1').setValue(originalPrice || '');
-        sheet.getRange('L1').setValue(new Date().toLocaleString('en-IN'));
-      } catch(e) {}
-
       return { success: true, price: price, originalPrice: originalPrice, fetchedAt: new Date().toISOString() };
     }
 
-    return { success: false, error: 'Price not found in page', htmlLength: html.length };
-
+    return { success: false, error: 'Price not found in page' };
   } catch(err) {
     return { success: false, error: err.toString() };
   }
 }
 
-// ========== REFRESH TRIGGER (run this once manually to authorize) ==========
 function refreshPrice() {
   var result = fetchFlipkartPrice();
   Logger.log(JSON.stringify(result));
@@ -109,22 +74,60 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// ========== doPost: Warranty Registration ==========
+// ========== doPost: Warranty Registration & Automatic Email Delivery ==========
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  sheet.appendRow([
-    data.certificateId,
-    data.name,
-    data.purchaseDate,
-    data.productPurchased,
-    data.storeOutlet,
-    data.phone,
-    data.orderId,
-    data.submittedAt,
-    data.warrantyStatus
-  ]);
-  return ContentService
-    .createTextOutput(JSON.stringify({ result: 'success' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    sheet.appendRow([
+      data.certificateId || '',
+      data.name || '',
+      data.email || '',
+      data.phone || '',
+      data.purchaseDate || '',
+      data.warrantyExpires || '',
+      data.productPurchased || '',
+      data.storeOutlet || '',
+      data.orderId || '',
+      data.submittedAt || '',
+      data.warrantyStatus || 'ACTIVE'
+    ]);
+
+    // Send Warranty Certificate Email to Customer
+    if (data.email && data.email.indexOf('@') > -1) {
+      var subject = "VOEUX® Official Warranty Certificate - " + (data.certificateId || '');
+      var body = 
+        "Dear " + (data.name || 'Valued Customer') + ",\n\n" +
+        "Congratulations! Your 1-Year Official Warranty for your VOEUX® product has been activated successfully.\n\n" +
+        "==========================================\n" +
+        "VOEUX® WARRANTY CERTIFICATE\n" +
+        "==========================================\n" +
+        "Certificate ID: " + (data.certificateId || 'VX-WRTY-ACTIVE') + "\n" +
+        "Product Name: " + (data.productPurchased || 'VOEUX Electronics') + "\n" +
+        "Date of Purchase: " + (data.purchaseDate || '') + "\n" +
+        "Warranty End Date: " + (data.warrantyExpires || '') + "\n" +
+        "Purchased From: " + (data.storeOutlet || '') + "\n" +
+        "Order / Invoice ID: " + (data.orderId || 'N/A') + "\n" +
+        "Warranty Status: ACTIVE (1-Year Official Warranty)\n" +
+        "==========================================\n\n" +
+        "Please keep this email for your records.\n\n" +
+        "Need technical assistance or warranty support?\n" +
+        "WhatsApp Support: +91 9999484530 (Mon-Sat 11 AM - 6 PM)\n" +
+        "Website: https://voeux.in\n\n" +
+        "Thank you for choosing VOEUX® Car Electronics!\n\n" +
+        "Best Regards,\n" +
+        "VOEUX® Customer Support Team";
+
+      MailApp.sendEmail(data.email, subject, body);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ result: 'success' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ result: 'error', error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail, CheckCircle2 } from 'lucide-react';
 
 export const WarrantyPortal = () => {
   // Google Apps Script Web App URL endpoint (Connects to Google Sheet ID: 1HrCZRT2DyDmBkj1Z2RT3s7hgiwN47xWhNxiyHpGg8wA)
@@ -21,6 +21,14 @@ export const WarrantyPortal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registeredCertificate, setRegisteredCertificate] = useState(null);
 
+  // Helper to compute exact 1-Year Warranty End Date
+  const getWarrantyEndDate = (purchaseDateStr) => {
+    if (!purchaseDateStr) return '';
+    const date = new Date(purchaseDateStr);
+    date.setFullYear(date.getFullYear() + 1);
+    return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,16 +40,15 @@ export const WarrantyPortal = () => {
       ? (formData.customStoreName.trim() || 'Other Retail Outlet')
       : formData.storeOutlet;
 
-    if (!formData.name || !formData.purchaseDate || !selectedProduct || !selectedStore) {
-      alert('Please fill in required fields: Customer Name, Date of Purchase, Product Purchased, and Store Outlet.');
+    if (!formData.name || !formData.email || !formData.purchaseDate || !selectedProduct || !selectedStore) {
+      alert('Please fill in required fields: Customer Name, Customer Email Address, Date of Purchase, Product Purchased, and Store Outlet.');
       return;
     }
 
     setIsSubmitting(true);
 
     const certificateId = 'VX-WRTY-' + Math.floor(100000 + Math.random() * 900000);
-    const purchaseYear = new Date(formData.purchaseDate).getFullYear() || 2026;
-    const expiryDate = `August ${purchaseYear + 1}`;
+    const expiryDate = getWarrantyEndDate(formData.purchaseDate);
 
     const submissionData = {
       ...formData,
@@ -63,7 +70,7 @@ export const WarrantyPortal = () => {
       console.error('Local storage error:', err);
     }
 
-    // 2. Post payload to Google Apps Script / Google Sheet
+    // 2. Post payload to Google Apps Script / Google Sheet (Triggers Auto-Email Delivery)
     try {
       await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
         method: 'POST',
@@ -86,7 +93,7 @@ export const WarrantyPortal = () => {
     <div className="bg-white min-h-screen">
       <div className="container mx-auto px-4 py-12 sm:py-16 max-w-2xl space-y-8 text-gray-900 text-left">
         
-        {/* Document Header - Written directly on white page */}
+        {/* Document Header */}
         <div className="border-b border-gray-200 pb-6 space-y-2">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             WARRANTY REGISTRATION PORTAL
@@ -122,7 +129,21 @@ export const WarrantyPortal = () => {
               />
             </div>
 
-            {/* Field 2: Date of Purchase */}
+            {/* Field 2: Customer Email Address */}
+            <div className="space-y-1">
+              <label className="text-gray-900 font-bold block">CUSTOMER EMAIL ADDRESS *</label>
+              <input
+                type="email"
+                placeholder="e.g. vikram.sharma@gmail.com"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
+                required
+              />
+              <span className="text-[10px] text-gray-500 block">We will email your official Warranty Certificate and exact End Date to this address.</span>
+            </div>
+
+            {/* Field 3: Date of Purchase */}
             <div className="space-y-1">
               <label className="text-gray-900 font-bold block">DATE OF PURCHASE *</label>
               <input
@@ -135,7 +156,7 @@ export const WarrantyPortal = () => {
               />
             </div>
 
-            {/* Field 3: Product Purchased */}
+            {/* Field 4: Product Purchased */}
             <div className="space-y-1">
               <label className="text-gray-900 font-bold block">PRODUCT PURCHASED *</label>
               <select
@@ -152,7 +173,7 @@ export const WarrantyPortal = () => {
               </select>
             </div>
 
-            {/* Field 3B: Custom Product Name (If Other is selected) */}
+            {/* Field 4B: Custom Product Name (If Other is selected) */}
             {formData.productPurchased === 'Other' && (
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-gray-900 font-bold block">PLEASE TYPE YOUR PRODUCT NAME *</label>
@@ -167,7 +188,7 @@ export const WarrantyPortal = () => {
               </div>
             )}
 
-            {/* Field 4: Which Store / Outlet */}
+            {/* Field 5: Which Store / Outlet */}
             <div className="space-y-1">
               <label className="text-gray-900 font-bold block">WHICH STORE / OUTLET PURCHASED FROM *</label>
               <select
@@ -184,7 +205,7 @@ export const WarrantyPortal = () => {
               </select>
             </div>
 
-            {/* Field 4B: Custom Store Name (If Other is selected) */}
+            {/* Field 5B: Custom Store Name (If Other is selected) */}
             {formData.storeOutlet === 'Other' && (
               <div className="space-y-1 animate-in fade-in duration-200">
                 <label className="text-gray-900 font-bold block">PLEASE TYPE STORE / OUTLET NAME *</label>
@@ -199,7 +220,7 @@ export const WarrantyPortal = () => {
               </div>
             )}
 
-            {/* Fields 5 & 6: Phone & Order ID */}
+            {/* Fields 6 & 7: Phone & Order ID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-gray-900 font-bold block">PHONE NUMBER</label>
@@ -228,49 +249,60 @@ export const WarrantyPortal = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold py-3.5 rounded-lg text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+              className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold py-3.5 rounded-lg text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 shadow-md"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>ACTIVATING WARRANTY...</span>
+                  <span>ACTIVATING WARRANTY & SENDING EMAIL...</span>
                 </>
               ) : (
-                <span>ACTIVATE WARRANTY NOW</span>
+                <span>ACTIVATE WARRANTY & SEND EMAIL CERTIFICATE</span>
               )}
             </button>
 
           </form>
         ) : (
           /* Confirmation Screen */
-          <div className="space-y-6 text-xs text-left border-t border-gray-200 pt-6">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
-              WARRANTY ACTIVATED SUCCESSFULLY
-            </h2>
+          <div className="space-y-6 text-xs text-left border-t border-gray-200 pt-6 animate-in fade-in duration-300">
+            <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center gap-3 text-emerald-900">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
+              <div>
+                <h2 className="text-sm font-bold text-emerald-950 uppercase tracking-wide">
+                  WARRANTY ACTIVATED SUCCESSFULLY
+                </h2>
+                <p className="text-xs text-emerald-800 flex items-center gap-1 mt-0.5">
+                  <Mail className="w-3.5 h-3.5 text-emerald-700 inline" /> Official Warranty Certificate sent to <strong className="underline">{registeredCertificate.email}</strong>
+                </p>
+              </div>
+            </div>
 
-            <div className="space-y-2 text-xs text-gray-900 font-mono border border-gray-300 p-6 rounded-lg">
+            <div className="space-y-2 text-xs text-gray-900 font-mono border border-gray-300 p-6 rounded-lg bg-gray-50">
               <p><strong>Certificate ID:</strong> {registeredCertificate.certificateId}</p>
               <p><strong>Customer Name:</strong> {registeredCertificate.name}</p>
+              <p><strong>Customer Email:</strong> {registeredCertificate.email}</p>
               <p><strong>Date of Purchase:</strong> {registeredCertificate.purchaseDate}</p>
               <p><strong>Product:</strong> {registeredCertificate.productPurchased}</p>
               <p><strong>Store Outlet:</strong> {registeredCertificate.storeOutlet}</p>
               <p><strong>Phone:</strong> {registeredCertificate.phone || 'N/A'}</p>
               <p><strong>Order ID:</strong> {registeredCertificate.orderId || 'N/A'}</p>
               <p><strong>Status:</strong> <span className="text-emerald-700 font-bold">{registeredCertificate.warrantyStatus}</span></p>
-              <p><strong>Valid Until:</strong> {registeredCertificate.warrantyExpires}</p>
+              <p className="text-indigo-900 font-bold text-sm pt-2 border-t border-gray-200">
+                <strong>Warranty End Date:</strong> {registeredCertificate.warrantyExpires}
+              </p>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => window.print()}
-                className="bg-[#3B429F] text-white font-bold px-6 py-3 rounded-lg text-xs hover:bg-[#2B308B]"
+                className="bg-[#3B429F] text-white font-bold px-6 py-3 rounded-lg text-xs hover:bg-[#2B308B] shadow-sm"
               >
                 Print Certificate
               </button>
 
               <button
                 onClick={() => setRegisteredCertificate(null)}
-                className="border border-gray-300 text-gray-800 font-bold px-6 py-3 rounded-lg text-xs hover:bg-gray-50"
+                className="border border-gray-300 text-gray-800 font-bold px-6 py-3 rounded-lg text-xs hover:bg-gray-100"
               >
                 Register Another Product
               </button>
