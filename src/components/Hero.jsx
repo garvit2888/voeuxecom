@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
-import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Zap, Cpu, Volume2 } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const Hero = () => {
   const { setActivePage, setSelectedProductModal } = useShop();
@@ -51,41 +51,101 @@ export const Hero = () => {
 
   return (
     <section className="bg-white border-b border-gray-200">
-      {/* Banner Display Container */}
-      <div className="container mx-auto px-3 sm:px-4 py-4 md:py-12">
-        <div className="relative rounded-2xl md:rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[380px] md:min-h-[500px] flex items-center p-5 sm:p-8 md:p-12">
+      <div className="container mx-auto px-4 py-4 md:py-10">
+
+        {/* ========== MOBILE LAYOUT (Clean Vertical Stack - Image 100% Clear on Top, Text Below) ========== */}
+        <div className="md:hidden bg-slate-950 rounded-2xl overflow-hidden shadow-xl border border-slate-800 p-4 space-y-4 text-left">
           
-          {/* Full-bleed Zoomed Background Image positioned for product visibility */}
+          {/* Top Product Image Box - Crystal Clear White Background */}
+          <div className="bg-white p-4 rounded-xl border border-gray-200 flex items-center justify-center h-48 sm:h-56 w-full shadow-inner relative">
+            <span className="absolute top-2 left-2 text-[9px] font-extrabold tracking-widest text-indigo-900 uppercase bg-indigo-100 border border-indigo-300 px-2 py-0.5 rounded-md">
+              {slide.badge}
+            </span>
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="max-h-full max-w-full object-contain drop-shadow-md transition-all duration-500"
+            />
+          </div>
+
+          {/* Bottom Compact Text & CTA Section */}
+          <div className="space-y-2 text-white">
+            <h2 className="text-base font-black tracking-tight leading-snug">
+              {slide.title}
+            </h2>
+
+            <p className="text-xs text-gray-300 font-medium leading-relaxed">
+              {slide.tagline}
+            </p>
+
+            <div className="pt-2 flex items-center gap-2">
+              <button
+                onClick={() => setSelectedProductModal(slide.featuredProduct)}
+                className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-extrabold py-2.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition shadow-md"
+              >
+                <span>{slide.ctaText}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                onClick={() => setActivePage(slide.actionPage)}
+                className="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-semibold py-2.5 px-3 rounded-lg border border-slate-700 transition"
+              >
+                View Category
+              </button>
+            </div>
+          </div>
+
+          {/* Slide Dots Indicator for Mobile */}
+          <div className="flex items-center justify-center space-x-1.5 pt-1">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  currentSlide === idx ? 'w-6 bg-cyan-400' : 'w-1.5 bg-slate-700'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+
+        {/* ========== DESKTOP LAYOUT (Full-bleed Hero Banner with Side Arrows) ========== */}
+        <div className="hidden md:flex relative rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[480px] items-center p-10 lg:p-12 border border-slate-800 shadow-2xl">
+          
+          {/* Zoomed Background Image */}
           <div
-            className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-50 md:opacity-90"
+            className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-90"
             style={{
               backgroundImage: `url(${slide.image})`,
-              backgroundPosition: 'right 20% center',
+              backgroundPosition: 'right 15% center',
               backgroundSize: 'cover'
             }}
           ></div>
 
           {/* Smooth Dark Gradient Overlay for Clean Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-slate-950/70 md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/85 md:to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-transparent"></div>
 
           {/* Left Text Content */}
-          <div className="relative z-10 max-w-xl space-y-3 sm:space-y-4 text-left">
-            <span className="text-[10px] sm:text-[11px] font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/90 border border-indigo-500/40 px-2.5 py-1 rounded-full inline-block">
+          <div className="relative z-10 max-w-xl space-y-4 text-left">
+            <span className="text-xs font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/80 border border-indigo-500/40 px-3.5 py-1 rounded-full inline-block">
               FEATURED CATEGORY • {slide.badge}
             </span>
 
-            <h1 className="text-xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+            <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
               {slide.title}
             </h1>
 
-            <p className="text-xs sm:text-base text-gray-300 font-medium leading-relaxed line-clamp-3 sm:line-clamp-none">
+            <p className="text-base text-gray-300 font-medium leading-relaxed">
               {slide.tagline}
             </p>
 
-            <div className="pt-1 sm:pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <div className="pt-2 flex items-center gap-3">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="w-full sm:w-auto bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/40"
+                className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40"
               >
                 <span>{slide.ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -93,7 +153,7 @@ export const Hero = () => {
 
               <button
                 onClick={() => setActivePage(slide.actionPage)}
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2.5 sm:py-3 rounded-xl border border-white/20 transition text-center"
+                className="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-3 rounded-xl border border-white/20 transition"
               >
                 View All in Category
               </button>
@@ -101,7 +161,7 @@ export const Hero = () => {
           </div>
 
           {/* Slide Indicator Navigation */}
-          <div className="absolute bottom-3 left-5 sm:left-12 z-20 flex items-center space-x-2">
+          <div className="absolute bottom-5 left-10 lg:left-12 z-20 flex items-center space-x-2">
             {slides.map((_, idx) => (
               <button
                 key={idx}
@@ -114,26 +174,25 @@ export const Hero = () => {
             ))}
           </div>
 
-          {/* Prev & Next Arrows (Hidden on Mobile to prevent data blocking, visible on Desktop) */}
+          {/* Prev & Next Arrows for Desktop */}
           <button
             onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
-            className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-slate-900/70 hover:bg-slate-800 text-white border border-indigo-500/30 transition items-center justify-center"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition flex items-center justify-center shadow-md"
             aria-label="Previous Slide"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
-            className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-slate-900/70 hover:bg-slate-800 text-white border border-indigo-500/30 transition items-center justify-center"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition flex items-center justify-center shadow-md"
             aria-label="Next Slide"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
 
         </div>
+
       </div>
-
-
     </section>
   );
 };
