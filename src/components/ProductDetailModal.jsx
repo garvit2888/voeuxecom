@@ -276,12 +276,6 @@ export const ProductDetailModal = () => {
             >
               Key Features
             </button>
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={`pb-2.5 border-b-2 transition ${activeTab === 'reviews' ? 'border-[#3B429F] text-[#3B429F]' : 'border-transparent text-gray-500'}`}
-            >
-              Customer Reviews ({product.reviews.length})
-            </button>
           </div>
 
           {/* Tab Content Panels */}
@@ -305,37 +299,6 @@ export const ProductDetailModal = () => {
                 </li>
               ))}
             </ul>
-          )}
-
-          {activeTab === 'reviews' && (
-            <div className="space-y-4">
-              {product.reviews.map(rev => (
-                <div key={rev.id} className="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-indigo-100 text-[#3B429F] font-bold flex items-center justify-center">
-                        {rev.author[0]}
-                      </div>
-                      <span className="font-bold text-gray-900">{rev.author}</span>
-                      {rev.verified && (
-                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <ThumbsUp className="w-2.5 h-2.5" /> Verified Purchase
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-gray-400 text-[10px]">{rev.date}</span>
-                  </div>
-
-                  <div className="flex text-yellow-400">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
-                  </div>
-
-                  <p className="text-gray-700 leading-relaxed">{rev.comment}</p>
-                </div>
-              ))}
-            </div>
           )}
 
         </div>

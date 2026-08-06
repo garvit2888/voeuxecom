@@ -48,22 +48,12 @@ export const ProductCard = ({ product }) => {
       {/* Product Content Body */}
       <div className="flex-1 flex flex-col justify-between space-y-2">
         <div>
-
           <h3
             onClick={() => setSelectedProductModal(product)}
             className="text-xs sm:text-sm font-bold text-gray-900 hover:text-[#3B429F] cursor-pointer transition line-clamp-2 mt-0.5"
           >
             {product.name}
           </h3>
-
-          {/* Rating */}
-          <div className="flex items-center space-x-1 mt-1">
-            <div className="flex text-yellow-400">
-              <Star className="w-3 h-3 fill-current" />
-            </div>
-            <span className="text-xs font-bold text-gray-800">{product.rating}</span>
-            <span className="text-[10px] text-gray-400">({product.reviewsCount})</span>
-          </div>
         </div>
 
         {/* Flipkart Buy Action */}

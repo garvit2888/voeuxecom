@@ -11,16 +11,13 @@ export const PRODUCTS = [
     price: 8499,
     originalPrice: 39999,
     flipkartUrl: 'https://www.flipkart.com/voeux-premium-x80-series-dual-knob-10-1-android-stereo-ahd-camera-4gb-64gb-car/p/itmac82d9bb03bba?pid=CDPHJTY3R9RNTTGT&lid=LSTCDPHJTY3R9RNTTGTBOXXMT&marketplace=FLIPKART&q=voeux+x80+car+android+&store=1mt%2Feoe%2Fwmk&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=2aaf1827-5f94-4422-ba51-05a289f2cd6f.CDPHJTY3R9RNTTGT.SEARCH&ppt=sp&ppn=sp&ssid=mbc2lmau3k0000001785990213559&qH=e7e33053e446ca94&ov_redirect=true&ov_redirect=true',
-    rating: 4.9,
-    reviewsCount: 158,
     badge: 'X80 Diamond Flagship',
     isNew: true,
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_x80_stereo.jpg',
     gallery: [
-      '/images/voeux_x80_stereo.jpg',
-      '/images/voeux_x80_piano_buttons_stereo.png'
+      '/images/voeux_x80_stereo.jpg'
     ],
     shortSpecs: [
       '10.1" IPS Touchscreen Display',
@@ -60,10 +57,7 @@ export const PRODUCTS = [
       'Supports USB, AUX, and Steering Controls',
       'Double DIN Universal Fit'
     ],
-    reviews: [
-      { id: 1, author: 'Vikram S.', rating: 5, date: '2 days ago', comment: 'The dual rotary knobs are a game changer! Makes adjusting volume while driving so safe and convenient.', verified: true },
-      { id: 2, author: 'Ankit Sharma', rating: 5, date: '1 week ago', comment: 'Wireless CarPlay connects instantly. Screen touch speed is fast and sound quality is crisp.', verified: true }
-    ],
+    reviews: [],
     launchDate: '2026-08-01',
     stock: 30
   },
@@ -73,15 +67,12 @@ export const PRODUCTS = [
     category: 'speakers-soundbars',
     price: 9999,
     originalPrice: 14999,
-    rating: 4.9,
-    reviewsCount: 114,
     badge: '2-in-1 Convertible',
     isNew: true,
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_separable_soundbar.png',
     gallery: [
-      '/images/voeux_separable_soundbar.png',
       '/images/voeux_separable_soundbar.png'
     ],
     shortSpecs: ['160W Peak Power', '2-in-1 Separable Design', '2.1 CH Subwoofer', 'Bluetooth 5.0 & HDMI ARC'],
@@ -101,9 +92,7 @@ export const PRODUCTS = [
       'Bluetooth 5.0, HDMI ARC, Optical, and AUX input support',
       '3D Surround sound engine with 10 equalizer sound effect presets'
     ],
-    reviews: [
-      { id: 1, author: 'Rohan Mehra', rating: 5, date: '3 days ago', comment: 'Amazing 2-in-1 separable feature! Sound output is crystal clear and bass is super punchy.', verified: true }
-    ],
+    reviews: [],
     launchDate: '2026-07-28',
     stock: 25
   },
@@ -113,15 +102,12 @@ export const PRODUCTS = [
     category: 'speakers-soundbars',
     price: 2499,
     originalPrice: 3999,
-    rating: 4.9,
-    reviewsCount: 168,
     badge: 'Class AB Performance',
     isNew: true,
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_amp_board.png',
     gallery: [
-      '/images/voeux_amp_board.png',
       '/images/voeux_amp_board.png'
     ],
     shortSpecs: ['150W RMS Mono Output', 'Class AB Analog Circuit', 'Bass Crossover Control', '12V 25A Fuse Protected'],
@@ -141,9 +127,7 @@ export const PRODUCTS = [
       'Multiple inputs: RCA, High-level speaker input, and 3.5mm Aux',
       'Built-in 25A fuse and aluminum heatsink chassis for cool operation'
     ],
-    reviews: [
-      { id: 1, author: 'Manish K.', rating: 5, date: '1 day ago', comment: 'Pushes my 12-inch basstube with unbelievable bass pressure! Zero heating issues.', verified: true }
-    ],
+    reviews: [],
     launchDate: '2026-08-02',
     stock: 40
   },
@@ -154,8 +138,6 @@ export const PRODUCTS = [
     price: 8499,
     originalPrice: 39999,
     flipkartUrl: 'https://www.flipkart.com/voeux-premium-x80-series-dual-knob-10-1-android-stereo-ahd-camera-4gb-64gb-car/p/itmac82d9bb03bba',
-    rating: 4.9,
-    reviewsCount: 158,
     badge: 'Piano Buttons Flagship',
     isNew: true,
     isTrending: true,
@@ -214,8 +196,6 @@ export const PRODUCTS = [
     category: 'speakers-soundbars',
     price: 3499,
     originalPrice: 4999,
-    rating: 4.8,
-    reviewsCount: 77,
     badge: 'Popular',
     isNew: false,
     isTrending: true,
