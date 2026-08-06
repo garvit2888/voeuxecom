@@ -45,12 +45,26 @@ export const Navbar = () => {
       <nav className="px-4 py-3 sm:px-6 sm:py-4">
         <div className="container mx-auto flex items-center justify-between gap-3">
           
-          {/* Official Brand Logo */}
-          <div className="flex items-center cursor-pointer" onClick={() => setActivePage('home')}>
+          {/* Mobile Menu Toggle (Left on Mobile) */}
+          <div className="flex items-center lg:hidden w-10">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-gray-700 hover:text-black rounded-lg bg-gray-100"
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+
+          {/* Official Brand Logo - Centered & Larger on Mobile, Left on Desktop */}
+          <div
+            className="flex-1 lg:flex-none flex justify-center lg:justify-start items-center cursor-pointer"
+            onClick={() => setActivePage('home')}
+          >
             <img
               src="/images/voeux_logo.png"
               alt="VOEUX® Car Electronics"
-              className="h-8 sm:h-10 w-auto rounded-lg shadow-sm hover:opacity-95 transition"
+              className="h-11 sm:h-12 lg:h-10 w-auto rounded-lg shadow-sm hover:opacity-95 transition"
             />
           </div>
 
@@ -71,8 +85,8 @@ export const Navbar = () => {
             ))}
           </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          {/* Right Actions & Spacer for Mobile Balance */}
+          <div className="flex items-center justify-end space-x-2 sm:space-x-4 w-10 lg:w-auto">
             
             {/* Desktop Search Input */}
             <div className="relative hidden md:block w-48">
@@ -110,16 +124,6 @@ export const Navbar = () => {
               )}
             </div>
 
-
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-700 hover:text-black rounded-lg bg-gray-100"
-              aria-label="Toggle Navigation Menu"
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
 
         </div>
