@@ -5,33 +5,66 @@ import { fetchLiveFlipkartPrice } from '../utils/flipkartPriceScraper';
 const ShopContext = createContext();
 
 export const ShopProvider = ({ children }) => {
-  const [activePage, setActivePage] = useState('home');
-  const [selectedProductModal, _setSelectedProductModal] = useState(null);
-  const [productsList, setProductsList] = useState(PRODUCTS);
+  // Helper to parse page name from URL Hash for browser Back/Forward navigation
+  const getPageFromHash = () => {
+    const hash = (window.location.hash || '').replace('#', '').trim();
+    if (!hash) return 'home';
+    if (hash.startsWith('product-detail')) return 'product-detail';
+    return hash;
+  };
 
+  const [activePage, _setActivePageState] = useState(() => getPageFromHash());
+
+  const setActivePage = (page, skipHistory = false) => {
+    _setActivePageState(page);
+    if (!skipHistory) {
+      if (page === 'home') {
+        window.history.pushState({ page }, '', window.location.pathname);
+      } else {
+        window.history.pushState({ page }, '', `#${page}`);
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Sync state when user presses browser Back or Forward buttons
   useEffect(() => {
-    try {
-      (PRODUCTS || []).forEach(async (p) => {
-        if (p && p.flipkartUrl) {
-          try {
-            const live = await fetchLiveFlipkartPrice(p.flipkartUrl);
-            if (live && live.price) {
-              setProductsList(prev => (prev || []).map(item =>
-                item && item.id === p.id ? { ...item, price: live.price, originalPrice: live.originalPrice || item.originalPrice } : item
-              ));
-            }
-          } catch (err) {}
+    const handlePopState = (event) => {
+      const pageFromState = event.state?.page;
+      const hash = (window.location.hash || '').replace('#', '').trim();
+      
+      let targetPage = pageFromState || hash || 'home';
+      if (targetPage.startsWith('product-detail')) {
+        targetPage = 'product-detail';
+        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
+        const pid = urlParams.get('id') || event.state?.productId;
+        if (pid) {
+          const found = PRODUCTS.find(p => p.id === pid);
+          if (found) _setSelectedProductModal(found);
         }
-      });
-    } catch (e) {}
+      } else {
+        _setSelectedProductModal(null);
+      }
+
+      _setActivePageState(targetPage);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
   }, []);
 
   const setSelectedProductModal = (product) => {
-    // Sync modal product with latest live price
     const current = productsList.find(p => p.id === product?.id) || product;
     _setSelectedProductModal(current);
     if (product) {
-      setActivePage('product-detail');
+      _setActivePageState('product-detail');
+      window.history.pushState({ page: 'product-detail', productId: product.id }, '', `#product-detail?id=${product.id}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
   const [cart, setCart] = useState([]);
