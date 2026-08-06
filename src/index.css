@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --border-color: #E5E7EB;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --brand-indigo: #3B429F;
+  --brand-indigo-dark: #2B308B;
+  --brand-accent: #3B429F;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B429F;
+}
+
+/* Clean Card styling */
+.clean-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 1rem;
+  transition: all 0.25s ease;
+}
+.clean-card:hover {
+  border-color: #3B429F;
+  box-shadow: 0 10px 30px -10px rgba(59, 66, 159, 0.12);
+}
+
+.clean-nav {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.btn-primary {
+  background-color: #3B429F;
+  color: #FFFFFF;
+  font-weight: 600;
+  padding: 0.65rem 1.4rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background-color: #2B308B;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #F3F4F6;
+  color: #111827;
+  font-weight: 600;
+  padding: 0.65rem 1.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid #E5E7EB;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover {
+  background-color: #E5E7EB;
+  border-color: #D1D5DB;
+}
+
+.badge-minimal {
+  background-color: #EEF2FF;
+  color: #3B429F;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* News Ticker Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-news-ticker {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 16s linear infinite;
+}
+
+.animate-news-ticker:hover {
+  animation-play-state: paused;
+}
