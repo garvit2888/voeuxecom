@@ -58,6 +58,7 @@ function doPost(e) {
       try {
         GmailApp.sendEmail(data.email, subject, message, {
           name: "VOEUX® Official Warranty Care",
+          from: "voeuxexperience@gmail.com",
           replyTo: "voeuxexperience@gmail.com"
         });
       } catch (mailErr) {
