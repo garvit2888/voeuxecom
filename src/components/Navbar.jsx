@@ -64,7 +64,7 @@ export const Navbar = () => {
             <img
               src="/images/voeux_logo.png"
               alt="VOEUX® Car Electronics"
-              className="h-14 sm:h-16 lg:h-11 w-auto rounded-lg shadow-sm hover:opacity-95 transition"
+              className="h-10 sm:h-11 lg:h-10 w-auto scale-x-125 scale-y-110 sm:scale-x-135 sm:scale-y-115 lg:scale-100 object-contain rounded-lg shadow-sm hover:opacity-95 transition"
             />
           </div>
 
