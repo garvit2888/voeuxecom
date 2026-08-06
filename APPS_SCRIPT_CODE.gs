@@ -1,16 +1,17 @@
 // ========== Google Apps Script for VOEUX Warranty Registration & Emailing ==========
-// Official Sender Account: voeuxexperience@gmail.com
+// Note: To send emails directly FROM voeuxexperience@gmail.com, deploy this script 
+// while signed into your voeuxexperience@gmail.com Google Account!
 
-// IMPORTANT: Run this 'testEmail' function ONCE by clicking 'Run' at the top of Apps Script 
-// while logged in as voeuxexperience@gmail.com to grant Google permission to send emails!
 function testEmail() {
-  MailApp.sendEmail({
-    to: Session.getActiveUser().getEmail(),
-    subject: "VOEUX Test Email Authorization",
-    body: "Email authorization is active! Web app will now automatically email customers from voeuxexperience@gmail.com.",
-    name: "VOEUX® Official Warranty Care",
-    replyTo: "voeuxexperience@gmail.com"
-  });
+  GmailApp.sendEmail(
+    Session.getActiveUser().getEmail(),
+    "VOEUX Test Email Authorization",
+    "Email authorization is active! Web app will now automatically email customers.",
+    {
+      name: "VOEUX® Official Warranty Care",
+      replyTo: "voeuxexperience@gmail.com"
+    }
+  );
 }
 
 function doPost(e) {
@@ -33,7 +34,7 @@ function doPost(e) {
       data.warrantyStatus || 'ACTIVE'
     ]);
 
-    // 2. Send Warranty Certificate Email to Customer from voeuxexperience@gmail.com
+    // 2. Send Warranty Certificate Email to Customer
     if (data.email && data.email.indexOf('@') > -1) {
       var subject = "VOEUX Warranty Certificate - " + (data.certificateId || '');
       var message = "Dear " + (data.name || 'Valued Customer') + ",\n\n" +
@@ -54,13 +55,20 @@ function doPost(e) {
         "Website: https://voeux.in\n\n" +
         "Thank you for choosing VOEUX® Car Electronics!";
         
-      MailApp.sendEmail({
-        to: data.email,
-        subject: subject,
-        body: message,
-        name: "VOEUX® Official Warranty Care",
-        replyTo: "voeuxexperience@gmail.com"
-      });
+      try {
+        GmailApp.sendEmail(data.email, subject, message, {
+          name: "VOEUX® Official Warranty Care",
+          replyTo: "voeuxexperience@gmail.com"
+        });
+      } catch (mailErr) {
+        MailApp.sendEmail({
+          to: data.email,
+          subject: subject,
+          body: message,
+          name: "VOEUX® Official Warranty Care",
+          replyTo: "voeuxexperience@gmail.com"
+        });
+      }
     }
 
     return ContentService
