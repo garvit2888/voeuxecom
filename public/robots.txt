@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://voeuxtechnologies.in/sitemap.xml
