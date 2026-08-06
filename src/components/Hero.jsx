@@ -57,10 +57,7 @@ export const Hero = () => {
         <div className="md:hidden bg-slate-950 rounded-2xl overflow-hidden shadow-xl border border-slate-800 p-4 space-y-4 text-left">
           
           {/* Top Product Image Box - Crystal Clear White Background */}
-          <div className="bg-white p-4 rounded-xl border border-gray-200 flex items-center justify-center h-48 sm:h-56 w-full shadow-inner relative">
-            <span className="absolute top-2 left-2 text-[9px] font-extrabold tracking-widest text-indigo-900 uppercase bg-indigo-100 border border-indigo-300 px-2 py-0.5 rounded-md">
-              {slide.badge}
-            </span>
+          <div className="bg-white p-4 rounded-xl border border-gray-200 flex items-center justify-center h-48 sm:h-56 w-full shadow-inner">
             <img
               src={slide.image}
               alt={slide.title}
@@ -70,6 +67,10 @@ export const Hero = () => {
 
           {/* Bottom Compact Text & CTA Section */}
           <div className="space-y-2 text-white">
+            <span className="text-[10px] font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/90 border border-indigo-500/40 px-2.5 py-0.5 rounded-full inline-block">
+              FEATURED CATEGORY • {slide.badge}
+            </span>
+
             <h2 className="text-base font-black tracking-tight leading-snug">
               {slide.title}
             </h2>
