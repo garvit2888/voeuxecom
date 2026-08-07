@@ -139,7 +139,7 @@ export const PRODUCTS = [
     category: 'android-players',
     price: 8499,
     originalPrice: 39999,
-    flipkartUrl: 'https://www.flipkart.com/voeux-premium-x80-series-dual-knob-10-1-android-stereo-ahd-camera-4gb-64gb-car/p/itmac82d9bb03bba',
+    flipkartUrl: 'https://www.flipkart.com/voeux-android-10-1-dual-knob-piano-buttons-4gb-64gb-car-multimedia-player-stereo/p/itm4f6bce63370ea?pid=CDPHJ9ARWNKNAHCJ&lid=LSTCDPHJ9ARWNKNAHCJITYXYO&marketplace=FLIPKART&q=voeux+piano+dual+knob+&store=search.flipkart.com&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=5363074a-e955-46d7-b64f-d87734da1a22.CDPHJ9ARWNKNAHCJ.SEARCH&ppt=sp&ppn=sp&ssid=bx1j33hn280000001786093465039&qH=8c13c5ea026e2c9a&ov_redirect=true&ov_redirect=true',
     badge: 'Piano Buttons Flagship',
     isNew: true,
     isTrending: true,
