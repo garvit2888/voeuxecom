@@ -67,6 +67,7 @@ export const PRODUCTS = [
     category: 'speakers-soundbars',
     price: 9999,
     originalPrice: 14999,
+    flipkartUrl: 'https://www.flipkart.com/voeux-soundbar-subwoofer-160w-2-1-ch-separable-sound-bars-tv-bluetooth-160-w/p/itm4294462c83a41?pid=ACCHPUQGNGPGWXYW&lid=LSTACCHPUQGNGPGWXYWCRCL40&marketplace=FLIPKART&q=voeux+soundbar&store=0pm%2F0o7&srno=s_1_2&otracker=search&otracker1=search&fm=Search&iid=cef8a751-169c-4bb9-9ebe-de31bdff0e3e.ACCHPUQGNGPGWXYW.SEARCH&ppt=sp&ppn=sp&ssid=fuo1nr9shc0000001786092907106&qH=d13a7ab8b9861c45&ov_redirect=true&ov_redirect=true',
     badge: '2-in-1 Convertible',
     isNew: true,
     isTrending: true,
@@ -102,6 +103,7 @@ export const PRODUCTS = [
     category: 'speakers-soundbars',
     price: 2499,
     originalPrice: 3999,
+    flipkartUrl: 'https://www.flipkart.com/voeux-amp-board-150w-mono-class-ab-car-amplifier-basstube-speakers/p/itmebeda47843344?pid=CREHH5Z4QNUBCBYY&lid=LSTCREHH5Z4QNUBCBYYVWXX3I&marketplace=FLIPKART&q=voeux+amp&store=search.flipkart.com&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=952cf111-113b-4923-b85b-0dddc068340d.CREHH5Z4QNUBCBYY.SEARCH&ppt=sp&ppn=sp&ssid=41o15klz8w0000001786093003243&qH=0e7be7efc0526a5b&ov_redirect=true&ov_redirect=true',
     badge: 'Class AB Performance',
     isNew: true,
     isTrending: true,
@@ -189,33 +191,6 @@ export const PRODUCTS = [
     reviews: [],
     launchDate: '2026-08-05',
     stock: 25
-  },
-  {
-    id: 'voeux-pulsar-speakers-coaxial',
-    name: 'VOEUX® Pulsar 6.5" 400W 3-Way Coaxial Car Speakers (Pair)',
-    category: 'speakers-soundbars',
-    price: 3499,
-    originalPrice: 4999,
-    badge: 'Popular',
-    isNew: false,
-    isTrending: true,
-    isBestseller: false,
-    image: '/images/soundbar_1.png',
-    gallery: ['/images/soundbar_1.png'],
-    shortSpecs: ['400W Max Peak', '3-Way Audio System', 'Polypropylene Cone', 'Silk Dome Tweeter'],
-    fullSpecs: {
-      'Power Output': '400W Peak / 70W RMS per pair',
-      'Frequency Range': '45Hz - 20,000Hz',
-      'Impedance': '4 Ohms',
-      'Tweeter': '1-Inch Silk Dome Tweeter',
-      'Warranty': '1 Year Warranty'
-    },
-    compatibility: ['Fits standard 6.5-inch door speaker slots in 95% cars'],
-    description: 'Crisp highs and warm mid-bass. Crisp upgrade over dull factory paper speakers.',
-    features: ['Rubber surround edge for prolonged durability', 'Includes decorative protective grills'],
-    reviews: [],
-    launchDate: '2026-04-12',
-    stock: 22
   }
 ];
 
