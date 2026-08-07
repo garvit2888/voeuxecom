@@ -181,24 +181,7 @@ export const ProductDetailPage = () => {
               </h1>
             </div>
 
-            {/* Direct Flipkart Price Badge */}
-            <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex items-center justify-between text-xs">
-              <span className="font-bold text-blue-900">Check Best Live Price & Offers</span>
-              <span className="bg-[#2874F0] text-white font-extrabold text-[11px] px-2.5 py-1 rounded flex items-center gap-1">
-                Official Flipkart Listing
-              </span>
-            </div>
 
-            {/* Offers Box */}
-            <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2 text-xs text-amber-950">
-              <div className="font-extrabold flex items-center gap-1.5 text-amber-900">
-                <Tag className="w-4 h-4 text-amber-600" /> Exclusive Offers
-              </div>
-              <div className="space-y-1 text-xs font-medium">
-                <p>🎁 Use code <strong className="text-amber-900 bg-amber-200 px-2 py-0.5 rounded font-mono">VOEUX10</strong> for extra discount at checkout.</p>
-                <p>💳 Extra 5% off on all Prepaid UPI / NetBanking orders.</p>
-              </div>
-            </div>
 
             {/* Short Specs Quick Pills */}
             <div className="flex flex-wrap gap-2 text-xs">

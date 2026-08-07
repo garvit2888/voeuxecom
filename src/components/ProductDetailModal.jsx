@@ -193,16 +193,7 @@ export const ProductDetailModal = () => {
               <p className="text-[10px] text-gray-400">Inclusive of all taxes • Instant Dispatch</p>
             </div>
 
-            {/* Noise Promo & Coupon Offers Strip */}
-            <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl space-y-2 text-xs text-amber-950">
-              <div className="font-extrabold flex items-center gap-1.5 text-amber-900">
-                <Tag className="w-4 h-4 text-amber-600" /> Best Offers Available
-              </div>
-              <div className="space-y-1 text-[11px] font-medium">
-                <p>🎁 Use code <strong className="text-amber-900 bg-amber-200/80 px-1.5 py-0.5 rounded font-mono">VOEUX10</strong> for extra discount at checkout.</p>
-                <p>💳 Extra 5% off on Prepaid UPI / NetBanking orders.</p>
-              </div>
-            </div>
+
 
             {/* Specs Quick Pills */}
             <div className="flex flex-wrap gap-2 text-[11px]">
