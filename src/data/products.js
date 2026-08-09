@@ -114,7 +114,9 @@ export const PRODUCTS = [
     isBestseller: true,
     image: '/images/voeux_amp_board.jpg',
     gallery: [
-      '/images/voeux_amp_board.jpg'
+      '/images/voeux_amp_board.jpg',
+      '/images/voeux_amp_gallery_1.jpg',
+      '/images/voeux_amp_gallery_2.jpg'
     ],
     shortSpecs: ['150W RMS Mono Output', 'Class AB Analog Circuit', 'Bass Crossover Control', '12V 25A Fuse Protected'],
     fullSpecs: {

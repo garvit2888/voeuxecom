@@ -116,13 +116,13 @@ export const Hero = () => {
         {/* ========== DESKTOP LAYOUT (Full-bleed Hero Banner with Side Arrows) ========== */}
         <div className="hidden md:flex relative rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[500px] items-center p-10 lg:p-12 border border-slate-800 shadow-2xl">
           
-          {/* Zoomed Background Image */}
+          {/* Background Image - Clean Containment across all slides */}
           <div
             className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
             style={{
               backgroundImage: `url(${slide.image})`,
-              backgroundPosition: currentSlide === 0 ? 'right 2% center' : 'right 15% center',
-              backgroundSize: currentSlide === 0 ? 'contain' : 'cover'
+              backgroundPosition: 'right 2% center',
+              backgroundSize: 'contain'
             }}
           ></div>
 
