@@ -121,7 +121,7 @@ export const WarrantyPortal = () => {
               <label className="text-gray-900 font-bold block">CUSTOMER NAME *</label>
               <input
                 type="text"
-                placeholder="e.g. Vikram Sharma"
+                placeholder="Enter customer full name"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -134,7 +134,7 @@ export const WarrantyPortal = () => {
               <label className="text-gray-900 font-bold block">CUSTOMER EMAIL ADDRESS *</label>
               <input
                 type="email"
-                placeholder="e.g. vikram.sharma@gmail.com"
+                placeholder="Enter customer email address"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -179,7 +179,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">PLEASE TYPE YOUR PRODUCT NAME *</label>
                 <input
                   type="text"
-                  placeholder="e.g. VOEUX 9-Inch Android Stereo, Subwoofer, etc."
+                  placeholder="Enter product name"
                   value={formData.customProductName}
                   onChange={e => setFormData({ ...formData, customProductName: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -211,7 +211,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">PLEASE TYPE STORE / OUTLET NAME *</label>
                 <input
                   type="text"
-                  placeholder="e.g. Local Car Decor Shop, Retail Store Name, etc."
+                  placeholder="Enter store/outlet name"
                   value={formData.customStoreName}
                   onChange={e => setFormData({ ...formData, customStoreName: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -226,7 +226,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">PHONE NUMBER</label>
                 <input
                   type="tel"
-                  placeholder="e.g. 9876543210"
+                  placeholder="Enter 10-digit phone number"
                   value={formData.phone}
                   onChange={e => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -237,7 +237,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">ORDER ID / INVOICE NUMBER</label>
                 <input
                   type="text"
-                  placeholder="e.g. VOEUX-INV-8921"
+                  placeholder="Enter Order ID or Invoice Number"
                   value={formData.orderId}
                   onChange={e => setFormData({ ...formData, orderId: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
