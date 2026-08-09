@@ -18,7 +18,10 @@ export const PRODUCTS = [
     isBestseller: true,
     image: '/images/voeux_x80_stereo.jpg',
     gallery: [
-      '/images/voeux_x80_stereo.jpg'
+      '/images/voeux_x80_stereo.jpg',
+      '/images/voeux_x80_gallery_1.jpg',
+      '/images/voeux_x80_gallery_2.jpg',
+      '/images/voeux_x80_gallery_3.jpg'
     ],
     shortSpecs: [
       '10.1" IPS Touchscreen Display',
