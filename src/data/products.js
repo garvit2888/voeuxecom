@@ -1,7 +1,7 @@
 export const CATEGORIES = [
   { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 2, description: '4K QLED Touchscreen stereos with Wireless CarPlay & 32-Band DSP', image: '/images/android_player_1.png' },
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: 'High-fidelity car soundbars, coaxial speakers & subwoofers', image: '/images/soundbar_1.png' },
-  { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: 'Mono Class AB Analog Amplifier Boards for subwoofers & basstubes', image: '/images/voeux_amp_board.png' },
+  { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: 'Mono Class AB Analog Amplifier Boards for subwoofers & basstubes', image: '/images/voeux_amp_board.jpg' },
 ];
 
 export const PRODUCTS = [
@@ -112,9 +112,9 @@ export const PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: true,
-    image: '/images/voeux_amp_board.png',
+    image: '/images/voeux_amp_board.jpg',
     gallery: [
-      '/images/voeux_amp_board.png'
+      '/images/voeux_amp_board.jpg'
     ],
     shortSpecs: ['150W RMS Mono Output', 'Class AB Analog Circuit', 'Bass Crossover Control', '12V 25A Fuse Protected'],
     fullSpecs: {

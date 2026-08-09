@@ -33,7 +33,7 @@ export const Hero = () => {
       subtitle: 'For Basstubes, Subwoofers & Speakers',
       tagline: '150W RMS • Mono Class AB Circuit • Bass Crossover Control • 25A Fuse Protection',
       badge: 'Audio Power Drop',
-      image: '/images/voeux_amp_board.png',
+      image: '/images/voeux_amp_board.jpg',
       ctaText: 'Shop Car Amplifiers',
       actionPage: 'amplifiers',
       featuredProduct: PRODUCTS[2]
