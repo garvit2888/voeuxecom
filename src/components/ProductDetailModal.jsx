@@ -12,9 +12,11 @@ import {
   RefreshCw,
   Tag,
   ChevronRight,
+  ChevronLeft,
   Sparkles,
   MessageSquare,
-  ThumbsUp
+  ThumbsUp,
+  ZoomIn
 } from 'lucide-react';
 
 export const ProductDetailModal = () => {
@@ -28,15 +30,14 @@ export const ProductDetailModal = () => {
   if (!selectedProductModal) return null;
 
   const product = selectedProductModal;
-  const [selectedImg, setSelectedImg] = useState(product.gallery[0] || product.image);
-  const [activeTab, setActiveTab] = useState('specs');
+  const [selectedImg, setSelectedImg] = useState(product.image);
   const [is360Mode, setIs360Mode] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
-
   const [checkMake, setCheckMake] = useState('Hyundai');
   const [checkModel, setCheckModel] = useState('Creta');
   const [checkYear, setCheckYear] = useState('2022');
-
+  const [activeTab, setActiveTab] = useState('specs');
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
   const availableModels = CAR_MODELS.find(c => c.make === checkMake)?.models || [];
 
   const handleDrag360 = (e) => {
@@ -76,19 +77,33 @@ export const ProductDetailModal = () => {
           {/* Left Column: Image Gallery, 360 Spin & Trust Badges */}
           <div className="lg:col-span-6 space-y-5">
             
-            {/* Image Box */}
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center shadow-inner group">
+            {/* Image Box - Seamless Fitted Design */}
+            <div
+              onClick={() => !is360Mode && setIsZoomOpen(true)}
+              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center group shadow-md cursor-pointer"
+            >
               
               {/* 360 Spin Viewer Toggle Pill */}
               <button
-                onClick={() => setIs360Mode(!is360Mode)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIs360Mode(!is360Mode);
+                }}
                 className={`absolute top-3 left-3 z-10 text-[11px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition shadow-sm ${
-                  is360Mode ? 'bg-[#3B429F] text-white shadow-indigo-900/40' : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100'
+                  is360Mode ? 'bg-[#3B429F] text-white shadow-indigo-900/40' : 'bg-slate-900/80 text-white border border-slate-700 hover:bg-slate-800'
                 }`}
               >
                 <RotateCw className={`w-3.5 h-3.5 ${is360Mode ? 'animate-spin' : ''}`} />
                 <span>{is360Mode ? '360° Drag Mode Active' : '360° Interactive Spin'}</span>
               </button>
+
+              {/* Zoom Pill Indicator */}
+              {!is360Mode && (
+                <div className="absolute bottom-2 right-2 z-10 bg-slate-900/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-slate-700 backdrop-blur-sm shadow-sm group-hover:scale-105 transition">
+                  <ZoomIn className="w-3 h-3 text-cyan-400" />
+                  <span>Click to Zoom</span>
+                </div>
+              )}
 
               {/* Badge Tag */}
               {product.badge && (
@@ -106,14 +121,14 @@ export const ProductDetailModal = () => {
                     src={selectedImg}
                     alt={product.name}
                     style={{ transform: `rotateY(${rotationAngle}deg)` }}
-                    className="w-full h-full object-contain p-2"
+                    className="w-full h-full object-cover"
                   />
-                  <p className="absolute bottom-2 text-[10px] text-gray-600 bg-white/90 px-3 py-1 rounded-full border border-gray-200 shadow-sm font-semibold">
+                  <p className="absolute bottom-2 text-[10px] text-white bg-slate-900/90 px-3 py-1 rounded-full border border-slate-700 shadow-sm font-semibold">
                     ← Drag left or right to rotate →
                   </p>
                 </div>
               ) : (
-                <img src={selectedImg} alt={product.name} className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" />
+                <img src={selectedImg} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               )}
             </div>
 
@@ -304,6 +319,93 @@ export const ProductDetailModal = () => {
         </div>
 
       </div>
+
+      {/* High-Resolution Zoom Lightbox Modal */}
+      {isZoomOpen && (
+        <div
+          onClick={() => setIsZoomOpen(false)}
+          className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-4 sm:p-8 animate-in fade-in duration-200 select-none"
+        >
+          {/* Top Bar with Title & Close Button */}
+          <div className="w-full flex items-center justify-between z-10 text-white pb-4 border-b border-gray-800">
+            <div>
+              <h3 className="font-bold text-sm sm:text-base text-white">{product.name}</h3>
+              <p className="text-xs text-gray-400">High-Resolution Zoomed View</p>
+            </div>
+
+            <button
+              onClick={() => setIsZoomOpen(false)}
+              className="p-2.5 rounded-full bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 transition"
+              aria-label="Close Zoom View"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Center Main Zoomed Image Container */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex-1 w-full max-w-5xl flex items-center justify-center py-4"
+          >
+            <img
+              src={selectedImg}
+              alt={product.name}
+              className="max-h-[75vh] max-w-full object-contain rounded-2xl shadow-2xl transition-all duration-300"
+            />
+
+            {/* Prev & Next Controls if Gallery has multiple items */}
+            {product.gallery.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const currentIdx = product.gallery.indexOf(selectedImg);
+                    const prevIdx = (currentIdx - 1 + product.gallery.length) % product.gallery.length;
+                    setSelectedImg(product.gallery[prevIdx]);
+                  }}
+                  className="absolute left-2 sm:left-6 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800 text-white border border-gray-700 transition flex items-center justify-center shadow-xl"
+                  aria-label="Previous Image"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const currentIdx = product.gallery.indexOf(selectedImg);
+                    const nextIdx = (currentIdx + 1) % product.gallery.length;
+                    setSelectedImg(product.gallery[nextIdx]);
+                  }}
+                  className="absolute right-2 sm:right-6 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800 text-white border border-gray-700 transition flex items-center justify-center shadow-xl"
+                  aria-label="Next Image"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Bottom Gallery Thumbnails */}
+          {product.gallery.length > 1 && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-3 overflow-x-auto pt-4 max-w-full"
+            >
+              {product.gallery.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImg(img)}
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition shrink-0 ${
+                    selectedImg === img ? 'border-cyan-400 shadow-lg ring-2 ring-cyan-400/40' : 'border-gray-800 opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
