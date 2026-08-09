@@ -66,8 +66,7 @@ const MainContent = () => {
             <section className="container mx-auto px-4">
               <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
                 <div>
-                  <span className="badge-minimal">Product Lines</span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mt-1">Shop by Category</h2>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">Shop by Category</h2>
                 </div>
               </div>
 
@@ -101,8 +100,7 @@ const MainContent = () => {
             <section className="container mx-auto px-4">
               <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
                 <div>
-                  <span className="badge-minimal">Flagships</span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mt-1">Best Selling Electronics</h2>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">Best Selling Electronics</h2>
                 </div>
                 <button onClick={() => setActivePage('android-players')} className="btn-secondary text-xs flex items-center gap-1">
                   View All <ArrowRight className="w-3.5 h-3.5" />
@@ -149,7 +147,6 @@ const MainContent = () => {
             <section className="container mx-auto px-4">
               <div className="text-center max-w-xl mx-auto space-y-1 mb-8">
                 <h2 className="text-xl font-bold text-gray-900">Verified Customer Reviews</h2>
-                <p className="text-xs text-gray-500">Real verified buyer feedback directly from Flipkart.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">

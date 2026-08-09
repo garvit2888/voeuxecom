@@ -82,17 +82,10 @@ export const Hero = () => {
             <div className="pt-2 flex items-center gap-2">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-extrabold py-2.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition shadow-md"
+                className="w-full sm:w-auto bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-extrabold py-2.5 px-4 rounded-lg flex items-center justify-center gap-1.5 transition shadow-md"
               >
                 <span>{slide.ctaText}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                onClick={() => setActivePage(slide.actionPage)}
-                className="bg-slate-800 hover:bg-slate-700 text-gray-200 text-xs font-semibold py-2.5 px-3 rounded-lg border border-slate-700 transition"
-              >
-                View Category
               </button>
             </div>
           </div>
@@ -150,13 +143,6 @@ export const Hero = () => {
               >
                 <span>{slide.ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => setActivePage(slide.actionPage)}
-                className="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-3 rounded-xl border border-white/20 transition"
-              >
-                View All in Category
               </button>
             </div>
           </div>
