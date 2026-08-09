@@ -109,8 +109,8 @@ export const Hero = () => {
         </div>
 
 
-        {/* ========== DESKTOP LAYOUT (Full-bleed Hero Banner with Side Arrows) ========== */}
-        <div className="hidden md:flex relative rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[500px] items-center p-10 lg:p-12 border border-slate-800 shadow-2xl">
+        {/* ========== DESKTOP LAYOUT (Wall-to-Wall Full-Bleed Hero Canvas) ========== */}
+        <div className="hidden md:flex relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white items-center p-12 lg:p-20 -mx-4 -mt-4 md:-mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
           
           {/* Background Image - Clean Containment across all slides */}
           <div

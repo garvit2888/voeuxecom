@@ -37,13 +37,6 @@ export const SplashScreen = () => {
             className="w-56 sm:w-72 md:w-80 h-auto object-contain drop-shadow-lg transition-transform duration-700 transform scale-100 hover:scale-105"
           />
         </div>
-        
-        {/* Subtle white pulsing loader dots */}
-        <div className="flex items-center space-x-2 pt-2">
-          <div className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-        </div>
       </div>
     </div>
   );
