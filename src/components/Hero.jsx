@@ -53,56 +53,59 @@ export const Hero = () => {
     <section className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 py-4 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Clean Vertical Stack - Image 100% Clear on Top, Text Below) ========== */}
-        <div className="md:hidden bg-slate-950 rounded-2xl overflow-hidden shadow-xl border border-slate-800 p-4 space-y-4 text-left">
+        {/* ========== MOBILE LAYOUT (Full Phone Screen Hero Canvas) ========== */}
+        <div className="md:hidden relative min-h-[calc(100vh-80px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden">
           
-          {/* Top Product Image Box - Crystal Clear Background */}
-          <div className="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center justify-center h-60 sm:h-72 w-full overflow-hidden shadow-inner">
+          {/* Top Half: Product Image Viewport */}
+          <div className="relative flex-1 flex items-center justify-center py-4 w-full max-h-[46vh] overflow-hidden">
             <img
               src={slide.image}
               alt={slide.title}
-              className={`max-h-full max-w-full rounded-lg transition-all duration-500 ${currentSlide === 0 ? 'w-full h-full object-cover object-[center_75%]' : 'object-contain'}`}
+              className={`w-full h-full max-h-[40vh] transition-all duration-700 ${
+                currentSlide === 0 ? 'object-cover object-[center_75%]' : 'object-contain'
+              }`}
             />
           </div>
 
-          {/* Bottom Compact Text & CTA Section */}
-          <div className="space-y-2 text-white">
-            <span className="text-[10px] font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/90 border border-indigo-500/40 px-2.5 py-0.5 rounded-full inline-block">
+          {/* Bottom Half: Category Badge, Bold Title, Specs & Full Width CTA */}
+          <div className="relative z-10 space-y-3 pt-2 pb-2 text-left border-t border-slate-800/80">
+            <span className="text-[10px] font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/90 border border-indigo-500/40 px-3 py-1 rounded-full inline-block">
               FEATURED CATEGORY • {slide.badge}
             </span>
 
-            <h2 className="text-base font-black tracking-tight leading-snug">
+            <h1 className="text-xl font-black tracking-tight leading-snug text-white">
               {slide.title}
-            </h2>
+            </h1>
 
             <p className="text-xs text-gray-300 font-medium leading-relaxed">
               {slide.tagline}
             </p>
 
-            <div className="pt-2 flex items-center gap-2">
+            <div className="pt-2">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="w-full sm:w-auto bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-extrabold py-2.5 px-4 rounded-lg flex items-center justify-center gap-1.5 transition shadow-md"
+                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
               >
                 <span>{slide.ctaText}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
+            </div>
+
+            {/* Slide Dots Indicator for Mobile */}
+            <div className="flex items-center justify-center space-x-2 pt-2">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
+                  }`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Slide Dots Indicator for Mobile */}
-          <div className="flex items-center justify-center space-x-1.5 pt-1">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-6 bg-cyan-400' : 'w-1.5 bg-slate-700'
-                }`}
-              />
-            ))}
-          </div>
         </div>
 
 
