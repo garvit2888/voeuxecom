@@ -69,16 +69,21 @@ export const PRODUCTS = [
     id: 'voeux-160w-separable-soundbar',
     name: 'VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer',
     category: 'speakers-soundbars',
-    price: 9999,
+    price: 5149,
     originalPrice: 14999,
     flipkartUrl: 'https://www.flipkart.com/voeux-soundbar-subwoofer-160w-2-1-ch-separable-sound-bars-tv-bluetooth-160-w/p/itm4294462c83a41?pid=ACCHPUQGNGPGWXYW&lid=LSTACCHPUQGNGPGWXYWCRCL40&marketplace=FLIPKART&q=voeux+soundbar&store=0pm%2F0o7&srno=s_1_2&otracker=search&otracker1=search&fm=Search&iid=cef8a751-169c-4bb9-9ebe-de31bdff0e3e.ACCHPUQGNGPGWXYW.SEARCH&ppt=sp&ppn=sp&ssid=fuo1nr9shc0000001786092907106&qH=d13a7ab8b9861c45&ov_redirect=true&ov_redirect=true',
     badge: '2-in-1 Convertible',
     isNew: true,
     isTrending: true,
     isBestseller: true,
-    image: '/images/voeux_separable_soundbar.png',
+    image: '/images/voeux_soundbar_main.png',
     gallery: [
-      '/images/voeux_separable_soundbar.png'
+      '/images/voeux_soundbar_main.png',
+      '/images/voeux_separable_soundbar.png',
+      '/images/voeux_soundbar_gallery_1.jpg',
+      '/images/voeux_soundbar_gallery_2.png',
+      '/images/voeux_soundbar_gallery_3.png',
+      '/images/voeux_soundbar_gallery_4.png'
     ],
     shortSpecs: ['160W Peak Power', '2-in-1 Separable Design', '2.1 CH Subwoofer', 'Bluetooth 5.0 & HDMI ARC'],
     fullSpecs: {

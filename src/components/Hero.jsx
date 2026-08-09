@@ -23,7 +23,7 @@ export const Hero = () => {
       subtitle: 'Convertible Dual Tower & Horizontal Soundbar',
       tagline: '160W RMS • 2.1 CH Subwoofer • Bluetooth 5.0 • 3D Sound & HDMI ARC',
       badge: 'Home & Auto Audio',
-      image: '/images/voeux_separable_soundbar.png',
+      image: '/images/voeux_soundbar_main.png',
       ctaText: 'Shop 160W Soundbar',
       actionPage: 'speakers-soundbars',
       featuredProduct: PRODUCTS[1]
