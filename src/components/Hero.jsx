@@ -57,11 +57,11 @@ export const Hero = () => {
         <div className="md:hidden bg-slate-950 rounded-2xl overflow-hidden shadow-xl border border-slate-800 p-4 space-y-4 text-left">
           
           {/* Top Product Image Box - Crystal Clear Background */}
-          <div className="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center justify-center h-52 sm:h-60 w-full overflow-hidden shadow-inner">
+          <div className="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center justify-center h-60 sm:h-72 w-full overflow-hidden shadow-inner">
             <img
               src={slide.image}
               alt={slide.title}
-              className={`max-h-full max-w-full rounded-lg transition-all duration-500 ${currentSlide === 0 ? 'w-full h-full object-cover' : 'object-contain'}`}
+              className={`max-h-full max-w-full rounded-lg transition-all duration-500 ${currentSlide === 0 ? 'w-full h-full object-cover object-[center_75%]' : 'object-contain'}`}
             />
           </div>
 
@@ -114,20 +114,20 @@ export const Hero = () => {
 
 
         {/* ========== DESKTOP LAYOUT (Full-bleed Hero Banner with Side Arrows) ========== */}
-        <div className="hidden md:flex relative rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[480px] items-center p-10 lg:p-12 border border-slate-800 shadow-2xl">
+        <div className="hidden md:flex relative rounded-3xl overflow-hidden bg-slate-950 text-white min-h-[500px] items-center p-10 lg:p-12 border border-slate-800 shadow-2xl">
           
           {/* Zoomed Background Image */}
           <div
             className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
             style={{
               backgroundImage: `url(${slide.image})`,
-              backgroundPosition: currentSlide === 0 ? 'right center' : 'right 15% center',
-              backgroundSize: 'cover'
+              backgroundPosition: currentSlide === 0 ? 'right 2% center' : 'right 15% center',
+              backgroundSize: currentSlide === 0 ? 'contain' : 'cover'
             }}
           ></div>
 
           {/* Smooth Dark Gradient Overlay for Clean Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent max-w-xl"></div>
 
           {/* Left Text Content */}
           <div className="relative z-10 max-w-xl space-y-4 text-left">
