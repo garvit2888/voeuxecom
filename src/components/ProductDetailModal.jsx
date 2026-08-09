@@ -3,28 +3,23 @@ import { useShop } from '../context/ShopContext';
 import { CAR_MODELS } from '../data/products';
 import {
   X,
-  Star,
-  ShoppingCart,
   ShieldCheck,
   CheckCircle,
   RotateCw,
   Truck,
   RefreshCw,
-  Tag,
   ChevronRight,
   ChevronLeft,
-  Sparkles,
+  ChevronDown,
   MessageSquare,
-  ThumbsUp,
-  ZoomIn
+  ZoomIn,
+  HelpCircle
 } from 'lucide-react';
 
 export const ProductDetailModal = () => {
   const {
     selectedProductModal,
-    setSelectedProductModal,
-    addToCart,
-    setIsCartOpen
+    setSelectedProductModal
   } = useShop();
 
   if (!selectedProductModal) return null;
@@ -36,8 +31,23 @@ export const ProductDetailModal = () => {
   const [checkMake, setCheckMake] = useState('Hyundai');
   const [checkModel, setCheckModel] = useState('Creta');
   const [checkYear, setCheckYear] = useState('2022');
-  const [activeTab, setActiveTab] = useState('specs');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  const [openAccordions, setOpenAccordions] = useState({
+    description: true,
+    features: true,
+    specs: false
+  });
+
+  const [openFaqs, setOpenFaqs] = useState({});
+
+  const toggleAccordion = (key) => {
+    setOpenAccordions(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const toggleFaq = (idx) => {
+    setOpenFaqs(prev => ({ ...prev, [idx]: !prev[idx] }));
+  };
   const availableModels = CAR_MODELS.find(c => c.make === checkMake)?.models || [];
 
   const handleDrag360 = (e) => {
@@ -168,91 +178,59 @@ export const ProductDetailModal = () => {
 
           </div>
 
-          {/* Right Column: Noise Product Info, Pricing & Buy Section */}
+          {/* Right Column: Clean Noise Product Info & Pricing */}
           <div className="lg:col-span-6 space-y-5 text-left">
             
-            {/* Title & Reviews */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3B429F] bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
+            {/* Title & Short Specs */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3B429F]">
                 OFFICIAL VOEUX® PRODUCT
               </span>
               
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900 leading-snug">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug">
                 {product.name}
               </h1>
 
-              <div className="flex items-center gap-3 pt-1">
-                <div className="bg-emerald-600 text-white text-xs font-black px-2 py-0.5 rounded flex items-center gap-1">
-                  <span>{product.rating}</span>
-                  <Star className="w-3 h-3 fill-current" />
-                </div>
-                <span className="text-xs font-semibold text-gray-600">
-                  {product.reviewsCount} Verified Buyer Reviews
-                </span>
-              </div>
+              <p className="text-xs text-gray-600 font-medium pt-0.5">
+                {product.shortSpecs.join(' • ')}
+              </p>
             </div>
 
-            {/* Noise Price Box */}
-            <div className="bg-slate-900 text-white p-4 rounded-2xl space-y-1 shadow-md">
+            {/* Noise Price Row */}
+            <div className="space-y-1.5 py-3 border-y border-gray-200">
               <div className="flex items-baseline gap-3">
-                <span className="text-2xl sm:text-3xl font-black text-white">
+                <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                   ₹{product.price.toLocaleString('en-IN')}
                 </span>
                 <span className="text-sm text-gray-400 line-through">
                   ₹{product.originalPrice.toLocaleString('en-IN')}
                 </span>
-                <span className="bg-emerald-500 text-black text-xs font-extrabold px-2 py-0.5 rounded">
-                  {discountPercent}% OFF
+                <span className="text-xs font-bold text-emerald-600">
+                  {discountPercent}% off
                 </span>
               </div>
-              <p className="text-[10px] text-gray-400">Inclusive of all taxes • Instant Dispatch</p>
-            </div>
+              <p className="text-[10px] text-gray-500 font-medium">(MRP Inclusive of all taxes)</p>
 
-
-
-            {/* Exclusive Offers Box */}
-            <div className="bg-gray-50 border border-gray-200 p-3.5 rounded-xl space-y-1 text-xs text-gray-800">
-              <div className="font-bold text-gray-900">Exclusive Offers</div>
-              <div className="space-y-0.5 text-[11px] font-medium text-gray-700">
-                <p>For WhatsApp Orders use code <strong className="text-gray-900 bg-gray-200 px-1.5 py-0.5 rounded font-mono">VOEUX10</strong> for extra discount on all Car Electronics</p>
-                <p>Extra 5% off on all Prepaid UPI</p>
-              </div>
-            </div>
-
-            {/* Specs Quick Pills */}
-            <div className="flex flex-wrap gap-2 text-[11px]">
-              {product.shortSpecs.map((spec, i) => (
-                <span key={i} className="bg-gray-100 text-gray-800 font-semibold px-2.5 py-1 rounded-lg border border-gray-200 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-[#3B429F]" /> {spec}
-                </span>
-              ))}
-            </div>
-
-            {/* Vehicle Compatibility Checker */}
-            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-2 text-xs">
-              <p className="font-bold text-gray-900">Check Vehicle Fitment:</p>
-              <div className="grid grid-cols-3 gap-2">
-                <select value={checkMake} onChange={e => setCheckMake(e.target.value)} className="bg-white border rounded-lg p-2 text-xs font-semibold">
-                  {CAR_MODELS.map(c => <option key={c.make} value={c.make}>{c.make}</option>)}
-                </select>
-                <select value={checkModel} onChange={e => setCheckModel(e.target.value)} className="bg-white border rounded-lg p-2 text-xs font-semibold">
-                  {availableModels.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-                <input type="text" value={checkYear} onChange={e => setCheckYear(e.target.value)} className="bg-white border rounded-lg p-2 text-xs font-semibold" />
-              </div>
-              <div className="text-emerald-800 bg-emerald-50 p-2 rounded-lg border border-emerald-200 flex items-center gap-1.5 font-bold text-[11px]">
-                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Guaranteed Fitment for {checkMake} {checkModel} ({checkYear})</span>
+              {/* Clean Offer Lines */}
+              <div className="pt-2 text-xs space-y-1 font-medium text-gray-700">
+                <p className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>For WhatsApp Orders use code <strong className="font-mono font-bold text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">VOEUX10</strong> for extra discount on all Car Electronics</span>
+                </p>
+                <p className="flex items-center gap-2 text-gray-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                  <span>Extra 5% off on all Prepaid UPI</span>
+                </p>
               </div>
             </div>
 
             {/* Primary Action Buttons */}
-            <div className="space-y-2.5 pt-2">
+            <div className="space-y-2.5 pt-1">
               <button
                 onClick={() => {
                   window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
                 }}
-                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-blue-600/20"
+                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
               >
                 <span className="bg-yellow-400 text-[#2874F0] font-black text-xs px-2 py-0.5 rounded italic leading-none shadow-sm">f</span>
                 <span>BUY NOW ON FLIPKART</span>
@@ -270,52 +248,111 @@ export const ProductDetailModal = () => {
               </button>
             </div>
 
+            {/* Noise Accordions */}
+            <div className="pt-2 border-t border-gray-200 divide-y divide-gray-200">
+              
+              {/* Description */}
+              <div className="py-3">
+                <button
+                  onClick={() => toggleAccordion('description')}
+                  className="w-full flex items-center justify-between font-bold text-xs text-gray-900 text-left cursor-pointer"
+                >
+                  <span>Description</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openAccordions.description ? 'rotate-180' : ''}`} />
+                </button>
+                {openAccordions.description && (
+                  <div className="pt-2 text-xs text-gray-600 leading-relaxed font-medium">
+                    {product.description}
+                  </div>
+                )}
+              </div>
+
+              {/* Key Features */}
+              <div className="py-3">
+                <button
+                  onClick={() => toggleAccordion('features')}
+                  className="w-full flex items-center justify-between font-bold text-xs text-gray-900 text-left cursor-pointer"
+                >
+                  <span>Key Features</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openAccordions.features ? 'rotate-180' : ''}`} />
+                </button>
+                {openAccordions.features && (
+                  <ul className="pt-2 space-y-1.5 text-xs text-gray-700 font-medium">
+                    {product.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#3B429F] mt-1.5 shrink-0"></span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Specifications */}
+              <div className="py-3">
+                <button
+                  onClick={() => toggleAccordion('specs')}
+                  className="w-full flex items-center justify-between font-bold text-xs text-gray-900 text-left cursor-pointer"
+                >
+                  <span>Specifications</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openAccordions.specs ? 'rotate-180' : ''}`} />
+                </button>
+                {openAccordions.specs && (
+                  <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {Object.entries(product.fullSpecs).map(([k, v]) => (
+                      <div key={k} className="py-1 border-b border-gray-100 flex justify-between gap-3">
+                        <span className="text-gray-500 font-medium">{k}</span>
+                        <span className="font-semibold text-gray-900 text-right">{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+
           </div>
 
         </div>
 
-        {/* Detailed Noise Tabs Section Below */}
-        <div className="border-t border-gray-200 bg-gray-50 p-4 sm:p-8 space-y-6 text-xs text-left">
-          
-          {/* Tab Navigation Buttons */}
-          <div className="flex border-b border-gray-200 gap-6 font-bold">
-            <button
-              onClick={() => setActiveTab('specs')}
-              className={`pb-2.5 border-b-2 transition ${activeTab === 'specs' ? 'border-[#3B429F] text-[#3B429F]' : 'border-transparent text-gray-500'}`}
-            >
-              Technical Specifications
-            </button>
-            <button
-              onClick={() => setActiveTab('features')}
-              className={`pb-2.5 border-b-2 transition ${activeTab === 'features' ? 'border-[#3B429F] text-[#3B429F]' : 'border-transparent text-gray-500'}`}
-            >
-              Key Features
-            </button>
+        {/* FAQs Dropdown Section in Modal */}
+        <div className="border-t border-gray-200 bg-gray-50 p-4 sm:p-6 space-y-4 text-xs text-left">
+          <h3 className="font-extrabold text-sm text-gray-900">Frequently Asked Questions</h3>
+
+          <div className="divide-y divide-gray-200 border-y border-gray-200">
+            {[
+              {
+                q: 'How do I register for the 1-Year Warranty?',
+                a: 'Click "Register Warranty" in the menu, enter your Order ID, purchase date and email to receive your official Warranty Certificate.'
+              },
+              {
+                q: 'Is this product compatible with my car model?',
+                a: 'Designed with Double DIN universal fitment standards for Maruti, Hyundai, Tata, Kia, Mahindra, Honda, Toyota and other major cars.'
+              },
+              {
+                q: 'What is included in the box?',
+                a: 'Includes VOEUX hardware unit, plug-and-play harness, GPS Antenna, AHD Rear View Camera, and warranty documents.'
+              }
+            ].map((faq, idx) => (
+              <div key={idx} className="py-3">
+                <button
+                  onClick={() => toggleFaq(idx)}
+                  className="w-full flex items-center justify-between font-bold text-xs text-gray-900 text-left cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <HelpCircle className="w-3.5 h-3.5 text-[#3B429F] shrink-0" />
+                    <span>{faq.q}</span>
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${openFaqs[idx] ? 'rotate-180' : ''}`} />
+                </button>
+                {openFaqs[idx] && (
+                  <p className="pt-2 pl-5 text-[11px] text-gray-600 font-medium leading-relaxed">
+                    {faq.a}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
-
-          {/* Tab Content Panels */}
-          {activeTab === 'specs' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {Object.entries(product.fullSpecs).map(([k, v]) => (
-                <div key={k} className="bg-white p-3 rounded-xl border border-gray-200 flex justify-between gap-4">
-                  <span className="font-bold text-gray-500 uppercase text-[10px]">{k}</span>
-                  <span className="font-semibold text-gray-900 text-right">{v}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'features' && (
-            <ul className="space-y-2 bg-white p-5 rounded-2xl border border-gray-200">
-              {product.features.map((f, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-gray-700">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
         </div>
 
       </div>

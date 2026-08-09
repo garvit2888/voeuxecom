@@ -78,6 +78,13 @@ export const ShopProvider = ({ children }) => {
     };
   }, []);
 
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_recently_viewed');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) { return []; }
+  });
+
   const setSelectedProductModal = (product) => {
     const current = productsList.find(p => p.id === product?.id) || product;
     _setSelectedProductModal(current);
@@ -85,6 +92,14 @@ export const ShopProvider = ({ children }) => {
       _setActivePageState('product-detail');
       window.history.pushState({ page: 'product-detail', productId: product.id }, '', `#product-detail?id=${product.id}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Add to recently viewed list
+      setRecentlyViewed(prev => {
+        const filtered = (prev || []).filter(p => p && p.id !== product.id);
+        const updated = [current, ...filtered].slice(0, 6);
+        try { localStorage.setItem('voeux_recently_viewed', JSON.stringify(updated)); } catch(e){}
+        return updated;
+      });
     }
   };
   const [cart, setCart] = useState([]);
@@ -197,6 +212,7 @@ export const ShopProvider = ({ children }) => {
         setActivePage,
         selectedProductModal,
         setSelectedProductModal,
+        recentlyViewed,
         productsList,
         cart,
         addToCart,

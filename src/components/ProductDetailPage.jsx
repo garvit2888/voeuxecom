@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
+import { ProductCard } from './ProductCard';
 import {
-  Star,
-  ShoppingCart,
   ShieldCheck,
   RotateCw,
   Truck,
   RefreshCw,
-  Tag,
   ChevronRight,
   ChevronLeft,
-  Sparkles,
-  ThumbsUp,
-  CheckCircle,
-  ArrowLeft,
+  ChevronDown,
   MessageSquare,
   ZoomIn,
-  X
+  X,
+  HelpCircle
 } from 'lucide-react';
 
 export const ProductDetailPage = () => {
   const {
     selectedProductModal,
     setActivePage,
-    addToCart,
-    setIsCartOpen
+    recentlyViewed,
+    productsList
   } = useShop();
 
   const product = selectedProductModal;
@@ -32,8 +28,25 @@ export const ProductDetailPage = () => {
   const [selectedImg, setSelectedImg] = useState(product?.image || '');
   const [is360Mode, setIs360Mode] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
-  const [activeTab, setActiveTab] = useState('specs');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  // Accordion state for Description, Key Features & Specifications
+  const [openAccordions, setOpenAccordions] = useState({
+    description: true,
+    features: true,
+    specs: false
+  });
+
+  // Accordion state for FAQs
+  const [openFaqs, setOpenFaqs] = useState({});
+
+  const toggleAccordion = (key) => {
+    setOpenAccordions(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const toggleFaq = (idx) => {
+    setOpenFaqs(prev => ({ ...prev, [idx]: !prev[idx] }));
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -190,45 +203,55 @@ export const ProductDetailPage = () => {
 
           </div>
 
-          {/* Right Column: Title, Noise Pricing, Offers & Buy Action */}
+          {/* Right Column: Clean Noise-Inspired Info & Pricing */}
           <div className="lg:col-span-6 space-y-6 text-left">
             
-            {/* Category & Title */}
-            <div className="space-y-2">
-              <span className="badge-minimal">OFFICIAL VOEUX® FLAGSHIP</span>
-              
-              <h1 className="text-2xl sm:text-4xl font-black text-gray-900 leading-tight">
+            {/* Title & Short Specs */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-gray-500 tracking-wider uppercase">OFFICIAL VOEUX® STORE</span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
                 {product.name}
               </h1>
+              <p className="text-xs text-gray-600 font-medium leading-relaxed">
+                {product.shortSpecs.join(' • ')}
+              </p>
             </div>
 
+            {/* Noise Pricing & Offer Row */}
+            <div className="space-y-2 py-4 border-y border-gray-200">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-extrabold text-gray-900">
+                  ₹{product.price.toLocaleString('en-IN')}
+                </span>
+                <span className="text-base text-gray-400 line-through">
+                  ₹{product.originalPrice.toLocaleString('en-IN')}
+                </span>
+                <span className="text-xs font-bold text-emerald-600">
+                  {discountPercent}% off
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-500 font-medium">(MRP Inclusive of all taxes)</p>
 
-
-            {/* Exclusive Offers Box */}
-            <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 text-xs text-gray-800">
-              <div className="font-bold text-gray-900">Exclusive Offers</div>
-              <div className="space-y-1 text-xs font-medium text-gray-700">
-                <p>For WhatsApp Orders use code <strong className="text-gray-900 bg-gray-200 px-2 py-0.5 rounded font-mono">VOEUX10</strong> for extra discount on all Car Electronics</p>
-                <p>Extra 5% off on all Prepaid UPI</p>
+              {/* Clean Offer Lines */}
+              <div className="pt-2 text-xs space-y-1 font-medium text-gray-700">
+                <p className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>For WhatsApp Orders use code <strong className="font-mono font-bold text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">VOEUX10</strong> for extra discount on all Car Electronics</span>
+                </p>
+                <p className="flex items-center gap-2 text-gray-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                  <span>Extra 5% off on all Prepaid UPI</span>
+                </p>
               </div>
             </div>
 
-            {/* Short Specs Quick Pills */}
-            <div className="flex flex-wrap gap-2 text-xs">
-              {product.shortSpecs.map((spec, i) => (
-                <span key={i} className="bg-gray-100 text-gray-800 font-semibold px-3 py-1.5 rounded-lg border border-gray-200 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#3B429F]" /> {spec}
-                </span>
-              ))}
-            </div>
-
-            {/* Flipkart Buy Action & WhatsApp Query */}
-            <div className="pt-2 space-y-3">
+            {/* Action Buttons */}
+            <div className="space-y-2.5 pt-1">
               <button
                 onClick={() => {
                   window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
                 }}
-                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-sm sm:text-base font-extrabold py-4 rounded-xl transition flex items-center justify-center gap-2.5 shadow-lg shadow-blue-600/20"
+                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
               >
                 <span className="bg-yellow-400 text-[#2874F0] font-black text-xs px-2 py-0.5 rounded italic leading-none shadow-sm">f</span>
                 <span>BUY NOW ON FLIPKART</span>
@@ -239,60 +262,142 @@ export const ProductDetailPage = () => {
                   const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
                   window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
                 }}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-md"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
               >
                 <MessageSquare className="w-4 h-4" />
                 <span>Send Query on WhatsApp</span>
               </button>
             </div>
 
+            {/* Noise-Style Accordions (Description, Key Features, Specifications) */}
+            <div className="pt-4 border-t border-gray-200 divide-y divide-gray-200">
+              
+              {/* Description Accordion */}
+              <div className="py-4">
+                <button
+                  onClick={() => toggleAccordion('description')}
+                  className="w-full flex items-center justify-between font-bold text-sm text-gray-900 text-left cursor-pointer"
+                >
+                  <span>Description</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openAccordions.description ? 'rotate-180' : ''}`} />
+                </button>
+                {openAccordions.description && (
+                  <div className="pt-3 text-xs text-gray-600 leading-relaxed font-medium">
+                    {product.description}
+                  </div>
+                )}
+              </div>
+
+              {/* Key Features Accordion */}
+              <div className="py-4">
+                <button
+                  onClick={() => toggleAccordion('features')}
+                  className="w-full flex items-center justify-between font-bold text-sm text-gray-900 text-left cursor-pointer"
+                >
+                  <span>Key Features</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openAccordions.features ? 'rotate-180' : ''}`} />
+                </button>
+                {openAccordions.features && (
+                  <ul className="pt-3 space-y-2 text-xs text-gray-700 font-medium">
+                    {product.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#3B429F] mt-1.5 shrink-0"></span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Specifications Accordion */}
+              <div className="py-4">
+                <button
+                  onClick={() => toggleAccordion('specs')}
+                  className="w-full flex items-center justify-between font-bold text-sm text-gray-900 text-left cursor-pointer"
+                >
+                  <span>Specifications</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openAccordions.specs ? 'rotate-180' : ''}`} />
+                </button>
+                {openAccordions.specs && (
+                  <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {Object.entries(product.fullSpecs).map(([k, v]) => (
+                      <div key={k} className="py-1.5 border-b border-gray-100 flex justify-between gap-3">
+                        <span className="text-gray-500 font-medium">{k}</span>
+                        <span className="font-semibold text-gray-900 text-right">{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+
           </div>
 
         </div>
 
-        {/* Detailed Full-Width Tabs Section */}
-        <div className="border-t border-gray-200 pt-10 space-y-8 text-xs text-left">
-          
-          {/* Tab Navigation */}
-          <div className="flex border-b border-gray-200 gap-8 font-bold text-sm">
-            <button
-              onClick={() => setActiveTab('specs')}
-              className={`pb-3 border-b-2 transition ${activeTab === 'specs' ? 'border-[#3B429F] text-[#3B429F]' : 'border-transparent text-gray-500'}`}
-            >
-              Technical Specifications
-            </button>
-            <button
-              onClick={() => setActiveTab('features')}
-              className={`pb-3 border-b-2 transition ${activeTab === 'features' ? 'border-[#3B429F] text-[#3B429F]' : 'border-transparent text-gray-500'}`}
-            >
-              Key Features
-            </button>
+        {/* FAQs Dropdown Section */}
+        <div className="border-t border-gray-200 pt-12 text-left space-y-6">
+          <div>
+            <span className="text-[10px] font-bold tracking-widest text-[#3B429F] uppercase">Help & Support</span>
+            <h2 className="text-2xl font-extrabold text-gray-900 mt-0.5">Frequently Asked Questions</h2>
           </div>
 
-          {/* Tab Content Panels */}
-          {activeTab === 'specs' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {Object.entries(product.fullSpecs).map(([k, v]) => (
-                <div key={k} className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center gap-4">
-                  <span className="font-bold text-gray-500 uppercase text-xs">{k}</span>
-                  <span className="font-semibold text-gray-900 text-right">{v}</span>
-                </div>
+          <div className="divide-y divide-gray-200 border-y border-gray-200">
+            {[
+              {
+                q: 'How do I register for the 1-Year Official Warranty?',
+                a: 'You can register your warranty in under 60 seconds! Click on "Register Warranty" in the main menu, enter your Certificate ID or Order ID, select your purchase date and email. We will generate your official Warranty Certificate and send it directly to your email.'
+              },
+              {
+                q: 'Is this product compatible with my car model?',
+                a: 'VOEUX Android Players and Car Amplifiers are designed with Double DIN universal fitment standards. They fit standard dashboard slots for Maruti, Hyundai, Tata, Kia, Mahindra, Honda, Toyota and other major car manufacturers across India.'
+              },
+              {
+                q: 'What is included in the box?',
+                a: 'Each product package includes the main VOEUX hardware unit, complete plug-and-play wiring harness, GPS Antenna (for Android players), AHD Rear View Night-Vision Camera, mounting accessories, and warranty documentation.'
+              },
+              {
+                q: 'How do shipping, delivery and replacement work?',
+                a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+              }
+            ].map((faq, idx) => (
+              <div key={idx} className="py-4">
+                <button
+                  onClick={() => toggleFaq(idx)}
+                  className="w-full flex items-center justify-between font-bold text-sm text-gray-900 text-left cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <HelpCircle className="w-4 h-4 text-[#3B429F] shrink-0" />
+                    <span>{faq.q}</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openFaqs[idx] ? 'rotate-180' : ''}`} />
+                </button>
+                {openFaqs[idx] && (
+                  <p className="pt-2 pl-6 text-xs text-gray-600 font-medium leading-relaxed">
+                    {faq.a}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recently Viewed Products Section */}
+        {recentlyViewed && recentlyViewed.filter(p => p && p.id !== product.id).length > 0 && (
+          <div className="border-t border-gray-200 pt-12 text-left space-y-6">
+            <div>
+              <span className="text-[10px] font-bold tracking-widest text-[#3B429F] uppercase">Browsing History</span>
+              <h2 className="text-2xl font-extrabold text-gray-900 mt-0.5">Recently Viewed Products</h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {recentlyViewed.filter(p => p && p.id !== product.id).slice(0, 4).map(p => (
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
-          )}
-
-          {activeTab === 'features' && (
-            <ul className="space-y-3 bg-gray-50 p-6 rounded-2xl border border-gray-200 text-xs">
-              {product.features.map((f, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-gray-800 font-medium">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="leading-relaxed">{f}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-        </div>
+          </div>
+        )}
 
       </div>
 
