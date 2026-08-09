@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ChevronLeft,
   ChevronDown,
+  ArrowLeft,
   MessageSquare,
   ZoomIn,
   X,
