@@ -345,7 +345,28 @@ export const ProductDetailPage = () => {
           </div>
 
           <div className="divide-y divide-gray-200 border-y border-gray-200">
-            {[
+            {(product.category === 'speakers-soundbars' ? [
+              {
+                q: 'How do I register for the 1-Year Official Warranty?',
+                a: 'You can register your warranty in under 60 seconds! Click on "Register Warranty" in the main menu, enter your Certificate ID or Order ID, select your purchase date and email. We will generate your official Warranty Certificate and send it directly to your email.'
+              },
+              {
+                q: 'How do I connect the Soundbar to my TV, phone, or home audio system?',
+                a: 'The VOEUX 160W Soundbar supports multiple connectivity modes: Bluetooth 5.0 wireless, HDMI ARC (for seamless TV remote control), Optical Audio, Coaxial, 3.5mm AUX, and USB media playback.'
+              },
+              {
+                q: 'Can I use this as twin vertical tower speakers?',
+                a: 'Yes! Features an innovative 2-in-1 separable design. You can use it as a single horizontal soundbar mounted under your TV, or separate it into twin vertical tower speakers with the included stand bases.'
+              },
+              {
+                q: 'What is included in the box package?',
+                a: 'Package includes 1 VOEUX 160W Convertible Soundbar unit, 1 Dedicated Bass Subwoofer, 1 Wireless Remote Control, 2 Tower Stand Bases, Power Cable, AUX Cable, and 1-Year Warranty Card.'
+              },
+              {
+                q: 'How do shipping, delivery and replacement work?',
+                a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+              }
+            ] : [
               {
                 q: 'How do I register for the 1-Year Official Warranty?',
                 a: 'You can register your warranty in under 60 seconds! Click on "Register Warranty" in the main menu, enter your Certificate ID or Order ID, select your purchase date and email. We will generate your official Warranty Certificate and send it directly to your email.'
@@ -362,7 +383,7 @@ export const ProductDetailPage = () => {
                 q: 'How do shipping, delivery and replacement work?',
                 a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
               }
-            ].map((faq, idx) => (
+            ]).map((faq, idx) => (
               <div key={idx} className="py-4">
                 <button
                   onClick={() => toggleFaq(idx)}

@@ -320,7 +320,24 @@ export const ProductDetailModal = () => {
           <h3 className="font-extrabold text-sm text-gray-900">Frequently Asked Questions</h3>
 
           <div className="divide-y divide-gray-200 border-y border-gray-200">
-            {[
+            {(product.category === 'speakers-soundbars' ? [
+              {
+                q: 'How do I register for the 1-Year Warranty?',
+                a: 'Click "Register Warranty" in the menu, enter your Order ID, purchase date and email to receive your official Warranty Certificate.'
+              },
+              {
+                q: 'How do I connect the Soundbar to my TV or phone?',
+                a: 'Supports Bluetooth 5.0 wireless, HDMI ARC (for TV remote control), Optical Audio, AUX, and USB media playback.'
+              },
+              {
+                q: 'Can I use this as twin vertical tower speakers?',
+                a: 'Yes! Features a 2-in-1 separable design for horizontal soundbar or dual vertical tower speaker setup.'
+              },
+              {
+                q: 'What is included in the box?',
+                a: 'Includes VOEUX 160W Convertible Soundbar unit, Subwoofer, Remote Control, 2 Tower Bases, and cables.'
+              }
+            ] : [
               {
                 q: 'How do I register for the 1-Year Warranty?',
                 a: 'Click "Register Warranty" in the menu, enter your Order ID, purchase date and email to receive your official Warranty Certificate.'
@@ -333,7 +350,7 @@ export const ProductDetailModal = () => {
                 q: 'What is included in the box?',
                 a: 'Includes VOEUX hardware unit, plug-and-play harness, GPS Antenna, AHD Rear View Camera, and warranty documents.'
               }
-            ].map((faq, idx) => (
+            ]).map((faq, idx) => (
               <div key={idx} className="py-3">
                 <button
                   onClick={() => toggleFaq(idx)}
