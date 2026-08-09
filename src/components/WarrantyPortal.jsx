@@ -121,7 +121,7 @@ export const WarrantyPortal = () => {
               <label className="text-gray-900 font-bold block">CUSTOMER NAME *</label>
               <input
                 type="text"
-                placeholder="Enter customer full name"
+                placeholder="Enter your full name"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -134,7 +134,7 @@ export const WarrantyPortal = () => {
               <label className="text-gray-900 font-bold block">CUSTOMER EMAIL ADDRESS *</label>
               <input
                 type="email"
-                placeholder="Enter customer email address"
+                placeholder="Enter your email address"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -211,7 +211,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">PLEASE TYPE STORE / OUTLET NAME *</label>
                 <input
                   type="text"
-                  placeholder="Enter store/outlet name"
+                  placeholder="Enter store name"
                   value={formData.customStoreName}
                   onChange={e => setFormData({ ...formData, customStoreName: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -226,7 +226,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">PHONE NUMBER</label>
                 <input
                   type="tel"
-                  placeholder="Enter 10-digit phone number"
+                  placeholder="Enter 10-digit mobile number"
                   value={formData.phone}
                   onChange={e => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -237,7 +237,7 @@ export const WarrantyPortal = () => {
                 <label className="text-gray-900 font-bold block">ORDER ID / INVOICE NUMBER</label>
                 <input
                   type="text"
-                  placeholder="Enter Order ID or Invoice Number"
+                  placeholder="Enter order or invoice number"
                   value={formData.orderId}
                   onChange={e => setFormData({ ...formData, orderId: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
