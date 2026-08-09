@@ -13,7 +13,7 @@ export const Hero = () => {
       subtitle: '4GB RAM + 64GB ROM • Dual Rotary Knobs',
       tagline: '4GB RAM + 64GB ROM • Dual Metallic Knobs • Wireless CarPlay & Android Auto',
       badge: 'Flagship Launch 2026',
-      image: '/images/voeux_x80_stereo.jpg',
+      image: '/images/voeux_x80_hero_bg.jpg',
       ctaText: 'Explore X80 Stereo',
       actionPage: 'android-players',
       featuredProduct: PRODUCTS[0]
@@ -35,7 +35,7 @@ export const Hero = () => {
       badge: 'Audio Power Drop',
       image: '/images/voeux_amp_board.png',
       ctaText: 'Shop Car Amplifiers',
-      actionPage: 'speakers-soundbars',
+      actionPage: 'amplifiers',
       featuredProduct: PRODUCTS[2]
     }
   ];
@@ -56,12 +56,12 @@ export const Hero = () => {
         {/* ========== MOBILE LAYOUT (Clean Vertical Stack - Image 100% Clear on Top, Text Below) ========== */}
         <div className="md:hidden bg-slate-950 rounded-2xl overflow-hidden shadow-xl border border-slate-800 p-4 space-y-4 text-left">
           
-          {/* Top Product Image Box - Crystal Clear White Background */}
-          <div className="bg-white p-4 rounded-xl border border-gray-200 flex items-center justify-center h-48 sm:h-56 w-full shadow-inner">
+          {/* Top Product Image Box - Crystal Clear Background */}
+          <div className="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center justify-center h-52 sm:h-60 w-full overflow-hidden shadow-inner">
             <img
               src={slide.image}
               alt={slide.title}
-              className="max-h-full max-w-full object-contain drop-shadow-md transition-all duration-500"
+              className={`max-h-full max-w-full rounded-lg transition-all duration-500 ${currentSlide === 0 ? 'w-full h-full object-cover' : 'object-contain'}`}
             />
           </div>
 
@@ -118,16 +118,16 @@ export const Hero = () => {
           
           {/* Zoomed Background Image */}
           <div
-            className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-90"
+            className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
             style={{
               backgroundImage: `url(${slide.image})`,
-              backgroundPosition: 'right 15% center',
+              backgroundPosition: currentSlide === 0 ? 'right center' : 'right 15% center',
               backgroundSize: 'cover'
             }}
           ></div>
 
           {/* Smooth Dark Gradient Overlay for Clean Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
 
           {/* Left Text Content */}
           <div className="relative z-10 max-w-xl space-y-4 text-left">
