@@ -34,7 +34,7 @@ export const SplashScreen = () => {
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX®"
-            className="w-56 sm:w-72 md:w-80 h-auto object-contain drop-shadow-lg transition-transform duration-700 transform scale-100 hover:scale-105"
+            className="w-32 sm:w-40 md:w-48 h-auto object-contain drop-shadow-md transition-transform duration-700 transform scale-100 hover:scale-105"
           />
         </div>
       </div>
