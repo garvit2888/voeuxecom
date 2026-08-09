@@ -87,10 +87,10 @@ export const ProductDetailModal = () => {
           {/* Left Column: Image Gallery, 360 Spin & Trust Badges */}
           <div className="lg:col-span-6 space-y-5">
             
-            {/* Image Box - Seamless Fitted Design */}
+            {/* Image Box - Borderless Pure Fitted Design */}
             <div
               onClick={() => !is360Mode && setIsZoomOpen(true)}
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center group shadow-md cursor-pointer"
+              className="relative aspect-[4/3] rounded-2xl overflow-hidden flex items-center justify-center group cursor-pointer"
             >
               
               {/* 360 Spin Viewer Toggle Pill */}
@@ -100,7 +100,7 @@ export const ProductDetailModal = () => {
                   setIs360Mode(!is360Mode);
                 }}
                 className={`absolute top-3 left-3 z-10 text-[11px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition shadow-sm ${
-                  is360Mode ? 'bg-[#3B429F] text-white shadow-indigo-900/40' : 'bg-slate-900/80 text-white border border-slate-700 hover:bg-slate-800'
+                  is360Mode ? 'bg-[#3B429F] text-white shadow-indigo-900/40' : 'bg-white/95 text-gray-800 border border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 <RotateCw className={`w-3.5 h-3.5 ${is360Mode ? 'animate-spin' : ''}`} />
@@ -109,15 +109,15 @@ export const ProductDetailModal = () => {
 
               {/* Zoom Pill Indicator */}
               {!is360Mode && (
-                <div className="absolute bottom-2 right-2 z-10 bg-slate-900/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-slate-700 backdrop-blur-sm shadow-sm group-hover:scale-105 transition">
-                  <ZoomIn className="w-3 h-3 text-cyan-400" />
+                <div className="absolute bottom-2 right-2 z-10 bg-white/95 text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-gray-200 backdrop-blur-sm shadow-sm group-hover:scale-105 transition">
+                  <ZoomIn className="w-3 h-3 text-[#3B429F]" />
                   <span>Click to Zoom</span>
                 </div>
               )}
 
               {/* Badge Tag */}
               {product.badge && (
-                <span className="absolute top-3 right-3 z-10 bg-slate-900 text-yellow-400 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider border border-yellow-400/30">
+                <span className="absolute top-3 right-3 z-10 bg-[#3B429F] text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider shadow-sm">
                   {product.badge}
                 </span>
               )}
@@ -131,14 +131,14 @@ export const ProductDetailModal = () => {
                     src={selectedImg}
                     alt={product.name}
                     style={{ transform: `rotateY(${rotationAngle}deg)` }}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
-                  <p className="absolute bottom-2 text-[10px] text-white bg-slate-900/90 px-3 py-1 rounded-full border border-slate-700 shadow-sm font-semibold">
+                  <p className="absolute bottom-2 text-[10px] text-gray-800 bg-white/95 px-3 py-1 rounded-full border border-gray-200 shadow-sm font-semibold">
                     ← Drag left or right to rotate →
                   </p>
                 </div>
               ) : (
-                <img src={selectedImg} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <img src={selectedImg} alt={product.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
               )}
             </div>
 
