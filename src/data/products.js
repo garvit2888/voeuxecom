@@ -1,6 +1,7 @@
 export const CATEGORIES = [
-  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 12, description: '4K QLED Touchscreen stereos with Wireless CarPlay & 32-Band DSP', image: '/images/android_player_1.png' },
-  { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 8, description: 'High-fidelity car soundbars, coaxial speakers & subwoofers', image: '/images/soundbar_1.png' },
+  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 2, description: '4K QLED Touchscreen stereos with Wireless CarPlay & 32-Band DSP', image: '/images/android_player_1.png' },
+  { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: 'High-fidelity car soundbars, coaxial speakers & subwoofers', image: '/images/soundbar_1.png' },
+  { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: 'Mono Class AB Analog Amplifier Boards for subwoofers & basstubes', image: '/images/voeux_amp_board.png' },
 ];
 
 export const PRODUCTS = [
@@ -100,7 +101,7 @@ export const PRODUCTS = [
   {
     id: 'voeux-150w-amp-board',
     name: 'VOEUX® AMP Board 150W Mono Class AB Car Amplifier',
-    category: 'speakers-soundbars',
+    category: 'amplifiers',
     price: 2499,
     originalPrice: 3999,
     flipkartUrl: 'https://www.flipkart.com/voeux-amp-board-150w-mono-class-ab-car-amplifier-basstube-speakers/p/itmebeda47843344?pid=CREHH5Z4QNUBCBYY&lid=LSTCREHH5Z4QNUBCBYYVWXX3I&marketplace=FLIPKART&q=voeux+amp&store=search.flipkart.com&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=952cf111-113b-4923-b85b-0dddc068340d.CREHH5Z4QNUBCBYY.SEARCH&ppt=sp&ppn=sp&ssid=41o15klz8w0000001786093003243&qH=0e7be7efc0526a5b&ov_redirect=true&ov_redirect=true',

@@ -12,7 +12,8 @@ import {
   Sparkles,
   ThumbsUp,
   CheckCircle,
-  ArrowLeft
+  ArrowLeft,
+  MessageSquare
 } from 'lucide-react';
 
 export const ProductDetailPage = () => {
@@ -183,6 +184,15 @@ export const ProductDetailPage = () => {
 
 
 
+            {/* Exclusive Offers Box */}
+            <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 text-xs text-gray-800">
+              <div className="font-bold text-gray-900">Exclusive Offers</div>
+              <div className="space-y-1 text-xs font-medium text-gray-700">
+                <p>For WhatsApp Orders use code <strong className="text-gray-900 bg-gray-200 px-2 py-0.5 rounded font-mono">VOEUX10</strong> for extra discount on all Car Electronics</p>
+                <p>Extra 5% off on all Prepaid UPI</p>
+              </div>
+            </div>
+
             {/* Short Specs Quick Pills */}
             <div className="flex flex-wrap gap-2 text-xs">
               {product.shortSpecs.map((spec, i) => (
@@ -192,8 +202,8 @@ export const ProductDetailPage = () => {
               ))}
             </div>
 
-            {/* Flipkart Buy Action */}
-            <div className="pt-2">
+            {/* Flipkart Buy Action & WhatsApp Query */}
+            <div className="pt-2 space-y-3">
               <button
                 onClick={() => {
                   window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
@@ -202,6 +212,17 @@ export const ProductDetailPage = () => {
               >
                 <span className="bg-yellow-400 text-[#2874F0] font-black text-xs px-2 py-0.5 rounded italic leading-none shadow-sm">f</span>
                 <span>BUY NOW ON FLIPKART</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
+                  window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
+                }}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-md"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Send Query on WhatsApp</span>
               </button>
             </div>
 

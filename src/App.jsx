@@ -32,6 +32,8 @@ const MainContent = () => {
         return <CategoryPage categoryId="android-players" />;
       case 'speakers-soundbars':
         return <CategoryPage categoryId="speakers-soundbars" />;
+      case 'amplifiers':
+        return <CategoryPage categoryId="amplifiers" />;
       case 'whats-new':
         return <WhatsNewPage />;
       case 'about-us':
@@ -77,7 +79,9 @@ const MainContent = () => {
                     className="clean-card group p-5 cursor-pointer flex flex-col justify-between"
                   >
                     <div className="space-y-2">
-                      <span className="text-[10px] font-bold text-[#3B429F] uppercase">{cat.count} Items</span>
+                      <span className="text-[10px] font-bold text-[#3B429F] uppercase">
+                        {(productsList || PRODUCTS).filter(p => p.category === cat.id).length} { (productsList || PRODUCTS).filter(p => p.category === cat.id).length === 1 ? 'Item' : 'Items' }
+                      </span>
                       <h3 className="text-base font-bold text-gray-900 group-hover:text-[#3B429F] transition">{cat.name}</h3>
                       <p className="text-xs text-gray-500 line-clamp-2">{cat.description}</p>
                     </div>

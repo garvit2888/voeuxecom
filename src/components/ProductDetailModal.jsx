@@ -195,6 +195,15 @@ export const ProductDetailModal = () => {
 
 
 
+            {/* Exclusive Offers Box */}
+            <div className="bg-gray-50 border border-gray-200 p-3.5 rounded-xl space-y-1 text-xs text-gray-800">
+              <div className="font-bold text-gray-900">Exclusive Offers</div>
+              <div className="space-y-0.5 text-[11px] font-medium text-gray-700">
+                <p>For WhatsApp Orders use code <strong className="text-gray-900 bg-gray-200 px-1.5 py-0.5 rounded font-mono">VOEUX10</strong> for extra discount on all Car Electronics</p>
+                <p>Extra 5% off on all Prepaid UPI</p>
+              </div>
+            </div>
+
             {/* Specs Quick Pills */}
             <div className="flex flex-wrap gap-2 text-[11px]">
               {product.shortSpecs.map((spec, i) => (
@@ -223,26 +232,26 @@ export const ProductDetailModal = () => {
             </div>
 
             {/* Primary Action Buttons */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="space-y-2.5 pt-2">
               <button
                 onClick={() => {
-                  addToCart(product);
-                  setIsCartOpen(true);
+                  window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
                 }}
-                className="btn-secondary text-xs py-3.5 font-bold flex items-center justify-center gap-2 border-gray-300"
+                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-blue-600/20"
               >
-                <ShoppingCart className="w-4 h-4" /> Add to Cart
+                <span className="bg-yellow-400 text-[#2874F0] font-black text-xs px-2 py-0.5 rounded italic leading-none shadow-sm">f</span>
+                <span>BUY NOW ON FLIPKART</span>
               </button>
 
               <button
                 onClick={() => {
-                  addToCart(product);
-                  setSelectedProductModal(null);
-                  setIsCartOpen(true);
+                  const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
+                  window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
                 }}
-                className="btn-primary text-xs py-3.5 font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/30"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
               >
-                <span>BUY NOW</span>
+                <MessageSquare className="w-4 h-4" />
+                <span>Send Query on WhatsApp</span>
               </button>
             </div>
 

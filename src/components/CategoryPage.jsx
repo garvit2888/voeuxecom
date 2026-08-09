@@ -21,14 +21,11 @@ export const CategoryPage = ({ categoryId }) => {
   const [maxPrice, setMaxPrice] = useState(30000);
   const [sortBy, setSortBy] = useState('popular');
   const [filterQuery, setFilterQuery] = useState('');
-  const [selectedMake, setSelectedMake] = useState('All');
-
   let filtered = categoryProducts.filter(p => {
     const matchesPrice = p.price <= maxPrice;
     const matchesQuery = p.name.toLowerCase().includes(filterQuery.toLowerCase()) ||
                          p.shortSpecs.some(s => s.toLowerCase().includes(filterQuery.toLowerCase()));
-    const matchesMake = selectedMake === 'All' || p.compatibility.some(c => c.toLowerCase().includes(selectedMake.toLowerCase()));
-    return matchesPrice && matchesQuery && matchesMake;
+    return matchesPrice && matchesQuery;
   });
 
   if (sortBy === 'price-low') {
@@ -66,20 +63,7 @@ export const CategoryPage = ({ categoryId }) => {
 
 
 
-        {/* Car Make Filter */}
-        <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-          <span className="text-gray-600 font-medium">Make:</span>
-          <select
-            value={selectedMake}
-            onChange={e => setSelectedMake(e.target.value)}
-            className="bg-transparent text-gray-900 focus:outline-none cursor-pointer"
-          >
-            <option value="All">All Makes</option>
-            {CAR_MODELS.map(c => (
-              <option key={c.make} value={c.make}>{c.make}</option>
-            ))}
-          </select>
-        </div>
+
 
         {/* Sort */}
         <div className="flex items-center space-x-2">

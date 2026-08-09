@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { Star, ShoppingCart, Heart, Scale, Eye, Check } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Scale, Eye, Check, MessageSquare } from 'lucide-react';
 
 export const ProductCard = ({ product }) => {
   if (!product) return null;
@@ -56,8 +56,8 @@ export const ProductCard = ({ product }) => {
           </h3>
         </div>
 
-        {/* Flipkart Buy Action */}
-        <div className="pt-3 border-t border-gray-100">
+        {/* Flipkart Buy Action & WhatsApp Query */}
+        <div className="pt-3 border-t border-gray-100 space-y-2">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -67,6 +67,18 @@ export const ProductCard = ({ product }) => {
           >
             <span className="bg-yellow-400 text-[#2874F0] font-black text-[11px] px-1.5 py-0.5 rounded italic leading-none shadow-sm">f</span>
             <span>BUY NOW ON FLIPKART</span>
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
+              window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
+            }}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5 shadow-sm"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Send Query on WhatsApp</span>
           </button>
         </div>
       </div>
