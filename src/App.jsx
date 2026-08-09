@@ -18,9 +18,9 @@ import { CartDrawer } from './components/CartDrawer';
 import { CarSelectorModal } from './components/CarSelectorModal';
 import { LiveChatWidget } from './components/LiveChatWidget';
 import { Footer } from './components/Footer';
+import { SplashScreen } from './components/SplashScreen';
 import { PRODUCTS, CATEGORIES } from './data/products';
 import { ArrowRight, Star, ShieldCheck, Zap, Wrench } from 'lucide-react';
-
 import { WarrantyPolicyPage } from './components/WarrantyPolicyPage';
 
 const MainContent = () => {
@@ -241,7 +241,9 @@ const MainContent = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col justify-between">
-      
+      {/* Brand Splash Screen on Initial Load */}
+      <SplashScreen />
+
       {/* Toast Notification */}
       <div className="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-xs pointer-events-none">
         {toasts.map(toast => (
