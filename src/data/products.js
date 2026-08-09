@@ -76,10 +76,9 @@ export const PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: true,
-    image: '/images/voeux_soundbar_main.png',
+    image: '/images/voeux_soundbar_main.jpg',
     gallery: [
-      '/images/voeux_soundbar_main.png',
-      '/images/voeux_separable_soundbar.png',
+      '/images/voeux_soundbar_main.jpg',
       '/images/voeux_soundbar_gallery_1.jpg',
       '/images/voeux_soundbar_gallery_2.png',
       '/images/voeux_soundbar_gallery_3.png',
