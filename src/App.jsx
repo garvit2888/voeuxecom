@@ -160,7 +160,7 @@ const MainContent = () => {
                     title: 'Perfect product!',
                     review: 'Awesome 👍',
                     rating: 4.5,
-                    date: '4 months ago',
+                    timestamp: '2026-04-09T00:00:00Z',
                     verifiedBadge: 'Flipkart Verified Buyer'
                   },
                   {
@@ -169,7 +169,7 @@ const MainContent = () => {
                     title: 'Classy product',
                     review: 'Nice parrot bass super hard ♥️♥️♥️',
                     rating: 5,
-                    date: '14 days ago',
+                    timestamp: '2026-07-26T00:00:00Z',
                     verifiedBadge: 'Flipkart Verified Buyer'
                   },
                   {
@@ -178,19 +178,35 @@ const MainContent = () => {
                     title: 'Terrific purchase',
                     review: 'Best product in this prices, amazing and touch with...',
                     rating: 5,
-                    date: '5 months ago',
+                    timestamp: '2026-03-09T00:00:00Z',
                     verifiedBadge: 'Flipkart Verified Buyer'
                   }
-                ].map((rev, i) => (
-                  <div key={i} className="clean-card p-5 space-y-3 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="bg-yellow-100 text-yellow-900 font-extrabold text-[10px] px-2 py-0.5 rounded flex items-center gap-1 border border-yellow-300/60">
-                          <span className="bg-yellow-400 text-[#2874F0] font-black text-[9px] px-1 rounded italic leading-none">f</span>
-                          {rev.verifiedBadge}
-                        </span>
-                        <span className="text-[10px] text-gray-400 font-medium">{rev.date}</span>
-                      </div>
+                ].map((rev, i) => {
+                  const getRelativeTimeAgo = (isoDateStr) => {
+                    const date = new Date(isoDateStr);
+                    const now = new Date();
+                    const diffInMs = Math.max(0, now - date);
+
+                    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+                    const diffInMonths = Math.floor(diffInDays / 30);
+                    const diffInYears = Math.floor(diffInDays / 365);
+
+                    if (diffInYears >= 1) return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
+                    if (diffInMonths >= 1) return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
+                    if (diffInDays >= 1) return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
+                    return 'today';
+                  };
+
+                  return (
+                    <div key={i} className="clean-card p-5 space-y-3 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="bg-yellow-100 text-yellow-900 font-extrabold text-[10px] px-2 py-0.5 rounded flex items-center gap-1 border border-yellow-300/60">
+                            <span className="bg-yellow-400 text-[#2874F0] font-black text-[9px] px-1 rounded italic leading-none">f</span>
+                            {rev.verifiedBadge}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-medium">{getRelativeTimeAgo(rev.timestamp)}</span>
+                        </div>
 
                       <div>
                         <span className="text-[10px] text-[#3B429F] font-bold block uppercase">{rev.product}</span>
@@ -216,7 +232,8 @@ const MainContent = () => {
                       </span>
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
             </section>
 
