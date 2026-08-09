@@ -25,16 +25,16 @@ export const SplashScreen = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] bg-[#3F4095] flex flex-col items-center justify-center select-none transition-opacity duration-700 ease-in-out ${
+      className={`fixed inset-0 z-[99999] bg-[#3B429F] flex flex-col items-center justify-center select-none transition-opacity duration-700 ease-in-out ${
         fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
       <div className="flex flex-col items-center justify-center space-y-6">
         <div className="relative flex items-center justify-center p-4">
           <img
-            src="/images/voeux_logo_transparent.png"
+            src="/images/voeux_logo.png"
             alt="VOEUX®"
-            className="w-56 sm:w-72 md:w-80 h-auto object-contain transition-transform duration-700 transform scale-100 hover:scale-105"
+            className="w-56 sm:w-72 md:w-80 h-auto object-contain brightness-0 invert drop-shadow-xl transition-transform duration-700 transform scale-100 hover:scale-105"
           />
         </div>
         
