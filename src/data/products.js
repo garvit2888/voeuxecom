@@ -150,8 +150,8 @@ export const PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: true,
-    image: '/images/voeux_x80_piano_buttons_stereo.png',
-    gallery: ['/images/voeux_x80_piano_buttons_stereo.png'],
+    image: '/images/voeux_dual_knob_piano_stereo.jpg',
+    gallery: ['/images/voeux_dual_knob_piano_stereo.jpg'],
     shortSpecs: [
       '10.1 Inch QLED Touchscreen Display',
       'Dual Knob & Piano Buttons Design',
