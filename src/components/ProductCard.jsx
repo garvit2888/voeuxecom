@@ -25,23 +25,21 @@ export const ProductCard = ({ product }) => {
   return (
     <div className="clean-card group relative flex flex-col justify-between overflow-hidden p-4 space-y-3">
       
-      {/* Top Image Section */}
-      <div className="relative aspect-[4/3] bg-gray-50 rounded-xl overflow-hidden cursor-pointer" onClick={() => setSelectedProductModal(product)}>
+      {/* Top Image Section - Fitted Uncropped Design */}
+      <div className="relative aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden cursor-pointer flex items-center justify-center p-2" onClick={() => setSelectedProductModal(product)}>
         {/* Badges */}
         <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
           {product.badge && (
-            <span className="bg-[#3B429F] text-white text-[9px] font-bold px-2 py-0.5 rounded">
+            <span className="bg-[#3B429F] text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm">
               {product.badge}
             </span>
           )}
         </div>
 
-
-
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
