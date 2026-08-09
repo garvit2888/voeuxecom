@@ -8,14 +8,14 @@ export const LiveChatWidget = () => {
 
   return (
     <div className="fixed bottom-5 right-4 sm:right-6 z-50 flex items-center gap-2.5 sm:gap-3">
-      {/* Blue Register for Warranty Button (Left of WhatsApp) */}
+      {/* Blue Register for Warranty Button (Left of WhatsApp) - Compact Sleek Design */}
       <button
         onClick={() => setActivePage('warranty-registration')}
-        className="p-3 sm:px-4 sm:py-3 rounded-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-black text-xs shadow-blue-600/40 border border-blue-400/60 cursor-pointer"
+        className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white shadow-lg hover:scale-105 transition-all duration-300 flex items-center gap-1.5 font-bold text-[11px] sm:text-xs shadow-blue-600/30 border border-blue-400/50 cursor-pointer"
         title="Register Your Product Warranty"
       >
-        <ShieldCheck className="w-5 h-5 text-yellow-300 shrink-0" />
-        <span className="font-extrabold tracking-wide text-xs">Register Warranty</span>
+        <ShieldCheck className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+        <span className="font-bold tracking-tight">Register Warranty</span>
       </button>
 
       {/* WhatsApp Official Support Button */}
