@@ -55,15 +55,19 @@ export const Hero = () => {
       {/* ========== MOBILE LAYOUT ONLY — outside container so image fills 100% viewport width ========== */}
       <div className="md:hidden relative min-h-screen bg-slate-950 text-white pb-32">
 
-        {/* IMAGE: h-72 so full product is visible, slim gradient only at the very bottom edge */}
+        {/* IMAGE: h-72 with slim gradient overlays at both top and bottom edges */}
         <div className="relative w-full h-72 overflow-hidden">
+          {/* Top gradient fade */}
+          <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
+
           <img
             src={slide.image}
             alt={slide.title}
             className="w-full h-full object-cover object-center transition-all duration-700"
           />
-          {/* Slim gradient — only fades the very bottom edge into background */}
-          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none" />
+
+          {/* Bottom gradient fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
         {/* TEXT: mt-7 gap below image, larger text sizes to fill empty dark space elegantly */}
