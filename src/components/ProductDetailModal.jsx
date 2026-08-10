@@ -165,23 +165,7 @@ export const ProductDetailModal = () => {
           {/* Right Column: Clean Product Info & Pricing */}
           <div className="lg:col-span-6 space-y-5 text-left">
             
-            {/* Trust Features Grid (Positioned TOP above Title, Pricing & Buttons) */}
-            <div className="grid grid-cols-3 gap-3 text-center text-[11px] font-semibold text-gray-700">
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <ShieldCheck className="w-5 h-5 text-[#3B429F]" />
-                <span>1 Year Warranty*</span>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <RefreshCw className="w-5 h-5 text-emerald-600" />
-                <span>7 Days Replacement</span>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <Truck className="w-5 h-5 text-[#3B429F]" />
-                <span>Free Express Delivery</span>
-              </div>
-            </div>
-
-            {/* Title & Short Specs (Positioned BELOW Trust Badges) */}
+            {/* Title & Short Specs */}
             <div className="space-y-1">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3B429F]">
                 OFFICIAL VOEUX® PRODUCT
@@ -246,6 +230,22 @@ export const ProductDetailModal = () => {
                 <MessageSquare className="w-4 h-4" />
                 <span>Send Query on WhatsApp</span>
               </button>
+            </div>
+
+            {/* Trust Features Grid (Positioned BELOW Action Buttons) */}
+            <div className="grid grid-cols-3 gap-3 pt-2 text-center text-[11px] font-semibold text-gray-700">
+              <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
+                <ShieldCheck className="w-5 h-5 text-[#3B429F]" />
+                <span>1 Year Warranty*</span>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
+                <RefreshCw className="w-5 h-5 text-emerald-600" />
+                <span>7 Days Replacement</span>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
+                <Truck className="w-5 h-5 text-[#3B429F]" />
+                <span>Free Express Delivery</span>
+              </div>
             </div>
 
             {/* Noise Accordions */}

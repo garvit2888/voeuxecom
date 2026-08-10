@@ -191,23 +191,7 @@ export const ProductDetailPage = () => {
           {/* Right Column: Clean Product Info & Pricing */}
           <div className="lg:col-span-6 space-y-6 text-left">
             
-            {/* Minimalist Trust Features Row (Positioned TOP above Title, Pricing & Buttons) */}
-            <div className="grid grid-cols-3 gap-3 text-center text-xs font-semibold text-gray-700">
-              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <ShieldCheck className="w-5 h-5 text-[#3B429F]" />
-                <span>1 Year Warranty*</span>
-              </div>
-              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <RefreshCw className="w-5 h-5 text-emerald-600" />
-                <span>7 Days Replacement</span>
-              </div>
-              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <Truck className="w-5 h-5 text-[#3B429F]" />
-                <span>Free Express Delivery</span>
-              </div>
-            </div>
-
-            {/* Title & Short Specs (Positioned BELOW Trust Badges) */}
+            {/* Title & Short Specs */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold text-gray-500 tracking-wider uppercase">OFFICIAL VOEUX® STORE</span>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
@@ -268,6 +252,22 @@ export const ProductDetailPage = () => {
                 <MessageSquare className="w-4 h-4" />
                 <span>Send Query on WhatsApp</span>
               </button>
+            </div>
+
+            {/* Minimalist Trust Features Row (Positioned BELOW Action Buttons) */}
+            <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs font-semibold text-gray-700">
+              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
+                <ShieldCheck className="w-5 h-5 text-[#3B429F]" />
+                <span>1 Year Warranty*</span>
+              </div>
+              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
+                <RefreshCw className="w-5 h-5 text-emerald-600" />
+                <span>7 Days Replacement</span>
+              </div>
+              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
+                <Truck className="w-5 h-5 text-[#3B429F]" />
+                <span>Free Express Delivery</span>
+              </div>
             </div>
 
             {/* Noise-Style Accordions (Description, Key Features, Specifications) */}
