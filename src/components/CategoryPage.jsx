@@ -39,39 +39,41 @@ export const CategoryPage = ({ categoryId }) => {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       
-      {/* Category Header */}
-      <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 text-left">
-        <span className="badge-minimal">VOEUX® Category</span>
-        <h1 className="text-3xl font-extrabold text-gray-900 mt-1">{category.name}</h1>
-        <p className="text-xs text-gray-500 mt-1">{category.description}</p>
+      {/* Category Header (Clean Typography, No Artificial Box Container) */}
+      <div className="py-2 text-left border-b border-gray-200 pb-6">
+        <span className="text-[11px] font-extrabold tracking-widest text-[#3B429F] uppercase">
+          VOEUX® Category
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mt-1 tracking-tight">
+          {category.name}
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">
+          {category.description}
+        </p>
       </div>
 
-      {/* Filter Row */}
-      <div className="bg-white p-4 rounded-xl border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+      {/* Filter Row (Clean & Unboxed Layout) */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs py-1">
         
-        {/* Search */}
+        {/* Search Input */}
         <div className="relative flex-1 max-w-xs w-full">
           <input
             type="text"
             placeholder="Search category..."
             value={filterQuery}
             onChange={e => setFilterQuery(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg pl-8 pr-3 py-2 focus:outline-none focus:border-[#3B429F]"
+            className="w-full bg-gray-100 border border-gray-200 text-gray-900 text-xs rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#3B429F] font-medium"
           />
-          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
         </div>
 
-
-
-
-
-        {/* Sort */}
+        {/* Sort Dropdown */}
         <div className="flex items-center space-x-2">
           <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
-            className="bg-gray-50 border border-gray-200 text-gray-900 rounded-lg px-3 py-2 focus:outline-none focus:border-[#3B429F]"
+            className="bg-gray-100 border border-gray-200 text-gray-900 text-xs font-semibold rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
           >
             <option value="popular">Popularity</option>
             <option value="price-low">Price: Low to High</option>
