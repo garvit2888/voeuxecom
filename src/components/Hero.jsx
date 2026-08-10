@@ -56,17 +56,17 @@ export const Hero = () => {
         {/* ========== MOBILE LAYOUT (Full Screen 100vh Dark Slate Canvas) ========== */}
         <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-32">
           
-          {/* Top Half: Wall-to-Wall Product Photo (100% Left-to-Right Edge Coverage) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-44 sm:h-52 overflow-hidden border-b border-slate-800/80">
+          {/* Top Half: Product Photo Viewport (100% Uncropped Image, Zero Bottom Cut, Wall-to-Wall Width) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center py-2 bg-slate-900/50 border-b border-slate-800/80 overflow-hidden">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover object-center transition-all duration-700"
+              className="w-full h-auto max-h-[32vh] sm:max-h-[38vh] object-contain transition-all duration-700"
             />
           </div>
 
-          {/* Bottom Half: Title, Specs & CTA (Positioned 16px Below Image Border with ZERO Overlap) */}
-          <div className="relative z-10 mt-4 pt-1 space-y-2.5 text-left">
+          {/* Bottom Half: Title, Specs & CTA (Positioned Cleanly Below Image Viewport with ZERO Overlap) */}
+          <div className="relative z-10 mt-3 space-y-2 text-left">
             <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
