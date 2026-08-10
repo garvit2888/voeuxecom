@@ -131,18 +131,18 @@ export const Navbar = () => {
           <span className="text-[11px] font-extrabold tracking-wide uppercase">Menu</span>
         </button>
 
-        {/* Center / Right: Official VOEUX Brand Logo inside Ovalish White Border Pill */}
+        {/* Center / Right: Official VOEUX Brand Logo inside Solid White Ovalish Pill */}
         <div
           onClick={() => {
             setActivePage('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center justify-center cursor-pointer px-3.5 py-1 rounded-full border-2 border-white bg-white/10 hover:bg-white/20 transition shadow-sm"
+          className="flex items-center justify-center cursor-pointer px-4 py-1.5 rounded-full border border-white/80 bg-white shadow-md hover:bg-gray-100 transition"
         >
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-5 w-auto object-contain brightness-0 invert"
+            className="h-5 w-auto object-contain"
           />
         </div>
       </div>

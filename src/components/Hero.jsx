@@ -53,23 +53,23 @@ export const Hero = () => {
     <section className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 py-4 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Compact Top Hero Canvas) ========== */}
-        <div className="md:hidden relative bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden space-y-2">
+        {/* ========== MOBILE LAYOUT (Full Phone Screen Edge-to-Edge Hero Canvas) ========== */}
+        <div className="md:hidden relative min-h-[calc(100vh-60px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden">
           
-          {/* Top Half: Product Image Viewport */}
-          <div className="relative flex items-center justify-center pt-2 pb-1 w-full h-56 sm:h-64 overflow-hidden">
+          {/* Top Half: Product Image Viewport (Stretches Full Screen Width from Left Edge to Right Edge) */}
+          <div className="relative w-full flex-1 flex items-center justify-center -mx-5 px-0 py-4 max-h-[48vh] overflow-hidden bg-slate-900/60 border-b border-slate-800/80">
             <img
               src={slide.image}
               alt={slide.title}
-              className={`w-full h-full max-h-52 transition-all duration-700 ${
-                currentSlide === 0 ? 'object-cover object-[center_75%]' : 'object-contain'
+              className={`w-full h-full max-h-[44vh] transition-all duration-700 ${
+                currentSlide === 0 ? 'object-cover object-[center_75%]' : 'object-contain px-2'
               }`}
             />
           </div>
 
-          {/* Bottom Half: Bold Title, Specs & Full Width CTA Right Below Image */}
-          <div className="relative z-10 space-y-2.5 pt-1 pb-1 text-left border-t border-slate-800/80">
-            <h1 className="text-lg font-black tracking-tight leading-snug text-white">
+          {/* Bottom Half: Title, Specs & Full Width CTA Covering Mobile Viewport */}
+          <div className="relative z-10 space-y-3 pt-3 pb-3 text-left">
+            <h1 className="text-xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
 
@@ -77,10 +77,10 @@ export const Hero = () => {
               {slide.tagline}
             </p>
 
-            <div className="pt-1">
+            <div className="pt-2">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
+                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
               >
                 <span>{slide.ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -88,7 +88,7 @@ export const Hero = () => {
             </div>
 
             {/* Slide Dots Indicator for Mobile */}
-            <div className="flex items-center justify-center space-x-2 pt-1 pb-1">
+            <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
               {slides.map((_, idx) => (
                 <button
                   key={idx}
