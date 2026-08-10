@@ -67,12 +67,8 @@ export const Hero = () => {
             />
           </div>
 
-          {/* Bottom Half: Category Badge, Bold Title, Specs & Full Width CTA */}
+          {/* Bottom Half: Bold Title, Specs & Full Width CTA */}
           <div className="relative z-10 space-y-3 pt-2 pb-2 text-left border-t border-slate-800/80">
-            <span className="text-[10px] font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/90 border border-indigo-500/40 px-3 py-1 rounded-full inline-block">
-              FEATURED CATEGORY • {slide.badge}
-            </span>
-
             <h1 className="text-xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
@@ -127,10 +123,6 @@ export const Hero = () => {
 
           {/* Left Text Content */}
           <div className="relative z-10 max-w-xl space-y-4 text-left">
-            <span className="text-xs font-extrabold tracking-widest text-indigo-400 uppercase bg-indigo-950/80 border border-indigo-500/40 px-3.5 py-1 rounded-full inline-block">
-              FEATURED CATEGORY • {slide.badge}
-            </span>
-
             <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
               {slide.title}
             </h1>
