@@ -66,28 +66,28 @@ export const Hero = () => {
           <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none" />
         </div>
 
-        {/* TEXT: mt-6 gap below image */}
-        <div className="px-5 mt-6 space-y-2.5">
-          <h1 className="text-xl font-black tracking-tight leading-snug text-white">
+        {/* TEXT: mt-7 gap below image, larger text sizes to fill empty dark space elegantly */}
+        <div className="px-5 mt-7 space-y-4 text-left">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
             {slide.title}
           </h1>
 
-          <p className="text-xs text-gray-300 font-medium leading-relaxed">
+          <p className="text-sm text-gray-300 font-medium leading-relaxed">
             {slide.tagline}
           </p>
 
-          <div className="pt-1.5">
+          <div className="pt-2">
             <button
               onClick={() => setSelectedProductModal(slide.featuredProduct)}
-              className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+              className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-sm font-extrabold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
             >
               <span>{slide.ctaText}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4.5 h-4.5" />
             </button>
           </div>
 
           {/* Slide Dots */}
-          <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
+          <div className="flex items-center justify-center space-x-2 pt-3 pb-1">
             {slides.map((_, idx) => (
               <button
                 key={idx}
