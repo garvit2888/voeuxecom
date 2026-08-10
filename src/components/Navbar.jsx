@@ -124,14 +124,14 @@ export const Navbar = () => {
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="flex items-center gap-1.5 text-white hover:text-cyan-300 font-bold text-xs p-1 cursor-pointer"
+          className="flex items-center gap-2 text-white hover:text-cyan-300 font-black text-sm p-1 cursor-pointer"
           aria-label="Toggle Mobile Menu"
         >
-          {isMobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
-          <span className="text-[11px] font-extrabold tracking-wide uppercase">Menu</span>
+          {isMobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+          <span className="text-xs sm:text-sm font-black tracking-wider uppercase">Menu</span>
         </button>
 
-        {/* Center / Right: Official Crisp VOEUX Brand Logo */}
+        {/* Center / Right: Official Uploaded VOEUX Brand Logo Image (Bigger Size) */}
         <div
           onClick={() => {
             setActivePage('home');
@@ -139,9 +139,11 @@ export const Navbar = () => {
           }}
           className="flex items-center justify-center cursor-pointer p-1"
         >
-          <span className="text-white font-black tracking-[0.2em] text-sm sm:text-base uppercase flex items-center gap-0.5 font-sans">
-            VOEUX<span className="text-cyan-300 text-[10px] font-bold">®</span>
-          </span>
+          <img
+            src="/images/voeux_logo.png"
+            alt="VOEUX® Logo"
+            className="h-8 sm:h-9 w-auto object-contain brightness-0 invert drop-shadow-md"
+          />
         </div>
       </div>
 
