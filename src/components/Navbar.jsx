@@ -120,7 +120,7 @@ export const Navbar = () => {
       </header>
 
       {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR (FES Coffee Style) ==================== */}
-      <div className="lg:hidden fixed bottom-10 left-3 right-3 z-[90] max-w-md mx-auto bg-[#3B429F] text-white rounded-full px-5 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
+      <div className="lg:hidden fixed bottom-10 left-5 right-5 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
