@@ -55,19 +55,19 @@ export const Hero = () => {
       {/* ========== MOBILE LAYOUT ONLY — outside container so image fills 100% viewport width ========== */}
       <div className="md:hidden relative min-h-screen bg-slate-950 text-white pb-32">
 
-        {/* IMAGE: full viewport width with slim gradient at very bottom edge */}
-        <div className="relative w-full h-56 overflow-hidden">
+        {/* IMAGE: h-72 so full product is visible, slim gradient only at the very bottom edge */}
+        <div className="relative w-full h-72 overflow-hidden">
           <img
             src={slide.image}
             alt={slide.title}
             className="w-full h-full object-cover object-center transition-all duration-700"
           />
-          {/* Slim gradient — only fades bottom edge, does not block the product */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none" />
+          {/* Slim gradient — only fades the very bottom edge into background */}
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none" />
         </div>
 
-        {/* TEXT: mt-10 gap below image — clearly below, never overlapping */}
-        <div className="px-5 mt-10 space-y-2.5">
+        {/* TEXT: mt-6 gap below image */}
+        <div className="px-5 mt-6 space-y-2.5">
           <h1 className="text-xl font-black tracking-tight leading-snug text-white">
             {slide.title}
           </h1>
