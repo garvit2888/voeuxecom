@@ -142,7 +142,8 @@ export const Navbar = () => {
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-8 sm:h-9 w-auto object-contain brightness-0 invert drop-shadow-md"
+            className="h-8 sm:h-9 w-auto object-contain drop-shadow-md"
+            style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
           />
         </div>
       </div>

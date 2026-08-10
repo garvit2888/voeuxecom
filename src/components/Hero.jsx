@@ -71,11 +71,9 @@ export const Hero = () => {
               {slide.title}
             </h1>
 
-            <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800/80 backdrop-blur-sm">
-              <p className="text-xs text-indigo-200 font-semibold leading-relaxed">
-                {slide.tagline}
-              </p>
-            </div>
+            <p className="text-xs text-gray-300 font-medium leading-relaxed">
+              {slide.tagline}
+            </p>
 
             <div className="pt-1">
               <button
