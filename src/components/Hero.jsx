@@ -54,19 +54,19 @@ export const Hero = () => {
       <div className="container mx-auto px-4 py-4 md:py-10">
 
         {/* ========== MOBILE LAYOUT (Full Phone Screen Edge-to-Edge Hero Canvas) ========== */}
-        <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-28">
+        <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden space-y-2 pb-24">
           
-          {/* Top Half: Product Image Viewport (Stretches 100% Wall-to-Wall Left to Right across ALL slides) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-56 sm:h-64 overflow-hidden">
+          {/* Top Half: Product Image Viewport (100% Uncut Image Spanning Wall-to-Wall Left to Right with Zero Bottom Crop) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center pt-1 pb-1 overflow-hidden">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover object-center transition-all duration-700"
+              className="w-full max-h-[36vh] sm:max-h-[42vh] object-contain transition-all duration-700"
             />
           </div>
 
-          {/* Bottom Half: Title, Specs & Full Width CTA Directly Below Image with Minimal Gap */}
-          <div className="relative z-10 space-y-2 pt-1 text-left">
+          {/* Bottom Half: Title, Specs & Full Width CTA Directly Below Image with Minimal Distance */}
+          <div className="relative z-10 space-y-1.5 pt-0.5 text-left">
             <h1 className="text-lg font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
@@ -75,7 +75,7 @@ export const Hero = () => {
               {slide.tagline}
             </p>
 
-            <div className="pt-1.5">
+            <div className="pt-1">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
                 className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
@@ -86,7 +86,7 @@ export const Hero = () => {
             </div>
 
             {/* Slide Dots Indicator for Mobile */}
-            <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
+            <div className="flex items-center justify-center space-x-2 pt-1.5 pb-0.5">
               {slides.map((_, idx) => (
                 <button
                   key={idx}
