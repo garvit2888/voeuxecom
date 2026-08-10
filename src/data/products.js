@@ -1,5 +1,5 @@
 export const CATEGORIES = [
-  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 2, description: 'HD QLED Touchscreen Stereos with Wireless CarPlay & Android Auto', image: '/images/android_player_1.png' },
+  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 3, description: 'HD QLED Touchscreen Stereos with Wireless CarPlay & Android Auto', image: '/images/android_player_1.png' },
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: 'High-fidelity car soundbars, coaxial speakers & subwoofers', image: '/images/soundbar_1.png' },
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: 'Mono Class AB Analog Amplifier Boards for subwoofers & basstubes', image: '/images/voeux_amp_board.jpg' },
 ];
@@ -201,6 +201,65 @@ export const PRODUCTS = [
     reviews: [],
     launchDate: '2026-08-05',
     stock: 25
+  },
+  {
+    id: 'voeux-carbon-black-ts7-4-64',
+    name: 'Voeux Android 4+64GB, 6th Gen, 4 Core Car Stereo with Apple CarPlay & Android Auto',
+    category: 'android-players',
+    price: 7599,
+    originalPrice: 24999,
+    flipkartUrl: 'https://www.flipkart.com/search?q=VOEUX+car+electronics',
+    badge: 'CARBON BLACK TS7',
+    isNew: true,
+    isTrending: true,
+    isBestseller: true,
+    image: '/images/voeux_carbon_black_ts7.jpg',
+    gallery: ['/images/voeux_carbon_black_ts7.jpg'],
+    shortSpecs: [
+      '9 Inch QLED Touchscreen Display',
+      '4GB RAM + 64GB Storage (TS7 4-Core)',
+      'Wireless Apple CarPlay & Android Auto',
+      'AHD Reverse Camera Included',
+      'Preset Tuner (FM 87.5-108MHz, AM 530-1710kHz)',
+      'Universal Double DIN Fit'
+    ],
+    fullSpecs: {
+      'Brand': 'Voeux',
+      'Model Number': 'CARBON BLACK Series Android TS7 4+64GB*, 6th Gen, 4 Core',
+      'Type': 'Audio & Video Double DIN',
+      'Display Features': '9 Inch QLED Touchscreen Display (Full Colour, ID3 Tag Display, Display Off)',
+      'Storage Features': '4GB RAM + 64GB Storage (32GB Built-in Memory)',
+      'Technology Used': 'TS7 6th Gen 4-Core Processor',
+      'Connectivity Features': 'Bluetooth 5, AUX, Wi-Fi, USB, GPS Navigation',
+      'Convenience Features': 'Android Auto, Apple CarPlay, GPS Navigation, MirrorLink, iOS Connectivity, HD Radio, Touchscreen, Siri Eyes Free Control',
+      'Tuner Features': 'Preset Tuner 3Bands * 6Stations (FM: 87.5-108.0 MHz, AM: 530-1710 kHz, 18 FM & 12 AM Channels)',
+      'Body & Design Features': 'Steering Wheel Controls: Yes | Mounting Frame: No',
+      'In the Box': '1 car media player with 1 Remote, AHD Rear Camera, GPS Antenna & Wiring Harness',
+      'Power Features': 'MOSFET Output Power 50W x 4 (200 W Maximum Output Power, 12V DC)',
+      'Audio Features': 'AAC, MP3, iTunes, WAV, WMA | Built-in Equaliser: Normal, Pop, Jazz, Classical, Flat, User (Balance Control, Bass Boost, Treble Control, Loudness Control)',
+      'Video Features': 'Supported Video: MP4, AVI, MKV, MOV, WMV, FLV | Picture: JPEG, JPG, GIF, PNG, BMP (3D GUI Type)',
+      'Dimensions': 'Width: 25.5 cm | Height: 13.5 cm | Depth: 6.5 cm | Weight: 1 kg',
+      'RCA Output': '4 V RCA Output (Front, Rear, Subwoofer), 4 V Sub-woofer Pre-amp (Digital Optical Out: No)',
+      'Vehicle Compatibility': 'Universal For Car (Double DIN)',
+      'Warranty Summary': '1 Year Domestic Warranty on Manufacturing Defects',
+      'Covered in Warranty': 'Warranty covers manufacturing defects in the hardware components of the product.',
+      'Not Covered in Warranty': 'Warranty does not cover physical damage, water damage, burnt units, unauthorized modifications, accessories, or issues arising from improper installation.',
+      'Warranty Service Type': 'Customer needs to call or email customer support. Product will be repaired or replaced.'
+    },
+    compatibility: ['Universal For Car (Double DIN)'],
+    description: 'VOEUX® CARBON BLACK Series Android TS7 4+64GB*, 6th Gen, 4 Core Car Stereo with Apple CarPlay & Android Auto. Features a crystal-clear 9-inch QLED Touchscreen Display with 3D Graphical User Interface, fast 4-Core processor with 4GB RAM and 64GB storage. Comes complete with AHD Reverse Camera, Preset Radio Tuner (FM/AM), MOSFET 200W max power output, built-in equalizer, steering wheel controls compatibility, Bluetooth 5, Wi-Fi, and GPS navigation.',
+    features: [
+      '9 Inch QLED Touchscreen Display with 3D Graphical User Interface',
+      '4GB RAM + 64GB Storage powered by 6th Gen 4-Core TS7 Processor',
+      'Wireless Apple CarPlay & Android Auto with Siri Eyes Free Control',
+      '1 car media player with 1 Remote & AHD Night-Vision Camera included',
+      'Preset Tuner: 3Bands * 6Stations (FM: 87.5-108.0 MHz, AM: 530-1710 kHz)',
+      'MOSFET 50W x 4 (200 W Max Output) with Bass Boost, Treble & Equalizer Presets',
+      'Steering Wheel Controls compatible & Double DIN Universal Fitment'
+    ],
+    reviews: [],
+    launchDate: '2026-08-10',
+    stock: 40
   }
 ];
 

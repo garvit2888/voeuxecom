@@ -37,6 +37,16 @@ export const Hero = () => {
       ctaText: 'Shop Car Amplifiers',
       actionPage: 'amplifiers',
       featuredProduct: PRODUCTS[2]
+    },
+    {
+      title: 'VOEUX® CARBON BLACK Series 9" QLED Android TS7 Stereo',
+      subtitle: '4GB RAM + 64GB ROM • 6th Gen 4-Core Processor',
+      tagline: '9" QLED Touchscreen • 4GB RAM + 64GB ROM • Wireless CarPlay & Android Auto • AHD Camera',
+      badge: 'New Drop 2026',
+      image: '/images/voeux_carbon_black_ts7.jpg',
+      ctaText: 'Explore Carbon Black TS7',
+      actionPage: 'android-players',
+      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0]
     }
   ];
 
