@@ -54,10 +54,10 @@ export const Hero = () => {
       <div className="container mx-auto px-4 py-0 md:py-10">
 
         {/* ========== MOBILE LAYOUT (Full Screen 100vh Dark Slate Canvas) ========== */}
-        <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-32 space-y-3">
+        <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-32">
           
-          {/* Top Half: Wall-to-Wall Product Photo (100% Left-to-Right Edge Coverage across ALL slides) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-56 sm:h-64 overflow-hidden border-b border-slate-800/60">
+          {/* Top Half: Wall-to-Wall Product Photo (100% Left-to-Right Edge Coverage) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-44 sm:h-52 overflow-hidden border-b border-slate-800/80">
             <img
               src={slide.image}
               alt={slide.title}
@@ -65,8 +65,8 @@ export const Hero = () => {
             />
           </div>
 
-          {/* Bottom Half: Title, Specs & Full Width CTA Sitting Cleanly Below Image with Zero Overlap */}
-          <div className="relative z-10 space-y-2.5 pt-3 text-left">
+          {/* Bottom Half: Title, Specs & CTA (Positioned 16px Below Image Border with ZERO Overlap) */}
+          <div className="relative z-10 mt-4 pt-1 space-y-2.5 text-left">
             <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
