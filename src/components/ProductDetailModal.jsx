@@ -160,8 +160,13 @@ export const ProductDetailModal = () => {
               ))}
             </div>
 
-            {/* Noise-Style Trust Features Grid */}
-            <div className="grid grid-cols-3 gap-3 pt-2 text-center text-[11px] font-semibold text-gray-700">
+          </div>
+
+          {/* Right Column: Clean Product Info & Pricing */}
+          <div className="lg:col-span-6 space-y-5 text-left">
+            
+            {/* Trust Features Grid (Positioned TOP above Title, Pricing & Buttons) */}
+            <div className="grid grid-cols-3 gap-3 text-center text-[11px] font-semibold text-gray-700">
               <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
                 <ShieldCheck className="w-5 h-5 text-[#3B429F]" />
                 <span>1 Year Warranty*</span>
@@ -176,12 +181,7 @@ export const ProductDetailModal = () => {
               </div>
             </div>
 
-          </div>
-
-          {/* Right Column: Clean Noise Product Info & Pricing */}
-          <div className="lg:col-span-6 space-y-5 text-left">
-            
-            {/* Title & Short Specs */}
+            {/* Title & Short Specs (Positioned BELOW Trust Badges) */}
             <div className="space-y-1">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3B429F]">
                 OFFICIAL VOEUX® PRODUCT
@@ -196,7 +196,7 @@ export const ProductDetailModal = () => {
               </p>
             </div>
 
-            {/* Noise Price Row */}
+            {/* Price Row */}
             <div className="space-y-1.5 py-3 border-y border-gray-200">
               <div className="flex items-baseline gap-3">
                 <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">
