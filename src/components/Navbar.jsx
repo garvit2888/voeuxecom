@@ -34,104 +34,144 @@ export const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200">
-      {/* News Channel Ticker Banner */}
-      <div className="bg-slate-900 text-white text-xs py-2 overflow-hidden relative">
-        <div className="animate-news-ticker tracking-wide font-bold">
-          For WhatsApp Orders use code <span className="text-yellow-400 font-extrabold bg-slate-800 px-2 py-0.5 rounded border border-yellow-400/40">VOEUX10</span> for extra discount on all Car Electronics! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For WhatsApp Orders use code <span className="text-yellow-400 font-extrabold bg-slate-800 px-2 py-0.5 rounded border border-yellow-400/40">VOEUX10</span> for extra discount on all Car Electronics!
+    <>
+      {/* Top Header Bar (Desktop Sticky Header & News Ticker) */}
+      <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200">
+        {/* News Channel Ticker Banner */}
+        <div className="bg-slate-900 text-white text-xs py-2 overflow-hidden relative">
+          <div className="animate-news-ticker tracking-wide font-bold">
+            For WhatsApp Orders use code <span className="text-yellow-400 font-extrabold bg-slate-800 px-2 py-0.5 rounded border border-yellow-400/40">VOEUX10</span> for extra discount on all Car Electronics! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For WhatsApp Orders use code <span className="text-yellow-400 font-extrabold bg-slate-800 px-2 py-0.5 rounded border border-yellow-400/40">VOEUX10</span> for extra discount on all Car Electronics!
+          </div>
         </div>
-      </div>
 
-      {/* Main Minimal Navbar */}
-      <nav className="px-4 py-3 sm:px-6 sm:py-4">
-        <div className="container mx-auto flex items-center justify-between gap-3">
-          
-          {/* Mobile Menu Toggle (Left on Mobile) */}
-          <div className="flex items-center lg:hidden w-10">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-gray-700 hover:text-black rounded-lg bg-gray-100"
-              aria-label="Toggle Navigation Menu"
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-
-          {/* Official Brand Logo - Centered & Larger on Mobile, Left on Desktop */}
-          <div
-            className="flex-1 lg:flex-none flex justify-center lg:justify-start items-center cursor-pointer"
-            onClick={() => setActivePage('home')}
-          >
-            <img
-              src="/images/voeux_logo.png"
-              alt="VOEUX® Car Electronics"
-              className="h-10 sm:h-11 lg:h-10 w-auto scale-x-125 scale-y-110 sm:scale-x-135 sm:scale-y-115 lg:scale-100 object-contain rounded-lg shadow-sm hover:opacity-95 transition"
-            />
-          </div>
-
-          {/* Minimal Links (Desktop) */}
-          <div className="hidden lg:flex items-center space-x-8 text-xs font-semibold tracking-wide text-gray-700">
-            {navLinks.map(link => (
-              <button
-                key={link.id}
-                onClick={() => setActivePage(link.id)}
-                className={`py-1 transition-colors ${
-                  activePage === link.id
-                    ? 'text-[#3B429F] font-bold border-b-2 border-[#3B429F]'
-                    : 'hover:text-[#3B429F]'
-                }`}
-              >
-                {link.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Right Actions & Spacer for Mobile Balance */}
-          <div className="flex items-center justify-end space-x-2 sm:space-x-4 w-10 lg:w-auto">
+        {/* Main Minimal Navbar (Desktop Only) */}
+        <nav className="hidden lg:block px-4 py-3 sm:px-6 sm:py-4">
+          <div className="container mx-auto flex items-center justify-between gap-3">
             
-            {/* Desktop Search Input */}
-            <div className="relative hidden md:block w-48">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-                className="w-full bg-gray-100 text-gray-900 placeholder-gray-400 text-xs rounded-full pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
+            {/* Official Brand Logo */}
+            <div
+              className="flex justify-start items-center cursor-pointer"
+              onClick={() => setActivePage('home')}
+            >
+              <img
+                src="/images/voeux_logo.png"
+                alt="VOEUX® Car Electronics"
+                className="h-10 w-auto object-contain rounded-lg shadow-sm hover:opacity-95 transition"
               />
-              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
+            </div>
 
-              {/* Suggestions */}
-              {isSearchFocused && searchResults.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-xl z-50 border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-                  {searchResults.map(p => (
-                    <div
-                      key={p.id}
-                      onClick={() => {
-                        setSelectedProductModal(p);
-                        setSearchQuery('');
-                      }}
-                      className="p-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer"
-                    >
-                      <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-gray-100" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-900 truncate">{p.name}</p>
-                        <p className="text-[10px] text-[#3B429F] font-bold">₹{p.price.toLocaleString('en-IN')}</p>
+            {/* Minimal Links (Desktop) */}
+            <div className="flex items-center space-x-8 text-xs font-semibold tracking-wide text-gray-700">
+              {navLinks.map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => setActivePage(link.id)}
+                  className={`py-1 transition-colors ${
+                    activePage === link.id
+                      ? 'text-[#3B429F] font-bold border-b-2 border-[#3B429F]'
+                      : 'hover:text-[#3B429F]'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Right Actions (Desktop Search) */}
+            <div className="flex items-center justify-end space-x-4">
+              <div className="relative w-48">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                  className="w-full bg-gray-100 text-gray-900 placeholder-gray-400 text-xs rounded-full pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
+                />
+                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
+
+                {/* Suggestions */}
+                {isSearchFocused && searchResults.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-xl z-50 border border-gray-200 divide-y divide-gray-100 overflow-hidden">
+                    {searchResults.map(p => (
+                      <div
+                        key={p.id}
+                        onClick={() => {
+                          setSelectedProductModal(p);
+                          setSearchQuery('');
+                        }}
+                        className="p-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer"
+                      >
+                        <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-gray-100" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-gray-900 truncate">{p.name}</p>
+                          <p className="text-[10px] text-[#3B429F] font-bold">₹{p.price.toLocaleString('en-IN')}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>
+        </nav>
+      </header>
 
+      {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR (FES Coffee Style) ==================== */}
+      <div className="lg:hidden fixed bottom-4 left-4 right-4 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-5 py-2.5 flex items-center justify-between shadow-2xl border border-indigo-400/40 backdrop-blur-lg">
+        {/* Left: Mobile Menu Toggle */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="flex items-center gap-1.5 text-white hover:text-cyan-300 font-bold text-xs p-1 cursor-pointer"
+          aria-label="Toggle Mobile Menu"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+          <span className="text-[11px] font-extrabold tracking-wide uppercase">Menu</span>
+        </button>
+
+        {/* Center: Official VOEUX Brand Logo */}
+        <div
+          onClick={() => {
+            setActivePage('home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex items-center justify-center cursor-pointer p-1"
+        >
+          <img
+            src="/images/voeux_logo.png"
+            alt="VOEUX® Logo"
+            className="h-6 w-auto object-contain brightness-0 invert"
+          />
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden mt-3 pt-3 border-t border-gray-200 space-y-3 animate-in fade-in duration-200">
+        {/* Right: Cart Button with Counter Badge */}
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="relative flex items-center justify-center p-1.5 text-white hover:text-cyan-300 transition cursor-pointer"
+          aria-label="Open Cart"
+        >
+          <ShoppingCart className="w-5 h-5 text-white" />
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1.5 bg-red-500 text-white font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-white">
+              {cartCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Drawer Menu Modal */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-[85] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200">
+          <div className="bg-white rounded-t-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-gray-200">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Navigation Menu</span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-full bg-gray-100 text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
             {/* Mobile Search Bar */}
             <div className="relative">
               <input
@@ -167,7 +207,7 @@ export const Navbar = () => {
             </div>
 
             {/* Mobile Nav Links */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-2.5 text-xs">
               {navLinks.map(link => (
                 <button
                   key={link.id}
@@ -175,7 +215,7 @@ export const Navbar = () => {
                     setActivePage(link.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`p-3 rounded-xl text-left font-semibold transition ${
+                  className={`p-3 rounded-xl text-left font-bold transition ${
                     activePage === link.id ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-50 text-gray-800 border border-gray-200'
                   }`}
                 >
@@ -184,8 +224,8 @@ export const Navbar = () => {
               ))}
             </div>
           </div>
-        )}
-      </nav>
-    </header>
+        </div>
+      )}
+    </>
   );
 };
