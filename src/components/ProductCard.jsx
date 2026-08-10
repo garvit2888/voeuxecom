@@ -1,40 +1,29 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { Star, ShoppingCart, Heart, Scale, Eye, Check, MessageSquare } from 'lucide-react';
 
 export const ProductCard = ({ product }) => {
   if (!product) return null;
 
-  const {
-    addToCart,
-    wishlist,
-    toggleWishlist,
-    compareList,
-    toggleCompare,
-    setSelectedProductModal,
-    selectedCar
-  } = useShop();
-
-  const isWishlisted = wishlist.some(item => item.id === product.id);
-  const isCompared = compareList.some(item => item.id === product.id);
+  const { setSelectedProductModal } = useShop();
 
   const discountPercent = Math.round(
     ((product.originalPrice - product.price) / product.originalPrice) * 100
   );
 
   return (
-    <div className="clean-card group relative flex flex-col justify-between overflow-hidden p-4 space-y-3">
+    <div
+      onClick={() => setSelectedProductModal(product)}
+      className="clean-card group relative flex flex-col justify-between overflow-hidden p-4 space-y-3 cursor-pointer hover:border-[#3B429F] hover:shadow-xl transition-all duration-300"
+    >
       
-      {/* Top Image Section - Fitted Uncropped Design */}
-      <div className="relative aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden cursor-pointer flex items-center justify-center p-2" onClick={() => setSelectedProductModal(product)}>
+      {/* Top Image Section - Fitted Design */}
+      <div className="relative aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2">
         {/* Badges */}
-        <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-          {product.badge && (
-            <span className="bg-[#3B429F] text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm">
-              {product.badge}
-            </span>
-          )}
-        </div>
+        {product.badge && (
+          <span className="absolute top-2 left-2 z-10 bg-[#3B429F] text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm">
+            {product.badge}
+          </span>
+        )}
 
         <img
           src={product.image}
@@ -43,41 +32,27 @@ export const ProductCard = ({ product }) => {
         />
       </div>
 
-      {/* Product Content Body */}
-      <div className="flex-1 flex flex-col justify-between space-y-2">
+      {/* Product Title & Pricing */}
+      <div className="flex-1 flex flex-col justify-between space-y-2.5 text-left">
         <div>
-          <h3
-            onClick={() => setSelectedProductModal(product)}
-            className="text-xs sm:text-sm font-bold text-gray-900 hover:text-[#3B429F] cursor-pointer transition line-clamp-2 mt-0.5"
-          >
+          <h3 className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-[#3B429F] transition line-clamp-2">
             {product.name}
           </h3>
         </div>
 
-        {/* Flipkart Buy Action & WhatsApp Query */}
-        <div className="pt-3 border-t border-gray-100 space-y-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
-            }}
-            className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs font-extrabold py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow-sm"
-          >
-            <span className="bg-yellow-400 text-[#2874F0] font-black text-[11px] px-1.5 py-0.5 rounded italic leading-none shadow-sm">f</span>
-            <span>BUY NOW ON FLIPKART</span>
-          </button>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
-              window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
-            }}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-1.5 shadow-sm"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Send Query on WhatsApp</span>
-          </button>
+        {/* Price & Discount Display */}
+        <div className="pt-2 border-t border-gray-100 flex items-baseline justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base sm:text-lg font-black text-gray-900">
+              ₹{product.price.toLocaleString('en-IN')}
+            </span>
+            <span className="text-xs text-gray-400 line-through">
+              ₹{product.originalPrice.toLocaleString('en-IN')}
+            </span>
+          </div>
+          <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+            {discountPercent}% OFF
+          </span>
         </div>
       </div>
 

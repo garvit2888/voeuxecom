@@ -41,10 +41,7 @@ export const CategoryPage = ({ categoryId }) => {
       
       {/* Category Header (Clean Typography, No Artificial Box Container) */}
       <div className="py-2 text-left border-b border-gray-200 pb-6">
-        <span className="text-[11px] font-extrabold tracking-widest text-[#3B429F] uppercase">
-          VOEUX® Category
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mt-1 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
           {category.name}
         </h1>
         <p className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">
