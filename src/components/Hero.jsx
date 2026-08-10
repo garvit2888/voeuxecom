@@ -50,133 +50,128 @@ export const Hero = () => {
   const slide = slides[currentSlide];
 
   return (
-    <section className="bg-slate-950 md:bg-white border-b border-gray-200 overflow-hidden">
-      <div className="container mx-auto px-4 py-0 md:py-10">
+    <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
-        {/* ========== MOBILE LAYOUT ONLY (Full Screen Dark Slate Canvas) ========== */}
-        <div className="md:hidden">
-          <div className="relative w-full min-h-screen bg-slate-950 text-white overflow-hidden pb-32 -mx-4">
+      {/* ========== MOBILE LAYOUT ONLY — outside container so image fills 100% viewport width ========== */}
+      <div className="md:hidden relative min-h-screen bg-slate-950 text-white pb-32">
 
-            {/* IMAGE: Absolute positioned at top, full width, fixed height - MOBILE ONLY */}
-            <div className="absolute top-0 left-0 right-0 h-56 sm:h-64 overflow-hidden border-b border-slate-800/80">
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover object-center transition-all duration-700"
-              />
-            </div>
-
-            {/* TEXT CONTENT: Padded by exact image height so it is always below the image - MOBILE ONLY */}
-            <div className="pt-[240px] sm:pt-[272px] px-5">
-              <div className="space-y-2.5">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
-                  {slide.title}
-                </h1>
-
-                <p className="text-xs text-gray-300 font-medium leading-relaxed">
-                  {slide.tagline}
-                </p>
-
-                <div className="pt-1.5">
-                  <button
-                    onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                    className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
-                  >
-                    <span>{slide.ctaText}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Slide Dots */}
-                <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
-                  {slides.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentSlide(idx)}
-                      aria-label={`Go to slide ${idx + 1}`}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-          </div>
+        {/* IMAGE: simple w-full block element - no container, no negative margins needed */}
+        <div className="w-full h-56 overflow-hidden border-b border-slate-800/80">
+          <img
+            src={slide.image}
+            alt={slide.title}
+            className="w-full h-full object-cover object-center transition-all duration-700"
+          />
         </div>
 
+        {/* TEXT: normal block flow, padding on sides, mt-5 gap from image — physically impossible to overlap */}
+        <div className="px-5 mt-5 space-y-2.5">
+          <h1 className="text-xl font-black tracking-tight leading-snug text-white">
+            {slide.title}
+          </h1>
 
-        {/* ========== DESKTOP LAYOUT (Wall-to-Wall Full-Bleed Hero Canvas) ========== */}
-        <div className="hidden md:flex relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white items-center p-12 lg:p-20 -mx-4 -mt-4 md:-mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
-          
-          {/* Background Image - Clean Containment across all slides */}
-          <div
-            className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
-            style={{
-              backgroundImage: `url(${slide.image})`,
-              backgroundPosition: 'right 2% center',
-              backgroundSize: 'contain'
-            }}
-          ></div>
+          <p className="text-xs text-gray-300 font-medium leading-relaxed">
+            {slide.tagline}
+          </p>
 
-          {/* Smooth Dark Gradient Overlay for Clean Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent max-w-xl"></div>
-
-          {/* Left Text Content */}
-          <div className="relative z-10 max-w-xl space-y-4 text-left">
-            <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-              {slide.title}
-            </h1>
-
-            <p className="text-base text-gray-300 font-medium leading-relaxed">
-              {slide.tagline}
-            </p>
-
-            <div className="pt-2 flex items-center gap-3">
-              <button
-                onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40"
-              >
-                <span>{slide.ctaText}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="pt-1.5">
+            <button
+              onClick={() => setSelectedProductModal(slide.featuredProduct)}
+              className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+            >
+              <span>{slide.ctaText}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Slide Indicator Navigation */}
-          <div className="absolute bottom-5 left-10 lg:left-12 z-20 flex items-center space-x-2">
+          {/* Slide Dots */}
+          <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-gray-600'
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
                 }`}
               />
             ))}
           </div>
-
-          {/* Prev & Next Arrows for Desktop */}
-          <button
-            onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition flex items-center justify-center shadow-md"
-            aria-label="Previous Slide"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition flex items-center justify-center shadow-md"
-            aria-label="Next Slide"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-
         </div>
 
       </div>
+
+      {/* ========== DESKTOP LAYOUT ONLY — inside container, untouched ========== */}
+      <div className="hidden md:block">
+        <div className="container mx-auto px-4 py-10">
+          <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
+
+            {/* Background Image */}
+            <div
+              className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
+              style={{
+                backgroundImage: `url(${slide.image})`,
+                backgroundPosition: 'right 2% center',
+                backgroundSize: 'contain'
+              }}
+            />
+
+            {/* Dark Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent max-w-xl" />
+
+            {/* Left Text Content */}
+            <div className="relative z-10 max-w-xl space-y-4 text-left">
+              <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                {slide.title}
+              </h1>
+              <p className="text-base text-gray-300 font-medium leading-relaxed">
+                {slide.tagline}
+              </p>
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  onClick={() => setSelectedProductModal(slide.featuredProduct)}
+                  className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40"
+                >
+                  <span>{slide.ctaText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Slide Dots Desktop */}
+            <div className="absolute bottom-5 left-10 lg:left-12 z-20 flex items-center space-x-2">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-gray-600'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Prev & Next Arrows Desktop */}
+            <button
+              onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-md"
+              aria-label="Previous Slide"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-md"
+              aria-label="Next Slide"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+          </div>
+        </div>
+      </div>
+
     </section>
   );
 };
