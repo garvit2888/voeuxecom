@@ -50,23 +50,23 @@ export const Hero = () => {
   const slide = slides[currentSlide];
 
   return (
-    <section className="bg-white border-b border-gray-200">
-      <div className="container mx-auto px-4 py-4 md:py-10">
+    <section className="bg-white border-b border-gray-200 overflow-hidden">
+      <div className="container mx-auto px-4 py-0 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Rich Full Phone Screen Hero Canvas) ========== */}
-        <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-36 space-y-4">
+        {/* ========== MOBILE LAYOUT (Rich Full Phone Screen Edge-to-Edge Canvas) ========== */}
+        <div className="md:hidden relative min-h-[calc(100vh-48px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-28 space-y-3">
           
-          {/* Top Half: Product Image Viewport (Covers 100% Wall-to-Wall Left to Right across ALL slides) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-52 sm:h-60 overflow-hidden border-b border-slate-800/60">
+          {/* Top Half: Product Image Viewport (100% Uncut Wall-to-Wall Left to Right with Zero Bottom Crop) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center pt-2 pb-1 overflow-hidden">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover object-center transition-all duration-700"
+              className="w-full h-auto max-h-[38vh] sm:max-h-[44vh] object-contain transition-all duration-700"
             />
           </div>
 
-          {/* Bottom Half: Rich Bold Title, Specs Badge & Full Width CTA Filling Mobile Screen */}
-          <div className="relative z-10 space-y-3 pt-1 text-left">
+          {/* Bottom Half: Title, Specs & Full Width CTA Directly Below Image with Minimal Gap */}
+          <div className="relative z-10 space-y-2 pt-0.5 text-left">
             <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
@@ -86,7 +86,7 @@ export const Hero = () => {
             </div>
 
             {/* Slide Dots Indicator for Mobile */}
-            <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
+            <div className="flex items-center justify-center space-x-2 pt-2 pb-0.5">
               {slides.map((_, idx) => (
                 <button
                   key={idx}
