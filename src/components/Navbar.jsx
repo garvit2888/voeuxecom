@@ -120,7 +120,7 @@ export const Navbar = () => {
       </header>
 
       {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR (FES Coffee Style) ==================== */}
-      <div className="lg:hidden fixed bottom-4 left-4 right-4 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-5 py-2.5 flex items-center justify-between shadow-2xl border border-indigo-400/40 backdrop-blur-lg">
+      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-xs mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/40 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -131,43 +131,28 @@ export const Navbar = () => {
           <span className="text-[11px] font-extrabold tracking-wide uppercase">Menu</span>
         </button>
 
-        {/* Center: Official VOEUX Brand Logo */}
+        {/* Center / Right: Official VOEUX Brand Logo inside Ovalish White Border Pill */}
         <div
           onClick={() => {
             setActivePage('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center justify-center cursor-pointer p-1"
+          className="flex items-center justify-center cursor-pointer px-3.5 py-1 rounded-full border-2 border-white bg-white/10 hover:bg-white/20 transition shadow-sm"
         >
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-6 w-auto object-contain brightness-0 invert"
+            className="h-5 w-auto object-contain brightness-0 invert"
           />
         </div>
-
-        {/* Right: Cart Button with Counter Badge */}
-        <button
-          onClick={() => setIsCartOpen(true)}
-          className="relative flex items-center justify-center p-1.5 text-white hover:text-cyan-300 transition cursor-pointer"
-          aria-label="Open Cart"
-        >
-          <ShoppingCart className="w-5 h-5 text-white" />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1.5 bg-red-500 text-white font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-white">
-              {cartCount}
-            </span>
-          )}
-        </button>
       </div>
 
       {/* Mobile Drawer Menu Modal */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-[85] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200">
           <div className="bg-white rounded-t-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-gray-200">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Navigation Menu</span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-full bg-gray-100 text-gray-700">
+            <div className="flex items-center justify-end border-b border-gray-100 pb-2">
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
