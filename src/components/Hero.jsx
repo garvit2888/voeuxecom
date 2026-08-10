@@ -53,11 +53,11 @@ export const Hero = () => {
     <section className="bg-slate-950 md:bg-white border-b border-gray-200 overflow-hidden">
       <div className="container mx-auto px-4 py-0 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Full Screen 100vh Dark Slate Canvas) ========== */}
-        <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-32">
+        {/* ========== MOBILE LAYOUT (Full Screen Dark Slate Canvas) ========== */}
+        <div className="md:hidden relative min-h-screen bg-slate-950 text-white p-5 -mx-4 border-b border-slate-800 shadow-2xl pb-32">
           
-          {/* Top Half: Wall-to-Wall Edge-to-Edge Product Photo (100% Full Width from Left Side to Right Side) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-60 sm:h-72 overflow-hidden border-b border-slate-800/80">
+          {/* Top Block: Wall-to-Wall Product Photo (100% Full Width from Left Side to Right Side) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-56 sm:h-64 overflow-hidden border-b border-slate-800/80">
             <img
               src={slide.image}
               alt={slide.title}
@@ -65,8 +65,8 @@ export const Hero = () => {
             />
           </div>
 
-          {/* Bottom Half: Title, Specs & CTA (Positioned 100% Cleanly Below Image Viewport) */}
-          <div className="relative z-10 mt-4 pt-1 space-y-2.5 text-left">
+          {/* Bottom Block: Title, Specs & CTA (STRICTLY BELOW WITH 20px MARGIN - ZERO OVERLAP) */}
+          <div className="relative z-10 mt-5 space-y-2.5 text-left">
             <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
