@@ -53,53 +53,57 @@ export const Hero = () => {
     <section className="bg-slate-950 md:bg-white border-b border-gray-200 overflow-hidden">
       <div className="container mx-auto px-4 py-0 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Full Screen Dark Slate Canvas) ========== */}
-        <div className="md:hidden relative min-h-screen bg-slate-950 text-white p-5 -mx-4 border-b border-slate-800 shadow-2xl pb-32">
-          
-          {/* Top Block: Wall-to-Wall Product Photo (100% Full Width from Left Side to Right Side) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-56 sm:h-64 overflow-hidden border-b border-slate-800/80">
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover object-center transition-all duration-700"
-            />
-          </div>
+        {/* ========== MOBILE LAYOUT ONLY (Full Screen Dark Slate Canvas) ========== */}
+        <div className="md:hidden">
+          <div className="relative w-full min-h-screen bg-slate-950 text-white overflow-hidden pb-32 -mx-4">
 
-          {/* Bottom Block: Title, Specs & CTA (STRICTLY BELOW WITH 20px MARGIN - ZERO OVERLAP) */}
-          <div className="relative z-10 mt-5 space-y-2.5 text-left">
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
-              {slide.title}
-            </h1>
-
-            <p className="text-xs text-gray-300 font-medium leading-relaxed">
-              {slide.tagline}
-            </p>
-
-            <div className="pt-1.5">
-              <button
-                onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
-              >
-                <span>{slide.ctaText}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            {/* IMAGE: Absolute positioned at top, full width, fixed height - MOBILE ONLY */}
+            <div className="absolute top-0 left-0 right-0 h-56 sm:h-64 overflow-hidden border-b border-slate-800/80">
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover object-center transition-all duration-700"
+              />
             </div>
 
-            {/* Slide Dots Indicator for Mobile */}
-            <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  aria-label={`Go to slide ${idx + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+            {/* TEXT CONTENT: Padded by exact image height so it is always below the image - MOBILE ONLY */}
+            <div className="pt-[240px] sm:pt-[272px] px-5">
+              <div className="space-y-2.5">
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
+                  {slide.title}
+                </h1>
 
+                <p className="text-xs text-gray-300 font-medium leading-relaxed">
+                  {slide.tagline}
+                </p>
+
+                <div className="pt-1.5">
+                  <button
+                    onClick={() => setSelectedProductModal(slide.featuredProduct)}
+                    className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+                  >
+                    <span>{slide.ctaText}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Slide Dots */}
+                <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
+                  {slides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentSlide(idx)}
+                      aria-label={`Go to slide ${idx + 1}`}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
 
 
