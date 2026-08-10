@@ -56,12 +56,12 @@ export const Hero = () => {
         {/* ========== MOBILE LAYOUT (Rich Full Phone Screen Hero Canvas) ========== */}
         <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-36 space-y-4">
           
-          {/* Top Half: Product Image Viewport (Wall-to-Wall Left to Right with Uncut Image) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center pt-3 pb-2 overflow-hidden bg-gradient-to-b from-slate-900/40 to-transparent border-b border-slate-800/60">
+          {/* Top Half: Product Image Viewport (Covers 100% Wall-to-Wall Left to Right across ALL slides) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-52 sm:h-60 overflow-hidden border-b border-slate-800/60">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full max-h-[38vh] sm:max-h-[44vh] object-contain transition-all duration-700 drop-shadow-2xl"
+              className="w-full h-full object-cover object-center transition-all duration-700"
             />
           </div>
 
