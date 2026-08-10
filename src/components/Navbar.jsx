@@ -119,15 +119,15 @@ export const Navbar = () => {
         </nav>
       </header>
 
-      {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR (FES Coffee Style) ==================== */}
-      <div className="lg:hidden fixed bottom-10 left-5 right-5 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
+      {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR ==================== */}
+      <div className="lg:hidden fixed bottom-4 left-4 right-4 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="flex items-center gap-2 text-white hover:text-cyan-300 font-black text-sm p-1 cursor-pointer"
+          className="flex items-center gap-2 text-white hover:text-cyan-300 font-black text-sm p-1 cursor-pointer transition-colors"
           aria-label="Toggle Mobile Menu"
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+          {isMobileMenuOpen ? <X className="w-5 h-5 text-cyan-300 animate-spin-once" /> : <Menu className="w-5 h-5 text-white" />}
           <span className="text-xs sm:text-sm font-black tracking-wider uppercase">Menu</span>
         </button>
 
@@ -135,6 +135,7 @@ export const Navbar = () => {
         <div
           onClick={() => {
             setActivePage('home');
+            setIsMobileMenuOpen(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           className="flex items-center justify-center cursor-pointer p-1"
@@ -147,29 +148,44 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu Modal */}
+      {/* ==================== MOBILE ANIMATED POPUP MENU (NO WHITE BACKGROUND) ==================== */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[85] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-gray-200">
-            <div className="flex items-center justify-end border-b border-gray-100 pb-2">
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                <X className="w-5 h-5" />
+        <>
+          {/* Transparent Backdrop Click Catch to Close Menu */}
+          <div
+            className="lg:hidden fixed inset-0 z-[80] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          {/* Floating Menu Card Popping Up Directly Above MENU Button */}
+          <div className="lg:hidden fixed bottom-18 left-4 right-4 z-[85] max-w-sm mx-auto bg-slate-950/90 backdrop-blur-2xl text-white rounded-3xl p-5 border border-indigo-500/40 shadow-2xl shadow-indigo-950/80 animate-in fade-in slide-in-from-bottom-6 duration-300 ease-out origin-bottom">
+            
+            {/* Header Title with Thin Font */}
+            <div className="flex items-center justify-between border-b border-indigo-500/20 pb-3 mb-3">
+              <span className="text-xs font-light tracking-widest text-indigo-200 uppercase">
+                Explore Voeux®
+              </span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1 text-gray-400 hover:text-white transition"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Mobile Search Bar */}
-            <div className="relative">
+            {/* Transparent Search Bar */}
+            <div className="relative mb-3.5">
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-100 text-gray-900 placeholder-gray-500 text-xs rounded-xl pl-9 pr-3 py-2.5 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
+                className="w-full bg-slate-900/90 text-white placeholder-gray-400 text-xs font-light rounded-xl pl-9 pr-3 py-2 border border-slate-700/70 focus:outline-none focus:border-cyan-400/80 transition"
               />
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
 
               {searchResults.length > 0 && searchQuery && (
-                <div className="mt-2 bg-white rounded-xl shadow-lg border border-gray-200 divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                <div className="mt-2 bg-slate-900/95 backdrop-blur-md rounded-xl shadow-2xl border border-indigo-500/30 divide-y divide-slate-800 max-h-48 overflow-y-auto">
                   {searchResults.map(p => (
                     <div
                       key={p.id}
@@ -178,12 +194,12 @@ export const Navbar = () => {
                         setSearchQuery('');
                         setIsMobileMenuOpen(false);
                       }}
-                      className="p-2.5 flex items-center gap-3 active:bg-gray-100 cursor-pointer"
+                      className="p-2.5 flex items-center gap-3 hover:bg-indigo-600/20 cursor-pointer transition"
                     >
-                      <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-gray-100" />
+                      <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-slate-800" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-900 truncate">{p.name}</p>
-                        <p className="text-[10px] text-[#3B429F] font-bold">₹{p.price.toLocaleString('en-IN')}</p>
+                        <p className="text-xs font-light text-white truncate">{p.name}</p>
+                        <p className="text-[10px] text-cyan-400 font-normal">₹{p.price.toLocaleString('en-IN')}</p>
                       </div>
                     </div>
                   ))}
@@ -191,8 +207,8 @@ export const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile Nav Links */}
-            <div className="grid grid-cols-2 gap-2.5 text-xs">
+            {/* Menu Options Grid with Thin Font & No White Background */}
+            <div className="grid grid-cols-2 gap-2 text-xs font-light tracking-wide">
               {navLinks.map(link => (
                 <button
                   key={link.id}
@@ -200,16 +216,19 @@ export const Navbar = () => {
                     setActivePage(link.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`p-3 rounded-xl text-left font-bold transition ${
-                    activePage === link.id ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-50 text-gray-800 border border-gray-200'
+                  className={`p-2.5 rounded-xl text-left font-light tracking-wide transition-all duration-200 border ${
+                    activePage === link.id
+                      ? 'bg-[#3B429F] text-white font-normal border-indigo-400 shadow-md shadow-indigo-900/50'
+                      : 'bg-white/5 hover:bg-indigo-600/20 text-gray-200 border-white/10 hover:border-cyan-400/40 hover:text-white'
                   }`}
                 >
                   {link.label}
                 </button>
               ))}
             </div>
+
           </div>
-        </div>
+        </>
       )}
     </>
   );

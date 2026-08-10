@@ -8,8 +8,8 @@ export const LiveChatWidget = () => {
 
   return (
     <>
-      {/* Blue Register for Warranty Button (Positioned on Left Side on Mobile, above bottom-10 nav bar) */}
-      <div className="fixed bottom-32 sm:bottom-5 left-4 sm:left-6 z-50">
+      {/* Blue Register for Warranty Button (Positioned on Left Side on Mobile, above bottom-5 nav bar) */}
+      <div className="fixed bottom-20 sm:bottom-5 left-4 sm:left-6 z-50">
         <button
           onClick={() => setActivePage('warranty-registration')}
           className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-1.5 font-bold text-[11px] sm:text-xs shadow-blue-600/30 border border-blue-400/50 cursor-pointer"
@@ -20,8 +20,8 @@ export const LiveChatWidget = () => {
         </button>
       </div>
 
-      {/* WhatsApp Official Support Button (Positioned on Right Side, above bottom-10 nav bar) */}
-      <div className="fixed bottom-32 sm:bottom-5 right-4 sm:right-6 z-50">
+      {/* WhatsApp Official Support Button (Positioned on Right Side, above bottom-5 nav bar) */}
+      <div className="fixed bottom-20 sm:bottom-5 right-4 sm:right-6 z-50">
         <a
           href={whatsappUrl}
           target="_blank"
