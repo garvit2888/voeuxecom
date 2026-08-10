@@ -120,7 +120,7 @@ export const Navbar = () => {
       </header>
 
       {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR (FES Coffee Style) ==================== */}
-      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-xs mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/40 backdrop-blur-lg">
+      <div className="lg:hidden fixed bottom-8 left-5 right-5 z-[90] max-w-xs mx-auto bg-[#3B429F] text-white rounded-full px-5 py-3 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -131,18 +131,18 @@ export const Navbar = () => {
           <span className="text-[11px] font-extrabold tracking-wide uppercase">Menu</span>
         </button>
 
-        {/* Center / Right: Official Uploaded VOEUX Brand Logo inside Thin White Oval Pill */}
+        {/* Center / Right: Official VOEUX Brand Logo directly on Brand Blue Canvas */}
         <div
           onClick={() => {
             setActivePage('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center justify-center cursor-pointer px-3.5 py-1 rounded-full border border-white/90 bg-white shadow-sm hover:bg-gray-100 transition"
+          className="flex items-center justify-center cursor-pointer p-1"
         >
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-5 w-auto object-contain mix-blend-multiply"
+            className="h-6 w-auto object-contain brightness-0 invert"
           />
         </div>
       </div>
