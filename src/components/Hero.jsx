@@ -53,32 +53,34 @@ export const Hero = () => {
     <section className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 py-4 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Full Phone Screen Edge-to-Edge Hero Canvas) ========== */}
-        <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden space-y-2 pb-24">
+        {/* ========== MOBILE LAYOUT (Rich Full Phone Screen Hero Canvas) ========== */}
+        <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-36 space-y-4">
           
-          {/* Top Half: Product Image Viewport (100% Uncut Image Spanning Wall-to-Wall Left to Right with Zero Bottom Crop) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center pt-1 pb-1 overflow-hidden">
+          {/* Top Half: Product Image Viewport (Wall-to-Wall Left to Right with Uncut Image) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center pt-3 pb-2 overflow-hidden bg-gradient-to-b from-slate-900/40 to-transparent border-b border-slate-800/60">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full max-h-[36vh] sm:max-h-[42vh] object-contain transition-all duration-700"
+              className="w-full max-h-[38vh] sm:max-h-[44vh] object-contain transition-all duration-700 drop-shadow-2xl"
             />
           </div>
 
-          {/* Bottom Half: Title, Specs & Full Width CTA Directly Below Image with Minimal Distance */}
-          <div className="relative z-10 space-y-1.5 pt-0.5 text-left">
-            <h1 className="text-lg font-black tracking-tight leading-snug text-white">
+          {/* Bottom Half: Rich Bold Title, Specs Badge & Full Width CTA Filling Mobile Screen */}
+          <div className="relative z-10 space-y-3 pt-1 text-left">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
               {slide.title}
             </h1>
 
-            <p className="text-xs text-gray-300 font-medium leading-relaxed">
-              {slide.tagline}
-            </p>
+            <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800/80 backdrop-blur-sm">
+              <p className="text-xs text-indigo-200 font-semibold leading-relaxed">
+                {slide.tagline}
+              </p>
+            </div>
 
             <div className="pt-1">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
+                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
               >
                 <span>{slide.ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -86,7 +88,7 @@ export const Hero = () => {
             </div>
 
             {/* Slide Dots Indicator for Mobile */}
-            <div className="flex items-center justify-center space-x-2 pt-1.5 pb-0.5">
+            <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
               {slides.map((_, idx) => (
                 <button
                   key={idx}
