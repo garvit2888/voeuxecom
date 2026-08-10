@@ -56,16 +56,16 @@ export const Hero = () => {
         {/* ========== MOBILE LAYOUT (Full Screen 100vh Dark Slate Canvas) ========== */}
         <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-32 space-y-3">
           
-          {/* Top Half: Large Edge-to-Edge Product Image (Wall-to-Wall Left to Right, 100% Uncovered & Uncropped) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 flex items-center justify-center pt-2 pb-2 bg-slate-900/40 border-b border-slate-800/60 overflow-hidden">
+          {/* Top Half: Wall-to-Wall Product Photo (100% Left-to-Right Edge Coverage across ALL slides) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-56 sm:h-64 overflow-hidden border-b border-slate-800/60">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full max-h-[38vh] sm:max-h-[44vh] object-contain transition-all duration-700"
+              className="w-full h-full object-cover object-center transition-all duration-700"
             />
           </div>
 
-          {/* Bottom Half: Title, Specs & Full Width CTA Directly Below Image with Zero Overlap */}
+          {/* Bottom Half: Title, Specs & Full Width CTA Sitting Cleanly Below Image with Zero Overlap */}
           <div className="relative z-10 space-y-2.5 pt-3 text-left">
             <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
               {slide.title}
