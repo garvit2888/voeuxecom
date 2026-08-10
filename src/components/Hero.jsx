@@ -53,11 +53,11 @@ export const Hero = () => {
     <section className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 py-4 md:py-10">
 
-        {/* ========== MOBILE LAYOUT (Compact Wall-to-Wall Hero Canvas) ========== */}
-        <div className="md:hidden relative bg-slate-950 text-white flex flex-col justify-start p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-xl overflow-hidden space-y-3 pb-6">
+        {/* ========== MOBILE LAYOUT (Full Phone Screen Edge-to-Edge Hero Canvas) ========== */}
+        <div className="md:hidden relative min-h-[calc(100vh-64px)] bg-slate-950 text-white flex flex-col justify-between p-5 -mx-4 -mt-4 border-b border-slate-800 shadow-2xl overflow-hidden pb-28">
           
-          {/* Top Half: Product Image Viewport (Covers 100% Wall-to-Wall Left to Right across ALL slides) */}
-          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-48 sm:h-56 overflow-hidden">
+          {/* Top Half: Product Image Viewport (Stretches 100% Wall-to-Wall Left to Right across ALL slides) */}
+          <div className="relative w-[calc(100%+2.5rem)] -mx-5 h-56 sm:h-64 overflow-hidden">
             <img
               src={slide.image}
               alt={slide.title}
@@ -75,10 +75,10 @@ export const Hero = () => {
               {slide.tagline}
             </p>
 
-            <div className="pt-1">
+            <div className="pt-1.5">
               <button
                 onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
+                className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-xs font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-900/50"
               >
                 <span>{slide.ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -86,7 +86,7 @@ export const Hero = () => {
             </div>
 
             {/* Slide Dots Indicator for Mobile */}
-            <div className="flex items-center justify-center space-x-2 pt-1 pb-1">
+            <div className="flex items-center justify-center space-x-2 pt-2 pb-1">
               {slides.map((_, idx) => (
                 <button
                   key={idx}

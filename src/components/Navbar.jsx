@@ -137,13 +137,9 @@ export const Navbar = () => {
             setActivePage('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center justify-center cursor-pointer px-3.5 py-1 rounded-full border border-white/80 bg-transparent hover:bg-white/10 transition shadow-sm"
+          className="flex items-center justify-center cursor-pointer px-3.5 py-1 rounded-full border border-white/90 bg-white/10 hover:bg-white/20 transition shadow-sm"
         >
-          <img
-            src="/images/voeux_logo.png"
-            alt="VOEUX® Logo"
-            className="h-5 w-auto object-contain brightness-0 invert"
-          />
+          <span className="text-white font-black tracking-widest text-xs uppercase px-0.5">VOEUX®</span>
         </div>
       </div>
 
