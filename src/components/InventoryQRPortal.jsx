@@ -234,6 +234,22 @@ export const InventoryQRPortal = () => {
     setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
   };
 
+  // Stock Quantity Quick Adjuster directly from Saved Shelves List
+  const updateShelfQuantityInList = (shelfId, amount) => {
+    setShelves(prev => prev.map(s => {
+      if (s.id === shelfId) {
+        const newQty = Math.max(0, s.quantity + amount);
+        const updated = { ...s, quantity: newQty };
+        if (activeShelf?.id === shelfId) {
+          setActiveShelf(updated);
+          setInlineQty(String(newQty));
+        }
+        return updated;
+      }
+      return s;
+    }));
+  };
+
   const filteredShelves = shelves.filter(s =>
     s.shelfNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -710,70 +726,139 @@ export const InventoryQRPortal = () => {
 
         {/* ==================== VIEW 4: ALL SAVED WAREHOUSE SHELVES LIST ==================== */}
         {viewMode === 'all-shelves' && (
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5 text-left">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-3">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 text-left">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
               <div>
-                <h2 className="text-base font-bold text-gray-900 uppercase">Saved Warehouse Shelves</h2>
-                <p className="text-xs text-gray-500">List of all generated shelf QR records</p>
+                <h2 className="text-base font-bold text-gray-900 uppercase">Saved Warehouse Shelves ({filteredShelves.length})</h2>
+                <p className="text-xs text-gray-500 mt-0.5">All live shelf allocation details and updated stock records</p>
               </div>
 
-              <div className="relative w-full sm:w-64">
+              <div className="relative w-full sm:w-72">
                 <input
                   type="text"
-                  placeholder="Search shelf # or product..."
+                  placeholder="Search by shelf #, product, assistant..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-[#3B429F]"
+                  className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3B429F]"
                 />
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
               </div>
             </div>
 
             {filteredShelves.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-5">
                 {filteredShelves.map(shelf => (
                   <div
                     key={shelf.id}
-                    className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-2.5 text-xs hover:border-[#3B429F] transition"
+                    className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-4 text-xs hover:border-[#3B429F] transition-all shadow-sm"
                   >
-                    <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                      <span className="bg-[#3B429F] text-white text-[11px] font-bold px-2.5 py-0.5 rounded uppercase">
-                        SHELF {shelf.shelfNumber}
+                    {/* Header Row */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-[#3B429F] text-white text-xs font-extrabold px-3 py-1 rounded-md uppercase tracking-wider">
+                          SHELF {shelf.shelfNumber}
+                        </span>
+                        <span className="text-[10px] font-mono text-gray-500 bg-white px-2 py-0.5 rounded border border-gray-200">
+                          {shelf.id}
+                        </span>
+                      </div>
+
+                      <span className="text-[11px] text-gray-500 font-medium">
+                        Created: {shelf.createdAt}
                       </span>
-                      <span className="text-[10px] font-mono text-gray-500">{shelf.id}</span>
                     </div>
 
-                    <div>
-                      <h3 className="font-bold text-gray-900 line-clamp-1">{shelf.productName}</h3>
-                      <p className="text-gray-600 text-[11px] mt-0.5">Assistant: <strong className="text-gray-900">{shelf.assistantName}</strong></p>
+                    {/* All Details Body */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Product Info */}
+                      <div className="md:col-span-2 space-y-1">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase block">Product Name</span>
+                        <h3 className="text-sm font-bold text-gray-900 leading-snug">{shelf.productName}</h3>
+                        
+                        {shelf.notes && (
+                          <p className="text-[11px] text-gray-600 pt-1">
+                            <strong>Zone / Notes:</strong> {shelf.notes}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Assistant & Stock Details */}
+                      <div className="bg-white p-3 rounded-lg border border-gray-200 space-y-2">
+                        <div>
+                          <span className="text-[10px] text-gray-500 font-bold uppercase block">Assigned Assistant</span>
+                          <p className="font-semibold text-gray-900 flex items-center gap-1 mt-0.5">
+                            <User className="w-3.5 h-3.5 text-[#3B429F]" />
+                            <span>{shelf.assistantName}</span>
+                          </p>
+                        </div>
+
+                        <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
+                          <span className="text-[10px] text-gray-500 font-bold uppercase">Live Stock</span>
+                          <span className="text-sm font-black text-emerald-700">{shelf.quantity} Units</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-1 border-t border-gray-200">
-                      <span className="text-emerald-700 font-bold">{shelf.quantity} Units</span>
-                      <div className="flex items-center gap-3">
+                    {/* Bottom Quick Actions */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-200">
+                      {/* Quantity Quick Adjust */}
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] text-gray-500 font-semibold mr-1">Quick Adjust Stock:</span>
+                        <button
+                          onClick={() => updateShelfQuantityInList(shelf.id, -1)}
+                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-red-600 transition cursor-pointer"
+                          title="Decrease 1 Unit"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="font-extrabold text-gray-900 px-2 min-w-[28px] text-center">{shelf.quantity}</span>
+                        <button
+                          onClick={() => updateShelfQuantityInList(shelf.id, 1)}
+                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-emerald-600 transition cursor-pointer"
+                          title="Increase 1 Unit"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* View / Edit / Print Action Buttons */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleCopyLink(shelf)}
+                          className="px-3 py-1.5 rounded-md bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                        >
+                          <Copy className="w-3.5 h-3.5 text-[#3B429F]" />
+                          <span>Copy Link</span>
+                        </button>
+
                         <button
                           onClick={() => navigateView('shelf-detail', shelf)}
-                          className="text-xs text-[#3B429F] hover:underline font-bold flex items-center gap-1"
+                          className="px-3.5 py-1.5 rounded-md bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs flex items-center gap-1 transition shadow-sm cursor-pointer"
                         >
-                          <ExternalLink className="w-3.5 h-3.5" /> View / Edit
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>View & Edit</span>
                         </button>
+
                         <button
                           onClick={() => navigateView('qr-generated', shelf)}
-                          className="text-xs text-gray-700 hover:underline font-bold flex items-center gap-1"
+                          className="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition shadow-sm cursor-pointer"
                         >
-                          <QrCode className="w-3.5 h-3.5" /> Print QR
+                          <Printer className="w-3.5 h-3.5" />
+                          <span>Print QR Tag</span>
                         </button>
                       </div>
                     </div>
+
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-10 text-xs text-gray-500 space-y-2">
-                <p>No active shelf records found in database.</p>
+              <div className="text-center py-12 text-xs text-gray-500 space-y-3">
+                <p className="text-sm font-semibold text-gray-700">No active shelf records found in database.</p>
+                <p className="text-xs text-gray-500">Create a shelf tag to view all updated warehouse records here.</p>
                 <button
                   onClick={() => navigateView('create')}
-                  className="btn-primary text-xs py-2 px-4"
+                  className="btn-primary text-xs py-2.5 px-5 mt-2 cursor-pointer"
                 >
                   Create First Shelf Tag
                 </button>
