@@ -22,12 +22,16 @@ import { SplashScreen } from './components/SplashScreen';
 import { PRODUCTS, CATEGORIES } from './data/products';
 import { ArrowRight, Star, ShieldCheck, Zap, Wrench } from 'lucide-react';
 import { WarrantyPolicyPage } from './components/WarrantyPolicyPage';
+import { InventoryQRPortal } from './components/InventoryQRPortal';
 
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts } = useShop();
 
   const renderPage = () => {
     switch (activePage) {
+      case 'inventory-qr':
+      case 'warehouse-qr':
+        return <InventoryQRPortal />;
       case 'android-players':
         return <CategoryPage categoryId="android-players" />;
       case 'speakers-soundbars':

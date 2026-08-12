@@ -5,11 +5,19 @@ import { fetchLiveFlipkartPrice } from '../utils/flipkartPriceScraper';
 const ShopContext = createContext();
 
 export const ShopProvider = ({ children }) => {
-  // Helper to parse page name from URL Hash for browser Back/Forward navigation
+  // Helper to parse page name from URL Hash & Search Params for browser navigation & mobile QR scans
   const getPageFromHash = () => {
     const hash = (window.location.hash || '').replace('#', '').trim();
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    if (searchParams.has('shelfId') || searchParams.get('page') === 'inventory-qr') {
+      return 'inventory-qr';
+    }
     if (!hash) return 'home';
     if (hash.startsWith('product-detail')) return 'product-detail';
+    if (hash.startsWith('inventory-qr') || hash.startsWith('warehouse-qr') || hash.startsWith('qr-inventory')) {
+      return 'inventory-qr';
+    }
     return hash;
   };
 
