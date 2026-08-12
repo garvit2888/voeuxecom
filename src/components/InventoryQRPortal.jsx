@@ -24,17 +24,23 @@ import {
 export const InventoryQRPortal = () => {
   const { setActivePage } = useShop();
 
-  // Load shelves from localStorage without any mock data
+  // Load shelves from localStorage and purge any leftover mock data
   const [shelves, setShelves] = useState(() => {
     try {
       const saved = localStorage.getItem('voeux_warehouse_shelves');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Filter out leftover mock entries
+        const clean = (parsed || []).filter(item => item && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(item.id));
+        return clean;
+      }
+      return [];
     } catch (e) {
       return [];
     }
   });
 
-  // Save shelves to localStorage on change
+  // Save clean shelves list to localStorage on change
   useEffect(() => {
     try {
       localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(shelves));
