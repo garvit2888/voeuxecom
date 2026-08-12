@@ -13,8 +13,8 @@ import {
   ArrowLeft,
   Search,
   ExternalLink,
-  RefreshCcw,
-  Sparkles,
+  Edit3,
+  Save,
   Layers,
   Copy,
   Check,
@@ -24,54 +24,24 @@ import {
 export const InventoryQRPortal = () => {
   const { setActivePage } = useShop();
 
-  // Initial Pre-seeded Shelves Data (persisted in localStorage)
-  const defaultShelves = [
-    {
-      id: 'VOEUX-INV-101',
-      shelfNumber: 'A-12',
-      productName: 'Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)',
-      assistantName: 'Rajesh Kumar',
-      quantity: 45,
-      notes: 'Rack 1, Top Tier • High Demand Item',
-      createdAt: new Date(Date.now() - 86400000 * 3).toLocaleString('en-IN')
-    },
-    {
-      id: 'VOEUX-INV-102',
-      shelfNumber: 'B-04',
-      productName: 'VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer',
-      assistantName: 'Vikram Singh',
-      quantity: 28,
-      notes: 'Zone B Soundbar Bay',
-      createdAt: new Date(Date.now() - 86400000 * 2).toLocaleString('en-IN')
-    },
-    {
-      id: 'VOEUX-INV-103',
-      shelfNumber: 'C-08',
-      productName: 'Voeux Android 4+64GB, 6th Gen, 4 Core Car Stereo with Apple CarPlay & Android Auto',
-      assistantName: 'Amit Sharma',
-      quantity: 60,
-      notes: 'Carbon Black Series Pallet',
-      createdAt: new Date(Date.now() - 86400000 * 1).toLocaleString('en-IN')
-    }
-  ];
-
+  // Load shelves from localStorage without any mock data
   const [shelves, setShelves] = useState(() => {
     try {
       const saved = localStorage.getItem('voeux_warehouse_shelves');
-      return saved ? JSON.parse(saved) : defaultShelves;
+      return saved ? JSON.parse(saved) : [];
     } catch (e) {
-      return defaultShelves;
+      return [];
     }
   });
 
-  // Save to localStorage on change
+  // Save shelves to localStorage on change
   useEffect(() => {
     try {
       localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(shelves));
     } catch (e) {}
   }, [shelves]);
 
-  // Form State
+  // Form Input States
   const [productName, setProductName] = useState(PRODUCTS[0]?.name || '');
   const [customProduct, setCustomProduct] = useState('');
   const [assistantName, setAssistantName] = useState('');
@@ -82,38 +52,78 @@ export const InventoryQRPortal = () => {
   // Active View State: 'create' | 'qr-generated' | 'shelf-detail' | 'all-shelves'
   const [viewMode, setViewMode] = useState('create');
   const [activeShelf, setActiveShelf] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Detect URL parameter when scanned from mobile phone camera
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const shelfIdFromUrl = urlParams.get('shelfId');
-    const hash = window.location.hash || '';
+  // Navigation with Browser History (Back / Forward Arrow Support)
+  const navigateView = (mode, shelf = null, skipHistory = false) => {
+    setViewMode(mode);
+    setIsEditing(false);
+    if (shelf) setActiveShelf(shelf);
 
-    if (shelfIdFromUrl) {
-      const matched = shelves.find(s => s.id === shelfIdFromUrl);
-      if (matched) {
-        setActiveShelf(matched);
-        setViewMode('shelf-detail');
+    if (!skipHistory) {
+      let newUrl = window.location.pathname;
+      if (mode === 'shelf-detail' && shelf) {
+        newUrl += `?shelfId=${shelf.id}#inventory-qr`;
+      } else if (mode === 'qr-generated' && shelf) {
+        newUrl += `?shelfId=${shelf.id}&preview=true#inventory-qr`;
+      } else if (mode === 'all-shelves') {
+        newUrl += `?page=inventory-qr&view=all#inventory-qr`;
       } else {
-        // Create temporary view if dynamic shelf ID scanned
-        const dynamicShelf = {
-          id: shelfIdFromUrl,
-          shelfNumber: urlParams.get('shelf') || 'A-01',
-          productName: urlParams.get('product') || 'VOEUX Car Electronics Product',
-          assistantName: urlParams.get('assistant') || 'Warehouse Staff',
-          quantity: parseInt(urlParams.get('qty') || '30', 10),
-          notes: 'Scanned via Mobile Camera',
-          createdAt: new Date().toLocaleString('en-IN')
-        };
-        setActiveShelf(dynamicShelf);
-        setViewMode('shelf-detail');
+        newUrl += `#inventory-qr`;
       }
+      window.history.pushState({ viewMode: mode, shelfId: shelf?.id }, '', newUrl);
     }
-  }, []);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  // Submit Handler for Generating New QR Tag
+  // Sync with browser Back and Forward button events (popstate) & mobile QR camera scan URLs
+  useEffect(() => {
+    const handleUrlState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shelfIdFromUrl = urlParams.get('shelfId');
+
+      if (shelfIdFromUrl) {
+        const matched = shelves.find(s => s.id === shelfIdFromUrl);
+        if (matched) {
+          setActiveShelf(matched);
+          setViewMode(urlParams.get('preview') ? 'qr-generated' : 'shelf-detail');
+          return;
+        } else {
+          // Dynamic entry if scanned ID not in local list yet
+          const dynamicShelf = {
+            id: shelfIdFromUrl,
+            shelfNumber: (urlParams.get('shelf') || 'A-01').toUpperCase(),
+            productName: urlParams.get('product') || 'VOEUX Electronics Item',
+            assistantName: urlParams.get('assistant') || 'Warehouse Assistant',
+            quantity: parseInt(urlParams.get('qty') || '10', 10),
+            notes: 'Scanned via QR Code',
+            createdAt: new Date().toLocaleString('en-IN')
+          };
+          setActiveShelf(dynamicShelf);
+          setViewMode('shelf-detail');
+          return;
+        }
+      }
+
+      const viewParam = urlParams.get('view');
+      if (viewParam === 'all') setViewMode('all-shelves');
+      else setViewMode('create');
+    };
+
+    handleUrlState();
+
+    const handlePopState = () => {
+      handleUrlState();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [shelves]);
+
+  // Submit Handler for Creating a New QR Code Tag
   const handleGenerateQR = (e) => {
     e.preventDefault();
     const selectedProd = productName === 'CUSTOM' ? customProduct : productName;
@@ -122,7 +132,7 @@ export const InventoryQRPortal = () => {
       return;
     }
 
-    const newId = `VOEUX-INV-${Math.floor(100 + Math.random() * 900)}`;
+    const newId = `VOEUX-INV-${Math.floor(1000 + Math.random() * 9000)}`;
     const newShelf = {
       id: newId,
       shelfNumber: shelfNumber.toUpperCase().trim(),
@@ -134,8 +144,26 @@ export const InventoryQRPortal = () => {
     };
 
     setShelves(prev => [newShelf, ...prev]);
-    setActiveShelf(newShelf);
-    setViewMode('qr-generated');
+    navigateView('qr-generated', newShelf);
+  };
+
+  // Save Edits to Active Shelf
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editFormData || !activeShelf) return;
+
+    const updated = {
+      ...activeShelf,
+      productName: editFormData.productName,
+      assistantName: editFormData.assistantName,
+      shelfNumber: editFormData.shelfNumber.toUpperCase().trim(),
+      quantity: Number(editFormData.quantity) || 0,
+      notes: editFormData.notes
+    };
+
+    setActiveShelf(updated);
+    setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
+    setIsEditing(false);
   };
 
   // Helper to generate full scan URL encoded into QR Code
@@ -151,7 +179,7 @@ export const InventoryQRPortal = () => {
     return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(scanUrl)}&margin=1`;
   };
 
-  // Copy Link Handler
+  // Copy Direct Link Handler
   const handleCopyLink = (shelf) => {
     const url = getScanUrl(shelf);
     navigator.clipboard.writeText(url);
@@ -164,7 +192,7 @@ export const InventoryQRPortal = () => {
     window.print();
   };
 
-  // Stock Quantity Adjuster
+  // Stock Quantity Quick Adjuster
   const updateQuantity = (amount) => {
     if (!activeShelf) return;
     const newQty = Math.max(0, activeShelf.quantity + amount);
@@ -181,7 +209,7 @@ export const InventoryQRPortal = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white py-8 px-4 sm:px-6">
+    <div className="min-h-screen bg-gray-50 text-gray-900 py-10 px-4 sm:px-6">
       
       {/* ==================== PRINTABLE STICKER TAG (HIDDEN ON SCREEN, SHOWN ON PRINT) ==================== */}
       {activeShelf && (
@@ -189,7 +217,7 @@ export const InventoryQRPortal = () => {
           <div className="max-w-xs mx-auto border-4 border-black p-5 rounded-2xl text-center space-y-3 bg-white">
             <div className="border-b-2 border-black pb-2">
               <h2 className="text-xl font-black tracking-widest uppercase text-black">VOEUX® LOGISTICS</h2>
-              <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">Warehouse Shelf Inventory Tag</p>
+              <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wider">Warehouse Shelf Inventory Tag</p>
             </div>
 
             <div className="bg-black text-white font-black text-2xl py-2 px-3 rounded-lg tracking-widest">
@@ -207,86 +235,74 @@ export const InventoryQRPortal = () => {
             <div className="text-left space-y-1 text-xs border-t-2 border-black pt-2 font-medium">
               <p className="truncate"><strong>PRODUCT:</strong> {activeShelf.productName}</p>
               <p><strong>ASSISTANT:</strong> {activeShelf.assistantName}</p>
-              <p><strong>INITIAL STOCK:</strong> {activeShelf.quantity} Units</p>
+              <p><strong>CURRENT STOCK:</strong> {activeShelf.quantity} Units</p>
               <p><strong>TAG ID:</strong> {activeShelf.id}</p>
               <p><strong>DATE:</strong> {activeShelf.createdAt}</p>
             </div>
 
-            <div className="border-t border-dashed border-gray-400 pt-2 text-[9px] text-gray-700 italic">
-              Scan QR code with mobile phone camera to open live inventory details & update stock.
+            <div className="border-t border-dashed border-gray-400 pt-2 text-[9px] text-gray-700">
+              Scan QR code with phone camera to view & update live shelf details.
             </div>
           </div>
         </div>
       )}
 
-      {/* ==================== MAIN APPLICATION INTERFACE (NON-PRINT) ==================== */}
-      <div className="max-w-4xl mx-auto space-y-8 print:hidden">
+      {/* ==================== MAIN APPLICATION INTERFACE ==================== */}
+      <div className="max-w-3xl mx-auto space-y-6 print:hidden">
         
-        {/* Top Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="bg-indigo-600/30 text-indigo-400 text-[10px] font-extrabold px-3 py-1 rounded-full border border-indigo-500/30 tracking-widest uppercase">
-                Internal Logistics Portal
-              </span>
+        {/* Top Page Header (Warranty Portal Style) */}
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-4 text-left">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+                <QrCode className="w-7 h-7 text-[#3B429F]" />
+                <span>Warehouse Inventory System</span>
+              </h1>
+              <p className="text-xs text-gray-500 mt-1 font-medium">
+                VOEUX® Logistics • Shelf Tag Generator & Scan System
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white mt-1.5 tracking-tight flex items-center gap-2.5">
-              <QrCode className="w-7 h-7 text-cyan-400" />
-              <span>Warehouse QR Inventory System</span>
-            </h1>
-            <p className="text-xs text-gray-400 mt-1 font-medium">
-              Generate printable shelf QR codes & scan tags live via phone camera
-            </p>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode('create')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                viewMode === 'create' ? 'bg-[#3B429F] text-white shadow-lg shadow-indigo-900/50' : 'bg-slate-900 text-gray-300 border border-slate-800 hover:bg-slate-800'
-              }`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>New QR Tag</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigateView('create')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  viewMode === 'create' ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create QR Tag</span>
+              </button>
 
-            <button
-              onClick={() => setViewMode('all-shelves')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                viewMode === 'all-shelves' ? 'bg-[#3B429F] text-white shadow-lg shadow-indigo-900/50' : 'bg-slate-900 text-gray-300 border border-slate-800 hover:bg-slate-800'
-              }`}
-            >
-              <Layers className="w-4 h-4" />
-              <span>All Shelves ({shelves.length})</span>
-            </button>
+              <button
+                onClick={() => navigateView('all-shelves')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  viewMode === 'all-shelves' ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                <span>Saved Shelves ({shelves.length})</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* ==================== VIEW 1: CREATE NEW SHELF QR TAG FORM ==================== */}
         {viewMode === 'create' && (
-          <div className="bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-slate-800/80 shadow-2xl space-y-6">
-            <div className="flex items-center gap-3 border-b border-slate-800/80 pb-4">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-cyan-400">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-white">Generate Warehouse Shelf QR Tag</h2>
-                <p className="text-xs text-gray-400">Enter shelf allocation details to produce a printable sticker tag</p>
-              </div>
-            </div>
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5 text-left">
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+              CREATE WAREHOUSE SHELF TAG
+            </h2>
 
-            <form onSubmit={handleGenerateQR} className="space-y-5">
+            <form onSubmit={handleGenerateQR} className="space-y-4 text-xs">
               
               {/* Product Selection */}
-              <div className="space-y-1.5 text-left">
-                <label className="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
-                  <Package className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Select Product</span>
-                </label>
+              <div className="space-y-1">
+                <label className="text-gray-900 font-bold block">PRODUCT NAME *</label>
                 <select
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400 transition"
+                  className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
                 >
                   {PRODUCTS.map(p => (
                     <option key={p.id} value={p.name}>
@@ -302,67 +318,61 @@ export const InventoryQRPortal = () => {
                     placeholder="Type custom product name..."
                     value={customProduct}
                     onChange={(e) => setCustomProduct(e.target.value)}
-                    className="mt-2 w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+                    className="mt-2 w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
                     required
                   />
                 )}
               </div>
 
               {/* Grid 2-cols: Assistant Name & Shelf Number */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Warehouse Assistant Name</span>
-                  </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-gray-900 font-bold block">WAREHOUSE ASSISTANT NAME *</label>
                   <input
                     type="text"
                     placeholder="e.g. Rajesh Kumar"
                     value={assistantName}
                     onChange={(e) => setAssistantName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
                     required
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Shelf Number / Rack Zone</span>
-                  </label>
+                <div className="space-y-1">
+                  <label className="text-gray-900 font-bold block">SHELF NUMBER / ZONE *</label>
                   <input
                     type="text"
-                    placeholder="e.g. A-12 or Zone 3-B"
+                    placeholder="e.g. A-12 or Zone B-04"
                     value={shelfNumber}
                     onChange={(e) => setShelfNumber(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white uppercase placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 uppercase focus:outline-none focus:border-[#3B429F]"
                     required
                   />
                 </div>
               </div>
 
               {/* Quantity & Notes */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-300">Initial Stock Quantity</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-gray-900 font-bold block">INITIAL QUANTITY *</label>
                   <input
                     type="number"
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
                     required
                   />
                 </div>
 
-                <div className="sm:col-span-2 space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-300">Notes / Pallet Batch Info</label>
+                <div className="sm:col-span-2 space-y-1">
+                  <label className="text-gray-900 font-bold block">NOTES / PALLET DETAILS</label>
                   <input
                     type="text"
-                    placeholder="e.g. Top Rack, Fast Moving, Batch #2026-08"
+                    placeholder="e.g. Rack 1, Top Tier, Fast Moving"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
                   />
                 </div>
               </div>
@@ -370,96 +380,89 @@ export const InventoryQRPortal = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60 cursor-pointer"
+                className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-3.5 px-6 rounded-lg transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
-                <QrCode className="w-5 h-5" />
-                <span>GENERATE & PREVIEW PRINTABLE QR CODE TAG</span>
+                <QrCode className="w-4 h-4" />
+                <span>GENERATE & PREVIEW QR CODE TAG</span>
               </button>
             </form>
           </div>
         )}
 
-        {/* ==================== VIEW 2: QR GENERATED & PRINT PREVIEW ==================== */}
+        {/* ==================== VIEW 2: QR GENERATED & PREVIEW ==================== */}
         {viewMode === 'qr-generated' && activeShelf && (
-          <div className="bg-slate-900/90 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-slate-800/80 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <CheckCircle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-white">QR Code Tag Ready for Printing</h2>
-                  <p className="text-xs text-gray-400">Stick this printed QR tag on Warehouse Shelf {activeShelf.shelfNumber}</p>
-                </div>
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 text-left">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-gray-900 uppercase">QR Code Tag Generated</h2>
+                <p className="text-xs text-gray-500">Ready to print and attach to Shelf {activeShelf.shelfNumber}</p>
               </div>
 
               <button
-                onClick={() => setViewMode('create')}
-                className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                onClick={() => navigateView('create')}
+                className="text-xs text-[#3B429F] hover:underline flex items-center gap-1 font-bold"
               >
-                <ArrowLeft className="w-4 h-4" /> Back
+                <ArrowLeft className="w-4 h-4" /> Back to Form
               </button>
             </div>
 
-            {/* Visual Label Box Preview */}
-            <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 flex flex-col sm:flex-row items-center gap-8 justify-between">
+            {/* Visual Tag Preview Card */}
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-6 justify-between">
               
-              {/* QR Image Frame */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="bg-white p-4 rounded-2xl shadow-2xl border-4 border-slate-900 text-center">
+              {/* QR Image Box */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="bg-white p-3 rounded-xl shadow-md border-2 border-gray-900 text-center">
                   <img
                     src={getQrImageUrl(activeShelf)}
                     alt="Generated QR"
-                    className="w-48 h-48 sm:w-56 sm:h-56 object-contain"
+                    className="w-48 h-48 object-contain"
                   />
-                  <span className="block mt-2 text-[10px] font-black tracking-widest text-slate-800 uppercase">
+                  <span className="block mt-1 text-[9px] font-bold text-gray-700 uppercase">
                     SCAN WITH PHONE CAMERA
                   </span>
                 </div>
 
                 <button
                   onClick={() => handleCopyLink(activeShelf)}
-                  className="text-xs text-cyan-400 hover:underline flex items-center gap-1.5 pt-1"
+                  className="text-xs text-[#3B429F] hover:underline flex items-center gap-1 font-semibold pt-1"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedLink ? 'Direct Scan Link Copied!' : 'Copy Direct Scan URL'}</span>
+                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedLink ? 'Scan Link Copied!' : 'Copy Direct Scan URL'}</span>
                 </button>
               </div>
 
-              {/* Shelf Tag Summary */}
-              <div className="flex-1 space-y-4 text-left">
+              {/* Shelf Info Summary */}
+              <div className="flex-1 space-y-3">
                 <div>
-                  <span className="bg-indigo-600/30 text-cyan-300 text-[11px] font-black px-3 py-1 rounded-full border border-indigo-500/30 tracking-widest uppercase">
-                    SHELF LOCATION
-                  </span>
-                  <h1 className="text-3xl sm:text-4xl font-black text-white mt-1 tracking-tight">
+                  <span className="text-[10px] font-bold text-[#3B429F] tracking-wider uppercase">SHELF ALLOCATION</span>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5">
                     SHELF {activeShelf.shelfNumber}
                   </h1>
                 </div>
 
-                <div className="space-y-2 text-xs text-gray-300 border-y border-slate-800/80 py-3">
-                  <p><strong className="text-white">Product:</strong> {activeShelf.productName}</p>
-                  <p><strong className="text-white">Assigned Assistant:</strong> {activeShelf.assistantName}</p>
-                  <p><strong className="text-white">Stock Quantity:</strong> <span className="text-emerald-400 font-bold">{activeShelf.quantity} Units</span></p>
-                  <p><strong className="text-white">Tag Record ID:</strong> <span className="font-mono text-gray-400">{activeShelf.id}</span></p>
+                <div className="space-y-1.5 text-xs text-gray-700 border-y border-gray-200 py-3">
+                  <p><strong className="text-gray-900">Product:</strong> {activeShelf.productName}</p>
+                  <p><strong className="text-gray-900">Assistant:</strong> {activeShelf.assistantName}</p>
+                  <p><strong className="text-gray-900">Stock Quantity:</strong> <span className="text-emerald-700 font-bold">{activeShelf.quantity} Units</span></p>
+                  <p><strong className="text-gray-900">Tag Record ID:</strong> <span className="font-mono text-gray-500">{activeShelf.id}</span></p>
                 </div>
 
-                {/* Print Button */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                {/* Print & View Buttons */}
+                <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
                   <button
                     onClick={handlePrintTag}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/60 transition cursor-pointer"
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer shadow-sm"
                   >
                     <Printer className="w-4 h-4" />
-                    <span>PRINT STICKER TAG (WINDOW.PRINT)</span>
+                    <span>PRINT TAG</span>
                   </button>
 
                   <button
-                    onClick={() => setViewMode('shelf-detail')}
-                    className="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer"
+                    onClick={() => navigateView('shelf-detail', activeShelf)}
+                    className="bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer shadow-sm"
                   >
-                    <Smartphone className="w-4 h-4 text-cyan-400" />
-                    <span>Test Mobile Phone Scan View</span>
+                    <Smartphone className="w-4 h-4" />
+                    <span>View Scanned Page</span>
                   </button>
                 </div>
               </div>
@@ -468,104 +471,193 @@ export const InventoryQRPortal = () => {
           </div>
         )}
 
-        {/* ==================== VIEW 3: SCANNED SHELF DETAIL VIEW (PHONE CAMERA VIEW) ==================== */}
+        {/* ==================== VIEW 3: SCANNED SHELF DETAILS & EDIT VIEW ==================== */}
         {viewMode === 'shelf-detail' && activeShelf && (
-          <div className="bg-slate-900/90 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-slate-800/80 shadow-2xl space-y-6 text-left animate-in fade-in duration-300">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 text-left">
             
-            {/* Header notification badge */}
-            <div className="bg-indigo-950/80 border border-indigo-500/40 rounded-2xl p-4 flex items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 text-cyan-300">
-                <Smartphone className="w-5 h-5 shrink-0" />
-                <span>Scanned Live from Warehouse Mobile Camera</span>
-              </div>
-              <button
-                onClick={() => setViewMode('all-shelves')}
-                className="text-[11px] text-gray-400 hover:text-white underline shrink-0"
-              >
-                View All Shelves
-              </button>
-            </div>
-
-            {/* Shelf Location Tag */}
-            <div>
-              <span className="bg-cyan-500/20 text-cyan-300 text-[10px] font-black px-3 py-1 rounded-full border border-cyan-500/40 uppercase tracking-widest">
-                VERIFIED SHELF LOCATION
-              </span>
-              <h1 className="text-3xl sm:text-4xl font-black text-white mt-1.5 tracking-tight">
-                SHELF {activeShelf.shelfNumber}
-              </h1>
-              <p className="text-xs text-gray-400 mt-1">Tag ID: <span className="font-mono text-cyan-400">{activeShelf.id}</span> • Scanned at {new Date().toLocaleTimeString('en-IN')}</p>
-            </div>
-
-            {/* Product Details Card */}
-            <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+            {/* Top Bar */}
+            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
               <div>
-                <span className="text-[10px] text-gray-500 font-extrabold uppercase">Product Item</span>
-                <h3 className="text-base font-bold text-white mt-0.5">{activeShelf.productName}</h3>
+                <span className="text-[10px] font-bold text-[#3B429F] tracking-wider uppercase">SCANNED SHELF LOCATION</span>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5">
+                  SHELF {activeShelf.shelfNumber}
+                </h1>
+                <p className="text-xs text-gray-500 mt-0.5">Tag ID: <span className="font-mono text-gray-700 font-bold">{activeShelf.id}</span></p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-xs border-t border-slate-800/80 pt-3">
-                <div>
-                  <span className="text-[10px] text-gray-500">Assigned Assistant</span>
-                  <p className="font-semibold text-white mt-0.5 flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>{activeShelf.assistantName}</span>
-                  </p>
-                </div>
-                <div>
-                  <span className="text-[10px] text-gray-500">Zone / Notes</span>
-                  <p className="font-semibold text-white mt-0.5">{activeShelf.notes || 'Standard Rack'}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Live Stock Counter & Quick Adjuster */}
-            <div className="bg-indigo-950/40 border border-indigo-500/30 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <span className="text-xs text-gray-300 font-semibold">Current Live Stock Quantity</span>
-                <div className="text-3xl font-black text-emerald-400 mt-0.5">
-                  {activeShelf.quantity} <span className="text-xs font-normal text-gray-400">Units</span>
-                </div>
-              </div>
-
-              {/* Adjust Buttons */}
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => updateQuantity(-1)}
-                  className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition flex items-center justify-center cursor-pointer border border-slate-700"
-                  title="Decrease Stock Count"
+                  onClick={() => {
+                    setEditFormData({ ...activeShelf });
+                    setIsEditing(!isEditing);
+                  }}
+                  className="px-3.5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <Minus className="w-5 h-5 text-red-400" />
+                  <Edit3 className="w-4 h-4 text-[#3B429F]" />
+                  <span>{isEditing ? 'Cancel Edit' : 'Edit Shelf Details'}</span>
                 </button>
 
                 <button
-                  onClick={() => updateQuantity(1)}
-                  className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition flex items-center justify-center cursor-pointer border border-slate-700"
-                  title="Increase Stock Count"
+                  onClick={() => navigateView('all-shelves')}
+                  className="text-xs text-[#3B429F] hover:underline font-bold"
                 >
-                  <Plus className="w-5 h-5 text-emerald-400" />
-                </button>
-
-                <button
-                  onClick={() => handlePrintTag()}
-                  className="ml-2 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-extrabold py-3 px-4 rounded-xl flex items-center gap-1.5 transition cursor-pointer"
-                >
-                  <Printer className="w-4 h-4" />
-                  <span>Reprint Tag</span>
+                  All Shelves
                 </button>
               </div>
             </div>
+
+            {/* EDIT FORM MODE */}
+            {isEditing && editFormData ? (
+              <form onSubmit={handleSaveEdit} className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-4 text-xs">
+                <h3 className="font-bold text-gray-900 uppercase">EDIT SHELF DETAILS</h3>
+
+                <div className="space-y-1">
+                  <label className="text-gray-900 font-bold block">PRODUCT NAME</label>
+                  <input
+                    type="text"
+                    value={editFormData.productName}
+                    onChange={e => setEditFormData({ ...editFormData, productName: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-gray-900 font-bold block">ASSISTANT NAME</label>
+                    <input
+                      type="text"
+                      value={editFormData.assistantName}
+                      onChange={e => setEditFormData({ ...editFormData, assistantName: e.target.value })}
+                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-gray-900 font-bold block">SHELF NUMBER</label>
+                    <input
+                      type="text"
+                      value={editFormData.shelfNumber}
+                      onChange={e => setEditFormData({ ...editFormData, shelfNumber: e.target.value })}
+                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 uppercase focus:outline-none focus:border-[#3B429F] bg-white"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-gray-900 font-bold block">STOCK QUANTITY</label>
+                    <input
+                      type="number"
+                      value={editFormData.quantity}
+                      onChange={e => setEditFormData({ ...editFormData, quantity: e.target.value })}
+                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                      required
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2 space-y-1">
+                    <label className="text-gray-900 font-bold block">NOTES</label>
+                    <input
+                      type="text"
+                      value={editFormData.notes}
+                      onChange={e => setEditFormData({ ...editFormData, notes: e.target.value })}
+                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-lg bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs flex items-center gap-1.5"
+                  >
+                    <Save className="w-4 h-4" /> Save Changes
+                  </button>
+                </div>
+              </form>
+            ) : (
+              /* VIEW MODE */
+              <div className="space-y-5 text-xs">
+                {/* Product Information Box */}
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                  <div>
+                    <span className="text-[10px] text-gray-500 font-bold uppercase">PRODUCT ITEM</span>
+                    <h3 className="text-sm font-bold text-gray-900 mt-0.5">{activeShelf.productName}</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 border-t border-gray-200 pt-3 text-gray-700">
+                    <div>
+                      <span className="text-[10px] text-gray-500 font-bold block">ASSIGNED ASSISTANT</span>
+                      <p className="font-semibold text-gray-900 mt-0.5 flex items-center gap-1">
+                        <User className="w-3.5 h-3.5 text-[#3B429F]" />
+                        <span>{activeShelf.assistantName}</span>
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-500 font-bold block">ZONE / NOTES</span>
+                      <p className="font-semibold text-gray-900 mt-0.5">{activeShelf.notes || 'Standard Storage'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stock Counter Bar */}
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <span className="text-xs text-gray-600 font-bold">CURRENT STOCK QUANTITY</span>
+                    <div className="text-3xl font-extrabold text-emerald-700 mt-0.5">
+                      {activeShelf.quantity} <span className="text-xs font-medium text-gray-500">Units</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => updateQuantity(-1)}
+                      className="p-2.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
+                      title="Decrease Stock"
+                    >
+                      <Minus className="w-4 h-4 text-red-600" />
+                    </button>
+
+                    <button
+                      onClick={() => updateQuantity(1)}
+                      className="p-2.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
+                      title="Increase Stock"
+                    >
+                      <Plus className="w-4 h-4 text-emerald-600" />
+                    </button>
+
+                    <button
+                      onClick={() => handlePrintTag()}
+                      className="ml-2 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center gap-1.5 transition cursor-pointer shadow-sm"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>Print Tag</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         )}
 
-        {/* ==================== VIEW 4: ALL WAREHOUSE SHELVES LIST ==================== */}
+        {/* ==================== VIEW 4: ALL SAVED WAREHOUSE SHELVES LIST ==================== */}
         {viewMode === 'all-shelves' && (
-          <div className="bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-slate-800/80 shadow-2xl space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5 text-left">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-3">
               <div>
-                <h2 className="text-lg font-bold text-white">All Warehouse Shelves & QR Tags</h2>
-                <p className="text-xs text-gray-400">Search active shelf allocations across the warehouse</p>
+                <h2 className="text-base font-bold text-gray-900 uppercase">Saved Warehouse Shelves</h2>
+                <p className="text-xs text-gray-500">List of all generated shelf QR records</p>
               </div>
 
               <div className="relative w-full sm:w-64">
@@ -574,56 +666,62 @@ export const InventoryQRPortal = () => {
                   placeholder="Search shelf # or product..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 text-white text-xs rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-cyan-400"
+                  className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-[#3B429F]"
                 />
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-              {filteredShelves.map(shelf => (
-                <div
-                  key={shelf.id}
-                  className="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-3 hover:border-indigo-500/40 transition"
-                >
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                    <span className="bg-indigo-600/30 text-cyan-300 text-xs font-black px-2.5 py-0.5 rounded-lg border border-indigo-500/30 uppercase">
-                      SHELF {shelf.shelfNumber}
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-400">{shelf.id}</span>
-                  </div>
+            {filteredShelves.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredShelves.map(shelf => (
+                  <div
+                    key={shelf.id}
+                    className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-2.5 text-xs hover:border-[#3B429F] transition"
+                  >
+                    <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                      <span className="bg-[#3B429F] text-white text-[11px] font-bold px-2.5 py-0.5 rounded uppercase">
+                        SHELF {shelf.shelfNumber}
+                      </span>
+                      <span className="text-[10px] font-mono text-gray-500">{shelf.id}</span>
+                    </div>
 
-                  <div>
-                    <h3 className="text-xs font-bold text-white line-clamp-1">{shelf.productName}</h3>
-                    <p className="text-[11px] text-gray-400 mt-0.5">Assistant: <strong className="text-gray-200">{shelf.assistantName}</strong></p>
-                  </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 line-clamp-1">{shelf.productName}</h3>
+                      <p className="text-gray-600 text-[11px] mt-0.5">Assistant: <strong className="text-gray-900">{shelf.assistantName}</strong></p>
+                    </div>
 
-                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800/80">
-                    <span className="text-emerald-400 font-extrabold">{shelf.quantity} Units in Stock</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setActiveShelf(shelf);
-                          setViewMode('shelf-detail');
-                        }}
-                        className="text-xs text-cyan-400 hover:underline flex items-center gap-1"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" /> View
-                      </button>
-                      <button
-                        onClick={() => {
-                          setActiveShelf(shelf);
-                          setViewMode('qr-generated');
-                        }}
-                        className="text-xs text-indigo-400 hover:underline flex items-center gap-1"
-                      >
-                        <QrCode className="w-3.5 h-3.5" /> Print QR
-                      </button>
+                    <div className="flex items-center justify-between pt-1 border-t border-gray-200">
+                      <span className="text-emerald-700 font-bold">{shelf.quantity} Units</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => navigateView('shelf-detail', shelf)}
+                          className="text-xs text-[#3B429F] hover:underline font-bold flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" /> View / Edit
+                        </button>
+                        <button
+                          onClick={() => navigateView('qr-generated', shelf)}
+                          className="text-xs text-gray-700 hover:underline font-bold flex items-center gap-1"
+                        >
+                          <QrCode className="w-3.5 h-3.5" /> Print QR
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 text-xs text-gray-500 space-y-2">
+                <p>No active shelf records found in database.</p>
+                <button
+                  onClick={() => navigateView('create')}
+                  className="btn-primary text-xs py-2 px-4"
+                >
+                  Create First Shelf Tag
+                </button>
+              </div>
+            )}
           </div>
         )}
 
