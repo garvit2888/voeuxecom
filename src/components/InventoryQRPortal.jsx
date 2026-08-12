@@ -140,15 +140,20 @@ export const InventoryQRPortal = () => {
     } catch (e) {}
   };
 
-  // Auto-sync cloud data on component mount
+  // Auto-sync cloud data automatically on mount and every 5 seconds in background
   useEffect(() => {
     syncFromCloud();
+    const interval = setInterval(() => {
+      syncFromCloud();
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // Navigation with Browser History (Back / Forward Arrow Support)
   const navigateView = (mode, shelf = null, skipHistory = false) => {
     setViewMode(mode);
     setIsEditing(false);
+    syncFromCloud(); // Auto sync on view switch
     if (shelf) {
       setActiveShelf(shelf);
       setInlineQty(String(shelf.quantity));
@@ -419,16 +424,6 @@ export const InventoryQRPortal = () => {
               >
                 <Layers className="w-4 h-4" />
                 <span>Saved Shelves ({shelves.length})</span>
-              </button>
-
-              <button
-                onClick={syncFromCloud}
-                disabled={isSyncing}
-                className="px-3.5 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                title="Synchronize warehouse database across devices"
-              >
-                <RefreshCcw className={`w-3.5 h-3.5 text-emerald-700 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? 'Syncing...' : 'Sync Cloud DB'}</span>
               </button>
             </div>
           </div>
