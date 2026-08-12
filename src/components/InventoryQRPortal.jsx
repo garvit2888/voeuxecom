@@ -18,7 +18,8 @@ import {
   Layers,
   Copy,
   Check,
-  Smartphone
+  Smartphone,
+  RefreshCcw
 } from 'lucide-react';
 
 export const InventoryQRPortal = () => {
@@ -63,6 +64,86 @@ export const InventoryQRPortal = () => {
   const [inlineQty, setInlineQty] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // Cloud Database Sync Endpoints (Cross-Device Database)
+  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/251bfc52c14540fb8864c102b3666650/shelves';
+  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
+
+  // Fetch Cloud Database Shelves and Sync Across Devices
+  const syncFromCloud = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch(CLOUD_SYNC_ENDPOINT);
+      if (res.ok) {
+        const cloudData = await res.json();
+        if (Array.isArray(cloudData) && cloudData.length > 0) {
+          setShelves(prev => {
+            const merged = [...prev];
+            cloudData.forEach(item => {
+              const cleanItem = {
+                id: item.shelfId || item.id,
+                shelfNumber: item.shelfNumber,
+                productName: item.productName,
+                assistantName: item.assistantName,
+                quantity: Number(item.quantity) || 0,
+                notes: item.notes || '',
+                createdAt: item.createdAt || new Date().toLocaleString('en-IN')
+              };
+              if (cleanItem.id && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanItem.id)) {
+                const idx = merged.findIndex(m => m.id === cleanItem.id);
+                if (idx > -1) {
+                  merged[idx] = { ...merged[idx], ...cleanItem };
+                } else {
+                  merged.unshift(cleanItem);
+                }
+              }
+            });
+            return merged;
+          });
+        }
+      }
+    } catch (err) {
+      console.log('Cloud sync status:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Push Shelf Record to Cloud Database for Multi-Device Access
+  const pushToCloud = async (shelfItem) => {
+    if (!shelfItem || !shelfItem.id) return;
+    try {
+      fetch(CLOUD_SYNC_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shelfId: shelfItem.id,
+          shelfNumber: shelfItem.shelfNumber,
+          productName: shelfItem.productName,
+          assistantName: shelfItem.assistantName,
+          quantity: shelfItem.quantity,
+          notes: shelfItem.notes || '',
+          createdAt: shelfItem.createdAt
+        })
+      }).catch(() => {});
+
+      fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_shelf',
+          shelf: shelfItem
+        })
+      }).catch(() => {});
+    } catch (e) {}
+  };
+
+  // Auto-sync cloud data on component mount
+  useEffect(() => {
+    syncFromCloud();
+  }, []);
 
   // Navigation with Browser History (Back / Forward Arrow Support)
   const navigateView = (mode, shelf = null, skipHistory = false) => {
@@ -163,6 +244,7 @@ export const InventoryQRPortal = () => {
     };
 
     setShelves(prev => [newShelf, ...prev]);
+    pushToCloud(newShelf);
     navigateView('qr-generated', newShelf);
   };
 
@@ -183,6 +265,7 @@ export const InventoryQRPortal = () => {
     setActiveShelf(updated);
     setInlineQty(String(updated.quantity));
     setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
+    pushToCloud(updated);
     setIsEditing(false);
   };
 
@@ -196,6 +279,7 @@ export const InventoryQRPortal = () => {
     const updated = { ...activeShelf, quantity: newNum };
     setActiveShelf(updated);
     setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
+    pushToCloud(updated);
   };
 
   // Helper to generate full scan URL encoded into QR Code
@@ -232,6 +316,7 @@ export const InventoryQRPortal = () => {
     setActiveShelf(updated);
     setInlineQty(String(newQty));
     setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
+    pushToCloud(updated);
   };
 
   // Stock Quantity Quick Adjuster directly from Saved Shelves List
@@ -244,6 +329,7 @@ export const InventoryQRPortal = () => {
           setActiveShelf(updated);
           setInlineQty(String(newQty));
         }
+        pushToCloud(updated);
         return updated;
       }
       return s;
@@ -333,6 +419,16 @@ export const InventoryQRPortal = () => {
               >
                 <Layers className="w-4 h-4" />
                 <span>Saved Shelves ({shelves.length})</span>
+              </button>
+
+              <button
+                onClick={syncFromCloud}
+                disabled={isSyncing}
+                className="px-3.5 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                title="Synchronize warehouse database across devices"
+              >
+                <RefreshCcw className={`w-3.5 h-3.5 text-emerald-700 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Syncing...' : 'Sync Cloud DB'}</span>
               </button>
             </div>
           </div>
