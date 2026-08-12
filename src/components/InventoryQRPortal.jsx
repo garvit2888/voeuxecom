@@ -30,7 +30,7 @@ export const InventoryQRPortal = () => {
       const saved = localStorage.getItem('voeux_warehouse_shelves');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Filter out leftover mock entries
+        // Purge any leftover mock IDs
         const clean = (parsed || []).filter(item => item && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(item.id));
         return clean;
       }
@@ -60,6 +60,7 @@ export const InventoryQRPortal = () => {
   const [activeShelf, setActiveShelf] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
+  const [inlineQty, setInlineQty] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -67,12 +68,15 @@ export const InventoryQRPortal = () => {
   const navigateView = (mode, shelf = null, skipHistory = false) => {
     setViewMode(mode);
     setIsEditing(false);
-    if (shelf) setActiveShelf(shelf);
+    if (shelf) {
+      setActiveShelf(shelf);
+      setInlineQty(String(shelf.quantity));
+    }
 
     if (!skipHistory) {
       let newUrl = window.location.pathname;
       if (mode === 'shelf-detail' && shelf) {
-        newUrl += `?shelfId=${shelf.id}#inventory-qr`;
+        newUrl += `?shelfId=${shelf.id}&shelf=${encodeURIComponent(shelf.shelfNumber)}&product=${encodeURIComponent(shelf.productName)}&assistant=${encodeURIComponent(shelf.assistantName)}&qty=${shelf.quantity}#inventory-qr`;
       } else if (mode === 'qr-generated' && shelf) {
         newUrl += `?shelfId=${shelf.id}&preview=true#inventory-qr`;
       } else if (mode === 'all-shelves') {
@@ -95,20 +99,29 @@ export const InventoryQRPortal = () => {
         const matched = shelves.find(s => s.id === shelfIdFromUrl);
         if (matched) {
           setActiveShelf(matched);
+          setInlineQty(String(matched.quantity));
           setViewMode(urlParams.get('preview') ? 'qr-generated' : 'shelf-detail');
           return;
         } else {
-          // Dynamic entry if scanned ID not in local list yet
+          // Dynamic entry if scanned ID is not in local list yet (Cross-device QR scan!)
           const dynamicShelf = {
             id: shelfIdFromUrl,
             shelfNumber: (urlParams.get('shelf') || 'A-01').toUpperCase(),
             productName: urlParams.get('product') || 'VOEUX Electronics Item',
             assistantName: urlParams.get('assistant') || 'Warehouse Assistant',
             quantity: parseInt(urlParams.get('qty') || '10', 10),
-            notes: 'Scanned via QR Code',
+            notes: urlParams.get('notes') || 'Scanned via QR Code Tag',
             createdAt: new Date().toLocaleString('en-IN')
           };
+
+          // Save newly scanned shelf into device's localStorage
+          setShelves(prev => {
+            if (prev.some(s => s.id === dynamicShelf.id)) return prev;
+            return [dynamicShelf, ...prev];
+          });
+
           setActiveShelf(dynamicShelf);
+          setInlineQty(String(dynamicShelf.quantity));
           setViewMode('shelf-detail');
           return;
         }
@@ -168,15 +181,28 @@ export const InventoryQRPortal = () => {
     };
 
     setActiveShelf(updated);
+    setInlineQty(String(updated.quantity));
     setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
     setIsEditing(false);
+  };
+
+  // Direct Quantity Save Handler
+  const handleDirectQtySave = (e) => {
+    e.preventDefault();
+    if (!activeShelf) return;
+    const newNum = Number(inlineQty);
+    if (isNaN(newNum) || newNum < 0) return;
+
+    const updated = { ...activeShelf, quantity: newNum };
+    setActiveShelf(updated);
+    setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
   };
 
   // Helper to generate full scan URL encoded into QR Code
   const getScanUrl = (shelf) => {
     if (!shelf) return window.location.href;
     const baseUrl = window.location.origin + window.location.pathname;
-    return `${baseUrl}?shelfId=${shelf.id}&shelf=${encodeURIComponent(shelf.shelfNumber)}&product=${encodeURIComponent(shelf.productName)}&assistant=${encodeURIComponent(shelf.assistantName)}&qty=${shelf.quantity}#inventory-qr`;
+    return `${baseUrl}?shelfId=${shelf.id}&shelf=${encodeURIComponent(shelf.shelfNumber)}&product=${encodeURIComponent(shelf.productName)}&assistant=${encodeURIComponent(shelf.assistantName)}&qty=${shelf.quantity}&notes=${encodeURIComponent(shelf.notes || '')}#inventory-qr`;
   };
 
   // Helper to generate QR Image URL
@@ -198,12 +224,13 @@ export const InventoryQRPortal = () => {
     window.print();
   };
 
-  // Stock Quantity Quick Adjuster
+  // Stock Quantity Quick Adjuster (+ / -)
   const updateQuantity = (amount) => {
     if (!activeShelf) return;
     const newQty = Math.max(0, activeShelf.quantity + amount);
     const updated = { ...activeShelf, quantity: newQty };
     setActiveShelf(updated);
+    setInlineQty(String(newQty));
     setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
   };
 
@@ -217,43 +244,45 @@ export const InventoryQRPortal = () => {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 py-10 px-4 sm:px-6">
       
-      {/* ==================== PRINTABLE STICKER TAG (HIDDEN ON SCREEN, SHOWN ON PRINT) ==================== */}
+      {/* ==================== PRINTABLE STICKER TAG (STRICT PRINT ISOLATION WRAPPER) ==================== */}
       {activeShelf && (
-        <div id="printable-qr-tag" className="hidden print:block font-sans text-black bg-white p-6">
-          <div className="max-w-xs mx-auto border-4 border-black p-5 rounded-2xl text-center space-y-3 bg-white">
-            <div className="border-b-2 border-black pb-2">
-              <h2 className="text-xl font-black tracking-widest uppercase text-black">VOEUX® LOGISTICS</h2>
-              <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wider">Warehouse Shelf Inventory Tag</p>
-            </div>
+        <div id="printable-qr-tag-wrapper">
+          <div className="font-sans text-black bg-white p-6">
+            <div className="max-w-xs mx-auto border-4 border-black p-5 rounded-2xl text-center space-y-3 bg-white">
+              <div className="border-b-2 border-black pb-2">
+                <h2 className="text-xl font-black tracking-widest uppercase text-black">VOEUX® LOGISTICS</h2>
+                <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wider">Warehouse Shelf Inventory Tag</p>
+              </div>
 
-            <div className="bg-black text-white font-black text-2xl py-2 px-3 rounded-lg tracking-widest">
-              SHELF {activeShelf.shelfNumber}
-            </div>
+              <div className="bg-black text-white font-black text-2xl py-2 px-3 rounded-lg tracking-widest">
+                SHELF {activeShelf.shelfNumber}
+              </div>
 
-            <div className="flex justify-center py-1">
-              <img
-                src={getQrImageUrl(activeShelf)}
-                alt="Shelf QR Code"
-                className="w-44 h-44 object-contain border-2 border-black p-1 rounded-md"
-              />
-            </div>
+              <div className="flex justify-center py-1">
+                <img
+                  src={getQrImageUrl(activeShelf)}
+                  alt="Shelf QR Code"
+                  className="w-44 h-44 object-contain border-2 border-black p-1 rounded-md"
+                />
+              </div>
 
-            <div className="text-left space-y-1 text-xs border-t-2 border-black pt-2 font-medium">
-              <p className="truncate"><strong>PRODUCT:</strong> {activeShelf.productName}</p>
-              <p><strong>ASSISTANT:</strong> {activeShelf.assistantName}</p>
-              <p><strong>CURRENT STOCK:</strong> {activeShelf.quantity} Units</p>
-              <p><strong>TAG ID:</strong> {activeShelf.id}</p>
-              <p><strong>DATE:</strong> {activeShelf.createdAt}</p>
-            </div>
+              <div className="text-left space-y-1 text-xs border-t-2 border-black pt-2 font-medium">
+                <p className="truncate"><strong>PRODUCT:</strong> {activeShelf.productName}</p>
+                <p><strong>ASSISTANT:</strong> {activeShelf.assistantName}</p>
+                <p><strong>CURRENT STOCK:</strong> {activeShelf.quantity} Units</p>
+                <p><strong>TAG ID:</strong> {activeShelf.id}</p>
+                <p><strong>DATE:</strong> {activeShelf.createdAt}</p>
+              </div>
 
-            <div className="border-t border-dashed border-gray-400 pt-2 text-[9px] text-gray-700">
-              Scan QR code with phone camera to view & update live shelf details.
+              <div className="border-t border-dashed border-gray-400 pt-2 text-[9px] text-gray-700">
+                Scan QR code with phone camera to view & update live shelf details.
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ==================== MAIN APPLICATION INTERFACE ==================== */}
+      {/* ==================== MAIN APPLICATION INTERFACE (NON-PRINT) ==================== */}
       <div className="max-w-3xl mx-auto space-y-6 print:hidden">
         
         {/* Top Page Header (Warranty Portal Style) */}
@@ -363,7 +392,7 @@ export const InventoryQRPortal = () => {
                   <label className="text-gray-900 font-bold block">INITIAL QUANTITY *</label>
                   <input
                     type="number"
-                    min="1"
+                    min="0"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
@@ -512,7 +541,7 @@ export const InventoryQRPortal = () => {
               </div>
             </div>
 
-            {/* EDIT FORM MODE */}
+            {/* FULL EDIT FORM MODE */}
             {isEditing && editFormData ? (
               <form onSubmit={handleSaveEdit} className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-4 text-xs">
                 <h3 className="font-bold text-gray-900 uppercase">EDIT SHELF DETAILS</h3>
@@ -557,6 +586,7 @@ export const InventoryQRPortal = () => {
                     <label className="text-gray-900 font-bold block">STOCK QUANTITY</label>
                     <input
                       type="number"
+                      min="0"
                       value={editFormData.quantity}
                       onChange={e => setEditFormData({ ...editFormData, quantity: e.target.value })}
                       className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
@@ -592,7 +622,7 @@ export const InventoryQRPortal = () => {
                 </div>
               </form>
             ) : (
-              /* VIEW MODE */
+              /* VIEW & QUICK EDIT QUANTITY MODE */
               <div className="space-y-5 text-xs">
                 {/* Product Information Box */}
                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
@@ -616,40 +646,61 @@ export const InventoryQRPortal = () => {
                   </div>
                 </div>
 
-                {/* Stock Counter Bar */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <span className="text-xs text-gray-600 font-bold">CURRENT STOCK QUANTITY</span>
-                    <div className="text-3xl font-extrabold text-emerald-700 mt-0.5">
-                      {activeShelf.quantity} <span className="text-xs font-medium text-gray-500">Units</span>
+                {/* Stock Counter & Editable Input Bar */}
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                  <span className="text-xs text-gray-600 font-bold block">EDITABLE STOCK QUANTITY</span>
+                  
+                  <form onSubmit={handleDirectQtySave} className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(-1)}
+                        className="p-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
+                        title="Decrease Stock"
+                      >
+                        <Minus className="w-4 h-4 text-red-600" />
+                      </button>
+
+                      {/* Editable Numeric Quantity Input */}
+                      <div className="relative flex-1 sm:w-32">
+                        <input
+                          type="number"
+                          min="0"
+                          value={inlineQty}
+                          onChange={(e) => setInlineQty(e.target.value)}
+                          className="w-full text-center font-extrabold text-xl text-emerald-700 bg-white border border-gray-300 rounded-lg py-2 focus:outline-none focus:border-[#3B429F]"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(1)}
+                        className="p-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
+                        title="Increase Stock"
+                      >
+                        <Plus className="w-4 h-4 text-emerald-600" />
+                      </button>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => updateQuantity(-1)}
-                      className="p-2.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
-                      title="Decrease Stock"
-                    >
-                      <Minus className="w-4 h-4 text-red-600" />
-                    </button>
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <button
+                        type="submit"
+                        className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>Update Stock Quantity</span>
+                      </button>
 
-                    <button
-                      onClick={() => updateQuantity(1)}
-                      className="p-2.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
-                      title="Increase Stock"
-                    >
-                      <Plus className="w-4 h-4 text-emerald-600" />
-                    </button>
-
-                    <button
-                      onClick={() => handlePrintTag()}
-                      className="ml-2 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center gap-1.5 transition cursor-pointer shadow-sm"
-                    >
-                      <Printer className="w-4 h-4" />
-                      <span>Print Tag</span>
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => handlePrintTag()}
+                        className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center gap-1.5 transition cursor-pointer shadow-sm"
+                      >
+                        <Printer className="w-4 h-4" />
+                        <span>Print Tag</span>
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
