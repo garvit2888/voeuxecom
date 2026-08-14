@@ -60,97 +60,135 @@ export const Hero = () => {
   const slide = slides[currentSlide];
 
   return (
-    <section className="bg-slate-950 text-white border-b border-slate-800 relative overflow-hidden">
-      <div className="container mx-auto px-4 py-6 md:py-10 lg:py-14">
-        
-        {/* Main Responsive Layout Container - Seamless on Samsung Galaxy Fold, Tablets & Desktop */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-12 min-h-[380px] sm:min-h-[440px] md:min-h-[480px] lg:min-h-[520px] relative z-10">
-          
-          {/* Left / Text Content Column */}
-          <div className="w-full md:w-1/2 lg:w-7/12 text-left space-y-3.5 sm:space-y-4 md:space-y-5 order-2 md:order-1 px-1 sm:px-3">
-            
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-600/30 border border-indigo-500/40 text-cyan-300 text-xs font-black tracking-widest uppercase">
-              <span>{slide.badge}</span>
-            </div>
+    <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
-            {/* Title */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-              {slide.title}
-            </h1>
+      {/* ========== MOBILE & FOLD PHONE LAYOUT ========== */}
+      <div className="md:hidden relative bg-slate-950 text-white pb-20">
 
-            {/* Tagline */}
-            <p className="text-xs sm:text-sm md:text-base text-gray-300 font-medium leading-relaxed max-w-xl">
-              {slide.tagline}
-            </p>
+        {/* Full-Width Image Banner (h-72 on small phones, sm:h-96 on Fold Ultra/tablets so product is never cut off) */}
+        <div className="relative w-full h-72 sm:h-96 max-h-[420px] bg-slate-950 overflow-hidden flex items-center justify-center">
+          {/* Top gradient fade */}
+          <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
 
-            {/* CTA Button */}
-            <div className="pt-1.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <button
-                onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                className="bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-extrabold py-3.5 sm:py-4 px-6 sm:px-8 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-950/80 cursor-pointer"
-              >
-                <span>{slide.ctaText}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+          <img
+            key={slide.image}
+            src={slide.image}
+            alt={slide.title}
+            className="w-full h-full object-contain sm:object-cover object-center transition-all duration-700"
+          />
 
-          {/* Right / Product Image Column (Un-cropped, Un-zoomed, Zero Overlap) */}
-          <div className="w-full md:w-1/2 lg:w-5/12 flex items-center justify-center order-1 md:order-2 p-2 sm:p-4">
-            <div className="relative w-full flex items-center justify-center">
-              {/* Soft ambient glow */}
-              <div className="absolute inset-0 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-              
-              <img
-                key={slide.image}
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-auto max-h-[260px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[460px] object-contain transition-all duration-700 drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)]"
-              />
-            </div>
-          </div>
-
+          {/* Bottom gradient fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* Carousel Controls Footer: Slide Dots & Arrow Navigation */}
-        <div className="flex items-center justify-between pt-5 border-t border-slate-900/80 mt-4 sm:mt-6">
-          
-          {/* Slide Indicators / Dots */}
-          <div className="flex items-center space-x-2">
+        {/* Text Section below Image */}
+        <div className="px-5 mt-6 space-y-4 text-left">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
+            {slide.title}
+          </h1>
+
+          <p className="text-sm text-gray-300 font-medium leading-relaxed">
+            {slide.tagline}
+          </p>
+
+          <div className="pt-2">
+            <button
+              onClick={() => setSelectedProductModal(slide.featuredProduct)}
+              className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-sm font-extrabold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+            >
+              <span>{slide.ctaText}</span>
+              <ArrowRight className="w-4.5 h-4.5" />
+            </button>
+          </div>
+
+          {/* Slide Dots */}
+          <div className="flex items-center justify-center space-x-2 pt-3 pb-1">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-slate-700 hover:bg-slate-500'
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
                 }`}
               />
             ))}
           </div>
-
-          {/* Previous / Next Slide Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 transition cursor-pointer"
-              aria-label="Previous Slide"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 transition cursor-pointer"
-              aria-label="Next Slide"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
         </div>
 
       </div>
+
+      {/* ========== DESKTOP LAYOUT ========== */}
+      <div className="hidden md:block">
+        <div className="container mx-auto px-4 py-10">
+          <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
+
+            {/* Background Image */}
+            <div
+              className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
+              style={{
+                backgroundImage: `url(${slide.image})`,
+                backgroundPosition: 'right 2% center',
+                backgroundSize: 'contain'
+              }}
+            />
+
+            {/* Dark Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent max-w-xl" />
+
+            {/* Left Text Content */}
+            <div className="relative z-10 max-w-xl space-y-4 text-left">
+              <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                {slide.title}
+              </h1>
+              <p className="text-base text-gray-300 font-medium leading-relaxed">
+                {slide.tagline}
+              </p>
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  onClick={() => setSelectedProductModal(slide.featuredProduct)}
+                  className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40"
+                >
+                  <span>{slide.ctaText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Slide Dots Desktop */}
+            <div className="absolute bottom-5 left-10 lg:left-12 z-20 flex items-center space-x-2">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-gray-600'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Prev & Next Arrows Desktop */}
+            <button
+              onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-md"
+              aria-label="Previous Slide"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-md"
+              aria-label="Next Slide"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+          </div>
+        </div>
+      </div>
+
     </section>
   );
 };
