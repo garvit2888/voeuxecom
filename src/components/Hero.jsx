@@ -62,27 +62,26 @@ export const Hero = () => {
   return (
     <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
-      {/* ========== MOBILE & FOLD PHONE LAYOUT ========== */}
-      <div className="md:hidden relative bg-slate-950 text-white pb-20">
+      {/* ========== MOBILE LAYOUT ONLY — outside container so image fills 100% viewport width ========== */}
+      <div className="md:hidden relative min-h-screen bg-slate-950 text-white pb-32">
 
-        {/* Full-Width Image Banner (h-72 on small phones, sm:h-96 on Fold Ultra/tablets so product is never cut off) */}
-        <div className="relative w-full h-72 sm:h-96 max-h-[420px] bg-slate-950 overflow-hidden flex items-center justify-center">
+        {/* IMAGE: h-72 with slim gradient overlays at both top and bottom edges */}
+        <div className="relative w-full h-72 overflow-hidden">
           {/* Top gradient fade */}
-          <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
 
           <img
-            key={slide.image}
             src={slide.image}
             alt={slide.title}
-            className="w-full h-full object-contain sm:object-cover object-center transition-all duration-700"
+            className="w-full h-full object-cover object-center transition-all duration-700"
           />
 
           {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* Text Section below Image */}
-        <div className="px-5 mt-6 space-y-4 text-left">
+        {/* TEXT: mt-7 gap below image, larger text sizes to fill empty dark space elegantly */}
+        <div className="px-5 mt-7 space-y-4 text-left">
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
             {slide.title}
           </h1>
@@ -118,7 +117,7 @@ export const Hero = () => {
 
       </div>
 
-      {/* ========== DESKTOP LAYOUT ========== */}
+      {/* ========== DESKTOP LAYOUT ONLY — inside container, untouched ========== */}
       <div className="hidden md:block">
         <div className="container mx-auto px-4 py-10">
           <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
