@@ -2,19 +2,11 @@ import React from 'react';
 import { useShop } from '../context/ShopContext';
 import {
   Building2,
-  TrendingUp,
-  ShieldCheck,
-  Truck,
-  Award,
-  Users,
   MessageSquare,
   ArrowRight,
   Phone,
   Mail,
-  MapPin,
-  CheckCircle2,
-  Package,
-  Headphones
+  MapPin
 } from 'lucide-react';
 
 export const JoinUsPage = () => {
@@ -80,7 +72,7 @@ export const JoinUsPage = () => {
         </div>
 
         {/* ==================== PAN-INDIA EXPANSION VISION ==================== */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="space-y-2">
             <span className="text-xs font-extrabold text-[#3B429F] uppercase tracking-widest block">EXPANSION STRATEGY</span>
             <h3 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
@@ -90,26 +82,6 @@ export const JoinUsPage = () => {
           <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
             We are actively appointing authorized state distributors, city dealers, regional wholesalers, car accessory showroom partners, and automotive installation centers across North, South, East, and West India. As consumer demand for smart Android touchscreen players and high-fidelity car soundbars surges, VOEUX® provides distributors with complete brand backing, protected margins, and rapid stock supply.
           </p>
-
-          {/* Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-gray-100">
-            <div>
-              <span className="text-3xl sm:text-4xl font-black text-[#3B429F]">28+</span>
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">States Covered</p>
-            </div>
-            <div>
-              <span className="text-3xl sm:text-4xl font-black text-[#3B429F]">500+</span>
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">Retail Outlets</p>
-            </div>
-            <div>
-              <span className="text-3xl sm:text-4xl font-black text-[#3B429F]">1 Year</span>
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">Direct Brand Warranty</p>
-            </div>
-            <div>
-              <span className="text-3xl sm:text-4xl font-black text-[#3B429F]">100%</span>
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">Original Quality</p>
-            </div>
-          </div>
         </div>
 
         {/* ==================== DISTRIBUTOR PROGRAM ADVANTAGES ==================== */}
@@ -122,50 +94,30 @@ export const JoinUsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-indigo-50 text-[#3B429F]">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <h4 className="font-extrabold text-gray-900 text-base">Protected High Margins</h4>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-12">
+            <div className="space-y-2">
+              <h4 className="font-extrabold text-gray-900 text-base sm:text-lg">Protected High Margins</h4>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 Enjoy lucrative wholesale pricing structures, tiered bulk quantity discounts, and market price protection to ensure maximum profitability for your dealership.
               </p>
             </div>
 
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-indigo-50 text-[#3B429F]">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <h4 className="font-extrabold text-gray-900 text-base">Official Warranty Support</h4>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-12">
+            <div className="space-y-2">
+              <h4 className="font-extrabold text-gray-900 text-base sm:text-lg">Official Warranty Support</h4>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 All VOEUX® products carry a 1-Year Official Warranty. We handle customer service, replacements, and spare parts directly so your shop remains hassle-free.
               </p>
             </div>
 
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-indigo-50 text-[#3B429F]">
-                  <Truck className="w-5 h-5" />
-                </div>
-                <h4 className="font-extrabold text-gray-900 text-base">Priority Logistics & Stock</h4>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-12">
+            <div className="space-y-2">
+              <h4 className="font-extrabold text-gray-900 text-base sm:text-lg">Priority Logistics & Stock</h4>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 Authorized partners get priority order dispatch, express nationwide courier shipping, and guaranteed stock reservation during peak festival and product launch seasons.
               </p>
             </div>
 
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-indigo-50 text-[#3B429F]">
-                  <Award className="w-5 h-5" />
-                </div>
-                <h4 className="font-extrabold text-gray-900 text-base">Brand Marketing Support</h4>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-12">
+            <div className="space-y-2">
+              <h4 className="font-extrabold text-gray-900 text-base sm:text-lg">Brand Marketing Support</h4>
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 Receive official store standees, promotional banners, product catalog brochures, digital marketing collateral, and customer referral leads in your territory.
               </p>
             </div>
@@ -179,27 +131,23 @@ export const JoinUsPage = () => {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div className="p-4 rounded-xl border border-gray-200/80 space-y-2">
-              <Package className="w-5 h-5 text-[#3B429F]" />
-              <h4 className="font-bold text-gray-900 text-sm">Car Accessory Retailers</h4>
+            <div className="p-4 rounded-xl border border-gray-200/80 space-y-1.5">
+              <h4 className="font-extrabold text-gray-900 text-sm">Car Accessory Retailers</h4>
               <p className="text-gray-600">Established car decor shops & auto electronics stores.</p>
             </div>
 
-            <div className="p-4 rounded-xl border border-gray-200/80 space-y-2">
-              <Users className="w-5 h-5 text-[#3B429F]" />
-              <h4 className="font-bold text-gray-900 text-sm">Regional Wholesalers</h4>
+            <div className="p-4 rounded-xl border border-gray-200/80 space-y-1.5">
+              <h4 className="font-extrabold text-gray-900 text-sm">Regional Wholesalers</h4>
               <p className="text-gray-600">Stockists supplying to local car accessory markets.</p>
             </div>
 
-            <div className="p-4 rounded-xl border border-gray-200/80 space-y-2">
-              <Headphones className="w-5 h-5 text-[#3B429F]" />
-              <h4 className="font-bold text-gray-900 text-sm">Audio Installers</h4>
+            <div className="p-4 rounded-xl border border-gray-200/80 space-y-1.5">
+              <h4 className="font-extrabold text-gray-900 text-sm">Audio Installers</h4>
               <p className="text-gray-600">Professional car audio setup & wiring technicians.</p>
             </div>
 
-            <div className="p-4 rounded-xl border border-gray-200/80 space-y-2">
-              <Building2 className="w-5 h-5 text-[#3B429F]" />
-              <h4 className="font-bold text-gray-900 text-sm">E-commerce Sellers</h4>
+            <div className="p-4 rounded-xl border border-gray-200/80 space-y-1.5">
+              <h4 className="font-extrabold text-gray-900 text-sm">E-commerce Sellers</h4>
               <p className="text-gray-600">Online auto parts sellers & digital marketplace partners.</p>
             </div>
           </div>
