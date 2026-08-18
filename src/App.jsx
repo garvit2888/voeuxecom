@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ProductCard } from './components/ProductCard';
 import { CategoryPage } from './components/CategoryPage';
+import { JoinUsPage } from './components/JoinUsPage';
 import { WarrantyPortal } from './components/WarrantyPortal';
 import { InstallationPortal } from './components/InstallationPortal';
 import { DealerLocator } from './components/DealerLocator';
@@ -19,7 +20,7 @@ import { LiveChatWidget } from './components/LiveChatWidget';
 import { Footer } from './components/Footer';
 import { SplashScreen } from './components/SplashScreen';
 import { PRODUCTS, CATEGORIES } from './data/products';
-import { ArrowRight, Star, ShieldCheck, Zap, Wrench } from 'lucide-react';
+import { ArrowRight, Star, ShieldCheck, Zap, Wrench, Building2, MessageSquare } from 'lucide-react';
 import { WarrantyPolicyPage } from './components/WarrantyPolicyPage';
 import { InventoryQRPortal } from './components/InventoryQRPortal';
 
@@ -37,6 +38,9 @@ const MainContent = () => {
         return <CategoryPage categoryId="speakers-soundbars" />;
       case 'amplifiers':
         return <CategoryPage categoryId="amplifiers" />;
+      case 'join-us':
+      case 'distributor-program':
+        return <JoinUsPage />;
       case 'about-us':
         return <AboutUs />;
       case 'contact-us':
@@ -222,6 +226,44 @@ const MainContent = () => {
                   </div>
                 );
               })}
+              </div>
+            </section>
+
+            {/* ========== JOIN US / OFFICIAL DISTRIBUTOR PROGRAM BANNER ========== */}
+            <section className="mt-16 py-12 px-6 sm:px-12 bg-gradient-to-r from-slate-950 via-[#1E2255] to-slate-950 text-white rounded-3xl relative overflow-hidden text-left shadow-2xl">
+              <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                <div className="space-y-3 max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-cyan-300 text-xs font-bold uppercase tracking-wider">
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Pan-India Expansion</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+                    Partner With VOEUX® — Official Distributor Program
+                  </h2>
+                  <p className="text-slate-300 text-xs sm:text-sm font-medium leading-relaxed">
+                    Join India's fastest growing automotive electronics brand. Expand your business with our high-demand Android stereos, soundbars, amplifiers, and car accessories with direct factory support.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                  <button
+                    onClick={() => setActivePage('join-us')}
+                    className="px-6 py-3.5 rounded-xl bg-white hover:bg-gray-100 text-[#3B429F] font-extrabold text-xs tracking-wide transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                  >
+                    <span>Explore Distributor Program</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+
+                  <a
+                    href="https://api.whatsapp.com/send?phone=919999484530&text=hi%20i%20am%20interested%20to%20know%20more%20about%20voeux%20official%20distributor%20program"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs tracking-wide transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Inquire via WhatsApp</span>
+                  </a>
+                </div>
               </div>
             </section>
 

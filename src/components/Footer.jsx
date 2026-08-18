@@ -35,8 +35,9 @@ export const Footer = () => {
 
           {/* Service Links */}
           <div className="space-y-2.5">
-            <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Services</h4>
+            <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Services & Partners</h4>
             <ul className="space-y-2 text-indigo-100">
+              <li><button onClick={() => setActivePage('join-us')} className="hover:text-cyan-300 font-bold text-cyan-300 transition flex items-center gap-1">✨ Join Us (Distributor Program)</button></li>
               <li><button onClick={() => setActivePage('warranty-policy')} className="hover:text-cyan-300 font-bold text-white transition">Repairs & Warranty Policy</button></li>
               <li><button onClick={() => setActivePage('warranty')} className="hover:text-cyan-300 transition">Warranty Register Portal</button></li>
               <li><button onClick={() => setActivePage('contact-us')} className="hover:text-cyan-300 transition">Contact Support</button></li>

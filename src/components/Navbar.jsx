@@ -28,6 +28,7 @@ export const Navbar = () => {
     { id: 'speakers-soundbars', label: 'Speakers & Soundbars' },
     { id: 'amplifiers', label: 'Car Amplifiers' },
     { id: 'warranty', label: 'Register Warranty' },
+    { id: 'join-us', label: 'Join Us' },
     { id: 'about-us', label: 'About Us' },
     { id: 'contact-us', label: 'Contact Us' }
   ];
