@@ -30,7 +30,6 @@ export const Footer = () => {
               <li><button onClick={() => setActivePage('android-players')} className="hover:text-cyan-300 transition">Android Car Players</button></li>
               <li><button onClick={() => setActivePage('speakers-soundbars')} className="hover:text-cyan-300 transition">Speakers & Soundbars</button></li>
               <li><button onClick={() => setActivePage('amplifiers')} className="hover:text-cyan-300 transition">Car Amplifiers</button></li>
-              <li><button onClick={() => setActivePage('whats-new')} className="hover:text-cyan-300 transition">What's New Drops</button></li>
             </ul>
           </div>
 

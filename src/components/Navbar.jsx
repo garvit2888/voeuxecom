@@ -27,7 +27,6 @@ export const Navbar = () => {
     { id: 'android-players', label: 'Android Players' },
     { id: 'speakers-soundbars', label: 'Speakers & Soundbars' },
     { id: 'amplifiers', label: 'Car Amplifiers' },
-    { id: 'whats-new', label: "What's New Drops" },
     { id: 'warranty', label: 'Register Warranty' },
     { id: 'about-us', label: 'About Us' },
     { id: 'contact-us', label: 'Contact Us' }

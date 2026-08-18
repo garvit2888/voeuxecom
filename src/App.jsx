@@ -4,7 +4,6 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ProductCard } from './components/ProductCard';
 import { CategoryPage } from './components/CategoryPage';
-import { WhatsNewPage } from './components/WhatsNewPage';
 import { WarrantyPortal } from './components/WarrantyPortal';
 import { InstallationPortal } from './components/InstallationPortal';
 import { DealerLocator } from './components/DealerLocator';
@@ -38,8 +37,6 @@ const MainContent = () => {
         return <CategoryPage categoryId="speakers-soundbars" />;
       case 'amplifiers':
         return <CategoryPage categoryId="amplifiers" />;
-      case 'whats-new':
-        return <WhatsNewPage />;
       case 'about-us':
         return <AboutUs />;
       case 'contact-us':
