@@ -67,8 +67,24 @@ export const InventoryQRPortal = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
 
+  // Persistent Deleted Shelf IDs Tracking
+  const [deletedIds, setDeletedIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_deleted_shelf_ids');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(deletedIds));
+    } catch (e) {}
+  }, [deletedIds]);
+
   // Cloud Database Sync Endpoints (Cross-Device Database)
-  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/1d0a6b47157144cfb1a6b7eb58d65ee2/shelves';
+  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/a59d4b7b97b54a7b8d0fc7c894cfd83e/shelves';
   const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
   // Fetch Cloud Database Shelves and Sync Across Devices
@@ -78,29 +94,51 @@ export const InventoryQRPortal = () => {
       const res = await fetch(CLOUD_SYNC_ENDPOINT);
       if (res.ok) {
         const cloudData = await res.json();
-        if (Array.isArray(cloudData) && cloudData.length > 0) {
+        if (Array.isArray(cloudData)) {
+          // Identify any tombstones in cloudData
+          const cloudDeletedIds = cloudData
+            .filter(item => item && (item.isDeleted || item.action === 'delete_shelf'))
+            .map(item => item.shelfId || item.id)
+            .filter(Boolean);
+
+          const currentDeleted = Array.from(new Set([...deletedIds, ...cloudDeletedIds]));
+          if (cloudDeletedIds.length > 0) {
+            setDeletedIds(currentDeleted);
+            try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(currentDeleted)); } catch(e){}
+          }
+
           setShelves(prev => {
-            const merged = [...prev];
+            let updated = prev.filter(s => !currentDeleted.includes(s.id));
+
             cloudData.forEach(item => {
-              const cleanItem = {
-                id: item.shelfId || item.id,
-                shelfNumber: item.shelfNumber,
-                productName: item.productName,
-                assistantName: item.assistantName,
-                quantity: Number(item.quantity) || 0,
-                notes: item.notes || '',
-                createdAt: item.createdAt || new Date().toLocaleString('en-IN')
-              };
-              if (cleanItem.id && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanItem.id)) {
-                const idx = merged.findIndex(m => m.id === cleanItem.id);
+              const cleanId = item.shelfId || item.id;
+              if (
+                cleanId &&
+                !item.isDeleted &&
+                item.action !== 'delete_shelf' &&
+                !currentDeleted.includes(cleanId) &&
+                !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanId)
+              ) {
+                const cleanItem = {
+                  id: cleanId,
+                  shelfNumber: item.shelfNumber,
+                  productName: item.productName,
+                  assistantName: item.assistantName,
+                  quantity: Number(item.quantity) || 0,
+                  notes: item.notes || '',
+                  createdAt: item.createdAt || new Date().toLocaleString('en-IN')
+                };
+                const idx = updated.findIndex(m => m.id === cleanItem.id);
                 if (idx > -1) {
-                  merged[idx] = { ...merged[idx], ...cleanItem };
+                  updated[idx] = { ...updated[idx], ...cleanItem };
                 } else {
-                  merged.unshift(cleanItem);
+                  updated.unshift(cleanItem);
                 }
               }
             });
-            return merged;
+
+            try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updated)); } catch(e){}
+            return updated;
           });
         }
       }
@@ -113,7 +151,7 @@ export const InventoryQRPortal = () => {
 
   // Push Shelf Record to Cloud Database for Multi-Device Access
   const pushToCloud = async (shelfItem) => {
-    if (!shelfItem || !shelfItem.id) return;
+    if (!shelfItem || !shelfItem.id || deletedIds.includes(shelfItem.id)) return;
     try {
       fetch(CLOUD_SYNC_ENDPOINT, {
         method: 'POST',
@@ -141,14 +179,60 @@ export const InventoryQRPortal = () => {
     } catch (e) {}
   };
 
-  // Auto-sync cloud data automatically on mount and every 5 seconds in background
+  // Broadcast Shelf Deletion to Cloud Database
+  const deleteFromCloud = async (shelfId) => {
+    if (!shelfId) return;
+
+    // 1. Delete matching records from Cloud REST endpoint
+    try {
+      const res = await fetch(CLOUD_SYNC_ENDPOINT);
+      if (res.ok) {
+        const cloudItems = await res.json();
+        if (Array.isArray(cloudItems)) {
+          const matched = cloudItems.filter(item => (item.shelfId || item.id) === shelfId);
+          matched.forEach(item => {
+            if (item._id) {
+              fetch(`${CLOUD_SYNC_ENDPOINT}/${item._id}`, { method: 'DELETE' }).catch(() => {});
+            }
+          });
+        }
+      }
+    } catch (e) {}
+
+    // 2. Post tombstone marker to Cloud REST endpoint for cross-device sync
+    try {
+      fetch(CLOUD_SYNC_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shelfId: shelfId,
+          isDeleted: true
+        })
+      }).catch(() => {});
+    } catch (e) {}
+
+    // 3. Send delete command to Google Apps Script
+    try {
+      fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_shelf',
+          shelfId: shelfId
+        })
+      }).catch(() => {});
+    } catch (e) {}
+  };
+
+  // Auto-sync cloud data automatically on mount and every 10 seconds in background
   useEffect(() => {
     syncFromCloud();
     const interval = setInterval(() => {
       syncFromCloud();
-    }, 5000);
+    }, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [deletedIds]);
 
   // Navigation with Browser History (Back / Forward Arrow Support)
   const navigateView = (mode, shelf = null, skipHistory = false) => {
@@ -383,12 +467,23 @@ export const InventoryQRPortal = () => {
   const handleDeleteShelf = (shelfId) => {
     if (!shelfId) return;
     if (window.confirm('Are you sure you want to delete this shelf record from the database?')) {
-      const updated = shelves.filter(s => s.id !== shelfId);
-      setShelves(updated);
-      try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updated)); } catch(e){}
+      // 1. Register as deleted ID locally
+      const updatedDeleted = Array.from(new Set([...deletedIds, shelfId]));
+      setDeletedIds(updatedDeleted);
+      try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(updatedDeleted)); } catch(e){}
+
+      // 2. Remove from local shelves state & localStorage
+      const updatedShelves = shelves.filter(s => s.id !== shelfId);
+      setShelves(updatedShelves);
+      try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updatedShelves)); } catch(e){}
+
       if (activeShelf?.id === shelfId) {
         setActiveShelf(null);
       }
+
+      // 3. Broadcast deletion to cloud database so all other devices clear it
+      deleteFromCloud(shelfId);
+
       navigateView('all-shelves');
     }
   };

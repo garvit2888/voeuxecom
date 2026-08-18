@@ -44,6 +44,8 @@ function doPost(e) {
         } else {
           existingList.unshift(shelf);
         }
+      } else if (data.action === 'delete_shelf' && data.shelfId) {
+        existingList = existingList.filter(function(s) { return s.id !== data.shelfId; });
       } else if (data.shelves && Array.isArray(data.shelves)) {
         existingList = data.shelves;
       }
