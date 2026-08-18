@@ -31,7 +31,7 @@ export const JoinUsPage = () => {
             Expand your automotive retail & distribution business by partnering with VOEUX® — India's premier manufacturer of smart car stereos, soundbars, amplifiers, and car audio systems.
           </p>
 
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="pt-4 flex flex-col items-center justify-center gap-3">
             <a
               href={whatsappUrl}
               target="_blank"
@@ -42,13 +42,9 @@ export const JoinUsPage = () => {
               <span>Inquire Now on WhatsApp</span>
             </a>
 
-            <button
-              onClick={() => setActivePage('contact-us')}
-              className="w-full sm:w-auto px-7 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm tracking-wide transition border border-white/20 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>Contact Business Team</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <p className="text-slate-300 text-xs sm:text-sm font-medium pt-1">
+              For inquiries, contact business team at <a href="mailto:voeuxexperience@gmail.com" className="text-cyan-300 font-bold hover:underline">voeuxexperience@gmail.com</a>
+            </p>
           </div>
         </div>
       </section>
