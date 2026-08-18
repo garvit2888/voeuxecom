@@ -500,12 +500,12 @@ export const InventoryQRPortal = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 py-10 px-4 sm:px-6">
+    <div className="min-h-screen bg-white text-gray-900 py-8 px-4 sm:px-8">
       
       {/* ==================== PRINTABLE STICKER TAG (STRICT PRINT ISOLATION WRAPPER) ==================== */}
       {activeShelf && (
-        <div id="printable-qr-tag-wrapper" className={viewMode === 'qr-generated' ? 'block' : 'hidden print:block'}>
-          <div className="font-sans text-black bg-white p-6">
+        <div id="printable-qr-tag-wrapper" className={viewMode === 'qr-generated' ? 'block mb-8' : 'hidden print:block'}>
+          <div className="font-sans text-black bg-white p-4">
             <div className="max-w-xs mx-auto border-4 border-black p-5 rounded-2xl text-center space-y-3 bg-white">
               <div className="border-b-2 border-black pb-2">
                 <h2 className="text-xl font-black tracking-widest uppercase text-black">VOEUX® LOGISTICS</h2>
@@ -541,23 +541,25 @@ export const InventoryQRPortal = () => {
       )}
 
       {/* ==================== MAIN APPLICATION INTERFACE (NON-PRINT) ==================== */}
-      <div className="max-w-3xl mx-auto space-y-6 print:hidden">
+      <div className="max-w-4xl mx-auto space-y-8 print:hidden">
         
-        {/* Top Page Header */}
-        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-4 text-left">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+        {/* Top Page Header (Clean Unboxed Website Header) */}
+        <div className="border-b border-gray-200/80 pb-6 space-y-4 text-left">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
-                <QrCode className="w-7 h-7 text-[#3B429F]" />
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2.5">
+                <QrCode className="w-8 h-8 text-[#3B429F]" />
                 <span>Warehouse Inventory System</span>
               </h1>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => navigateView('create')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  viewMode === 'create' ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  viewMode === 'create'
+                    ? 'bg-[#3B429F] text-white shadow-md'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                 }`}
               >
                 <Plus className="w-4 h-4" />
@@ -566,8 +568,10 @@ export const InventoryQRPortal = () => {
 
               <button
                 onClick={() => navigateView('all-shelves')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  viewMode === 'all-shelves' ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  viewMode === 'all-shelves'
+                    ? 'bg-[#3B429F] text-white shadow-md'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                 }`}
               >
                 <Layers className="w-4 h-4" />
@@ -585,20 +589,20 @@ export const InventoryQRPortal = () => {
 
         {/* ==================== VIEW 1: CREATE NEW SHELF QR TAG FORM ==================== */}
         {viewMode === 'create' && (
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5 text-left">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+          <div className="space-y-6 text-left max-w-2xl">
+            <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide border-b border-gray-100 pb-3">
               CREATE WAREHOUSE SHELF TAG
             </h2>
 
-            <form onSubmit={handleGenerateQR} className="space-y-4 text-xs">
+            <form onSubmit={handleGenerateQR} className="space-y-5 text-xs">
               
               {/* Product Selection */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-gray-900 font-bold block">PRODUCT NAME *</label>
                 <select
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
+                  className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                 >
                   {PRODUCTS.map(p => (
                     <option key={p.id} value={p.name}>
@@ -614,7 +618,7 @@ export const InventoryQRPortal = () => {
                     placeholder="Type custom product name..."
                     value={customProduct}
                     onChange={(e) => setCustomProduct(e.target.value)}
-                    className="mt-2 w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
+                    className="mt-2 w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                     required
                   />
                 )}
@@ -622,26 +626,26 @@ export const InventoryQRPortal = () => {
 
               {/* Grid 2-cols: Assistant Name & Shelf Number */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-gray-900 font-bold block">WAREHOUSE ASSISTANT NAME *</label>
                   <input
                     type="text"
                     placeholder="e.g. Rajesh Kumar"
                     value={assistantName}
                     onChange={(e) => setAssistantName(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
+                    className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                     required
                   />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-gray-900 font-bold block">SHELF NUMBER / ZONE *</label>
                   <input
                     type="text"
-                    placeholder="e.g. A-12 or Zone B-04"
+                    placeholder="e.g. A or Zone B-04"
                     value={shelfNumber}
                     onChange={(e) => setShelfNumber(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 uppercase focus:outline-none focus:border-[#3B429F]"
+                    className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 uppercase focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                     required
                   />
                 </div>
@@ -649,26 +653,26 @@ export const InventoryQRPortal = () => {
 
               {/* Quantity & Notes */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-gray-900 font-bold block">INITIAL QUANTITY *</label>
                   <input
                     type="number"
                     min="0"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
+                    className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                     required
                   />
                 </div>
 
-                <div className="sm:col-span-2 space-y-1">
+                <div className="sm:col-span-2 space-y-1.5">
                   <label className="text-gray-900 font-bold block">NOTES / PALLET DETAILS</label>
                   <input
                     type="text"
                     placeholder="e.g. Rack 1, Top Tier, Fast Moving"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F]"
+                    className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                   />
                 </div>
               </div>
@@ -676,7 +680,7 @@ export const InventoryQRPortal = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-3.5 px-6 rounded-lg transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-md mt-4"
               >
                 <QrCode className="w-4 h-4" />
                 <span>GENERATE & PREVIEW QR CODE TAG</span>
@@ -687,7 +691,7 @@ export const InventoryQRPortal = () => {
 
         {/* ==================== VIEW 2: QR GENERATED & PREVIEW ==================== */}
         {viewMode === 'qr-generated' && activeShelf && (
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 text-left">
+          <div className="space-y-6 text-left">
             <div className="flex items-center justify-between border-b border-gray-200 pb-3">
               <div>
                 <h2 className="text-base font-bold text-gray-900 uppercase">QR Code Tag Generated</h2>
@@ -703,24 +707,24 @@ export const InventoryQRPortal = () => {
             </div>
 
             {/* Visual Tag Preview Card */}
-            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-6 justify-between">
+            <div className="flex flex-col sm:flex-row items-center gap-8 justify-between pt-2">
               
               {/* QR Image Box */}
               <div className="flex flex-col items-center gap-2">
-                <div className="bg-white p-3 rounded-xl shadow-md border-2 border-gray-900 text-center">
+                <div className="bg-white p-4 rounded-2xl shadow-lg border-2 border-gray-900 text-center">
                   <img
                     src={getQrImageUrl(activeShelf)}
                     alt="Generated QR"
                     className="w-48 h-48 object-contain"
                   />
-                  <span className="block mt-1 text-[9px] font-bold text-gray-700 uppercase">
+                  <span className="block mt-2 text-[9px] font-extrabold text-gray-700 uppercase tracking-wider">
                     SCAN WITH PHONE CAMERA
                   </span>
                 </div>
 
                 <button
                   onClick={() => handleCopyLink(activeShelf)}
-                  className="text-xs text-[#3B429F] hover:underline flex items-center gap-1 font-semibold pt-1"
+                  className="text-xs text-[#3B429F] hover:underline flex items-center gap-1 font-semibold pt-2"
                 >
                   {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedLink ? 'Scan Link Copied!' : 'Copy Direct Scan URL'}</span>
@@ -728,26 +732,26 @@ export const InventoryQRPortal = () => {
               </div>
 
               {/* Shelf Info Summary */}
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 space-y-4">
                 <div>
-                  <span className="text-[10px] font-bold text-[#3B429F] tracking-wider uppercase">SHELF ALLOCATION</span>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5">
+                  <span className="text-[10px] font-extrabold text-[#3B429F] tracking-wider uppercase block">SHELF ALLOCATION</span>
+                  <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mt-0.5">
                     SHELF {activeShelf.shelfNumber}
                   </h1>
                 </div>
 
-                <div className="space-y-1.5 text-xs text-gray-700 border-y border-gray-200 py-3">
+                <div className="space-y-2 text-xs text-gray-700 border-y border-gray-200/80 py-4">
                   <p><strong className="text-gray-900">Product:</strong> {activeShelf.productName}</p>
                   <p><strong className="text-gray-900">Assistant:</strong> {activeShelf.assistantName}</p>
-                  <p><strong className="text-gray-900">Stock Quantity:</strong> <span className="text-emerald-700 font-bold">{activeShelf.quantity} Units</span></p>
+                  <p><strong className="text-gray-900">Stock Quantity:</strong> <span className="text-[#3B429F] font-extrabold">{activeShelf.quantity} Units</span></p>
                   <p><strong className="text-gray-900">Tag Record ID:</strong> <span className="font-mono text-gray-500">{activeShelf.id}</span></p>
                 </div>
 
                 {/* Print & View Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <button
                     onClick={handlePrintTag}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer shadow-sm"
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer shadow-md"
                   >
                     <Printer className="w-4 h-4" />
                     <span>PRINT TAG</span>
@@ -755,7 +759,7 @@ export const InventoryQRPortal = () => {
 
                   <button
                     onClick={() => navigateView('shelf-detail', activeShelf)}
-                    className="bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer shadow-sm"
+                    className="bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer shadow-md"
                   >
                     <Smartphone className="w-4 h-4" />
                     <span>View Scanned Page</span>
@@ -769,123 +773,116 @@ export const InventoryQRPortal = () => {
 
         {/* ==================== VIEW 3: SCANNED SHELF DETAILS & EDIT VIEW ==================== */}
         {viewMode === 'shelf-detail' && activeShelf && (
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 text-left">
+          <div className="space-y-6 text-left">
             
             {/* Top Bar */}
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+            <div className="flex items-center justify-between border-b border-gray-200/80 pb-4">
               <div>
-                <span className="text-[10px] font-bold text-[#3B429F] tracking-wider uppercase">SCANNED SHELF LOCATION</span>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5">
+                <span className="text-[10px] font-extrabold text-[#3B429F] tracking-wider uppercase block">SCANNED SHELF LOCATION</span>
+                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mt-0.5">
                   SHELF {activeShelf.shelfNumber}
                 </h1>
-                <p className="text-xs text-gray-500 mt-0.5">Tag ID: <span className="font-mono text-gray-700 font-bold">{activeShelf.id}</span></p>
+                <p className="text-xs text-gray-400 mt-0.5 font-medium">Tag ID: <span className="font-mono text-gray-700 font-bold">{activeShelf.id}</span></p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
                     setEditFormData({ ...activeShelf });
                     setIsEditing(!isEditing);
                   }}
-                  className="px-3.5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
                 >
                   <Edit3 className="w-4 h-4 text-[#3B429F]" />
-                  <span>{isEditing ? 'Cancel Edit' : 'Edit Shelf Details'}</span>
+                  <span>{isEditing ? 'Cancel Edit' : 'Edit Details'}</span>
                 </button>
 
                 <button
                   onClick={() => handleDeleteShelf(activeShelf.id)}
-                  className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
                   title="Delete this shelf record"
                 >
                   <Trash2 className="w-4 h-4 text-red-600" />
                   <span>Delete Shelf</span>
-                </button>
-
-                <button
-                  onClick={() => navigateView('all-shelves')}
-                  className="text-xs text-[#3B429F] hover:underline font-bold"
-                >
-                  All Shelves
                 </button>
               </div>
             </div>
 
             {/* FULL EDIT FORM MODE */}
             {isEditing && editFormData ? (
-              <form onSubmit={handleSaveEdit} className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-4 text-xs">
-                <h3 className="font-bold text-gray-900 uppercase">EDIT SHELF DETAILS</h3>
+              <form onSubmit={handleSaveEdit} className="space-y-4 text-xs max-w-2xl pt-2">
+                <h3 className="font-bold text-gray-900 uppercase tracking-wide border-b border-gray-100 pb-2">EDIT SHELF DETAILS</h3>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-gray-900 font-bold block">PRODUCT NAME</label>
                   <input
                     type="text"
                     value={editFormData.productName}
                     onChange={e => setEditFormData({ ...editFormData, productName: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                    className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <label className="text-gray-900 font-bold block">ASSISTANT NAME</label>
                     <input
                       type="text"
                       value={editFormData.assistantName}
                       onChange={e => setEditFormData({ ...editFormData, assistantName: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                      className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                       required
                     />
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <label className="text-gray-900 font-bold block">SHELF NUMBER</label>
                     <input
                       type="text"
                       value={editFormData.shelfNumber}
                       onChange={e => setEditFormData({ ...editFormData, shelfNumber: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 uppercase focus:outline-none focus:border-[#3B429F] bg-white"
+                      className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 uppercase focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <label className="text-gray-900 font-bold block">STOCK QUANTITY</label>
                     <input
                       type="number"
                       min="0"
                       value={editFormData.quantity}
                       onChange={e => setEditFormData({ ...editFormData, quantity: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                      className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                       required
                     />
                   </div>
 
-                  <div className="sm:col-span-2 space-y-1">
+                  <div className="sm:col-span-2 space-y-1.5">
                     <label className="text-gray-900 font-bold block">NOTES</label>
                     <input
                       type="text"
                       value={editFormData.notes}
                       onChange={e => setEditFormData({ ...editFormData, notes: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white"
+                      className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                     />
                   </div>
                 </div>
 
-                <div className="pt-2 flex justify-end gap-2">
+                <div className="pt-2 flex justify-end gap-3">
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold text-xs"
+                    className="px-5 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold text-xs"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-lg bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs flex items-center gap-1.5"
+                    className="px-6 py-2.5 rounded-xl bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
                   >
                     <Save className="w-4 h-4" /> Save Changes
                   </button>
@@ -893,69 +890,69 @@ export const InventoryQRPortal = () => {
               </form>
             ) : (
               /* VIEW & QUICK EDIT QUANTITY MODE */
-              <div className="space-y-5 text-xs">
-                {/* Product Information Box */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+              <div className="space-y-6 text-xs pt-2">
+                {/* Product Information Section */}
+                <div className="space-y-4 border-b border-gray-200/80 pb-6">
                   <div>
-                    <span className="text-[10px] text-gray-500 font-bold uppercase">PRODUCT ITEM</span>
-                    <h3 className="text-sm font-bold text-gray-900 mt-0.5">{activeShelf.productName}</h3>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PRODUCT NAME</span>
+                    <h3 className="text-lg font-bold text-gray-900 mt-0.5">{activeShelf.productName}</h3>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 border-t border-gray-200 pt-3 text-gray-700">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-gray-700 pt-2">
                     <div>
-                      <span className="text-[10px] text-gray-500 font-bold block">ASSIGNED ASSISTANT</span>
-                      <p className="font-semibold text-gray-900 mt-0.5 flex items-center gap-1">
-                        <User className="w-3.5 h-3.5 text-[#3B429F]" />
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">ASSIGNED ASSISTANT</span>
+                      <p className="font-bold text-gray-900 mt-1 text-sm flex items-center gap-1.5">
+                        <User className="w-4 h-4 text-[#3B429F]" />
                         <span>{activeShelf.assistantName}</span>
                       </p>
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-500 font-bold block">ZONE / NOTES</span>
-                      <p className="font-semibold text-gray-900 mt-0.5">{activeShelf.notes || 'Standard Storage'}</p>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">ZONE / NOTES</span>
+                      <p className="font-semibold text-gray-900 mt-1">{activeShelf.notes || 'Standard Storage'}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Stock Counter & Editable Input Bar */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                  <span className="text-xs text-gray-600 font-bold block">EDITABLE STOCK QUANTITY</span>
+                {/* Stock Counter & Editable Input Section */}
+                <div className="space-y-4 pt-2">
+                  <span className="text-xs text-gray-500 font-extrabold uppercase tracking-wider block">EDITABLE STOCK QUANTITY</span>
                   
                   <form onSubmit={handleDirectQtySave} className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
                       <button
                         type="button"
                         onClick={() => updateQuantity(-1)}
-                        className="p-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
+                        className="p-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-xs"
                         title="Decrease Stock"
                       >
                         <Minus className="w-4 h-4 text-red-600" />
                       </button>
 
                       {/* Editable Numeric Quantity Input */}
-                      <div className="relative flex-1 sm:w-32">
+                      <div className="relative flex-1 sm:w-36">
                         <input
                           type="number"
                           min="0"
                           value={inlineQty}
                           onChange={(e) => setInlineQty(e.target.value)}
-                          className="w-full text-center font-extrabold text-xl text-emerald-700 bg-white border border-gray-300 rounded-lg py-2 focus:outline-none focus:border-[#3B429F]"
+                          className="w-full text-center font-black text-2xl text-[#3B429F] bg-white border-2 border-gray-200 rounded-xl py-2 focus:outline-none focus:border-[#3B429F]"
                         />
                       </div>
 
                       <button
                         type="button"
                         onClick={() => updateQuantity(1)}
-                        className="p-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-sm"
+                        className="p-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold transition flex items-center justify-center cursor-pointer shadow-xs"
                         title="Increase Stock"
                       >
                         <Plus className="w-4 h-4 text-emerald-600" />
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
                       <button
                         type="submit"
-                        className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm"
+                        className="flex-1 sm:flex-none bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer shadow-md"
                       >
                         <Save className="w-4 h-4" />
                         <span>Update Stock Quantity</span>
@@ -964,7 +961,7 @@ export const InventoryQRPortal = () => {
                       <button
                         type="button"
                         onClick={() => handlePrintTag()}
-                        className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center gap-1.5 transition cursor-pointer shadow-sm"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3.5 px-5 rounded-xl flex items-center gap-2 transition cursor-pointer shadow-md"
                       >
                         <Printer className="w-4 h-4" />
                         <span>Print Tag</span>
@@ -980,94 +977,96 @@ export const InventoryQRPortal = () => {
 
         {/* ==================== VIEW 4: ALL SAVED WAREHOUSE SHELVES LIST ==================== */}
         {viewMode === 'all-shelves' && (
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6 text-left">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+          <div className="space-y-6 text-left">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200/80 pb-4">
               <div>
-                <h2 className="text-base font-bold text-gray-900 uppercase">Saved Warehouse Shelves ({filteredShelves.length})</h2>
+                <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide">
+                  Saved Warehouse Shelves ({filteredShelves.length})
+                </h2>
               </div>
 
               <div className="relative w-full sm:w-72">
                 <input
                   type="text"
-                  placeholder="Search by shelf #, product, assistant..."
+                  placeholder="Search shelf #, product, assistant..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3B429F]"
+                  className="w-full border-b-2 border-gray-300 text-gray-900 text-xs pl-8 pr-3 py-2 focus:outline-none focus:border-[#3B429F] bg-transparent"
                 />
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-gray-400 absolute left-1 top-2.5" />
               </div>
             </div>
 
             {filteredShelves.length > 0 ? (
-              <div className="grid grid-cols-1 gap-5">
+              <div className="space-y-2 divide-y divide-gray-100">
                 {filteredShelves.map(shelf => (
                   <div
                     key={shelf.id}
-                    className="bg-white p-5 rounded-xl border border-gray-200 space-y-4 text-xs hover:border-[#3B429F] transition-all shadow-sm"
+                    className="pt-5 pb-6 space-y-3.5 text-xs transition"
                   >
                     {/* Header Row */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="bg-[#3B429F] text-white text-xs font-extrabold px-3 py-1 rounded-md uppercase tracking-wider">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <span className="bg-[#3B429F] text-white text-xs font-black px-3 py-1 rounded-md uppercase tracking-wider">
                           SHELF {shelf.shelfNumber}
                         </span>
-                        <span className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
+                        <span className="text-xs font-mono text-gray-500 font-bold">
                           {shelf.id}
                         </span>
                       </div>
 
-                      <span className="text-[11px] text-gray-500 font-medium">
+                      <span className="text-xs text-gray-400 font-medium">
                         Created: {shelf.createdAt}
                       </span>
                     </div>
 
-                    {/* All Details Body */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Content Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
                       {/* Product Info */}
                       <div className="md:col-span-2 space-y-1">
-                        <span className="text-[10px] text-gray-500 font-bold uppercase block">Product Name</span>
-                        <h3 className="text-sm font-bold text-gray-900 leading-snug">{shelf.productName}</h3>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PRODUCT NAME</span>
+                        <h3 className="text-base font-bold text-gray-900 leading-snug">{shelf.productName}</h3>
                         
                         {shelf.notes && (
-                          <p className="text-[11px] text-gray-600 pt-1">
+                          <p className="text-xs text-gray-500 pt-0.5">
                             <strong>Zone / Notes:</strong> {shelf.notes}
                           </p>
                         )}
                       </div>
 
                       {/* Assistant & Stock Details */}
-                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200/80 space-y-2">
+                      <div className="space-y-2">
                         <div>
-                          <span className="text-[10px] text-gray-500 font-bold uppercase block">Assigned Assistant</span>
-                          <p className="font-semibold text-gray-900 flex items-center gap-1 mt-0.5">
-                            <User className="w-3.5 h-3.5 text-[#3B429F]" />
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">ASSIGNED ASSISTANT</span>
+                          <p className="font-bold text-gray-900 flex items-center gap-1.5 mt-0.5 text-sm">
+                            <User className="w-4 h-4 text-[#3B429F]" />
                             <span>{shelf.assistantName}</span>
                           </p>
                         </div>
 
-                        <div className="border-t border-gray-200/60 pt-2 flex items-center justify-between">
-                          <span className="text-[10px] text-gray-500 font-bold uppercase">Live Stock</span>
-                          <span className="text-sm font-black text-emerald-700">{shelf.quantity} Units</span>
+                        <div>
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">LIVE STOCK</span>
+                          <span className="text-base font-black text-[#3B429F]">{shelf.quantity} Units</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Bottom Quick Actions */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                    {/* Bottom Quick Actions Line */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                       {/* Quantity Quick Adjust */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-gray-500 font-semibold mr-1">Quick Adjust Stock:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 font-semibold mr-1">Quick Adjust Stock:</span>
                         <button
                           onClick={() => updateShelfQuantityInList(shelf.id, -1)}
-                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-red-600 transition cursor-pointer shadow-xs"
+                          className="w-7 h-7 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-red-600 transition cursor-pointer"
                           title="Decrease 1 Unit"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="font-extrabold text-gray-900 px-2 min-w-[28px] text-center">{shelf.quantity}</span>
+                        <span className="font-black text-gray-900 text-sm px-2 min-w-[28px] text-center">{shelf.quantity}</span>
                         <button
                           onClick={() => updateShelfQuantityInList(shelf.id, 1)}
-                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-emerald-600 transition cursor-pointer shadow-xs"
+                          className="w-7 h-7 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-emerald-600 transition cursor-pointer"
                           title="Increase 1 Unit"
                         >
                           <Plus className="w-3.5 h-3.5" />
@@ -1075,18 +1074,18 @@ export const InventoryQRPortal = () => {
                       </div>
 
                       {/* View / Edit / Print / Delete Action Buttons */}
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-3">
                         <button
                           onClick={() => handleCopyLink(shelf)}
-                          className="px-3 py-1.5 rounded-md bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                          className="text-xs text-gray-600 hover:text-[#3B429F] font-bold flex items-center gap-1 transition cursor-pointer"
                         >
-                          <Copy className="w-3.5 h-3.5 text-[#3B429F]" />
+                          <Copy className="w-3.5 h-3.5" />
                           <span>Copy Link</span>
                         </button>
 
                         <button
                           onClick={() => navigateView('shelf-detail', shelf)}
-                          className="px-3.5 py-1.5 rounded-md bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold text-xs flex items-center gap-1 transition shadow-sm cursor-pointer"
+                          className="text-xs text-[#3B429F] hover:underline font-extrabold flex items-center gap-1 transition cursor-pointer"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                           <span>View & Edit</span>
@@ -1094,7 +1093,7 @@ export const InventoryQRPortal = () => {
 
                         <button
                           onClick={() => navigateView('qr-generated', shelf)}
-                          className="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition shadow-sm cursor-pointer"
+                          className="text-xs text-emerald-600 hover:underline font-extrabold flex items-center gap-1 transition cursor-pointer"
                         >
                           <Printer className="w-3.5 h-3.5" />
                           <span>Print QR Tag</span>
@@ -1102,7 +1101,7 @@ export const InventoryQRPortal = () => {
 
                         <button
                           onClick={() => handleDeleteShelf(shelf.id)}
-                          className="px-3 py-1.5 rounded-md bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                          className="text-xs text-red-600 hover:underline font-extrabold flex items-center gap-1 transition cursor-pointer"
                           title="Delete shelf record"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1115,11 +1114,11 @@ export const InventoryQRPortal = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-xs text-gray-500 space-y-3">
+              <div className="text-center py-16 text-xs text-gray-500 space-y-3">
                 <p className="text-sm font-semibold text-gray-700">No active shelf records found in database.</p>
                 <button
                   onClick={() => navigateView('create')}
-                  className="btn-primary text-xs py-2.5 px-5 mt-2 cursor-pointer"
+                  className="bg-[#3B429F] text-white text-xs font-bold py-2.5 px-5 rounded-xl mt-2 cursor-pointer shadow-md"
                 >
                   Create First Shelf Tag
                 </button>
