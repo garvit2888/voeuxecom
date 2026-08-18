@@ -101,14 +101,15 @@ export const InventoryQRPortal = () => {
             .map(item => item.shelfId || item.id)
             .filter(Boolean);
 
-          const currentDeleted = Array.from(new Set([...deletedIds, ...cloudDeletedIds]));
-          if (cloudDeletedIds.length > 0) {
+          const currentDeleted = Array.from(new Set([...(Array.isArray(deletedIds) ? deletedIds : []), ...cloudDeletedIds]));
+          const hasNewDeleted = cloudDeletedIds.some(id => !deletedIds.includes(id));
+          if (hasNewDeleted) {
             setDeletedIds(currentDeleted);
             try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(currentDeleted)); } catch(e){}
           }
 
           setShelves(prev => {
-            let updated = prev.filter(s => !currentDeleted.includes(s.id));
+            let updated = (prev || []).filter(s => s && s.id && !currentDeleted.includes(s.id));
 
             cloudData.forEach(item => {
               const cleanId = item.shelfId || item.id;
@@ -121,9 +122,9 @@ export const InventoryQRPortal = () => {
               ) {
                 const cleanItem = {
                   id: cleanId,
-                  shelfNumber: item.shelfNumber,
-                  productName: item.productName,
-                  assistantName: item.assistantName,
+                  shelfNumber: item.shelfNumber || 'A-01',
+                  productName: item.productName || 'VOEUX Item',
+                  assistantName: item.assistantName || 'Assistant',
                   quantity: Number(item.quantity) || 0,
                   notes: item.notes || '',
                   createdAt: item.createdAt || new Date().toLocaleString('en-IN')
@@ -151,7 +152,7 @@ export const InventoryQRPortal = () => {
 
   // Push Shelf Record to Cloud Database for Multi-Device Access
   const pushToCloud = async (shelfItem) => {
-    if (!shelfItem || !shelfItem.id || deletedIds.includes(shelfItem.id)) return;
+    if (!shelfItem || !shelfItem.id || (deletedIds || []).includes(shelfItem.id)) return;
     try {
       fetch(CLOUD_SYNC_ENDPOINT, {
         method: 'POST',
@@ -189,7 +190,7 @@ export const InventoryQRPortal = () => {
       if (res.ok) {
         const cloudItems = await res.json();
         if (Array.isArray(cloudItems)) {
-          const matched = cloudItems.filter(item => (item.shelfId || item.id) === shelfId);
+          const matched = cloudItems.filter(item => item && (item.shelfId || item.id) === shelfId);
           matched.forEach(item => {
             if (item._id) {
               fetch(`${CLOUD_SYNC_ENDPOINT}/${item._id}`, { method: 'DELETE' }).catch(() => {});
@@ -232,7 +233,7 @@ export const InventoryQRPortal = () => {
       syncFromCloud();
     }, 10000);
     return () => clearInterval(interval);
-  }, [deletedIds]);
+  }, []);
 
   // Navigation with Browser History (Back / Forward Arrow Support)
   const navigateView = (mode, shelf = null, skipHistory = false) => {
