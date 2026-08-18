@@ -504,7 +504,7 @@ export const InventoryQRPortal = () => {
       
       {/* ==================== PRINTABLE STICKER TAG (STRICT PRINT ISOLATION WRAPPER) ==================== */}
       {activeShelf && (
-        <div id="printable-qr-tag-wrapper">
+        <div id="printable-qr-tag-wrapper" className={viewMode === 'qr-generated' ? 'block' : 'hidden print:block'}>
           <div className="font-sans text-black bg-white p-6">
             <div className="max-w-xs mx-auto border-4 border-black p-5 rounded-2xl text-center space-y-3 bg-white">
               <div className="border-b-2 border-black pb-2">
@@ -577,11 +577,9 @@ export const InventoryQRPortal = () => {
           </div>
 
           {/* Total Stock Available Count Banner */}
-          <div className="pt-2 flex items-center justify-between text-xs">
-            <span className="text-gray-600 font-bold">Total Stock Available:</span>
-            <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200/60">
-              {totalStockCount} Units ({shelves.length} Shelves)
-            </span>
+          <div className="pt-2 flex flex-wrap items-center justify-start text-left gap-2 text-sm sm:text-base font-extrabold text-gray-900">
+            <span>Total Stock Available:</span>
+            <span className="text-[#3B429F] font-black">{totalStockCount} Units ({shelves.length} Shelves)</span>
           </div>
         </div>
 
