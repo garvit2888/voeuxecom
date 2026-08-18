@@ -84,7 +84,7 @@ export const InventoryQRPortal = () => {
   }, [deletedIds]);
 
   // Cloud Database Sync Endpoints (Cross-Device Database)
-  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/a59d4b7b97b54a7b8d0fc7c894cfd83e/shelves';
+  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/9839c68e75be4151ae8b53053a16b0dc/shelves';
   const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
   // Fetch Cloud Database Shelves and Sync Across Devices
@@ -226,13 +226,23 @@ export const InventoryQRPortal = () => {
     } catch (e) {}
   };
 
-  // Auto-sync cloud data automatically on mount and every 10 seconds in background
+  // Auto-sync cloud data automatically on mount, window focus, and background interval
   useEffect(() => {
     syncFromCloud();
+
     const interval = setInterval(() => {
       syncFromCloud();
-    }, 10000);
-    return () => clearInterval(interval);
+    }, 20000);
+
+    const handleWindowFocus = () => {
+      syncFromCloud();
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
   }, []);
 
   // Navigation with Browser History (Back / Forward Arrow Support)
@@ -979,10 +989,17 @@ export const InventoryQRPortal = () => {
         {viewMode === 'all-shelves' && (
           <div className="space-y-6 text-left">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200/80 pb-4">
-              <div>
+              <div className="flex items-center gap-3">
                 <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide">
                   Saved Warehouse Shelves ({filteredShelves.length})
                 </h2>
+                <button
+                  onClick={() => syncFromCloud()}
+                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[#3B429F] transition cursor-pointer"
+                  title="Sync Latest Database"
+                >
+                  <RefreshCcw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                </button>
               </div>
 
               <div className="relative w-full sm:w-72">
