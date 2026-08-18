@@ -1,7 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
 import {
-  Building2,
   MessageSquare,
   ArrowRight,
   Phone,
@@ -24,11 +23,6 @@ export const JoinUsPage = () => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[#3B429F]/20 blur-3xl rounded-full pointer-events-none" />
 
         <div className="max-w-4xl mx-auto space-y-6 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-cyan-300 text-xs font-bold uppercase tracking-wider">
-            <Building2 className="w-4 h-4 text-cyan-300" />
-            <span>Pan-India Business Partner Network</span>
-          </div>
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
             VOEUX® Official Distributor Program
           </h1>
