@@ -120,9 +120,6 @@ const MainContent = () => {
             <section className="container mx-auto px-4">
               <div className="bg-gray-900 text-white rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="space-y-3 max-w-lg">
-                  <span className="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase">
-                    New Product Drop 2026
-                  </span>
                   <h3 className="text-2xl font-black leading-tight">
                     VOEUX® Android 10.1" Dual Knob Piano Buttons (4GB/64GB) Stereo
                   </h3>
@@ -233,10 +230,6 @@ const MainContent = () => {
             <section className="mt-16 py-12 px-6 sm:px-12 bg-gradient-to-r from-slate-950 via-[#1E2255] to-slate-950 text-white rounded-3xl relative overflow-hidden text-left shadow-2xl">
               <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
                 <div className="space-y-3 max-w-2xl">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-cyan-300 text-xs font-bold uppercase tracking-wider">
-                    <Building2 className="w-3.5 h-3.5" />
-                    <span>Pan-India Expansion</span>
-                  </div>
                   <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
                     Partner With VOEUX® — Official Distributor Program
                   </h2>
@@ -253,16 +246,6 @@ const MainContent = () => {
                     <span>Explore Distributor Program</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
-
-                  <a
-                    href="https://api.whatsapp.com/send?phone=919999484530&text=hi%20i%20am%20interested%20to%20know%20more%20about%20voeux%20official%20distributor%20program"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs tracking-wide transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Inquire via WhatsApp</span>
-                  </a>
                 </div>
               </div>
             </section>
