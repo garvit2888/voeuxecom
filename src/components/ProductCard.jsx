@@ -18,13 +18,6 @@ export const ProductCard = ({ product }) => {
       
       {/* Top Image Section - Fitted Design */}
       <div className="relative aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2">
-        {/* Badges */}
-        {product.badge && (
-          <span className="absolute top-2 left-2 z-10 bg-[#3B429F] text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm">
-            {product.badge}
-          </span>
-        )}
-
         <img
           src={product.image}
           alt={product.name}

@@ -115,13 +115,6 @@ export const ProductDetailModal = () => {
                 </div>
               )}
 
-              {/* Badge Tag */}
-              {product.badge && (
-                <span className="absolute top-3 right-3 z-10 bg-[#3B429F] text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider shadow-sm">
-                  {product.badge}
-                </span>
-              )}
-
               {is360Mode ? (
                 <div
                   onMouseMove={handleDrag360}

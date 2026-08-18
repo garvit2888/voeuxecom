@@ -67,7 +67,7 @@ export const InventoryQRPortal = () => {
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Cloud Database Sync Endpoints (Cross-Device Database)
-  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/251bfc52c14540fb8864c102b3666650/shelves';
+  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/1d0a6b47157144cfb1a6b7eb58d65ee2/shelves';
   const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
   // Fetch Cloud Database Shelves and Sync Across Devices
@@ -175,42 +175,79 @@ export const InventoryQRPortal = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Master database sync payload generator
+  const getMasterSyncUrl = () => {
+    try {
+      const payload = btoa(encodeURIComponent(JSON.stringify(shelves)));
+      const baseUrl = window.location.origin + window.location.pathname;
+      return `${baseUrl}?syncShelves=${payload}#inventory-qr`;
+    } catch (e) {
+      return window.location.href;
+    }
+  };
+
   // Sync with browser Back and Forward button events (popstate) & mobile QR camera scan URLs
   useEffect(() => {
     const handleUrlState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const shelfIdFromUrl = urlParams.get('shelfId');
+      const syncShelvesParam = urlParams.get('syncShelves');
 
+      // Master database sync URL payload scanned
+      if (syncShelvesParam) {
+        try {
+          const decoded = JSON.parse(decodeURIComponent(atob(syncShelvesParam)));
+          if (Array.isArray(decoded) && decoded.length > 0) {
+            setShelves(prev => {
+              const merged = [...prev];
+              decoded.forEach(item => {
+                if (item && item.id && !merged.some(m => m.id === item.id)) {
+                  merged.unshift(item);
+                }
+              });
+              try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(merged)); } catch(e){}
+              return merged;
+            });
+          }
+        } catch (e) {}
+      }
+
+      // Single shelf QR tag scanned from mobile phone camera
       if (shelfIdFromUrl) {
-        const matched = shelves.find(s => s.id === shelfIdFromUrl);
-        if (matched) {
-          setActiveShelf(matched);
-          setInlineQty(String(matched.quantity));
-          setViewMode(urlParams.get('preview') ? 'qr-generated' : 'shelf-detail');
-          return;
-        } else {
-          // Dynamic entry if scanned ID is not in local list yet (Cross-device QR scan!)
-          const dynamicShelf = {
-            id: shelfIdFromUrl,
-            shelfNumber: (urlParams.get('shelf') || 'A-01').toUpperCase(),
-            productName: urlParams.get('product') || 'VOEUX Electronics Item',
-            assistantName: urlParams.get('assistant') || 'Warehouse Assistant',
-            quantity: parseInt(urlParams.get('qty') || '10', 10),
-            notes: urlParams.get('notes') || 'Scanned via QR Code Tag',
-            createdAt: new Date().toLocaleString('en-IN')
-          };
+        const shelfNumberVal = (urlParams.get('shelf') || 'A-01').toUpperCase();
+        const productNameVal = urlParams.get('product') || 'VOEUX Electronics Item';
+        const assistantNameVal = urlParams.get('assistant') || 'Warehouse Assistant';
+        const quantityVal = parseInt(urlParams.get('qty') || '10', 10);
+        const notesVal = urlParams.get('notes') || 'Scanned via QR Code Tag';
 
-          // Save newly scanned shelf into device's localStorage
-          setShelves(prev => {
-            if (prev.some(s => s.id === dynamicShelf.id)) return prev;
-            return [dynamicShelf, ...prev];
-          });
+        const scannedShelf = {
+          id: shelfIdFromUrl,
+          shelfNumber: shelfNumberVal,
+          productName: productNameVal,
+          assistantName: assistantNameVal,
+          quantity: isNaN(quantityVal) ? 10 : quantityVal,
+          notes: notesVal,
+          createdAt: new Date().toLocaleString('en-IN')
+        };
 
-          setActiveShelf(dynamicShelf);
-          setInlineQty(String(dynamicShelf.quantity));
-          setViewMode('shelf-detail');
-          return;
-        }
+        // Unconditionally save & merge into localStorage & state on this device
+        setShelves(prev => {
+          const idx = prev.findIndex(s => s.id === scannedShelf.id);
+          let updatedList;
+          if (idx > -1) {
+            updatedList = [...prev];
+            updatedList[idx] = { ...updatedList[idx], ...scannedShelf };
+          } else {
+            updatedList = [scannedShelf, ...prev];
+          }
+          try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updatedList)); } catch(e){}
+          return updatedList;
+        });
+
+        setActiveShelf(scannedShelf);
+        setInlineQty(String(scannedShelf.quantity));
+        setViewMode(urlParams.get('preview') ? 'qr-generated' : 'shelf-detail');
+        return;
       }
 
       const viewParam = urlParams.get('view');
@@ -226,7 +263,7 @@ export const InventoryQRPortal = () => {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [shelves]);
+  }, []);
 
   // Submit Handler for Creating a New QR Code Tag
   const handleGenerateQR = (e) => {
@@ -824,15 +861,30 @@ export const InventoryQRPortal = () => {
                 <p className="text-xs text-gray-500 mt-0.5">All live shelf allocation details and updated stock records</p>
               </div>
 
-              <div className="relative w-full sm:w-72">
-                <input
-                  type="text"
-                  placeholder="Search by shelf #, product, assistant..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3B429F]"
-                />
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                <button
+                  onClick={() => {
+                    const masterUrl = getMasterSyncUrl();
+                    navigator.clipboard.writeText(masterUrl);
+                    alert('Master Warehouse Sync Link copied! Open or share this link on any mobile phone/device to instantly import all saved shelves.');
+                  }}
+                  className="px-3 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-[#3B429F] border border-indigo-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  title="Copy link to sync all shelves to any phone or tablet"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Sync All Shelves to Phone</span>
+                </button>
+
+                <div className="relative flex-1 sm:w-64">
+                  <input
+                    type="text"
+                    placeholder="Search by shelf #, product, assistant..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3B429F]"
+                  />
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                </div>
               </div>
             </div>
 

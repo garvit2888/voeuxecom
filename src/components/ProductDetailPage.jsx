@@ -131,17 +131,10 @@ export const ProductDetailPage = () => {
 
               {/* Zoom Pill Indicator */}
               {!is360Mode && (
-                <div className="absolute bottom-3 right-3 z-10 bg-white/95 text-gray-800 text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 border border-gray-200 backdrop-blur-sm shadow-sm group-hover:scale-105 transition">
+                <div className="absolute bottom-3 right-3 z-10 bg-white/95 text-gray-800 text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-gray-200 backdrop-blur-sm shadow-sm group-hover:scale-105 transition">
                   <ZoomIn className="w-3.5 h-3.5 text-[#3B429F]" />
                   <span>Click to Zoom</span>
                 </div>
-              )}
-
-              {/* Badge Tag */}
-              {product.badge && (
-                <span className="absolute top-4 right-4 z-10 bg-[#3B429F] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-md tracking-wider shadow-sm">
-                  {product.badge}
-                </span>
               )}
 
               {is360Mode ? (

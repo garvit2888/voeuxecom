@@ -198,11 +198,7 @@ const MainContent = () => {
                   return (
                     <div key={i} className="clean-card p-5 space-y-3 flex flex-col justify-between">
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="bg-yellow-100 text-yellow-900 font-extrabold text-[10px] px-2 py-0.5 rounded flex items-center gap-1 border border-yellow-300/60">
-                            <span className="bg-yellow-400 text-[#2874F0] font-black text-[9px] px-1 rounded italic leading-none">f</span>
-                            {rev.verifiedBadge}
-                          </span>
+                        <div className="flex items-center justify-end">
                           <span className="text-[10px] text-gray-400 font-medium">{getRelativeTimeAgo(rev.timestamp)}</span>
                         </div>
 
@@ -225,9 +221,6 @@ const MainContent = () => {
 
                     <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-gray-500">
                       <span className="font-bold text-gray-900">{rev.name}</span>
-                      <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-                        ✓ Verified Purchase
-                      </span>
                     </div>
                   </div>
                 );
