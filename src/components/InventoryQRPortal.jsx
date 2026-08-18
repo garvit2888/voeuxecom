@@ -19,7 +19,8 @@ import {
   Copy,
   Check,
   Smartphone,
-  RefreshCcw
+  RefreshCcw,
+  Trash2
 } from 'lucide-react';
 
 export const InventoryQRPortal = () => {
@@ -378,6 +379,23 @@ export const InventoryQRPortal = () => {
     }));
   };
 
+  // Delete Shelf Handler
+  const handleDeleteShelf = (shelfId) => {
+    if (!shelfId) return;
+    if (window.confirm('Are you sure you want to delete this shelf record from the database?')) {
+      const updated = shelves.filter(s => s.id !== shelfId);
+      setShelves(updated);
+      try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updated)); } catch(e){}
+      if (activeShelf?.id === shelfId) {
+        setActiveShelf(null);
+      }
+      navigateView('all-shelves');
+    }
+  };
+
+  // Total Available Stock Calculation
+  const totalStockCount = shelves.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+
   const filteredShelves = shelves.filter(s =>
     s.shelfNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -429,7 +447,7 @@ export const InventoryQRPortal = () => {
       {/* ==================== MAIN APPLICATION INTERFACE (NON-PRINT) ==================== */}
       <div className="max-w-3xl mx-auto space-y-6 print:hidden">
         
-        {/* Top Page Header (Warranty Portal Style) */}
+        {/* Top Page Header */}
         <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-4 text-left">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
             <div>
@@ -437,9 +455,6 @@ export const InventoryQRPortal = () => {
                 <QrCode className="w-7 h-7 text-[#3B429F]" />
                 <span>Warehouse Inventory System</span>
               </h1>
-              <p className="text-xs text-gray-500 mt-1 font-medium">
-                VOEUX® Logistics • Shelf Tag Generator & Scan System
-              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -463,6 +478,14 @@ export const InventoryQRPortal = () => {
                 <span>Saved Shelves ({shelves.length})</span>
               </button>
             </div>
+          </div>
+
+          {/* Total Stock Available Count Banner */}
+          <div className="pt-2 flex items-center justify-between text-xs">
+            <span className="text-gray-600 font-bold">Total Stock Available:</span>
+            <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200/60">
+              {totalStockCount} Units ({shelves.length} Shelves)
+            </span>
           </div>
         </div>
 
@@ -677,6 +700,15 @@ export const InventoryQRPortal = () => {
                 </button>
 
                 <button
+                  onClick={() => handleDeleteShelf(activeShelf.id)}
+                  className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  title="Delete this shelf record"
+                >
+                  <Trash2 className="w-4 h-4 text-red-600" />
+                  <span>Delete Shelf</span>
+                </button>
+
+                <button
                   onClick={() => navigateView('all-shelves')}
                   className="text-xs text-[#3B429F] hover:underline font-bold"
                 >
@@ -858,33 +890,17 @@ export const InventoryQRPortal = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
               <div>
                 <h2 className="text-base font-bold text-gray-900 uppercase">Saved Warehouse Shelves ({filteredShelves.length})</h2>
-                <p className="text-xs text-gray-500 mt-0.5">All live shelf allocation details and updated stock records</p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-                <button
-                  onClick={() => {
-                    const masterUrl = getMasterSyncUrl();
-                    navigator.clipboard.writeText(masterUrl);
-                    alert('Master Warehouse Sync Link copied! Open or share this link on any mobile phone/device to instantly import all saved shelves.');
-                  }}
-                  className="px-3 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-[#3B429F] border border-indigo-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                  title="Copy link to sync all shelves to any phone or tablet"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>Sync All Shelves to Phone</span>
-                </button>
-
-                <div className="relative flex-1 sm:w-64">
-                  <input
-                    type="text"
-                    placeholder="Search by shelf #, product, assistant..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3B429F]"
-                  />
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-                </div>
+              <div className="relative w-full sm:w-72">
+                <input
+                  type="text"
+                  placeholder="Search by shelf #, product, assistant..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full border border-gray-300 text-gray-900 text-xs rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3B429F]"
+                />
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
               </div>
             </div>
 
@@ -893,15 +909,15 @@ export const InventoryQRPortal = () => {
                 {filteredShelves.map(shelf => (
                   <div
                     key={shelf.id}
-                    className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-4 text-xs hover:border-[#3B429F] transition-all shadow-sm"
+                    className="bg-white p-5 rounded-xl border border-gray-200 space-y-4 text-xs hover:border-[#3B429F] transition-all shadow-sm"
                   >
                     {/* Header Row */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
                       <div className="flex items-center gap-2">
                         <span className="bg-[#3B429F] text-white text-xs font-extrabold px-3 py-1 rounded-md uppercase tracking-wider">
                           SHELF {shelf.shelfNumber}
                         </span>
-                        <span className="text-[10px] font-mono text-gray-500 bg-white px-2 py-0.5 rounded border border-gray-200">
+                        <span className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
                           {shelf.id}
                         </span>
                       </div>
@@ -926,7 +942,7 @@ export const InventoryQRPortal = () => {
                       </div>
 
                       {/* Assistant & Stock Details */}
-                      <div className="bg-white p-3 rounded-lg border border-gray-200 space-y-2">
+                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200/80 space-y-2">
                         <div>
                           <span className="text-[10px] text-gray-500 font-bold uppercase block">Assigned Assistant</span>
                           <p className="font-semibold text-gray-900 flex items-center gap-1 mt-0.5">
@@ -935,7 +951,7 @@ export const InventoryQRPortal = () => {
                           </p>
                         </div>
 
-                        <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
+                        <div className="border-t border-gray-200/60 pt-2 flex items-center justify-between">
                           <span className="text-[10px] text-gray-500 font-bold uppercase">Live Stock</span>
                           <span className="text-sm font-black text-emerald-700">{shelf.quantity} Units</span>
                         </div>
@@ -943,13 +959,13 @@ export const InventoryQRPortal = () => {
                     </div>
 
                     {/* Bottom Quick Actions */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-200">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-100">
                       {/* Quantity Quick Adjust */}
                       <div className="flex items-center gap-1.5">
                         <span className="text-[11px] text-gray-500 font-semibold mr-1">Quick Adjust Stock:</span>
                         <button
                           onClick={() => updateShelfQuantityInList(shelf.id, -1)}
-                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-red-600 transition cursor-pointer"
+                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-red-600 transition cursor-pointer shadow-xs"
                           title="Decrease 1 Unit"
                         >
                           <Minus className="w-3.5 h-3.5" />
@@ -957,15 +973,15 @@ export const InventoryQRPortal = () => {
                         <span className="font-extrabold text-gray-900 px-2 min-w-[28px] text-center">{shelf.quantity}</span>
                         <button
                           onClick={() => updateShelfQuantityInList(shelf.id, 1)}
-                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-emerald-600 transition cursor-pointer"
+                          className="w-7 h-7 rounded bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-emerald-600 transition cursor-pointer shadow-xs"
                           title="Increase 1 Unit"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      {/* View / Edit / Print Action Buttons */}
-                      <div className="flex items-center gap-2">
+                      {/* View / Edit / Print / Delete Action Buttons */}
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           onClick={() => handleCopyLink(shelf)}
                           className="px-3 py-1.5 rounded-md bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
@@ -989,6 +1005,15 @@ export const InventoryQRPortal = () => {
                           <Printer className="w-3.5 h-3.5" />
                           <span>Print QR Tag</span>
                         </button>
+
+                        <button
+                          onClick={() => handleDeleteShelf(shelf.id)}
+                          className="px-3 py-1.5 rounded-md bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                          title="Delete shelf record"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
                       </div>
                     </div>
 
@@ -998,7 +1023,6 @@ export const InventoryQRPortal = () => {
             ) : (
               <div className="text-center py-12 text-xs text-gray-500 space-y-3">
                 <p className="text-sm font-semibold text-gray-700">No active shelf records found in database.</p>
-                <p className="text-xs text-gray-500">Create a shelf tag to view all updated warehouse records here.</p>
                 <button
                   onClick={() => navigateView('create')}
                   className="btn-primary text-xs py-2.5 px-5 mt-2 cursor-pointer"
