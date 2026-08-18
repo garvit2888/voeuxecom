@@ -75,6 +75,7 @@ export const ShopProvider = ({ children }) => {
       }
 
       _setActivePageState(targetPage);
+      window.scrollTo(0, 0);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -85,6 +86,11 @@ export const ShopProvider = ({ children }) => {
       window.removeEventListener('hashchange', handlePopState);
     };
   }, []);
+
+  // Guarantee window scroll resets to top (0, 0) whenever activePage changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activePage]);
 
   const [recentlyViewed, setRecentlyViewed] = useState(() => {
     try {

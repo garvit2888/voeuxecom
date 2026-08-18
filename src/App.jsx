@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ShopProvider, useShop } from './context/ShopContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -26,6 +26,11 @@ import { InventoryQRPortal } from './components/InventoryQRPortal';
 
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts } = useShop();
+
+  // Scroll to top of viewport immediately whenever activePage route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activePage]);
 
   const renderPage = () => {
     switch (activePage) {
