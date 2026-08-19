@@ -28,7 +28,7 @@ export const JoinUsPage = () => {
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed font-normal">
-            Expand your automotive retail & distribution business by partnering with VOEUX® — India's premier manufacturer of smart car stereos, soundbars, amplifiers, and car audio systems.
+            Expand your automotive retail & distribution business by partnering with VOEUX® — India's premier distributor of smart car stereos, soundbars, amplifiers, and car audio systems.
           </p>
 
           <div className="pt-4 flex flex-col items-center justify-center gap-3">
