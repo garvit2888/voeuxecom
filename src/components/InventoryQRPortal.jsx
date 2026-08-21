@@ -87,11 +87,12 @@ export const InventoryQRPortal = () => {
   const PERMANENT_CLOUD_DB = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a02424b6a66c90';
   const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
-  // Fetch Cloud Database Shelves and Sync Across Devices
+  // Fetch Cloud Database Shelves and Sync Across Devices (Forces cache bypass for mobile Android/iOS browsers)
   const syncFromCloud = async () => {
     setIsSyncing(true);
     try {
-      const res = await fetch(PERMANENT_CLOUD_DB);
+      const cacheBustUrl = `${PERMANENT_CLOUD_DB}?t=${Date.now()}`;
+      const res = await fetch(cacheBustUrl, { cache: 'no-store', headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' } });
       if (res.ok) {
         const payload = await res.json();
         const cloudShelves = payload && payload.data && Array.isArray(payload.data.shelves) ? payload.data.shelves : [];
@@ -107,14 +108,14 @@ export const InventoryQRPortal = () => {
         setShelves(prev => {
           let mergedMap = new Map();
 
-          // 1. Existing local shelves (excluding deleted)
+          // 1. Local shelves
           (prev || []).forEach(s => {
             if (s && s.id && !currentDeleted.includes(s.id)) {
               mergedMap.set(s.id, s);
             }
           });
 
-          // 2. Cloud shelves (excluding deleted)
+          // 2. Cloud shelves (authoritative)
           cloudShelves.forEach(item => {
             const cleanId = item.shelfId || item.id;
             if (cleanId && !currentDeleted.includes(cleanId) && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanId)) {
@@ -230,7 +231,7 @@ export const InventoryQRPortal = () => {
 
     const interval = setInterval(() => {
       syncFromCloud();
-    }, 20000);
+    }, 6000);
 
     const handleWindowFocus = () => {
       syncFromCloud();
