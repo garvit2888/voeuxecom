@@ -90,7 +90,10 @@ export const InventoryQRPortal = () => {
   const getActiveEndpoint = () => {
     try {
       const saved = localStorage.getItem('voeux_firebase_db_url');
-      if (saved && saved.trim()) return saved.trim().replace(/\/+$/, '');
+      if (saved && saved.trim() && !saved.includes('asia-southeast1')) {
+        return saved.trim().replace(/\/+$/, '');
+      }
+      localStorage.removeItem('voeux_firebase_db_url');
     } catch (e) {}
     return DEFAULT_FIREBASE_URL;
   };
