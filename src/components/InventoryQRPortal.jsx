@@ -231,7 +231,7 @@ export const InventoryQRPortal = () => {
 
     const interval = setInterval(() => {
       syncFromCloud();
-    }, 6000);
+    }, 25000);
 
     const handleWindowFocus = () => {
       syncFromCloud();
