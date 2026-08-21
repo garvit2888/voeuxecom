@@ -83,65 +83,58 @@ export const InventoryQRPortal = () => {
     } catch (e) {}
   }, [deletedIds]);
 
-  // Cloud Database Sync Endpoints (Cross-Device Database)
-  const CLOUD_SYNC_ENDPOINT = 'https://crudcrud.com/api/9839c68e75be4151ae8b53053a16b0dc/shelves';
+  // Cloud Database Sync Endpoints (PERMANENT CROSS-DEVICE DATABASE - NO 24H EXPIRATION)
+  const PERMANENT_CLOUD_DB = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a02424b6a66c90';
   const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
   // Fetch Cloud Database Shelves and Sync Across Devices
   const syncFromCloud = async () => {
     setIsSyncing(true);
     try {
-      const res = await fetch(CLOUD_SYNC_ENDPOINT);
+      const res = await fetch(PERMANENT_CLOUD_DB);
       if (res.ok) {
-        const cloudData = await res.json();
-        if (Array.isArray(cloudData)) {
-          // Identify any tombstones in cloudData
-          const cloudDeletedIds = cloudData
-            .filter(item => item && (item.isDeleted || item.action === 'delete_shelf'))
-            .map(item => item.shelfId || item.id)
-            .filter(Boolean);
+        const payload = await res.json();
+        const cloudShelves = payload && payload.data && Array.isArray(payload.data.shelves) ? payload.data.shelves : [];
+        const cloudDeletedIds = payload && payload.data && Array.isArray(payload.data.deletedIds) ? payload.data.deletedIds : [];
 
-          const currentDeleted = Array.from(new Set([...(Array.isArray(deletedIds) ? deletedIds : []), ...cloudDeletedIds]));
-          const hasNewDeleted = cloudDeletedIds.some(id => !deletedIds.includes(id));
-          if (hasNewDeleted) {
-            setDeletedIds(currentDeleted);
-            try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(currentDeleted)); } catch(e){}
-          }
-
-          setShelves(prev => {
-            let updated = (prev || []).filter(s => s && s.id && !currentDeleted.includes(s.id));
-
-            cloudData.forEach(item => {
-              const cleanId = item.shelfId || item.id;
-              if (
-                cleanId &&
-                !item.isDeleted &&
-                item.action !== 'delete_shelf' &&
-                !currentDeleted.includes(cleanId) &&
-                !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanId)
-              ) {
-                const cleanItem = {
-                  id: cleanId,
-                  shelfNumber: item.shelfNumber || 'A-01',
-                  productName: item.productName || 'VOEUX Item',
-                  assistantName: item.assistantName || 'Assistant',
-                  quantity: Number(item.quantity) || 0,
-                  notes: item.notes || '',
-                  createdAt: item.createdAt || new Date().toLocaleString('en-IN')
-                };
-                const idx = updated.findIndex(m => m.id === cleanItem.id);
-                if (idx > -1) {
-                  updated[idx] = { ...updated[idx], ...cleanItem };
-                } else {
-                  updated.unshift(cleanItem);
-                }
-              }
-            });
-
-            try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updated)); } catch(e){}
-            return updated;
-          });
+        const currentDeleted = Array.from(new Set([...(Array.isArray(deletedIds) ? deletedIds : []), ...cloudDeletedIds]));
+        const hasNewDeleted = cloudDeletedIds.some(id => !deletedIds.includes(id));
+        if (hasNewDeleted) {
+          setDeletedIds(currentDeleted);
+          try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(currentDeleted)); } catch(e){}
         }
+
+        setShelves(prev => {
+          let mergedMap = new Map();
+
+          // 1. Existing local shelves (excluding deleted)
+          (prev || []).forEach(s => {
+            if (s && s.id && !currentDeleted.includes(s.id)) {
+              mergedMap.set(s.id, s);
+            }
+          });
+
+          // 2. Cloud shelves (excluding deleted)
+          cloudShelves.forEach(item => {
+            const cleanId = item.shelfId || item.id;
+            if (cleanId && !currentDeleted.includes(cleanId) && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanId)) {
+              const cleanItem = {
+                id: cleanId,
+                shelfNumber: item.shelfNumber || 'A-01',
+                productName: item.productName || 'VOEUX Item',
+                assistantName: item.assistantName || 'Assistant',
+                quantity: Number(item.quantity) || 0,
+                notes: item.notes || '',
+                createdAt: item.createdAt || new Date().toLocaleString('en-IN')
+              };
+              mergedMap.set(cleanId, cleanItem);
+            }
+          });
+
+          const updatedList = Array.from(mergedMap.values());
+          try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updatedList)); } catch(e){}
+          return updatedList;
+        });
       }
     } catch (err) {
       console.log('Cloud sync status:', err);
@@ -150,24 +143,35 @@ export const InventoryQRPortal = () => {
     }
   };
 
-  // Push Shelf Record to Cloud Database for Multi-Device Access
-  const pushToCloud = async (shelfItem) => {
+  // Push Shelf Record to Cloud Database for Permanent Multi-Device Access
+  const pushToCloud = async (shelfItem, customList = null) => {
     if (!shelfItem || !shelfItem.id || (deletedIds || []).includes(shelfItem.id)) return;
+
     try {
-      fetch(CLOUD_SYNC_ENDPOINT, {
-        method: 'POST',
+      const currentList = customList || shelves;
+      const idx = currentList.findIndex(s => s.id === shelfItem.id);
+      let updatedList = [...currentList];
+      if (idx > -1) {
+        updatedList[idx] = shelfItem;
+      } else {
+        updatedList = [shelfItem, ...updatedList];
+      }
+
+      await fetch(PERMANENT_CLOUD_DB, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          shelfId: shelfItem.id,
-          shelfNumber: shelfItem.shelfNumber,
-          productName: shelfItem.productName,
-          assistantName: shelfItem.assistantName,
-          quantity: shelfItem.quantity,
-          notes: shelfItem.notes || '',
-          createdAt: shelfItem.createdAt
+          name: 'VOEUX_WAREHOUSE_STORAGE',
+          data: {
+            shelves: updatedList,
+            deletedIds: deletedIds || []
+          }
         })
-      }).catch(() => {});
+      });
+    } catch (e) {}
 
+    // Backup push to Google Apps Script
+    try {
       fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -184,35 +188,29 @@ export const InventoryQRPortal = () => {
   const deleteFromCloud = async (shelfId) => {
     if (!shelfId) return;
 
-    // 1. Delete matching records from Cloud REST endpoint
-    try {
-      const res = await fetch(CLOUD_SYNC_ENDPOINT);
-      if (res.ok) {
-        const cloudItems = await res.json();
-        if (Array.isArray(cloudItems)) {
-          const matched = cloudItems.filter(item => item && (item.shelfId || item.id) === shelfId);
-          matched.forEach(item => {
-            if (item._id) {
-              fetch(`${CLOUD_SYNC_ENDPOINT}/${item._id}`, { method: 'DELETE' }).catch(() => {});
-            }
-          });
-        }
-      }
-    } catch (e) {}
+    const newDeleted = Array.from(new Set([...(deletedIds || []), shelfId]));
+    setDeletedIds(newDeleted);
+    try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(newDeleted)); } catch(e){}
 
-    // 2. Post tombstone marker to Cloud REST endpoint for cross-device sync
+    const remainingShelves = (shelves || []).filter(s => s.id !== shelfId);
+    setShelves(remainingShelves);
+    try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(remainingShelves)); } catch(e){}
+
     try {
-      fetch(CLOUD_SYNC_ENDPOINT, {
-        method: 'POST',
+      await fetch(PERMANENT_CLOUD_DB, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          shelfId: shelfId,
-          isDeleted: true
+          name: 'VOEUX_WAREHOUSE_STORAGE',
+          data: {
+            shelves: remainingShelves,
+            deletedIds: newDeleted
+          }
         })
-      }).catch(() => {});
+      });
     } catch (e) {}
 
-    // 3. Send delete command to Google Apps Script
+    // Backup delete command to Google Apps Script
     try {
       fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
@@ -381,8 +379,9 @@ export const InventoryQRPortal = () => {
       createdAt: new Date().toLocaleString('en-IN')
     };
 
-    setShelves(prev => [newShelf, ...prev]);
-    pushToCloud(newShelf);
+    const updatedList = [newShelf, ...(shelves || [])];
+    setShelves(updatedList);
+    pushToCloud(newShelf, updatedList);
     navigateView('qr-generated', newShelf);
   };
 
@@ -402,8 +401,9 @@ export const InventoryQRPortal = () => {
 
     setActiveShelf(updated);
     setInlineQty(String(updated.quantity));
-    setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
-    pushToCloud(updated);
+    const updatedList = (shelves || []).map(s => s.id === updated.id ? updated : s);
+    setShelves(updatedList);
+    pushToCloud(updated, updatedList);
     setIsEditing(false);
   };
 
@@ -416,8 +416,9 @@ export const InventoryQRPortal = () => {
 
     const updated = { ...activeShelf, quantity: newNum };
     setActiveShelf(updated);
-    setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
-    pushToCloud(updated);
+    const updatedList = (shelves || []).map(s => s.id === updated.id ? updated : s);
+    setShelves(updatedList);
+    pushToCloud(updated, updatedList);
   };
 
   // Helper to generate full scan URL encoded into QR Code
@@ -453,25 +454,29 @@ export const InventoryQRPortal = () => {
     const updated = { ...activeShelf, quantity: newQty };
     setActiveShelf(updated);
     setInlineQty(String(newQty));
-    setShelves(prev => prev.map(s => s.id === updated.id ? updated : s));
-    pushToCloud(updated);
+    const updatedList = (shelves || []).map(s => s.id === updated.id ? updated : s);
+    setShelves(updatedList);
+    pushToCloud(updated, updatedList);
   };
 
   // Stock Quantity Quick Adjuster directly from Saved Shelves List
   const updateShelfQuantityInList = (shelfId, amount) => {
-    setShelves(prev => prev.map(s => {
+    const updatedList = (shelves || []).map(s => {
       if (s.id === shelfId) {
         const newQty = Math.max(0, s.quantity + amount);
-        const updated = { ...s, quantity: newQty };
-        if (activeShelf?.id === shelfId) {
-          setActiveShelf(updated);
-          setInlineQty(String(newQty));
-        }
-        pushToCloud(updated);
-        return updated;
+        return { ...s, quantity: newQty };
       }
       return s;
-    }));
+    });
+    setShelves(updatedList);
+    const updatedItem = updatedList.find(s => s.id === shelfId);
+    if (updatedItem) {
+      if (activeShelf?.id === shelfId) {
+        setActiveShelf(updatedItem);
+        setInlineQty(String(updatedItem.quantity));
+      }
+      pushToCloud(updatedItem, updatedList);
+    }
   };
 
   // Delete Shelf Handler
