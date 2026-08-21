@@ -24,8 +24,8 @@ export const AboutUs = () => {
       {/* Real Stats */}
       <div className="bg-gray-900 text-white p-8 rounded-2xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
         <div>
-          <span className="text-2xl font-black text-cyan-400">400+</span>
-          <span className="text-[10px] uppercase block opacity-80 mt-1">E-Commerce Orders Delivered</span>
+          <span className="text-2xl font-black text-cyan-400">1000+</span>
+          <span className="text-[10px] uppercase block opacity-80 mt-1">E-Commerce Products Delivered</span>
         </div>
         <div>
           <span className="text-2xl font-black text-cyan-400">1 YEAR</span>
