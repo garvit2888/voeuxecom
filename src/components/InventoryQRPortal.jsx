@@ -85,7 +85,7 @@ export const InventoryQRPortal = () => {
   }, [deletedIds]);
 
   // Default Firebase DB URL (Auto-syncs across all devices)
-  const DEFAULT_FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.asia-southeast1.firebasedatabase.app';
+  const DEFAULT_FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.firebaseio.com';
 
   const getActiveEndpoint = () => {
     try {
