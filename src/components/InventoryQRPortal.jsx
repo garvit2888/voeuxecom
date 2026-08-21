@@ -180,12 +180,22 @@ export const InventoryQRPortal = () => {
       }
 
       const cleanUrl = getActiveEndpoint();
+      // Fetch current cloud deletedIds first so we don't overwrite them with stale local state
+      let cloudDeletedIds = [];
+      try {
+        const checkRes = await fetch(`${cleanUrl}/warehouse.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData && Array.isArray(checkData.deletedIds)) cloudDeletedIds = checkData.deletedIds;
+        }
+      } catch(e) {}
+
       await fetch(`${cleanUrl}/warehouse.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           shelves: updatedList,
-          deletedIds: deletedIds || []
+          deletedIds: cloudDeletedIds
         })
       });
     } catch (e) {}
@@ -208,16 +218,24 @@ export const InventoryQRPortal = () => {
   const deleteFromCloud = async (shelfId) => {
     if (!shelfId) return;
 
-    const newDeleted = Array.from(new Set([...(deletedIds || []), shelfId]));
-    setDeletedIds(newDeleted);
-    try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(newDeleted)); } catch(e){}
-
     const remainingShelves = (shelves || []).filter(s => s.id !== shelfId);
     setShelves(remainingShelves);
     try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(remainingShelves)); } catch(e){}
 
     try {
       const cleanUrl = getActiveEndpoint();
+      // Fetch current cloud deletedIds and append only this new deletion
+      let cloudDeletedIds = [];
+      try {
+        const checkRes = await fetch(`${cleanUrl}/warehouse.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData && Array.isArray(checkData.deletedIds)) cloudDeletedIds = checkData.deletedIds;
+        }
+      } catch(e) {}
+      const newDeleted = Array.from(new Set([...cloudDeletedIds, shelfId]));
+      setDeletedIds(newDeleted);
+
       await fetch(`${cleanUrl}/warehouse.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
