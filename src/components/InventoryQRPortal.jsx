@@ -27,28 +27,9 @@ import {
 export const InventoryQRPortal = () => {
   const { setActivePage } = useShop();
 
-  // Load shelves from localStorage and purge any leftover mock data
-  const [shelves, setShelves] = useState(() => {
-    try {
-      const saved = localStorage.getItem('voeux_warehouse_shelves');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // Purge any leftover mock IDs
-        const clean = (parsed || []).filter(item => item && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(item.id));
-        return clean;
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
-  });
-
-  // Save clean shelves list to localStorage on change
-  useEffect(() => {
-    try {
-      localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(shelves));
-    } catch (e) {}
-  }, [shelves]);
+  // Load shelves from localStorage initially (shows immediately while Firebase loads)
+  const [shelves, setShelves] = useState([]);
+  const [deletedIds, setDeletedIds] = useState([]);
 
   // Form Input States
   const [productName, setProductName] = useState(PRODUCTS[0]?.name || '');
@@ -68,197 +49,104 @@ export const InventoryQRPortal = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Deleted Shelf IDs — cloud is authoritative, always reset from Firebase on sync
-  const [deletedIds, setDeletedIds] = useState([]);
+  // ============================================================
+  // FIREBASE REALTIME DATABASE — Single Source of Truth
+  // No localStorage caching, no local merging — Firebase is law
+  // ============================================================
+  const FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.firebaseio.com/warehouse.json';
+  const DUMMY_IDS = ['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'];
 
+  // Clear stale localStorage on mount
   useEffect(() => {
-    // Clear any stale local deletedIds so they never block new shelves from appearing
-    try { localStorage.removeItem('voeux_deleted_shelf_ids'); } catch(e) {}
+    try {
+      localStorage.removeItem('voeux_deleted_shelf_ids');
+      localStorage.removeItem('voeux_firebase_db_url');
+      localStorage.removeItem('voeux_warehouse_shelves');
+    } catch(e) {}
   }, []);
 
-  // Default Firebase DB URL (Auto-syncs across all devices)
-  const DEFAULT_FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.firebaseio.com';
-
-  const getActiveEndpoint = () => {
-    try {
-      const saved = localStorage.getItem('voeux_firebase_db_url');
-      if (saved && saved.trim() && !saved.includes('asia-southeast1')) {
-        return saved.trim().replace(/\/+$/, '');
-      }
-      localStorage.removeItem('voeux_firebase_db_url');
-    } catch (e) {}
-    return DEFAULT_FIREBASE_URL;
-  };
-
-  // Cloud Database Sync Endpoints
-  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
-
-  // Fetch Cloud Database Shelves and Sync Across Devices (Firebase Realtime DB REST API)
+  // Read Firebase — fully replace local shelves state
   const syncFromCloud = async () => {
     setIsSyncing(true);
     try {
-      const cleanUrl = getActiveEndpoint();
-      const targetUrl = `${cleanUrl}/warehouse.json?t=${Date.now()}`;
+      const res = await fetch(`${FIREBASE_URL}?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
+      if (!res.ok) return;
+      const payload = await res.json();
+      if (!payload) { setShelves([]); setDeletedIds([]); return; }
 
-      const res = await fetch(targetUrl, { cache: 'no-store', headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' } });
-      if (res.ok) {
-        const payload = await res.json();
-        let cloudShelves = [];
-        let cloudDeletedIds = [];
+      const cloudShelves = Array.isArray(payload.shelves) ? payload.shelves : [];
+      const cloudDeletedIds = Array.isArray(payload.deletedIds) ? payload.deletedIds : [];
 
-        if (payload) {
-          if (Array.isArray(payload.shelves)) {
-            cloudShelves = payload.shelves;
-          } else if (payload.data && Array.isArray(payload.data.shelves)) {
-            cloudShelves = payload.data.shelves;
-          } else if (typeof payload === 'object') {
-            cloudShelves = Object.values(payload.shelves || payload || {}).filter(item => item && (item.id || item.shelfId));
-          }
-
-          if (Array.isArray(payload.deletedIds)) {
-            cloudDeletedIds = payload.deletedIds;
-          } else if (payload.data && Array.isArray(payload.data.deletedIds)) {
-            cloudDeletedIds = payload.data.deletedIds;
-          }
-        }
-
-        // Firebase is authoritative — use cloud deletedIds directly, don't merge stale local ones
-        const currentDeleted = Array.isArray(cloudDeletedIds) ? cloudDeletedIds : [];
-        setDeletedIds(currentDeleted);
-
-        setShelves(prev => {
-          let mergedMap = new Map();
-
-          // 1. Local shelves
-          (prev || []).forEach(s => {
-            if (s && s.id && !currentDeleted.includes(s.id)) {
-              mergedMap.set(s.id, s);
-            }
-          });
-
-          // 2. Cloud shelves (authoritative)
-          cloudShelves.forEach(item => {
-            const cleanId = item.shelfId || item.id;
-            if (cleanId && !currentDeleted.includes(cleanId) && !['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'].includes(cleanId)) {
-              const cleanItem = {
-                id: cleanId,
-                shelfNumber: item.shelfNumber || 'A-01',
-                productName: item.productName || 'VOEUX Item',
-                assistantName: item.assistantName || 'Assistant',
-                quantity: Number(item.quantity) || 0,
-                notes: item.notes || '',
-                createdAt: item.createdAt || new Date().toLocaleString('en-IN')
-              };
-              mergedMap.set(cleanId, cleanItem);
-            }
-          });
-
-          const updatedList = Array.from(mergedMap.values());
-          try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(updatedList)); } catch(e){}
-          return updatedList;
-        });
-      }
+      setDeletedIds(cloudDeletedIds);
+      setShelves(cloudShelves.filter(s =>
+        s && s.id && !cloudDeletedIds.includes(s.id) && !DUMMY_IDS.includes(s.id)
+      ));
     } catch (err) {
-      console.log('Cloud sync status:', err);
+      console.log('Firebase sync error:', err);
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // Push Shelf Record to Cloud Database (Firebase Realtime DB REST API)
-  const pushToCloud = async (shelfItem, customList = null) => {
-    if (!shelfItem || !shelfItem.id || (deletedIds || []).includes(shelfItem.id)) return;
-
+  // Write a shelf: read Firebase first, merge, write back atomically
+  const pushToCloud = async (shelfItem) => {
+    if (!shelfItem || !shelfItem.id) return;
     try {
-      const currentList = customList || shelves;
-      const idx = currentList.findIndex(s => s.id === shelfItem.id);
-      let updatedList = [...currentList];
-      if (idx > -1) {
-        updatedList[idx] = shelfItem;
-      } else {
-        updatedList = [shelfItem, ...updatedList];
-      }
-
-      const cleanUrl = getActiveEndpoint();
-      // Fetch current cloud deletedIds first so we don't overwrite them with stale local state
-      let cloudDeletedIds = [];
-      try {
-        const checkRes = await fetch(`${cleanUrl}/warehouse.json?t=${Date.now()}`, { cache: 'no-store' });
-        if (checkRes.ok) {
-          const checkData = await checkRes.json();
-          if (checkData && Array.isArray(checkData.deletedIds)) cloudDeletedIds = checkData.deletedIds;
+      const res = await fetch(`${FIREBASE_URL}?t=${Date.now()}`, { cache: 'no-store' });
+      let currentShelves = [];
+      let currentDeletedIds = [];
+      if (res.ok) {
+        const payload = await res.json();
+        if (payload) {
+          currentShelves = Array.isArray(payload.shelves) ? payload.shelves : [];
+          currentDeletedIds = Array.isArray(payload.deletedIds) ? payload.deletedIds : [];
         }
-      } catch(e) {}
+      }
+      const idx = currentShelves.findIndex(s => s.id === shelfItem.id);
+      const updatedShelves = idx > -1
+        ? currentShelves.map((s, i) => i === idx ? shelfItem : s)
+        : [shelfItem, ...currentShelves];
 
-      await fetch(`${cleanUrl}/warehouse.json`, {
+      await fetch(FIREBASE_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          shelves: updatedList,
-          deletedIds: cloudDeletedIds
-        })
+        body: JSON.stringify({ shelves: updatedShelves, deletedIds: currentDeletedIds })
       });
-    } catch (e) {}
 
-    // Backup push to Google Apps Script
-    try {
-      fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_shelf',
-          shelf: shelfItem
-        })
-      }).catch(() => {});
-    } catch (e) {}
+      setDeletedIds(currentDeletedIds);
+      setShelves(updatedShelves.filter(s => s && s.id && !currentDeletedIds.includes(s.id) && !DUMMY_IDS.includes(s.id)));
+    } catch (e) { console.log('Firebase push error:', e); }
   };
 
-  // Broadcast Shelf Deletion to Cloud Database
+  // Delete a shelf: read Firebase first, remove shelf, write back
   const deleteFromCloud = async (shelfId) => {
     if (!shelfId) return;
-
-    const remainingShelves = (shelves || []).filter(s => s.id !== shelfId);
-    setShelves(remainingShelves);
-    try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(remainingShelves)); } catch(e){}
-
     try {
-      const cleanUrl = getActiveEndpoint();
-      // Fetch current cloud deletedIds and append only this new deletion
-      let cloudDeletedIds = [];
-      try {
-        const checkRes = await fetch(`${cleanUrl}/warehouse.json?t=${Date.now()}`, { cache: 'no-store' });
-        if (checkRes.ok) {
-          const checkData = await checkRes.json();
-          if (checkData && Array.isArray(checkData.deletedIds)) cloudDeletedIds = checkData.deletedIds;
+      const res = await fetch(`${FIREBASE_URL}?t=${Date.now()}`, { cache: 'no-store' });
+      let currentShelves = [];
+      let currentDeletedIds = [];
+      if (res.ok) {
+        const payload = await res.json();
+        if (payload) {
+          currentShelves = Array.isArray(payload.shelves) ? payload.shelves : [];
+          currentDeletedIds = Array.isArray(payload.deletedIds) ? payload.deletedIds : [];
         }
-      } catch(e) {}
-      const newDeleted = Array.from(new Set([...cloudDeletedIds, shelfId]));
-      setDeletedIds(newDeleted);
+      }
+      const newDeletedIds = Array.from(new Set([...currentDeletedIds, shelfId]));
+      const remainingShelves = currentShelves.filter(s => s.id !== shelfId);
 
-      await fetch(`${cleanUrl}/warehouse.json`, {
+      await fetch(FIREBASE_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          shelves: remainingShelves,
-          deletedIds: newDeleted
-        })
+        body: JSON.stringify({ shelves: remainingShelves, deletedIds: newDeletedIds })
       });
-    } catch (e) {}
 
-    // Backup delete command to Google Apps Script
-    // Backup delete command to Google Apps Script
-    try {
-      fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete_shelf',
-          shelfId: shelfId
-        })
-      }).catch(() => {});
-    } catch (e) {}
+      setDeletedIds(newDeletedIds);
+      setShelves(remainingShelves);
+    } catch (e) { console.log('Firebase delete error:', e); }
   };
 
   // Auto-sync cloud data automatically on mount, window focus, and background interval
