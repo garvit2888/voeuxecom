@@ -84,42 +84,26 @@ export const InventoryQRPortal = () => {
     } catch (e) {}
   }, [deletedIds]);
 
-  // Persistent Firebase DB URL state
-  const [firebaseDbUrl, setFirebaseDbUrl] = useState(() => {
-    try {
-      return localStorage.getItem('voeux_firebase_db_url') || '';
-    } catch (e) {
-      return '';
-    }
-  });
+  // Default Firebase DB URL (Auto-syncs across all devices)
+  const DEFAULT_FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-  const [showFirebaseModal, setShowFirebaseModal] = useState(false);
-  const [inputFirebaseUrl, setInputFirebaseUrl] = useState(firebaseDbUrl);
-
-  // Save Custom Firebase URL
-  const handleSaveFirebaseUrl = (e) => {
-    e.preventDefault();
-    const cleanUrl = inputFirebaseUrl.trim().replace(/\/+$/, '');
-    setFirebaseDbUrl(cleanUrl);
+  const getActiveEndpoint = () => {
     try {
-      localStorage.setItem('voeux_firebase_db_url', cleanUrl);
+      const saved = localStorage.getItem('voeux_firebase_db_url');
+      if (saved && saved.trim()) return saved.trim().replace(/\/+$/, '');
     } catch (e) {}
-    setShowFirebaseModal(false);
-    syncFromCloud();
+    return DEFAULT_FIREBASE_URL;
   };
 
   // Cloud Database Sync Endpoints
-  const PERMANENT_CLOUD_DB = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a02424b6a66c90';
   const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
-  // Fetch Cloud Database Shelves and Sync Across Devices (Supports Firebase Realtime DB & Fallbacks)
+  // Fetch Cloud Database Shelves and Sync Across Devices (Firebase Realtime DB REST API)
   const syncFromCloud = async () => {
     setIsSyncing(true);
     try {
-      const activeEndpoint = firebaseDbUrl || PERMANENT_CLOUD_DB;
-      const cleanUrl = activeEndpoint.replace(/\/+$/, '');
-      const isFirebase = cleanUrl.includes('.firebasedatabase.app') || cleanUrl.includes('.firebaseio.com');
-      const targetUrl = isFirebase ? `${cleanUrl}/warehouse.json?t=${Date.now()}` : `${cleanUrl}?t=${Date.now()}`;
+      const cleanUrl = getActiveEndpoint();
+      const targetUrl = `${cleanUrl}/warehouse.json?t=${Date.now()}`;
 
       const res = await fetch(targetUrl, { cache: 'no-store', headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' } });
       if (res.ok) {
@@ -203,32 +187,15 @@ export const InventoryQRPortal = () => {
         updatedList = [shelfItem, ...updatedList];
       }
 
-      const activeEndpoint = firebaseDbUrl || PERMANENT_CLOUD_DB;
-      const cleanUrl = activeEndpoint.replace(/\/+$/, '');
-      const isFirebase = cleanUrl.includes('.firebasedatabase.app') || cleanUrl.includes('.firebaseio.com');
-
-      if (isFirebase) {
-        await fetch(`${cleanUrl}/warehouse.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            shelves: updatedList,
-            deletedIds: deletedIds || []
-          })
-        });
-      } else {
-        await fetch(PERMANENT_CLOUD_DB, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'VOEUX_WAREHOUSE_STORAGE',
-            data: {
-              shelves: updatedList,
-              deletedIds: deletedIds || []
-            }
-          })
-        });
-      }
+      const cleanUrl = getActiveEndpoint();
+      await fetch(`${cleanUrl}/warehouse.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shelves: updatedList,
+          deletedIds: deletedIds || []
+        })
+      });
     } catch (e) {}
 
     // Backup push to Google Apps Script
@@ -258,34 +225,18 @@ export const InventoryQRPortal = () => {
     try { localStorage.setItem('voeux_warehouse_shelves', JSON.stringify(remainingShelves)); } catch(e){}
 
     try {
-      const activeEndpoint = firebaseDbUrl || PERMANENT_CLOUD_DB;
-      const cleanUrl = activeEndpoint.replace(/\/+$/, '');
-      const isFirebase = cleanUrl.includes('.firebasedatabase.app') || cleanUrl.includes('.firebaseio.com');
-
-      if (isFirebase) {
-        await fetch(`${cleanUrl}/warehouse.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            shelves: remainingShelves,
-            deletedIds: newDeleted
-          })
-        });
-      } else {
-        await fetch(PERMANENT_CLOUD_DB, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'VOEUX_WAREHOUSE_STORAGE',
-            data: {
-              shelves: remainingShelves,
-              deletedIds: newDeleted
-            }
-          })
-        });
-      }
+      const cleanUrl = getActiveEndpoint();
+      await fetch(`${cleanUrl}/warehouse.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shelves: remainingShelves,
+          deletedIds: newDeleted
+        })
+      });
     } catch (e) {}
 
+    // Backup delete command to Google Apps Script
     // Backup delete command to Google Apps Script
     try {
       fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -667,15 +618,6 @@ export const InventoryQRPortal = () => {
               >
                 <Layers className="w-4 h-4" />
                 <span>Saved Shelves ({shelves.length})</span>
-              </button>
-
-              <button
-                onClick={() => setShowFirebaseModal(true)}
-                className="px-3.5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer border border-amber-200/80 shadow-xs"
-                title="Connect Firebase Realtime Database URL"
-              >
-                <Database className="w-4 h-4 text-amber-600" />
-                <span>{firebaseDbUrl ? 'Firebase Active' : 'Connect Firebase DB'}</span>
               </button>
             </div>
           </div>
@@ -1235,55 +1177,6 @@ export const InventoryQRPortal = () => {
         )}
 
       </div>
-
-      {/* Firebase Database Config Modal */}
-      {showFirebaseModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white p-6 sm:p-8 rounded-2xl max-w-md w-full text-left space-y-4 shadow-2xl border border-gray-100">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="font-extrabold text-gray-900 text-base flex items-center gap-2">
-                <Database className="w-5 h-5 text-amber-600" />
-                <span>Firebase Realtime DB Setup</span>
-              </h3>
-              <button onClick={() => setShowFirebaseModal(false)} className="text-gray-400 hover:text-gray-600 font-bold text-sm">✕</button>
-            </div>
-
-            <p className="text-xs text-gray-600 leading-relaxed">
-              Paste your Firebase Realtime Database URL below to enable unlimited, non-expiring multi-device cloud sync across all phones & laptops.
-            </p>
-
-            <form onSubmit={handleSaveFirebaseUrl} className="space-y-4 text-xs">
-              <div className="space-y-1.5">
-                <label className="text-gray-900 font-bold block">FIREBASE REALTIME DB URL</label>
-                <input
-                  type="url"
-                  placeholder="e.g. https://your-project-default-rtdb.firebaseio.com"
-                  value={inputFirebaseUrl}
-                  onChange={e => setInputFirebaseUrl(e.target.value)}
-                  className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] font-mono bg-white shadow-xs"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowFirebaseModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-bold text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md"
-                >
-                  Save & Connect Firebase
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
