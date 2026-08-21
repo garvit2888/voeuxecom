@@ -68,21 +68,13 @@ export const InventoryQRPortal = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Persistent Deleted Shelf IDs Tracking
-  const [deletedIds, setDeletedIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem('voeux_deleted_shelf_ids');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
+  // Deleted Shelf IDs — cloud is authoritative, always reset from Firebase on sync
+  const [deletedIds, setDeletedIds] = useState([]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(deletedIds));
-    } catch (e) {}
-  }, [deletedIds]);
+    // Clear any stale local deletedIds so they never block new shelves from appearing
+    try { localStorage.removeItem('voeux_deleted_shelf_ids'); } catch(e) {}
+  }, []);
 
   // Default Firebase DB URL (Auto-syncs across all devices)
   const DEFAULT_FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.firebaseio.com';
@@ -130,12 +122,9 @@ export const InventoryQRPortal = () => {
           }
         }
 
-        const currentDeleted = Array.from(new Set([...(Array.isArray(deletedIds) ? deletedIds : []), ...cloudDeletedIds]));
-        const hasNewDeleted = cloudDeletedIds.some(id => !deletedIds.includes(id));
-        if (hasNewDeleted) {
-          setDeletedIds(currentDeleted);
-          try { localStorage.setItem('voeux_deleted_shelf_ids', JSON.stringify(currentDeleted)); } catch(e){}
-        }
+        // Firebase is authoritative — use cloud deletedIds directly, don't merge stale local ones
+        const currentDeleted = Array.isArray(cloudDeletedIds) ? cloudDeletedIds : [];
+        setDeletedIds(currentDeleted);
 
         setShelves(prev => {
           let mergedMap = new Map();
