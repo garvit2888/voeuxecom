@@ -24,19 +24,19 @@ export const AboutUs = () => {
       {/* Real Stats */}
       <div className="bg-gray-900 text-white p-8 rounded-2xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
         <div>
-          <span className="text-2xl font-black text-cyan-400">1000+</span>
+          <span className="text-2xl font-black text-white">1000+</span>
           <span className="text-[10px] uppercase block opacity-80 mt-1">E-Commerce Products Delivered</span>
         </div>
         <div>
-          <span className="text-2xl font-black text-cyan-400">1 YEAR</span>
+          <span className="text-2xl font-black text-white">1 YEAR</span>
           <span className="text-[10px] uppercase block opacity-80 mt-1">Warranty*</span>
         </div>
         <div>
-          <span className="text-2xl font-black text-cyan-400">24/7</span>
+          <span className="text-2xl font-black text-white">24/7</span>
           <span className="text-[10px] uppercase block opacity-80 mt-1">WhatsApp Support Agent</span>
         </div>
         <div>
-          <span className="text-2xl font-black text-cyan-400">4.9 ★</span>
+          <span className="text-2xl font-black text-white">4.9 ★</span>
           <span className="text-[10px] uppercase block opacity-80 mt-1">Customer Rating</span>
         </div>
       </div>
