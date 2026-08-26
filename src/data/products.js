@@ -319,7 +319,7 @@ export const PRODUCTS = [
     category: 'car-speakers',
     price: 2299,
     originalPrice: 6999,
-    flipkartUrl: 'https://www.flipkart.com/search?q=VOEUX+coaxial+car+speakers',
+    flipkartUrl: 'https://www.flipkart.com/voeux-6-2-way-coaxial-car-speakers-380w-high-bass-dual-voice-coil-svx-001-speaker/p/itm7087e632dd585?pid=CSRHJH5U8F6K5ZGZ&lid=LSTCSRHJH5U8F6K5ZGZRGTNGR&marketplace=FLIPKART&q=voeux+car+speakers+6+inch+voeux&store=1mt%2Feoe%2Fvuu&srno=s_1_7&otracker=search&otracker1=search&fm=Search&iid=82f9d953-0ba0-4f9d-9275-9a85cd625be5.CSRHJH5U8F6K5ZGZ.SEARCH&ppt=sp&ppn=sp&ssid=p3ufvsi1kg0000001787733204787&qH=e54c53e1aaaf45da&ov_redirect=true&ov_redirect=true',
     isNew: true,
     isTrending: true,
     isBestseller: true,
