@@ -15,7 +15,10 @@ export const Hero = () => {
       image: '/images/voeux_x80_hero_bg.jpg',
       ctaText: 'Explore X80 Stereo',
       actionPage: 'android-players',
-      featuredProduct: PRODUCTS[0]
+      featuredProduct: PRODUCTS[0],
+      bgSize: 'contain',
+      bgPos: 'right 2% center',
+      mobilePadding: 'p-2'
     },
     {
       title: 'VOEUX® 160W 2-in-1 Separable Soundbar',
@@ -24,7 +27,10 @@ export const Hero = () => {
       image: '/images/voeux_soundbar_main.jpg',
       ctaText: 'Shop 160W Soundbar',
       actionPage: 'speakers-soundbars',
-      featuredProduct: PRODUCTS[1]
+      featuredProduct: PRODUCTS[1],
+      bgSize: 'contain',
+      bgPos: 'right 5% center',
+      mobilePadding: 'p-3'
     },
     {
       title: 'VOEUX® AMP Board 150W Mono Class AB Car Amplifier',
@@ -33,7 +39,10 @@ export const Hero = () => {
       image: '/images/voeux_amp_board.jpg',
       ctaText: 'Shop Car Amplifiers',
       actionPage: 'amplifiers',
-      featuredProduct: PRODUCTS[2]
+      featuredProduct: PRODUCTS[2],
+      bgSize: 'auto 65%',
+      bgPos: 'right 8% center',
+      mobilePadding: 'p-6'
     },
     {
       title: 'VOEUX® CARBON BLACK Series 9" QLED Android TS7 Stereo',
@@ -42,7 +51,10 @@ export const Hero = () => {
       image: '/images/voeux_carbon_black_ts7.jpg',
       ctaText: 'Explore Carbon Black TS7',
       actionPage: 'android-players',
-      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0]
+      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0],
+      bgSize: 'auto 65%',
+      bgPos: 'right 8% center',
+      mobilePadding: 'p-6'
     },
     {
       title: 'VOEUX® Single Knob Piano Series Android Stereo',
@@ -51,7 +63,10 @@ export const Hero = () => {
       image: '/images/voeux_single_knob_piano_stereo.png',
       ctaText: 'Explore Single Knob Piano',
       actionPage: 'android-players',
-      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-single-knob-piano-4-64') || PRODUCTS[0]
+      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-single-knob-piano-4-64') || PRODUCTS[0],
+      bgSize: 'auto 60%',
+      bgPos: 'right 8% center',
+      mobilePadding: 'p-9'
     }
   ];
 
@@ -67,25 +82,25 @@ export const Hero = () => {
   return (
     <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
-      {/* ========== MOBILE LAYOUT ONLY — outside container so image fills 100% viewport width ========== */}
+      {/* ========== MOBILE LAYOUT ONLY ========== */}
       <div className="md:hidden relative min-h-screen bg-slate-950 text-white pb-32">
 
-        {/* IMAGE: h-72 with slim gradient overlays at both top and bottom edges */}
-        <div className="relative w-full h-72 overflow-hidden">
+        {/* IMAGE: h-72 with slim gradient overlays */}
+        <div className="relative w-full h-72 overflow-hidden flex items-center justify-center">
           {/* Top gradient fade */}
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
 
           <img
             src={slide.image}
             alt={slide.title}
-            className="w-full h-full object-contain p-3 object-center transition-all duration-700"
+            className={`w-full h-full object-contain object-center transition-all duration-700 ${slide.mobilePadding || 'p-4'}`}
           />
 
           {/* Bottom gradient fade */}
           <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* TEXT: mt-7 gap below image, larger text sizes to fill empty dark space elegantly */}
+        {/* TEXT */}
         <div className="px-5 mt-7 space-y-4 text-left">
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
             {slide.title}
@@ -122,7 +137,7 @@ export const Hero = () => {
 
       </div>
 
-      {/* ========== DESKTOP LAYOUT ONLY — inside container, untouched ========== */}
+      {/* ========== DESKTOP LAYOUT ONLY ========== */}
       <div className="hidden md:block">
         <div className="container mx-auto px-4 py-10">
           <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
@@ -132,8 +147,8 @@ export const Hero = () => {
               className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
               style={{
                 backgroundImage: `url(${slide.image})`,
-                backgroundPosition: 'right 2% center',
-                backgroundSize: 'contain'
+                backgroundPosition: slide.bgPos || 'right 5% center',
+                backgroundSize: slide.bgSize || 'contain'
               }}
             />
 
