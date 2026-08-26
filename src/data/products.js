@@ -262,7 +262,7 @@ export const PRODUCTS = [
     category: 'android-players',
     price: 8299,
     originalPrice: 38999,
-    flipkartUrl: 'https://www.flipkart.com/search?q=VOEUX+car+electronics',
+    flipkartUrl: 'https://www.flipkart.com/voeux-android-stereo-64gb-carplay-single-knob-car/p/itmf738d9d0915a1?pid=CDPHNADEHPSJ3GRT',
     isNew: true,
     isTrending: true,
     isBestseller: true,
