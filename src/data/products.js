@@ -1,5 +1,5 @@
 export const CATEGORIES = [
-  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 3, description: 'HD QLED Touchscreen Stereos with Wireless CarPlay & Android Auto', image: '/images/android_player_1.png' },
+  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 4, description: 'HD QLED Touchscreen Stereos with Wireless CarPlay & Android Auto', image: '/images/android_player_1.png' },
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: 'High-fidelity car soundbars, coaxial speakers & subwoofers', image: '/images/soundbar_1.png' },
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: 'Mono Class AB Analog Amplifier Boards for subwoofers & basstubes', image: '/images/voeux_amp_board.jpg' },
 ];
@@ -255,6 +255,62 @@ export const PRODUCTS = [
     reviews: [],
     launchDate: '2026-08-10',
     stock: 40
+  },
+  {
+    id: 'voeux-single-knob-piano-4-64',
+    name: 'Voeux Single Knob Piano Series Android Stereo (4GB+64GB)',
+    category: 'android-players',
+    price: 8299,
+    originalPrice: 38999,
+    flipkartUrl: 'https://www.flipkart.com/search?q=VOEUX+car+electronics',
+    isNew: true,
+    isTrending: true,
+    isBestseller: true,
+    image: '/images/voeux_single_knob_piano_stereo.png',
+    gallery: ['/images/voeux_single_knob_piano_stereo.png'],
+    shortSpecs: [
+      'Single Knob & Physical Piano Buttons Design',
+      '4GB RAM + 64GB Storage',
+      'Wireless Apple CarPlay & Android Auto',
+      'Preset Tuner (3Bands * 6Stations FM/AM)',
+      'MOSFET 50W x 4 (240W Max Output)',
+      'Bluetooth 5.1 & Wi-Fi Connectivity'
+    ],
+    fullSpecs: {
+      'Brand & Model': 'Voeux - Android Stereo 64GB, CarPlay, Single Knob Piano Series',
+      'Type & Fitment': 'Audio & Video, Double DIN Universal For Car',
+      'RAM & Storage': '4 GB RAM + 64 GB Built-in Memory',
+      'Preset Tuner': '3Bands * 6Stations (FM: 87.5-108.0 MHz, AM: 530-1710 kHz, 18 FM & 12 AM Channels)',
+      'Steering Wheel Controls': 'Yes',
+      'Button Color': 'Black/Grey',
+      'Mounting Frame': 'No',
+      'In the Box': '1 car media player',
+      'Video Features': 'Supported Video Formats: AVI, M4V, MP4, MOV, MKV | Supported Picture Formats: GIF, HDRi, JPEG, JPG, PNG | 3D Graphical User Interface',
+      'Dimensions & Weight': 'Width: 32 cm | Height: 40 cm | Depth: 6 cm | Weight: 1.3 kg',
+      'Display Features': 'ID3 Tag Display: Yes | Dimmer: Yes | Display Off: Yes',
+      'Power Features': 'MOSFET Output Power: 50W x 4 | Power Consumption: 240 W (Maximum Output Power: 240 W)',
+      'Audio Features': 'Supported Audio Formats: AAC, M4A, MP3, MPEG, USB, WMA, WAV, iTunes',
+      'Convenience Features': 'Android Auto, Android Connectivity, GPS Navigation, HD Radio, Microphone, MirrorLink, Rear View Camera Compatible, Satellite Radio, Siri Eyes Free Control, Split Screen, Touchscreen, iOS Connectivity, iPod Compatible',
+      'Connectivity Features': 'Bluetooth 5.1, Wi-Fi | Sub-woofer Pre-amp: 4 V | RCA Output: 4 V',
+      'Warranty Summary': '1 Year Domestic Warranty on Manufacturing Defects',
+      'Covered in Warranty': 'Warranty covers manufacturing defects in the hardware components of the product.',
+      'Not Covered in Warranty': 'Warranty does not cover physical damage, water damage, burnt units, unauthorized modifications, accessories, or issues arising from improper installation.',
+      'Warranty Service Type': 'Customer needs to call or email the customer support. The product will be repaired or replaced at the nearest service center or picked up for service.'
+    },
+    compatibility: ['Universal For Car (Double DIN)'],
+    description: 'Voeux Single Knob Piano Series Android Stereo (4GB+64GB) with Apple CarPlay & Android Auto. Features single rotary knob and physical piano buttons for precise tactile control while driving. Built with 4GB RAM, 64GB storage, 3D Graphical Interface, Bluetooth 5.1, Wi-Fi, MOSFET 240W max output, and 4V RCA outputs.',
+    features: [
+      'Single Rotary Knob with Physical Piano Buttons Design',
+      '4GB RAM + 64GB Internal Storage with 3D GUI Interface',
+      'Wireless Apple CarPlay & Android Auto support with Siri Eyes Free Control',
+      'Preset Tuner (3Bands * 6Stations, 18 FM & 12 AM Channels)',
+      'MOSFET 50W x 4 (240W Max Output Power)',
+      'Bluetooth 5.1, Wi-Fi, GPS Navigation & Steering Wheel Control support',
+      'Double DIN Universal Fitment for all car models'
+    ],
+    reviews: [],
+    launchDate: '2026-08-26',
+    stock: 35
   }
 ];
 

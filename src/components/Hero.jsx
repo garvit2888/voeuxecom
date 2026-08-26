@@ -43,6 +43,15 @@ export const Hero = () => {
       ctaText: 'Explore Carbon Black TS7',
       actionPage: 'android-players',
       featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0]
+    },
+    {
+      title: 'VOEUX® Single Knob Piano Series Android Stereo',
+      subtitle: '4GB RAM + 64GB ROM • Single Knob & Physical Piano Buttons',
+      tagline: '4GB RAM + 64GB Storage • Single Rotary Knob & Piano Keys • Wireless CarPlay & Android Auto',
+      image: '/images/voeux_single_knob_piano_stereo.png',
+      ctaText: 'Explore Single Knob Piano',
+      actionPage: 'android-players',
+      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-single-knob-piano-4-64') || PRODUCTS[0]
     }
   ];
 
