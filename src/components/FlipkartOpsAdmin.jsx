@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
   ShieldCheck, Play, Clock, Package, Mail, Zap, CheckCircle,
   AlertCircle, RefreshCw, Eye, EyeOff, Boxes, Truck, FileText,
-  Bell, Activity, Settings, TrendingUp, X, ExternalLink
+  Bell, Activity, Settings, TrendingUp, X
 } from 'lucide-react';
 
-// ─── Config (credentials baked in — API pending approval) ────
+// ─── Config ──────────────────────────────────────────────────
 const CONFIG = {
   appId: '28a49b3985b7109470057a95972985708636',
   appSecret: '14de577644fa0da18c00db5134eafd379',
@@ -16,25 +16,8 @@ const CONFIG = {
   apiStatus: 'PENDING', // Change to 'ACTIVE' once Flipkart approves
 };
 
-// ─── Automation Pipeline Steps ───────────────────────────────
-const AUTOMATION_STEPS = [
-  { id: 1, icon: ShieldCheck, label: 'Authenticate with Flipkart', detail: 'Generate OAuth2 bearer token' },
-  { id: 2, icon: Boxes, label: 'Fetch Today\'s Shipments', detail: 'Filter active orders in APPROVED state' },
-  { id: 3, icon: Activity, label: 'Filter Eligible Orders', detail: 'Verify HOLD = false & DAD date passed' },
-  { id: 4, icon: Package, label: 'Pack Each Order', detail: 'Generate shipping labels on Flipkart' },
-  { id: 5, icon: FileText, label: 'Download Invoice PDFs', detail: 'Retrieve invoice documents via API' },
-  { id: 6, icon: Truck, label: 'Dispatch Orders', detail: 'Mark dispatched & schedule pickup' },
-  { id: 7, icon: Mail, label: 'Email Invoices to Office', detail: `Send PDF attachments to ${CONFIG.officeEmail}` },
-];
-
-const INITIAL_LOGS = [
-  { id: 1, timestamp: 'Pending Setup', status: 'waiting', message: 'Awaiting Flipkart API Approval', orders: 0 },
-];
-
 export const FlipkartOpsAdmin = () => {
   const [running, setRunning] = useState(false);
-  const [runLogs, setRunLogs] = useState(INITIAL_LOGS);
-  const [activeStep, setActiveStep] = useState(null);
   const [showConfig, setShowConfig] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
   const [toast, setToast] = useState(null);
@@ -50,18 +33,8 @@ export const FlipkartOpsAdmin = () => {
       return;
     }
     setRunning(true);
-    setActiveStep(1);
-    for (let i = 1; i <= AUTOMATION_STEPS.length; i++) {
-      setActiveStep(i);
-      await new Promise(r => setTimeout(r, 800));
-    }
-    setActiveStep(null);
+    await new Promise(r => setTimeout(r, 2000));
     setRunning(false);
-    const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    setRunLogs(prev => [
-      { id: Date.now(), timestamp: now, status: 'success', message: 'Automation executed successfully — Invoices emailed to office.', orders: 0 },
-      ...prev
-    ]);
     showToast('Automation complete. Order invoices sent to office email.', 'success');
   };
 
@@ -85,7 +58,7 @@ export const FlipkartOpsAdmin = () => {
       )}
 
       {/* Main Container */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 space-y-6">
         
         {/* Clean Header */}
         <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -126,9 +99,8 @@ export const FlipkartOpsAdmin = () => {
           </div>
         </div>
 
-        {/* Account Info & Status Alert */}
+        {/* Status Alert & Google Account Info */}
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Status Alert */}
           <div className="md:col-span-2 bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-start gap-4">
             <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-100 shrink-0">
               <AlertCircle className="w-5 h-5 text-amber-600" />
@@ -141,7 +113,6 @@ export const FlipkartOpsAdmin = () => {
             </div>
           </div>
 
-          {/* Google Account Info Box */}
           <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-2">
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
               <Mail className="w-3.5 h-3.5 text-[#3B429F]" />
@@ -179,132 +150,60 @@ export const FlipkartOpsAdmin = () => {
           </div>
         </div>
 
-        {/* Main Content Layout */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          
-          {/* Left Column: Automation Workflow */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-5">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        {/* Config & Backend Card Grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900">API Credentials</h3>
+              <button
+                onClick={() => setShowConfig(!showConfig)}
+                className="text-xs text-[#3B429F] hover:underline font-semibold flex items-center gap-1"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                {showConfig ? 'Hide Details' : 'View Config'}
+              </button>
+            </div>
+
+            {showConfig ? (
+              <div className="space-y-3 text-xs">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Automation Workflow Steps</h2>
-                  <p className="text-xs text-slate-500">Executes automatically every day at 11:00 AM IST</p>
+                  <span className="text-slate-400 font-medium block text-[11px]">Application ID (API Key)</span>
+                  <span className="font-mono text-slate-800 break-all">{CONFIG.appId}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-medium block text-[11px]">App Secret</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-slate-800 break-all">
+                      {showSecret ? CONFIG.appSecret : '••••••••••••••••••••••••••••••••'}
+                    </span>
+                    <button onClick={() => setShowSecret(!showSecret)} className="text-slate-400 hover:text-slate-600">
+                      {showSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-medium block text-[11px]">Seller ID</span>
+                  <span className="font-semibold text-slate-800">{CONFIG.sellerId}</span>
                 </div>
               </div>
-
-              <div className="space-y-3">
-                {AUTOMATION_STEPS.map((step) => {
-                  const isActive = activeStep === step.id;
-                  const isDone = activeStep !== null && step.id < activeStep;
-                  
-                  return (
-                    <div
-                      key={step.id}
-                      className={`flex items-start gap-4 p-3.5 rounded-lg border transition-all ${
-                        isActive
-                          ? 'bg-blue-50/50 border-[#3B429F]/30'
-                          : isDone
-                          ? 'bg-emerald-50/40 border-emerald-200'
-                          : 'bg-white border-slate-200'
-                      }`}
-                    >
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs ${
-                        isActive
-                          ? 'bg-[#3B429F] text-white'
-                          : isDone
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {isDone ? <CheckCircle className="w-4 h-4" /> : step.id}
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-xs font-bold text-slate-900">{step.label}</h4>
-                          {isActive && <RefreshCw className="w-3.5 h-3.5 text-[#3B429F] animate-spin" />}
-                        </div>
-                        <p className="text-xs text-slate-500 mt-0.5">{step.detail}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Run Logs */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
-              <h3 className="text-base font-bold text-slate-900">Execution Log History</h3>
-              <div className="space-y-2.5">
-                {runLogs.map(log => (
-                  <div key={log.id} className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 flex items-start justify-between text-xs">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${log.status === 'success' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                        <span className="font-semibold text-slate-800">{log.message}</span>
-                      </div>
-                      <p className="text-slate-500 text-[11px]">Timestamp: {log.timestamp}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ) : (
+              <p className="text-xs text-slate-500">Credentials stored securely for backend automation.</p>
+            )}
           </div>
 
-          {/* Right Column: Technical Credentials & API Details */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-bold text-slate-900">API Credentials</h3>
-                <button
-                  onClick={() => setShowConfig(!showConfig)}
-                  className="text-xs text-[#3B429F] hover:underline font-semibold flex items-center gap-1"
-                >
-                  <Settings className="w-3.5 h-3.5" />
-                  {showConfig ? 'Hide Details' : 'View Config'}
-                </button>
-              </div>
-
-              {showConfig ? (
-                <div className="space-y-3 text-xs">
-                  <div>
-                    <span className="text-slate-400 font-medium block text-[11px]">Application ID (API Key)</span>
-                    <span className="font-mono text-slate-800 break-all">{CONFIG.appId}</span>
-                  </div>
-
-                  <div>
-                    <span className="text-slate-400 font-medium block text-[11px]">App Secret</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-slate-800 break-all">
-                        {showSecret ? CONFIG.appSecret : '••••••••••••••••••••••••••••••••'}
-                      </span>
-                      <button onClick={() => setShowSecret(!showSecret)} className="text-slate-400 hover:text-slate-600">
-                        {showSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="text-slate-400 font-medium block text-[11px]">Seller ID</span>
-                    <span className="font-semibold text-slate-800">{CONFIG.sellerId}</span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500">Credentials stored securely for backend automation.</p>
-              )}
-            </div>
-
-            {/* Backend Integration Note */}
-            <div className="bg-slate-900 text-white rounded-xl p-5 shadow-sm space-y-3">
+          <div className="bg-slate-900 text-white rounded-xl p-6 shadow-sm space-y-3 flex flex-col justify-between">
+            <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">Backend App Script</h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-300 leading-relaxed mt-2">
                 The automation script is deployed in your Google Apps Script associated with <span className="text-amber-300 font-semibold">{CONFIG.scriptEmail}</span>.
               </p>
-              <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400">
-                Automatic trigger time: <span className="text-white font-medium">11:00 AM IST Daily</span>
-              </div>
+            </div>
+            <div className="pt-3 border-t border-slate-800 text-xs text-slate-400">
+              Automatic trigger time: <span className="text-white font-medium">11:00 AM IST Daily</span>
             </div>
           </div>
-
         </div>
 
       </div>
