@@ -324,7 +324,11 @@ export const PRODUCTS = [
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_svx001_coaxial_speakers.png',
-    gallery: ['/images/voeux_svx001_coaxial_speakers.png'],
+    gallery: [
+      '/images/voeux_svx001_coaxial_speakers.png',
+      '/images/voeux_svx001_gallery_1.png',
+      '/images/voeux_svx001_gallery_2.png'
+    ],
     shortSpecs: [
       '1 Pair of 6-Inch (16 cm) Coaxial Speakers',
       '380W Peak Power Output (High Bass)',
