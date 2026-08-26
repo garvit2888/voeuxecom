@@ -17,7 +17,7 @@ export const ProductCard = ({ product }) => {
     >
       
       {/* Top Image Section - Fitted Design */}
-      <div className="relative aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-2">
+      <div className="relative aspect-[4/3] bg-slate-50/80 rounded-xl overflow-hidden flex items-center justify-center p-2">
         <img
           src={product.image}
           alt={product.name}

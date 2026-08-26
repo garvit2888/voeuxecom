@@ -147,7 +147,7 @@ const MainContent = () => {
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="bg-slate-950 p-2 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-center shrink-0 w-full md:w-80 h-56 overflow-hidden">
+                <div className="bg-slate-900/60 p-2 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-center shrink-0 w-full md:w-80 h-56 overflow-hidden">
                   <img src="/images/voeux_dual_knob_piano_stereo.jpg" alt="VOEUX Dual Knob Piano Buttons Stereo" className="w-full h-full object-cover rounded-xl" />
                 </div>
               </div>
