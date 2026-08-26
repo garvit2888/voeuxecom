@@ -43,6 +43,8 @@ const MainContent = () => {
         return <InventoryQRPortal />;
       case 'android-players':
         return <CategoryPage categoryId="android-players" />;
+      case 'car-speakers':
+        return <CategoryPage categoryId="car-speakers" />;
       case 'speakers-soundbars':
         return <CategoryPage categoryId="speakers-soundbars" />;
       case 'amplifiers':

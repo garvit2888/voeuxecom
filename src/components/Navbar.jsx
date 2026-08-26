@@ -25,6 +25,7 @@ export const Navbar = () => {
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'android-players', label: 'Android Players' },
+    { id: 'car-speakers', label: 'Car Speakers' },
     { id: 'speakers-soundbars', label: 'Speakers & Soundbars' },
     { id: 'amplifiers', label: 'Car Amplifiers' },
     { id: 'warranty', label: 'Register Warranty' },

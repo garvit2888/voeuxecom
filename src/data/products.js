@@ -1,7 +1,8 @@
 export const CATEGORIES = [
-  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 4, description: 'HD QLED Touchscreen Stereos with Wireless CarPlay & Android Auto', image: '/images/android_player_1.png' },
-  { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: 'High-fidelity car soundbars, coaxial speakers & subwoofers', image: '/images/soundbar_1.png' },
-  { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: 'Mono Class AB Analog Amplifier Boards for subwoofers & basstubes', image: '/images/voeux_amp_board.jpg' },
+  { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 4, description: '', image: '/images/android_player_1.png' },
+  { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: '', image: '/images/soundbar_1.png' },
+  { id: 'car-speakers', name: 'Car Speakers', icon: 'Volume2', count: 1, description: '', image: '/images/voeux_svx001_coaxial_speakers.png' },
+  { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: '', image: '/images/voeux_amp_board.jpg' },
 ];
 
 export const PRODUCTS = [
@@ -311,6 +312,58 @@ export const PRODUCTS = [
     reviews: [],
     launchDate: '2026-08-26',
     stock: 35
+  },
+  {
+    id: 'voeux-svx001-6inch-speakers',
+    name: 'Voeux 6" 2-Way Coaxial Car Speakers, 380W High Bass (SVX-001)',
+    category: 'car-speakers',
+    price: 2299,
+    originalPrice: 6999,
+    flipkartUrl: 'https://www.flipkart.com/search?q=VOEUX+coaxial+car+speakers',
+    isNew: true,
+    isTrending: true,
+    isBestseller: true,
+    image: '/images/voeux_svx001_coaxial_speakers.png',
+    gallery: ['/images/voeux_svx001_coaxial_speakers.png'],
+    shortSpecs: [
+      '1 Pair of 6-Inch (16 cm) Coaxial Speakers',
+      '380W Peak Power Output (High Bass)',
+      'Dual Voice Coil Technology (91 dB)',
+      'Polypropylene Cone with Rubber Surround',
+      '30 Hz – 25,000 Hz Wide Frequency Response',
+      'Universal Door Mount Fitment (Pack of 2)'
+    ],
+    fullSpecs: {
+      'Brand & Model': 'Voeux 6" 2-Way Coaxial Car Speakers (SVX-001)',
+      'Type & Shape': 'Coaxial 2-Way, Round',
+      'Peak Power Handling': '380 W (Nominal Impedance: 4 ohm, Dynamic Power: 380 W)',
+      'Sensitivity & Response': '91 dB High Sensitivity, 30 Hz – 25,000 Hz Frequency Response',
+      'Technology Used': 'Dual Voice Coil Technology, 2-Way Coaxial Speaker Design, Polypropylene Cone with Rubber Surround, Ferrite Magnet Structure, Heat-Resistant Voice Coil',
+      'Mount Type & Placement': 'Door Mount, Door Mounted (Universal For Car)',
+      'Materials & Finish': 'Polypropylene Enclosure, Ferrite Magnet, Metal Mesh Grill, Matte Black Finish',
+      'Dimensions & Weight': 'Width: 16 cm | Height: 16 cm | Depth: 6.5 cm | Diameter: 16 cm | Weight: 1 kg',
+      'In the Box': '1 Pair of Premium 6-Inch Speakers (Pack of 2)',
+      'Performance Features': 'High Sensitivity 91 dB for loud/clear sound at lower volumes, Low Distortion Output, Bass-Heavy Playback Optimization, Wide Sound Dispersion, Enhanced Heat Dissipation',
+      'Installation Instructions': 'Ensure car battery is disconnected. Remove factory grilles or door panels. Unplug existing speakers. Position new VOEUX SVX-001 speakers into mounting slots. Connect speaker wires paying attention to polarity (+ to +, - to -). Fasten securely with hardware. Reconnect battery and test audio output.',
+      'Warranty Summary': '1 Year Domestic Warranty on Manufacturing Defects',
+      'Covered in Warranty': 'Warranty covers manufacturing defects in the hardware components of the product.',
+      'Not Covered in Warranty': 'Warranty does not cover physical damage, water damage, burnt units, unauthorized modifications, accessories, or issues arising from improper installation.',
+      'Warranty Service Type': 'Customer needs to call or email customer support. Product will be repaired or replaced.'
+    },
+    compatibility: ['Universal Door Mount Fit For All Car Models'],
+    description: 'The VOEUX SVX-001 6-Inch (16 cm) 2-Way Coaxial Car Speakers deliver a massive 380W Peak Output for high-bass performance, featuring a specialized Dual Voice Coil design that maximizes volume and clarity. With a wide 30 Hz – 25,000 Hz frequency response, these speakers capture everything from deep lows to crisp highs, while the durable polypropylene enclosure and matte black finish ensure long-lasting use and a premium interior look. Pack of 2 speakers built for universal door mount installation.',
+    features: [
+      '6-Inch (16 cm) 2-Way Coaxial Speaker Design',
+      '380W Peak Power Output with Dual Voice Coil Technology',
+      'High Sensitivity (91 dB) for loud & clear sound at lower volumes',
+      '30 Hz – 25,000 Hz Wide Frequency Response',
+      'Polypropylene Cone with Rubber Surround & Ferrite Magnet',
+      'Metal Mesh Protective Grill & Matte Black Finish',
+      'Universal Door Mount Fitment (1 Pair / Pack of 2)'
+    ],
+    reviews: [],
+    launchDate: '2026-08-26',
+    stock: 50
   }
 ];
 
