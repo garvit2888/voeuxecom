@@ -78,7 +78,7 @@ export const Hero = () => {
           <img
             src={slide.image}
             alt={slide.title}
-            className="w-full h-full object-cover object-center transition-all duration-700"
+            className="w-full h-full object-contain p-3 object-center transition-all duration-700"
           />
 
           {/* Bottom gradient fade */}
