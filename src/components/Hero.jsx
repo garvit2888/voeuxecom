@@ -55,18 +55,6 @@ export const Hero = () => {
       bgSize: 'auto 65%',
       bgPos: 'right 8% center',
       mobilePadding: 'p-6'
-    },
-    {
-      title: 'VOEUX® Single Knob Piano Series Android Stereo',
-      subtitle: '4GB RAM + 64GB ROM • Single Knob & Physical Piano Buttons',
-      tagline: '4GB RAM + 64GB Storage • Single Rotary Knob & Piano Keys • Wireless CarPlay & Android Auto',
-      image: '/images/voeux_single_knob_piano_stereo.png',
-      ctaText: 'Explore Single Knob Piano',
-      actionPage: 'android-players',
-      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-single-knob-piano-4-64') || PRODUCTS[0],
-      bgSize: 'auto 60%',
-      bgPos: 'right 8% center',
-      mobilePadding: 'p-9'
     }
   ];
 
