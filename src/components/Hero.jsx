@@ -17,8 +17,8 @@ export const Hero = () => {
       actionPage: 'android-players',
       featuredProduct: PRODUCTS[0],
       bgSize: 'contain',
-      bgPos: 'right 2% center',
-      mobilePadding: 'p-2'
+      bgPos: 'right 5% center',
+      mobilePadding: 'p-3'
     },
     {
       title: 'VOEUX® 160W 2-in-1 Separable Soundbar',
@@ -40,9 +40,9 @@ export const Hero = () => {
       ctaText: 'Shop Car Amplifiers',
       actionPage: 'amplifiers',
       featuredProduct: PRODUCTS[2],
-      bgSize: 'auto 65%',
-      bgPos: 'right 8% center',
-      mobilePadding: 'p-6'
+      bgSize: 'contain',
+      bgPos: 'right 5% center',
+      mobilePadding: 'p-5'
     },
     {
       title: 'VOEUX® CARBON BLACK Series 9" QLED Android TS7 Stereo',
@@ -52,9 +52,9 @@ export const Hero = () => {
       ctaText: 'Explore Carbon Black TS7',
       actionPage: 'android-players',
       featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0],
-      bgSize: 'auto 65%',
-      bgPos: 'right 8% center',
-      mobilePadding: 'p-6'
+      bgSize: 'contain',
+      bgPos: 'right 5% center',
+      mobilePadding: 'p-5'
     }
   ];
 
@@ -63,53 +63,71 @@ export const Hero = () => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
-
-  const slide = slides[currentSlide];
+  }, [slides.length]);
 
   return (
     <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative min-h-screen bg-slate-950 text-white pb-32">
+      <div className="md:hidden relative min-h-[580px] bg-slate-950 text-white pb-24">
 
-        {/* IMAGE: h-72 with slim gradient overlays */}
+        {/* IMAGE STACK: Smooth Cross-fade */}
         <div className="relative w-full h-72 overflow-hidden flex items-center justify-center">
           {/* Top gradient fade */}
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
 
-          <img
-            src={slide.image}
-            alt={slide.title}
-            className={`w-full h-full object-contain object-center transition-all duration-700 ${slide.mobilePadding || 'p-4'}`}
-          />
+          {slides.map((s, idx) => (
+            <img
+              key={idx}
+              src={s.image}
+              alt={s.title}
+              className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-700 ease-in-out ${
+                s.mobilePadding || 'p-4'
+              } ${
+                idx === currentSlide
+                  ? 'opacity-100 scale-100 z-1'
+                  : 'opacity-0 scale-95 pointer-events-none z-0'
+              }`}
+            />
+          ))}
 
           {/* Bottom gradient fade */}
           <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* TEXT */}
-        <div className="px-5 mt-7 space-y-4 text-left">
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
-            {slide.title}
-          </h1>
-
-          <p className="text-sm text-gray-300 font-medium leading-relaxed">
-            {slide.tagline}
-          </p>
-
-          <div className="pt-2">
-            <button
-              onClick={() => setSelectedProductModal(slide.featuredProduct)}
-              className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-sm font-extrabold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+        {/* TEXT STACK: Smooth Cross-fade */}
+        <div className="px-5 mt-4 space-y-4 text-left min-h-[220px] relative">
+          {slides.map((s, idx) => (
+            <div
+              key={idx}
+              className={`transition-all duration-500 ease-in-out space-y-4 ${
+                idx === currentSlide
+                  ? 'opacity-100 translate-y-0 relative z-10'
+                  : 'opacity-0 translate-y-3 absolute inset-0 px-5 pointer-events-none z-0'
+              }`}
             >
-              <span>{slide.ctaText}</span>
-              <ArrowRight className="w-4.5 h-4.5" />
-            </button>
-          </div>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
+                {s.title}
+              </h1>
 
-          {/* Slide Dots */}
-          <div className="flex items-center justify-center space-x-2 pt-3 pb-1">
+              <p className="text-sm text-gray-300 font-medium leading-relaxed">
+                {s.tagline}
+              </p>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => setSelectedProductModal(s.featuredProduct)}
+                  className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+                >
+                  <span>{s.ctaText}</span>
+                  <ArrowRight className="w-4.5 h-4.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Slide Dots Mobile */}
+          <div className="flex items-center justify-center space-x-2 pt-6 pb-1 relative z-20">
             {slides.map((_, idx) => (
               <button
                 key={idx}
@@ -130,47 +148,65 @@ export const Hero = () => {
         <div className="container mx-auto px-4 py-10">
           <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
 
-            {/* Background Image */}
-            <div
-              className="absolute inset-0 bg-no-repeat transition-all duration-700 opacity-95"
-              style={{
-                backgroundImage: `url(${slide.image})`,
-                backgroundPosition: slide.bgPos || 'right 5% center',
-                backgroundSize: slide.bgSize || 'contain'
-              }}
-            />
+            {/* STACKED BACKGROUND IMAGES FOR SMOOTH 700ms CROSS-FADE */}
+            {slides.map((s, idx) => (
+              <div
+                key={idx}
+                className={`absolute inset-0 bg-no-repeat transition-all duration-700 ease-in-out ${
+                  idx === currentSlide
+                    ? 'opacity-95 scale-100 z-0'
+                    : 'opacity-0 scale-105 pointer-events-none -z-10'
+                }`}
+                style={{
+                  backgroundImage: `url(${s.image})`,
+                  backgroundPosition: s.bgPos || 'right 5% center',
+                  backgroundSize: s.bgSize || 'contain'
+                }}
+              />
+            ))}
 
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent max-w-xl" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/75 to-transparent max-w-2xl pointer-events-none z-1" />
 
-            {/* Left Text Content */}
-            <div className="relative z-10 max-w-xl space-y-4 text-left">
-              <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                {slide.title}
-              </h1>
-              <p className="text-base text-gray-300 font-medium leading-relaxed">
-                {slide.tagline}
-              </p>
-              <div className="pt-2 flex items-center gap-3">
-                <button
-                  onClick={() => setSelectedProductModal(slide.featuredProduct)}
-                  className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40"
+            {/* STACKED TEXT CONTENT FOR SMOOTH FADE */}
+            <div className="relative z-10 max-w-xl text-left w-full">
+              {slides.map((s, idx) => (
+                <div
+                  key={idx}
+                  className={`transition-all duration-500 ease-in-out space-y-4 ${
+                    idx === currentSlide
+                      ? 'opacity-100 translate-y-0 relative z-10'
+                      : 'opacity-0 translate-y-4 absolute inset-0 pointer-events-none z-0'
+                  }`}
                 >
-                  <span>{slide.ctaText}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                    {s.title}
+                  </h1>
+                  <p className="text-base text-gray-300 font-medium leading-relaxed">
+                    {s.tagline}
+                  </p>
+                  <div className="pt-2 flex items-center gap-3">
+                    <button
+                      onClick={() => setSelectedProductModal(s.featuredProduct)}
+                      className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40 cursor-pointer"
+                    >
+                      <span>{s.ctaText}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Slide Dots Desktop */}
-            <div className="absolute bottom-5 left-10 lg:left-12 z-20 flex items-center space-x-2">
+            <div className="absolute bottom-6 left-10 lg:left-12 z-20 flex items-center space-x-2">
               {slides.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-gray-600'
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-gray-600 hover:bg-gray-400'
                   }`}
                 />
               ))}
@@ -179,14 +215,14 @@ export const Hero = () => {
             {/* Prev & Next Arrows Desktop */}
             <button
               onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-md"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Previous Slide"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-md"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Next Slide"
             >
               <ChevronRight className="w-5 h-5" />
