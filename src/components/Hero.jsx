@@ -16,8 +16,6 @@ export const Hero = () => {
       ctaText: 'Explore X80 Stereo',
       actionPage: 'android-players',
       featuredProduct: PRODUCTS[0],
-      bgSize: 'contain',
-      bgPos: 'right 5% center',
       mobilePadding: 'p-3'
     },
     {
@@ -28,8 +26,6 @@ export const Hero = () => {
       ctaText: 'Shop 160W Soundbar',
       actionPage: 'speakers-soundbars',
       featuredProduct: PRODUCTS[1],
-      bgSize: 'contain',
-      bgPos: 'right 5% center',
       mobilePadding: 'p-3'
     },
     {
@@ -40,8 +36,6 @@ export const Hero = () => {
       ctaText: 'Shop Car Amplifiers',
       actionPage: 'amplifiers',
       featuredProduct: PRODUCTS[2],
-      bgSize: 'contain',
-      bgPos: 'right 5% center',
       mobilePadding: 'p-5'
     },
     {
@@ -52,11 +46,17 @@ export const Hero = () => {
       ctaText: 'Explore Carbon Black TS7',
       actionPage: 'android-players',
       featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0],
-      bgSize: 'contain',
-      bgPos: 'right 5% center',
       mobilePadding: 'p-5'
     }
   ];
+
+  // Preload ALL hero slide images immediately into RAM/cache for instant switching with zero delay
+  useEffect(() => {
+    slides.forEach(slide => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -71,7 +71,7 @@ export const Hero = () => {
       {/* ========== MOBILE LAYOUT ONLY ========== */}
       <div className="md:hidden relative min-h-[580px] bg-slate-950 text-white pb-24">
 
-        {/* IMAGE STACK: Smooth Cross-fade */}
+        {/* IMAGE STACK: Eager Loaded Instant Preloaded Images */}
         <div className="relative w-full h-72 overflow-hidden flex items-center justify-center">
           {/* Top gradient fade */}
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
@@ -81,7 +81,9 @@ export const Hero = () => {
               key={idx}
               src={s.image}
               alt={s.title}
-              className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-700 ease-in-out ${
+              loading="eager"
+              fetchPriority="high"
+              className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-500 ease-in-out ${
                 s.mobilePadding || 'p-4'
               } ${
                 idx === currentSlide
@@ -95,7 +97,7 @@ export const Hero = () => {
           <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* TEXT STACK: Smooth Cross-fade */}
+        {/* TEXT STACK: Instant Smooth Cross-fade */}
         <div className="px-5 mt-4 space-y-4 text-left min-h-[220px] relative">
           {slides.map((s, idx) => (
             <div
@@ -148,27 +150,28 @@ export const Hero = () => {
         <div className="container mx-auto px-4 py-10">
           <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
 
-            {/* STACKED BACKGROUND IMAGES FOR SMOOTH 700ms CROSS-FADE */}
-            {slides.map((s, idx) => (
-              <div
-                key={idx}
-                className={`absolute inset-0 bg-no-repeat transition-all duration-700 ease-in-out ${
-                  idx === currentSlide
-                    ? 'opacity-95 scale-100 z-0'
-                    : 'opacity-0 scale-105 pointer-events-none -z-10'
-                }`}
-                style={{
-                  backgroundImage: `url(${s.image})`,
-                  backgroundPosition: s.bgPos || 'right 5% center',
-                  backgroundSize: s.bgSize || 'contain'
-                }}
-              />
-            ))}
+            {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
+            <div className="absolute right-6 top-8 bottom-8 w-[55%] flex items-center justify-end pointer-events-none z-0">
+              {slides.map((s, idx) => (
+                <img
+                  key={idx}
+                  src={s.image}
+                  alt={s.title}
+                  loading="eager"
+                  fetchPriority="high"
+                  className={`absolute right-4 max-h-full max-w-[85%] object-contain object-right transition-all duration-500 ease-in-out ${
+                    idx === currentSlide
+                      ? 'opacity-95 scale-100'
+                      : 'opacity-0 scale-95 pointer-events-none'
+                  }`}
+                />
+              ))}
+            </div>
 
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/75 to-transparent max-w-2xl pointer-events-none z-1" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent max-w-2xl pointer-events-none z-1" />
 
-            {/* STACKED TEXT CONTENT FOR SMOOTH FADE */}
+            {/* STACKED TEXT CONTENT */}
             <div className="relative z-10 max-w-xl text-left w-full">
               {slides.map((s, idx) => (
                 <div
