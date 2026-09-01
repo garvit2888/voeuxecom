@@ -69,10 +69,10 @@ export const Hero = () => {
     <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-between pb-20">
+      <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center pt-4 pb-24 px-4">
 
-        {/* IMAGE STACK: Eager Loaded Instant Preloaded Images */}
-        <div className="relative w-full h-72 overflow-hidden flex items-center justify-center">
+        {/* IMAGE STACK: Centered and moved down */}
+        <div className="relative w-full h-80 overflow-hidden flex items-center justify-center">
           {/* Top gradient fade */}
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
 
@@ -84,7 +84,7 @@ export const Hero = () => {
               loading="eager"
               fetchPriority="high"
               className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-500 ease-in-out ${
-                s.mobilePadding || 'p-4'
+                s.mobilePadding || 'p-2'
               } ${
                 idx === currentSlide
                   ? 'opacity-100 scale-100 z-1'
@@ -97,15 +97,15 @@ export const Hero = () => {
           <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* TEXT STACK: Instant Smooth Cross-fade */}
-        <div className="px-5 mt-4 space-y-4 text-left min-h-[220px] relative">
+        {/* TEXT STACK: Moved up directly below image with minimal gap */}
+        <div className="w-full mt-2 space-y-4 text-left min-h-[200px] relative">
           {slides.map((s, idx) => (
             <div
               key={idx}
-              className={`transition-all duration-500 ease-in-out space-y-4 ${
+              className={`transition-all duration-500 ease-in-out space-y-3.5 ${
                 idx === currentSlide
                   ? 'opacity-100 translate-y-0 relative z-10'
-                  : 'opacity-0 translate-y-3 absolute inset-0 px-5 pointer-events-none z-0'
+                  : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
               }`}
             >
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
@@ -116,7 +116,7 @@ export const Hero = () => {
                 {s.tagline}
               </p>
 
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   onClick={() => setSelectedProductModal(s.featuredProduct)}
                   className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
@@ -129,7 +129,7 @@ export const Hero = () => {
           ))}
 
           {/* Slide Dots Mobile */}
-          <div className="flex items-center justify-center space-x-2 pt-6 pb-1 relative z-20">
+          <div className="flex items-center justify-center space-x-2 pt-5 pb-1 relative z-20">
             {slides.map((_, idx) => (
               <button
                 key={idx}
