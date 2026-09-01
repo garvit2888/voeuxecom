@@ -209,8 +209,8 @@ const MainContent = () => {
                         </div>
 
                       <div>
-                        <span className="text-[10px] text-[#3B429F] font-bold block uppercase">{rev.product}</span>
-                        <h4 className="font-extrabold text-gray-900 text-sm mt-0.5">{rev.title}</h4>
+                        <span className="text-[10px] text-[#3B429F] font-normal block uppercase">{rev.product}</span>
+                        <h4 className="font-normal text-gray-900 text-sm mt-0.5">{rev.title}</h4>
                       </div>
 
                       <div className="flex items-center gap-1 text-yellow-400">
@@ -218,15 +218,15 @@ const MainContent = () => {
                           <Star key={idx} className="w-3.5 h-3.5 fill-current" />
                         ))}
                         {rev.rating % 1 !== 0 && (
-                          <span className="text-[10px] font-bold text-gray-700 ml-1">4.5★</span>
+                          <span className="text-[10px] font-normal text-gray-700 ml-1">4.5★</span>
                         )}
                       </div>
 
-                      <p className="text-gray-700 font-medium leading-relaxed">"{rev.review}"</p>
+                      <p className="text-gray-700 font-normal leading-relaxed">"{rev.review}"</p>
                     </div>
 
                     <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-gray-500">
-                      <span className="font-bold text-gray-900">{rev.name}</span>
+                      <span className="font-normal text-gray-900">{rev.name}</span>
                     </div>
                   </div>
                 );
