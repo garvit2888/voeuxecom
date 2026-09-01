@@ -13,7 +13,7 @@ export const ProductCard = ({ product }) => {
   return (
     <div
       onClick={() => setSelectedProductModal(product)}
-      className="clean-card group relative flex flex-col justify-between overflow-hidden p-4 space-y-3 cursor-pointer hover:border-[#3B429F] hover:shadow-xl transition-all duration-300"
+      className="clean-card group relative flex flex-col justify-between overflow-hidden p-4 space-y-3 cursor-pointer transition-all duration-300"
     >
       
       {/* Top Image Section - Fitted Design */}

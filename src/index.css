@@ -45,8 +45,7 @@ body {
   transition: all 0.25s ease;
 }
 .clean-card:hover {
-  border-color: #3B429F;
-  box-shadow: 0 10px 30px -10px rgba(59, 66, 159, 0.12);
+  border-color: #E5E7EB;
 }
 
 .clean-nav {
