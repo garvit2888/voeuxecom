@@ -69,7 +69,7 @@ export const Hero = () => {
     <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative min-h-[580px] bg-slate-950 text-white pb-24">
+      <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col justify-between pb-20">
 
         {/* IMAGE STACK: Eager Loaded Instant Preloaded Images */}
         <div className="relative w-full h-72 overflow-hidden flex items-center justify-center">
