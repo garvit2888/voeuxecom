@@ -69,12 +69,12 @@ export const Hero = () => {
     <section className="bg-slate-950 md:bg-white border-b border-gray-200">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center pt-4 pb-24 px-4">
+      <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center pt-2 pb-24 px-4 overflow-x-hidden">
 
-        {/* IMAGE STACK: Centered and moved down */}
-        <div className="relative w-full h-80 overflow-hidden flex items-center justify-center">
+        {/* IMAGE STACK: Spans 100% full width touching left & right phone screen edges */}
+        <div className="relative -mx-4 w-[calc(100%+2rem)] h-80 sm:h-96 overflow-hidden flex items-center justify-center">
           {/* Top gradient fade */}
-          <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
 
           {slides.map((s, idx) => (
             <img
@@ -83,22 +83,20 @@ export const Hero = () => {
               alt={s.title}
               loading="eager"
               fetchPriority="high"
-              className={`absolute inset-0 w-full h-full object-contain object-center transition-all duration-500 ease-in-out ${
-                s.mobilePadding || 'p-2'
-              } ${
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 ease-in-out ${
                 idx === currentSlide
                   ? 'opacity-100 scale-100 z-1'
-                  : 'opacity-0 scale-95 pointer-events-none z-0'
+                  : 'opacity-0 scale-105 pointer-events-none z-0'
               }`}
             />
           ))}
 
           {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
         </div>
 
-        {/* TEXT STACK: Moved up directly below image with minimal gap */}
-        <div className="w-full mt-2 space-y-4 text-left min-h-[200px] relative">
+        {/* TEXT STACK: Directly below edge-to-edge image */}
+        <div className="w-full mt-3 space-y-4 text-left min-h-[200px] relative px-1">
           {slides.map((s, idx) => (
             <div
               key={idx}
