@@ -6,10 +6,18 @@ export const CustomerProfilePage = () => {
   const { user, logoutUser, orders, setActivePage, addToast } = useShop();
   const [activeTab, setActiveTab] = useState('profile'); // 'orders' | 'profile' | 'rewards' | 'referral'
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+
+  const [editProfileData, setEditProfileData] = useState({
+    name: user?.name || '',
+    phone: user?.phone || '',
+    email: user?.email || ''
+  });
+
   const [newAddress, setNewAddress] = useState({
-    street: '',
-    city: '',
-    pincode: '',
+    street: user?.address || '',
+    city: user?.city || '',
+    pincode: user?.pincode || '',
     state: 'Delhi'
   });
 
@@ -32,6 +40,20 @@ export const CustomerProfilePage = () => {
   }
 
   const userOrders = orders.filter(o => o.userEmail === user.email || o.userPhone === user.phone);
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    if (!editProfileData.name || !editProfileData.phone || !editProfileData.email) {
+      addToast('Please fill in all profile fields', 'warning');
+      return;
+    }
+    user.name = editProfileData.name;
+    user.phone = editProfileData.phone;
+    user.email = editProfileData.email;
+    try { localStorage.setItem('voeux_user', JSON.stringify(user)); } catch(e){}
+    setIsEditProfileOpen(false);
+    addToast('Profile details updated successfully!', 'success');
+  };
 
   const handleSaveAddress = (e) => {
     e.preventDefault();
@@ -139,7 +161,14 @@ export const CustomerProfilePage = () => {
 
                     <div className="flex items-center gap-4 text-xs font-bold text-[#3B429F]">
                       <button
-                        onClick={() => setIsAddAddressOpen(true)}
+                        onClick={() => {
+                          setEditProfileData({
+                            name: user.name || '',
+                            phone: user.phone || '',
+                            email: user.email || ''
+                          });
+                          setIsEditProfileOpen(true);
+                        }}
                         className="flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -158,14 +187,22 @@ export const CustomerProfilePage = () => {
                     </div>
                   </div>
 
-                  {/* Phone & Email Row */}
+                  {/* Phone & Email Row with Working Edit Buttons */}
                   <div className="flex flex-wrap items-center gap-6 text-xs text-gray-700 font-medium">
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4 text-gray-400" />
                       <span>{user.phone || '+919999484530'}</span>
                       <button
-                        onClick={() => setIsAddAddressOpen(true)}
+                        onClick={() => {
+                          setEditProfileData({
+                            name: user.name || '',
+                            phone: user.phone || '',
+                            email: user.email || ''
+                          });
+                          setIsEditProfileOpen(true);
+                        }}
                         className="text-[#3B429F] font-bold flex items-center gap-0.5 hover:underline cursor-pointer ml-1"
+                        title="Edit Phone & Profile"
                       >
                         <Edit2 className="w-3 h-3" />
                         <span>Edit</span>
@@ -175,6 +212,21 @@ export const CustomerProfilePage = () => {
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-gray-400" />
                       <span>{user.email || 'customer@voeux.in'}</span>
+                      <button
+                        onClick={() => {
+                          setEditProfileData({
+                            name: user.name || '',
+                            phone: user.phone || '',
+                            email: user.email || ''
+                          });
+                          setIsEditProfileOpen(true);
+                        }}
+                        className="text-[#3B429F] font-bold flex items-center gap-0.5 hover:underline cursor-pointer ml-1"
+                        title="Edit Email & Profile"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        <span>Edit</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -346,12 +398,71 @@ export const CustomerProfilePage = () => {
 
       </div>
 
+      {/* Edit Profile Modal (Name, Phone Number, Email) */}
+      {isEditProfileOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md space-y-4 border border-gray-200 shadow-2xl text-left">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <h3 className="text-base font-bold text-gray-900">Edit Profile Details</h3>
+              <button onClick={() => setIsEditProfileOpen(false)} className="text-gray-400 hover:text-gray-900 p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-gray-600 font-semibold mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editProfileData.name}
+                  onChange={e => setEditProfileData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter full name"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 focus:bg-white focus:border-[#3B429F] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-600 font-semibold mb-1">Phone Number (10 digits)</label>
+                <input
+                  type="tel"
+                  required
+                  value={editProfileData.phone}
+                  onChange={e => setEditProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="9876543210"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 focus:bg-white focus:border-[#3B429F] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-600 font-semibold mb-1">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={editProfileData.email}
+                  onChange={e => setEditProfileData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="name@example.com"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 focus:bg-white focus:border-[#3B429F] focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white font-bold py-3 rounded-xl transition cursor-pointer mt-2"
+              >
+                Save Profile Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Add / Edit Address Modal */}
       {isAddAddressOpen && (
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md space-y-4 border border-gray-200 shadow-2xl text-left">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="text-base font-bold text-gray-900">Edit / Add Address</h3>
+              <h3 className="text-base font-bold text-gray-900">Manage Shipping Address</h3>
               <button onClick={() => setIsAddAddressOpen(false)} className="text-gray-400 hover:text-gray-900 p-1">
                 <X className="w-5 h-5" />
               </button>
