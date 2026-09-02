@@ -225,7 +225,7 @@ export const ProductDetailPage = () => {
               </div>
             </div>
 
-             {/* Primary Action Buttons */}
+            {/* Primary Action Buttons */}
             <div className="space-y-2.5 pt-1">
               <div className="flex gap-2">
                 <button
@@ -233,10 +233,9 @@ export const ProductDetailPage = () => {
                     addToCart(product, 1);
                     setIsCartOpen(true);
                   }}
-                  className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/30 cursor-pointer"
+                  className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 cursor-pointer text-center"
                 >
-                  <Zap className="w-4 h-4 fill-current text-yellow-300" />
-                  <span>BUY DIRECT NOW</span>
+                  Buy Now
                 </button>
 
                 <button
@@ -252,17 +251,7 @@ export const ProductDetailPage = () => {
 
               <button
                 onClick={() => {
-                  window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
-                }}
-                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-              >
-                <span className="bg-yellow-400 text-[#2874F0] font-black text-xs px-2 py-0.5 rounded italic leading-none shadow-sm">f</span>
-                <span>Buy Now on Flipkart</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
+                  const waText = encodeURIComponent(`Hi VOEUX, I am interested in buying ${product.name}`);
                   window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
                 }}
                 className="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
