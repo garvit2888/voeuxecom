@@ -1,14 +1,26 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
+import { ShoppingCart, Zap, ExternalLink } from 'lucide-react';
 
 export const ProductCard = ({ product }) => {
   if (!product) return null;
 
-  const { setSelectedProductModal } = useShop();
+  const { setSelectedProductModal, addToCart, setIsCartOpen } = useShop();
 
   const discountPercent = Math.round(
     ((product.originalPrice - product.price) / product.originalPrice) * 100
   );
+
+  const handleBuyNow = (e) => {
+    e.stopPropagation();
+    addToCart(product, 1);
+    setIsCartOpen(true);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    addToCart(product, 1);
+  };
 
   return (
     <div
@@ -47,6 +59,26 @@ export const ProductCard = ({ product }) => {
             {discountPercent}% OFF
           </span>
         </div>
+
+        {/* Direct Action Buttons: Buy Now & Add to Cart */}
+        <div className="pt-2 flex items-center gap-2">
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition shadow-sm"
+          >
+            <Zap className="w-3.5 h-3.5 fill-current text-yellow-300" />
+            <span>Buy Now</span>
+          </button>
+          
+          <button
+            onClick={handleAddToCart}
+            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition"
+            title="Add to Cart"
+          >
+            <ShoppingCart className="w-4 h-4 text-[#3B429F]" />
+          </button>
+        </div>
+
       </div>
 
     </div>

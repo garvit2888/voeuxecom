@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
-import { Search, ShoppingCart, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, User } from 'lucide-react';
 
 export const Navbar = () => {
   const {
@@ -9,7 +9,9 @@ export const Navbar = () => {
     setActivePage,
     cart,
     setIsCartOpen,
-    setSelectedProductModal
+    setSelectedProductModal,
+    user,
+    setIsAuthModalOpen
   } = useShop();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,6 +35,14 @@ export const Navbar = () => {
     { id: 'about-us', label: 'About Us' },
     { id: 'contact-us', label: 'Contact Us' }
   ];
+
+  const handleAccountClick = () => {
+    if (user) {
+      setActivePage('profile');
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
 
   return (
     <>
@@ -62,7 +72,7 @@ export const Navbar = () => {
             </div>
 
             {/* Minimal Links (Desktop) */}
-            <div className="flex items-center space-x-8 text-xs font-semibold tracking-wide text-gray-700">
+            <div className="flex items-center space-x-6 text-xs font-semibold tracking-wide text-gray-700">
               {navLinks.map(link => (
                 <button
                   key={link.id}
@@ -78,9 +88,9 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Right Actions (Desktop Search) */}
-            <div className="flex items-center justify-end space-x-4">
-              <div className="relative w-48">
+            {/* Right Actions (Desktop Search, Account & Cart) */}
+            <div className="flex items-center justify-end space-x-3">
+              <div className="relative w-44">
                 <input
                   type="text"
                   placeholder="Search products..."
@@ -102,7 +112,7 @@ export const Navbar = () => {
                           setSelectedProductModal(p);
                           setSearchQuery('');
                         }}
-                        className="p-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer"
+                        className="p-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer text-left"
                       >
                         <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-gray-100" />
                         <div className="flex-1 min-w-0">
@@ -114,25 +124,49 @@ export const Navbar = () => {
                   </div>
                 )}
               </div>
+
+              {/* User Account Button */}
+              <button
+                onClick={handleAccountClick}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition"
+                title={user ? user.name : 'Sign In / Account'}
+              >
+                <User className="w-4 h-4 text-[#3B429F]" />
+                <span>{user ? user.name.split(' ')[0] : 'Sign In'}</span>
+              </button>
+
+              {/* Cart Drawer Button */}
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 rounded-full bg-[#3B429F] text-white hover:bg-[#2B308B] transition shadow-md"
+                aria-label="View Cart"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
             </div>
 
           </div>
         </nav>
       </header>
 
-      {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR (FES Coffee Style) ==================== */}
-      <div className="lg:hidden fixed bottom-10 left-5 right-5 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
+      {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR ==================== */}
+      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="flex items-center gap-2 text-white hover:text-cyan-300 font-black text-sm p-1 cursor-pointer"
+          className="flex items-center gap-1.5 text-white hover:text-cyan-300 font-black text-xs p-1 cursor-pointer"
           aria-label="Toggle Mobile Menu"
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-          <span className="text-xs sm:text-sm font-black tracking-wider uppercase">Menu</span>
+          {isMobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+          <span className="text-xs font-black tracking-wider uppercase">Menu</span>
         </button>
 
-        {/* Center / Right: Original Uploaded VOEUX Brand Logo Image */}
+        {/* Center: Brand Logo */}
         <div
           onClick={() => {
             setActivePage('home');
@@ -143,20 +177,60 @@ export const Navbar = () => {
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-7 sm:h-8 w-auto object-contain"
+            className="h-7 w-auto object-contain"
           />
+        </div>
+
+        {/* Right: Account & Cart Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleAccountClick}
+            className="p-1.5 rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+            aria-label="Account"
+          >
+            <User className="w-4.5 h-4.5" />
+          </button>
+
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="relative p-1.5 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
+            aria-label="Cart"
+          >
+            <ShoppingCart className="w-4.5 h-4.5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Mobile Drawer Menu Modal */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-[85] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-gray-200">
-            <div className="flex items-center justify-end border-b border-gray-100 pb-2">
+          <div className="bg-white rounded-t-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-gray-200 text-left">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-gray-900">
+                <User className="w-4 h-4 text-[#3B429F]" />
+                <span>{user ? `Account: ${user.name}` : 'Welcome Guest'}</span>
+              </div>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* Mobile Account Button */}
+            <button
+              onClick={() => {
+                handleAccountClick();
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full bg-indigo-50 border border-indigo-100 text-[#3B429F] font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-between"
+            >
+              <span>{user ? 'My Profile & Orders' : 'Sign In / Create Account'}</span>
+              <User className="w-4 h-4" />
+            </button>
 
             {/* Mobile Search Bar */}
             <div className="relative">

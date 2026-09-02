@@ -22,8 +22,9 @@ import { SplashScreen } from './components/SplashScreen';
 import { PRODUCTS, CATEGORIES } from './data/products';
 import { ArrowRight, Star, ShieldCheck, Zap, Wrench, Building2, MessageSquare } from 'lucide-react';
 import { WarrantyPolicyPage } from './components/WarrantyPolicyPage';
-import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { FlipkartOpsAdmin } from './components/FlipkartOpsAdmin';
+import { CustomerAuthModal } from './components/CustomerAuthModal';
+import { CustomerProfilePage } from './components/CustomerProfilePage';
 
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts } = useShop();
@@ -71,6 +72,9 @@ const MainContent = () => {
         return <TermsAndConditions />;
       case 'product-detail':
         return <ProductDetailPage />;
+      case 'profile':
+      case 'my-orders':
+        return <CustomerProfilePage />;
       case 'home':
       default:
         return (
@@ -285,6 +289,7 @@ const MainContent = () => {
       <Footer />
 
       <CartDrawer />
+      <CustomerAuthModal />
       <CarSelectorModal />
       <LiveChatWidget />
     </div>

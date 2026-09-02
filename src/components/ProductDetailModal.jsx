@@ -13,7 +13,9 @@ import {
   ChevronDown,
   MessageSquare,
   ZoomIn,
-  HelpCircle
+  HelpCircle,
+  Zap,
+  ShoppingCart
 } from 'lucide-react';
 
 export const ProductDetailModal = () => {
@@ -203,14 +205,38 @@ export const ProductDetailModal = () => {
 
             {/* Primary Action Buttons */}
             <div className="space-y-2.5 pt-1">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    addToCart(product, 1);
+                    setIsCartOpen(true);
+                    setSelectedProductModal(null);
+                  }}
+                  className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/30 cursor-pointer"
+                >
+                  <Zap className="w-4 h-4 fill-current text-yellow-300" />
+                  <span>BUY DIRECT NOW</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    addToCart(product, 1);
+                  }}
+                  className="px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl transition flex items-center justify-center gap-2 text-xs font-bold cursor-pointer"
+                >
+                  <ShoppingCart className="w-4 h-4 text-[#3B429F]" />
+                  <span>Add to Cart</span>
+                </button>
+              </div>
+
               <button
                 onClick={() => {
                   window.open(product.flipkartUrl || 'https://www.flipkart.com/search?q=VOEUX+car+electronics', '_blank');
                 }}
-                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
+                className="w-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white text-xs font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
                 <span className="bg-yellow-400 text-[#2874F0] font-black text-xs px-2 py-0.5 rounded italic leading-none shadow-sm">f</span>
-                <span>BUY NOW ON FLIPKART</span>
+                <span>Buy Now on Flipkart</span>
               </button>
 
               <button
@@ -218,10 +244,10 @@ export const ProductDetailModal = () => {
                   const waText = encodeURIComponent(`Hi VOEUX, I am interested to know more details about ${product.name}`);
                   window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
                 }}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
+                className="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>Send Query on WhatsApp</span>
+                <span>Order via WhatsApp</span>
               </button>
             </div>
 

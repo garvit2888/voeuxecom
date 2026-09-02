@@ -219,6 +219,131 @@ export const ShopProvider = ({ children }) => {
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch(e) { return null; }
+  });
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch(e) { return []; }
+  });
+
+  const loginUser = async (email, password) => {
+    // Check local stored users or default user
+    const usersRaw = localStorage.getItem('voeux_users_db') || '[]';
+    let users = [];
+    try { users = JSON.parse(usersRaw); } catch(e){}
+
+    let found = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+    
+    if (!found) {
+      // Demo / auto-login fallback if password is valid length
+      if (password.length >= 4) {
+        found = {
+          name: email.split('@')[0],
+          email: email.toLowerCase(),
+          phone: '9999999999',
+          password
+        };
+      } else {
+        throw new Error('Invalid email or password');
+      }
+    }
+
+    setUser(found);
+    localStorage.setItem('voeux_user', JSON.stringify(found));
+    addToast(`Welcome back, ${found.name}!`, 'success');
+    return found;
+  };
+
+  const registerUser = async (userData) => {
+    const usersRaw = localStorage.getItem('voeux_users_db') || '[]';
+    let users = [];
+    try { users = JSON.parse(usersRaw); } catch(e){}
+
+    const exists = users.some(u => u.email.toLowerCase() === userData.email.toLowerCase());
+    if (exists) {
+      throw new Error('An account with this email already exists');
+    }
+
+    users.push(userData);
+    localStorage.setItem('voeux_users_db', JSON.stringify(users));
+    setUser(userData);
+    localStorage.setItem('voeux_user', JSON.stringify(userData));
+
+    // Firebase Sync
+    try {
+      fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/users.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+    } catch(e){}
+
+    addToast(`Account created! Welcome ${userData.name}`, 'success');
+    return userData;
+  };
+
+  const logoutUser = () => {
+    setUser(null);
+    localStorage.removeItem('voeux_user');
+    addToast('Signed out of account', 'info');
+  };
+
+  const placeOrder = async (orderData) => {
+    const newOrder = {
+      id: 'VX-' + Math.floor(100000 + Math.random() * 900000),
+      createdAt: new Date().toISOString(),
+      status: 'ORDER PLACED',
+      items: cart.map(i => ({
+        id: i.product.id,
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        image: i.product.image
+      })),
+      totalAmount: orderData.totalAmount || cartTotal,
+      shippingAddress: orderData.shippingAddress,
+      paymentMethod: orderData.paymentMethod || 'COD',
+      paymentId: orderData.paymentId || 'N/A',
+      userEmail: user?.email || orderData.shippingAddress?.email || 'guest@voeux.in',
+      userPhone: user?.phone || orderData.shippingAddress?.phone || 'N/A'
+    };
+
+    const updatedOrders = [newOrder, ...orders];
+    setOrders(updatedOrders);
+    try { localStorage.setItem('voeux_orders', JSON.stringify(updatedOrders)); } catch(e){}
+
+    // Firebase Sync
+    try {
+      fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/orders.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      });
+    } catch(e){}
+
+    // Apps Script Order Notification Email Sync
+    try {
+      fetch('https://script.google.com/macros/s/AKfycbz_placeholder/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'new_order', order: newOrder })
+      });
+    } catch(e){}
+
+    setCart([]);
+    addToast(`Order #${newOrder.id} placed successfully!`, 'success');
+    return newOrder;
+  };
+
   return (
     <ShopContext.Provider
       value={{
@@ -253,7 +378,15 @@ export const ShopProvider = ({ children }) => {
         searchQuery,
         setSearchQuery,
         toasts,
-        addToast
+        addToast,
+        user,
+        loginUser,
+        registerUser,
+        logoutUser,
+        orders,
+        placeOrder,
+        isAuthModalOpen,
+        setIsAuthModalOpen
       }}
     >
       {children}
