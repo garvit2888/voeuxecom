@@ -15,8 +15,8 @@ export const Navbar = () => {
   } = useShop();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -25,15 +25,11 @@ export const Navbar = () => {
     : [];
 
   const navLinks = [
-    { id: 'home', label: 'Home' },
     { id: 'android-players', label: 'Android Players' },
     { id: 'car-speakers', label: 'Car Speakers' },
     { id: 'speakers-soundbars', label: 'Speakers & Soundbars' },
     { id: 'amplifiers', label: 'Car Amplifiers' },
-    { id: 'warranty', label: 'Register Warranty' },
-    { id: 'join-us', label: 'Join Us' },
-    { id: 'about-us', label: 'About Us' },
-    { id: 'contact-us', label: 'Contact Us' }
+    { id: 'warranty', label: 'Register Warranty' }
   ];
 
   const handleAccountClick = () => {
@@ -47,40 +43,41 @@ export const Navbar = () => {
   return (
     <>
       {/* Top Header Bar (Desktop Sticky Header & News Ticker) */}
-      <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200">
-        {/* News Channel Ticker Banner */}
-        <div className="bg-slate-900 text-white text-xs py-2 overflow-hidden relative">
-          <div className="animate-news-ticker tracking-wide font-bold">
-            For WhatsApp Orders use code <span className="text-yellow-400 font-extrabold bg-slate-800 px-2 py-0.5 rounded border border-yellow-400/40">VOEUX10</span> for extra discount on all Car Electronics! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For WhatsApp Orders use code <span className="text-yellow-400 font-extrabold bg-slate-800 px-2 py-0.5 rounded border border-yellow-400/40">VOEUX10</span> for extra discount on all Car Electronics!
+      <header className="sticky top-0 z-40 w-full bg-slate-950 text-white border-b border-slate-800 shadow-md">
+        
+        {/* News Ticker Banner */}
+        <div className="bg-[#3B429F] text-white text-[11px] py-1.5 overflow-hidden relative border-b border-indigo-900/40">
+          <div className="animate-news-ticker tracking-wide font-semibold">
+            For WhatsApp Orders use code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> for extra discount on all Car Electronics! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For WhatsApp Orders use code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> for extra discount on all Car Electronics!
           </div>
         </div>
 
-        {/* Main Minimal Navbar (Desktop Only) */}
-        <nav className="hidden lg:block px-4 py-3 sm:px-6 sm:py-4">
-          <div className="container mx-auto flex items-center justify-between gap-3">
+        {/* Noise-Style Desktop Header: Single Line, Proper Spacing */}
+        <nav className="hidden lg:block px-6 py-3.5">
+          <div className="container mx-auto flex items-center justify-between gap-6">
             
-            {/* Official Brand Logo */}
+            {/* Left: Brand Logo */}
             <div
-              className="flex justify-start items-center cursor-pointer"
+              className="flex justify-start items-center cursor-pointer shrink-0"
               onClick={() => setActivePage('home')}
             >
               <img
                 src="/images/voeux_logo.png"
-                alt="VOEUX® Car Electronics"
-                className="h-10 w-auto object-contain rounded-lg shadow-sm hover:opacity-95 transition"
+                alt="VOEUX® Electronics"
+                className="h-8 w-auto object-contain transition hover:opacity-90"
               />
             </div>
 
-            {/* Minimal Links (Desktop) */}
-            <div className="flex items-center space-x-6 text-xs font-semibold tracking-wide text-gray-700">
+            {/* Center: Clean Nav Links in One Line */}
+            <div className="flex items-center space-x-8 text-xs font-medium text-slate-200 tracking-tight">
               {navLinks.map(link => (
                 <button
                   key={link.id}
                   onClick={() => setActivePage(link.id)}
-                  className={`py-1 transition-colors ${
+                  className={`py-1 transition-colors cursor-pointer whitespace-nowrap ${
                     activePage === link.id
-                      ? 'text-[#3B429F] font-bold border-b-2 border-[#3B429F]'
-                      : 'hover:text-[#3B429F]'
+                      ? 'text-cyan-400 font-bold border-b-2 border-cyan-400'
+                      : 'hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -88,66 +85,82 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Right Actions (Desktop Search, Account & Cart) */}
-            <div className="flex items-center justify-end space-x-3">
-              <div className="relative w-44">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-                  className="w-full bg-gray-100 text-gray-900 placeholder-gray-400 text-xs rounded-full pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
-                />
-                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
+            {/* Right: Search Icon, Profile Icon, Cart Icon with Red Counter Badge */}
+            <div className="flex items-center space-x-5 text-slate-200 shrink-0">
+              
+              {/* Search Toggle Icon */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  className="p-1.5 hover:text-white transition cursor-pointer"
+                  title="Search Products"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
 
-                {/* Suggestions */}
-                {isSearchFocused && searchResults.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-xl z-50 border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-                    {searchResults.map(p => (
-                      <div
-                        key={p.id}
-                        onClick={() => {
-                          setSelectedProductModal(p);
-                          setSearchQuery('');
-                        }}
-                        className="p-2.5 flex items-center gap-3 hover:bg-gray-50 cursor-pointer text-left"
-                      >
-                        <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-gray-100" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-900 truncate">{p.name}</p>
-                          <p className="text-[10px] text-[#3B429F] font-bold">₹{p.price.toLocaleString('en-IN')}</p>
-                        </div>
+                {/* Popover Search Bar */}
+                {isSearchOpen && (
+                  <div className="absolute right-0 top-full mt-3 w-72 bg-white text-gray-900 rounded-2xl shadow-2xl border border-gray-200 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        autoFocus
+                        className="w-full bg-gray-100 text-xs rounded-xl pl-9 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
+                      />
+                      <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                    </div>
+
+                    {searchResults.length > 0 && (
+                      <div className="mt-2 divide-y divide-gray-100 max-h-56 overflow-y-auto">
+                        {searchResults.map(p => (
+                          <div
+                            key={p.id}
+                            onClick={() => {
+                              setSelectedProductModal(p);
+                              setSearchQuery('');
+                              setIsSearchOpen(false);
+                            }}
+                            className="p-2 flex items-center gap-3 hover:bg-gray-50 rounded-lg cursor-pointer text-left"
+                          >
+                            <img src={p.image} alt={p.name} className="w-8 h-8 object-contain bg-gray-100 rounded p-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-gray-900 truncate">{p.name}</p>
+                              <p className="text-[10px] text-[#3B429F] font-bold">₹{p.price.toLocaleString('en-IN')}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* User Account Button */}
+              {/* Profile Icon */}
               <button
                 onClick={handleAccountClick}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition"
-                title={user ? user.name : 'Sign In / Account'}
+                className="p-1.5 hover:text-white transition cursor-pointer flex items-center gap-1"
+                title={user ? user.name : 'Account'}
               >
-                <User className="w-4 h-4 text-[#3B429F]" />
-                <span>{user ? user.name.split(' ')[0] : 'Sign In'}</span>
+                <User className="w-5 h-5" />
               </button>
 
-              {/* Cart Drawer Button */}
+              {/* Cart Icon with Red Counter Badge */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 rounded-full bg-[#3B429F] text-white hover:bg-[#2B308B] transition shadow-md"
+                className="relative p-1.5 hover:text-white transition cursor-pointer"
                 aria-label="View Cart"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-slate-950">
                     {cartCount}
                   </span>
                 )}
               </button>
+
             </div>
 
           </div>
@@ -155,15 +168,15 @@ export const Navbar = () => {
       </header>
 
       {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR ==================== */}
-      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2 flex items-center justify-between shadow-2xl border border-indigo-400/50 backdrop-blur-lg">
+      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-sm mx-auto bg-slate-950 text-white rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl border border-slate-800 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="flex items-center gap-1.5 text-white hover:text-cyan-300 font-black text-xs p-1 cursor-pointer"
+          className="flex items-center gap-1.5 text-white font-bold text-xs p-1 cursor-pointer"
           aria-label="Toggle Mobile Menu"
         >
           {isMobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
-          <span className="text-xs font-black tracking-wider uppercase">Menu</span>
+          <span className="text-xs font-bold tracking-wider uppercase">Menu</span>
         </button>
 
         {/* Center: Brand Logo */}
@@ -177,26 +190,26 @@ export const Navbar = () => {
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-7 w-auto object-contain"
+            className="h-6 w-auto object-contain"
           />
         </div>
 
         {/* Right: Account & Cart Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleAccountClick}
-            className="p-1.5 rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+            className="p-1 text-slate-200 hover:text-white transition"
             aria-label="Account"
           >
-            <User className="w-4.5 h-4.5" />
+            <User className="w-5 h-5" />
           </button>
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative p-1.5 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
+            className="relative p-1 text-slate-200 hover:text-white transition"
             aria-label="Cart"
           >
-            <ShoppingCart className="w-4.5 h-4.5" />
+            <ShoppingCart className="w-5 h-5" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
                 {cartCount}
