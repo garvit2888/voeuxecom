@@ -133,7 +133,7 @@ const MainContent = () => {
 
             {/* Clean What's New Drop Highlight */}
             <section className="container mx-auto px-4">
-              <div className="bg-gray-900 text-white rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="bg-black text-white rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-900 shadow-xl">
                 <div className="space-y-3 max-w-lg">
                   <h3 className="text-2xl font-black leading-tight">
                     VOEUX® Android 10.1" Dual Knob Piano Buttons (4GB/64GB) Stereo
@@ -239,7 +239,7 @@ const MainContent = () => {
             </section>
 
             {/* ========== JOIN US / OFFICIAL DISTRIBUTOR PROGRAM BANNER ========== */}
-            <section className="mt-16 py-12 px-6 sm:px-12 bg-gradient-to-r from-slate-950 via-[#1E2255] to-slate-950 text-white rounded-3xl relative overflow-hidden text-left shadow-2xl">
+            <section className="mt-16 py-12 px-6 sm:px-12 bg-black text-white rounded-3xl relative overflow-hidden text-left border border-slate-900 shadow-2xl">
               <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
                 <div className="space-y-3 max-w-2xl">
                   <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
