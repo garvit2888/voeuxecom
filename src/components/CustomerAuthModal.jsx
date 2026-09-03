@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { X, Lock, Mail, Phone, User, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X, Lock, Mail, Phone, User, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 export const CustomerAuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, loginUser, registerUser, addToast } = useShop();
@@ -11,17 +11,27 @@ export const CustomerAuthModal = () => {
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
     address: '',
     city: '',
     pincode: '',
     state: 'Delhi'
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   if (!isAuthModalOpen) return null;
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleModeSwitch = (newMode) => {
+    setMode(newMode);
+    setFormData({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: '', city: '', pincode: '', state: 'Delhi' });
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const handleSubmit = async (e) => {
@@ -31,7 +41,7 @@ export const CustomerAuthModal = () => {
     try {
       if (mode === 'login') {
         if (!formData.email || !formData.password) {
-          addToast('Please enter email and password', 'warning');
+          addToast('Please enter your email and password', 'warning');
           setLoading(false);
           return;
         }
@@ -42,7 +52,23 @@ export const CustomerAuthModal = () => {
           setLoading(false);
           return;
         }
-        await registerUser(formData);
+        if (formData.phone.replace(/\D/g, '').length !== 10) {
+          addToast('Please enter a valid 10-digit mobile number', 'warning');
+          setLoading(false);
+          return;
+        }
+        if (formData.password.length < 6) {
+          addToast('Password must be at least 6 characters', 'warning');
+          setLoading(false);
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          addToast('Passwords do not match. Please re-enter.', 'warning');
+          setLoading(false);
+          return;
+        }
+        const { confirmPassword, ...userData } = formData;
+        await registerUser(userData);
       }
       setIsAuthModalOpen(false);
     } catch (err) {
@@ -53,15 +79,15 @@ export const CustomerAuthModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[200] overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden text-left">
         
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-gray-100 bg-white">
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-gray-100">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#3B429F]">OFFICIAL STORE</span>
-            <h2 className="text-xl font-black text-gray-900 tracking-tight">
-              {mode === 'login' ? 'Customer Sign In' : 'Create Account'}
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#3B429F]">VOEUX® OFFICIAL STORE</span>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mt-0.5">
+              {mode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h2>
           </div>
           <button
@@ -72,127 +98,157 @@ export const CustomerAuthModal = () => {
           </button>
         </div>
 
-        {/* Mode Selector Tabs */}
-        <div className="flex border-b border-gray-100 bg-gray-50/50 p-1 mx-6 mt-4 rounded-2xl">
+        {/* Mode Tabs */}
+        <div className="flex mx-6 mt-4 bg-gray-100 rounded-2xl p-1 gap-1">
           <button
-            onClick={() => setMode('login')}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
-              mode === 'login'
-                ? 'bg-white text-[#3B429F] shadow-xs'
-                : 'text-gray-500 hover:text-gray-900'
+            type="button"
+            onClick={() => handleModeSwitch('login')}
+            className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition ${
+              mode === 'login' ? 'bg-white text-[#3B429F] shadow-sm' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
             Sign In
           </button>
           <button
-            onClick={() => setMode('register')}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
-              mode === 'register'
-                ? 'bg-white text-[#3B429F] shadow-xs'
-                : 'text-gray-500 hover:text-gray-900'
+            type="button"
+            onClick={() => handleModeSwitch('register')}
+            className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition ${
+              mode === 'register' ? 'bg-white text-[#3B429F] shadow-sm' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
             Create Account
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+          {/* Full Name — register only */}
           {mode === 'register' && (
             <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Full Name</label>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Full Name *</label>
               <div className="relative">
                 <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter full name"
+                  type="text" name="name" required
+                  value={formData.name} onChange={handleChange}
+                  placeholder="Enter your full name"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
               </div>
             </div>
           )}
 
+          {/* Email */}
           <div>
-            <label className="block text-[11px] font-semibold text-gray-600 mb-1">Email Address</label>
+            <label className="block text-[11px] font-semibold text-gray-600 mb-1">Email Address *</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
-                type="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
+                type="email" name="email" required
+                value={formData.email} onChange={handleChange}
                 placeholder="name@example.com"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
             </div>
           </div>
 
+          {/* Phone — register only */}
           {mode === 'register' && (
             <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Mobile Phone (10 digits)</label>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Mobile Number * (10 digits)</label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type="tel"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="9876543210"
+                  type="tel" name="phone" required
+                  value={formData.phone} onChange={handleChange}
+                  placeholder="9876543210" maxLength={10}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
               </div>
             </div>
           )}
 
+          {/* Password */}
           <div>
-            <label className="block text-[11px] font-semibold text-gray-600 mb-1">Password</label>
+            <label className="block text-[11px] font-semibold text-gray-600 mb-1">Password *{mode === 'register' && ' (min. 6 characters)'}</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
-                type="password"
-                name="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
+                type={showPassword ? 'text' : 'password'}
+                name="password" required
+                value={formData.password} onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(p => !p)}
+                className="absolute right-3.5 top-2.5 text-gray-400 hover:text-gray-700 transition"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
+          {/* Confirm Password — register only */}
+          {mode === 'register' && (
+            <div>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Confirm Password *</label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword" required
+                  value={formData.confirmPassword} onChange={handleChange}
+                  placeholder="Re-enter password"
+                  className={`w-full bg-gray-50 border rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 focus:bg-white focus:outline-none transition ${
+                    formData.confirmPassword && formData.confirmPassword !== formData.password
+                      ? 'border-red-400 focus:border-red-500'
+                      : formData.confirmPassword && formData.confirmPassword === formData.password
+                      ? 'border-emerald-400 focus:border-emerald-500'
+                      : 'border-gray-200 focus:border-[#3B429F]'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(p => !p)}
+                  className="absolute right-3.5 top-2.5 text-gray-400 hover:text-gray-700 transition"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+                {formData.confirmPassword && formData.confirmPassword !== formData.password && (
+                  <p className="text-[10px] text-red-500 font-semibold mt-1 ml-1">Passwords do not match</p>
+                )}
+                {formData.confirmPassword && formData.confirmPassword === formData.password && (
+                  <p className="text-[10px] text-emerald-600 font-semibold mt-1 ml-1">&#10003; Passwords match</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Optional Address — register only */}
           {mode === 'register' && (
             <div className="space-y-3 pt-2 border-t border-gray-100">
-              <p className="text-[11px] font-bold text-gray-700">Default Shipping Address (Optional)</p>
-              
+              <p className="text-[11px] font-bold text-gray-600">Default Shipping Address <span className="text-gray-400 font-normal">(Optional — saves time at checkout)</span></p>
               <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
+                type="text" name="address"
+                value={formData.address} onChange={handleChange}
                 placeholder="House No, Street, Landmark"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
-
               <div className="grid grid-cols-2 gap-2">
                 <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
+                  type="text" name="city"
+                  value={formData.city} onChange={handleChange}
                   placeholder="City"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
                 <input
-                  type="text"
-                  name="pincode"
-                  value={formData.pincode}
-                  onChange={handleChange}
+                  type="text" name="pincode"
+                  value={formData.pincode} onChange={handleChange}
                   placeholder="6-digit Pincode"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
@@ -203,17 +259,17 @@ export const CustomerAuthModal = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 mt-4 cursor-pointer"
+            className="w-full bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-60"
           >
-            <span>{loading ? 'Please wait...' : mode === 'login' ? 'Sign In to Account' : 'Create Account'}</span>
+            <span>{loading ? 'Please wait...' : mode === 'login' ? 'Sign In to Account' : 'Create My Account'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Footer Security Badge */}
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-center gap-2 text-[11px] text-gray-500 font-medium">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Encrypted Account Security</span>
+        {/* Footer */}
+        <div className="px-6 pb-5 flex items-center justify-center gap-2 text-[11px] text-gray-400 font-medium">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <span>256-bit encrypted · Your data is safe with VOEUX®</span>
         </div>
 
       </div>

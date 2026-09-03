@@ -23,10 +23,10 @@ export const CartDrawer = () => {
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedVoucherCode, setAppliedVoucherCode] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('ONLINE'); // 'ONLINE' | 'COD'
   const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [verifyingCoupon, setVerifyingCoupon] = useState(false);
+  const [paymentCancelled, setPaymentCancelled] = useState(false);
 
   const [addressData, setAddressData] = useState({
     fullName: user?.name || '',
@@ -38,11 +38,27 @@ export const CartDrawer = () => {
     state: 'Delhi'
   });
 
+  // Sync address from logged-in user when checkout step activates
+  React.useEffect(() => {
+    if (step === 'checkout' && user) {
+      setAddressData(prev => ({
+        ...prev,
+        fullName: prev.fullName || user.name || '',
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+        street: prev.street || user.address || '',
+        city: prev.city || user.city || '',
+        pincode: prev.pincode || user.pincode || '',
+      }));
+    }
+  }, [step, user]);
+
   // Sync step when cartStep changes (e.g. Buy Now triggers checkout jump)
   // Must be ABOVE the early return to satisfy React hooks rules
   React.useEffect(() => {
     if (isCartOpen) {
       setStep(cartStep || 'cart');
+      setPaymentCancelled(false);
     }
   }, [cartStep, isCartOpen]);
 
@@ -99,86 +115,57 @@ export const CartDrawer = () => {
     }
 
     setLoading(true);
+    setPaymentCancelled(false);
 
-    if (paymentMethod === 'ONLINE') {
-      const isLoaded = await loadRazorpayScript();
+    const isLoaded = await loadRazorpayScript();
 
-      if (isLoaded && window.Razorpay) {
-        const options = {
-          key: 'rzp_test_VOEUXTESTKEY123',
-          amount: finalTotal * 100,
-          currency: 'INR',
-          name: 'VOEUX® Electronics',
-          description: `Order for ${cart.length} item(s)`,
-          image: '/images/voeux_logo.png',
-          prefill: {
-            name: addressData.fullName,
-            email: addressData.email,
-            contact: addressData.phone
-          },
-          theme: { color: '#3B429F' },
-          handler: async function (response) {
-            const placed = await placeOrder({
-              totalAmount: finalTotal,
-              shippingAddress: addressData,
-              paymentMethod: 'RAZORPAY_ONLINE',
-              paymentId: response.razorpay_payment_id || 'PAY_' + Date.now(),
-              appliedVoucherCode,
-              discountAmount
-            });
-            setLastPlacedOrder(placed);
-            setStep('success');
-            setLoading(false);
-          },
-          modal: {
-            ondismiss: function () {
-              setLoading(false);
-              addToast('Payment popup closed. You can retry or choose COD.', 'info');
-            }
-          }
-        };
+    if (!isLoaded || !window.Razorpay) {
+      setLoading(false);
+      addToast('Unable to load payment gateway. Please check your connection and try again.', 'error');
+      return;
+    }
 
-        try {
-          const rzp = new window.Razorpay(options);
-          rzp.open();
-        } catch (err) {
-          const placed = await placeOrder({
-            totalAmount: finalTotal,
-            shippingAddress: addressData,
-            paymentMethod: 'ONLINE_UPI',
-            paymentId: 'PAY_' + Date.now(),
-            appliedVoucherCode,
-            discountAmount
-          });
-          setLastPlacedOrder(placed);
-          setStep('success');
-          setLoading(false);
-        }
-      } else {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_PLACEHOLDER',
+      amount: finalTotal * 100,
+      currency: 'INR',
+      name: 'VOEUX® Electronics',
+      description: `Order — ${cart.length} item(s)`,
+      image: '/images/voeux_logo.png',
+      prefill: {
+        name: addressData.fullName,
+        email: addressData.email,
+        contact: addressData.phone
+      },
+      theme: { color: '#3B429F' },
+      handler: async function (response) {
         const placed = await placeOrder({
           totalAmount: finalTotal,
           shippingAddress: addressData,
-          paymentMethod: 'ONLINE_UPI',
-          paymentId: 'PAY_' + Date.now(),
+          paymentMethod: 'RAZORPAY_ONLINE',
+          paymentId: response.razorpay_payment_id || 'PAY_' + Date.now(),
           appliedVoucherCode,
           discountAmount
         });
         setLastPlacedOrder(placed);
         setStep('success');
         setLoading(false);
+      },
+      modal: {
+        ondismiss: function () {
+          setLoading(false);
+          setPaymentCancelled(true);
+          addToast('Payment was cancelled. You can try again when ready.', 'info');
+        }
       }
-    } else {
-      const placed = await placeOrder({
-        totalAmount: finalTotal,
-        shippingAddress: addressData,
-        paymentMethod: 'COD',
-        paymentId: 'COD_' + Date.now(),
-        appliedVoucherCode,
-        discountAmount
-      });
-      setLastPlacedOrder(placed);
-      setStep('success');
+    };
+
+    try {
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
       setLoading(false);
+      addToast('Payment gateway error: ' + (err.message || 'Unknown error'), 'error');
     }
   };
 
@@ -457,46 +444,22 @@ export const CartDrawer = () => {
                 </div>
               </div>
 
-              {/* Payment Method Section */}
-              <div className="space-y-3 pt-3 border-t border-gray-100">
-                <h3 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-[#3B429F]" />
-                  <span>Payment Method</span>
-                </h3>
-
-                <div className="space-y-2.5">
-                  <label className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition ${
-                    paymentMethod === 'ONLINE' ? 'bg-indigo-50/40 border-[#3B429F] shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'ONLINE'}
-                      onChange={() => setPaymentMethod('ONLINE')}
-                      className="accent-[#3B429F] mt-0.5"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-gray-900">Razorpay Online Payment (UPI, Cards, Netbanking)</p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">Google Pay, PhonePe, Paytm, Credit/Debit Cards</p>
-                    </div>
-                  </label>
-
-                  <label className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition ${
-                    paymentMethod === 'COD' ? 'bg-indigo-50/40 border-[#3B429F] shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'COD'}
-                      onChange={() => setPaymentMethod('COD')}
-                      className="accent-[#3B429F] mt-0.5"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-gray-900">Cash on Delivery (COD)</p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">Pay in cash when order is delivered to your address</p>
-                    </div>
-                  </label>
+              {/* Payment Info */}
+              <div className="pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-3 p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
+                  <CreditCard className="w-5 h-5 text-[#3B429F] shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-gray-900">Razorpay Secure Payment</p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">UPI · Credit/Debit Cards · Net Banking · Wallets</p>
+                  </div>
                 </div>
+
+                {paymentCancelled && (
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-medium flex items-center gap-2">
+                    <span>&#9888;</span>
+                    <span>Payment was cancelled. Click "Pay Now" below to try again.</span>
+                  </div>
+                )}
               </div>
 
             </div>
@@ -511,7 +474,7 @@ export const CartDrawer = () => {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setStep('cart')}
+                  onClick={() => { setStep('cart'); setPaymentCancelled(false); }}
                   className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer"
                 >
                   Back
@@ -519,9 +482,9 @@ export const CartDrawer = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs font-bold py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 cursor-pointer text-center"
+                  className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs font-bold py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 cursor-pointer text-center disabled:opacity-70"
                 >
-                  {loading ? 'Processing Order...' : paymentMethod === 'ONLINE' ? 'Pay Online Now' : 'Complete Cash on Delivery Order'}
+                  {loading ? 'Opening Payment...' : paymentCancelled ? 'Try Payment Again' : 'Pay Now with Razorpay'}
                 </button>
               </div>
 

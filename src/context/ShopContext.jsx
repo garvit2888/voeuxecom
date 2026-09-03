@@ -337,9 +337,14 @@ export const ShopProvider = ({ children }) => {
     let users = [];
     try { users = JSON.parse(usersRaw); } catch(e){}
 
-    const exists = users.some(u => u.email.toLowerCase() === userData.email.toLowerCase());
-    if (exists) {
-      throw new Error('An account with this email already exists');
+    const emailExists = users.some(u => u.email.toLowerCase() === userData.email.toLowerCase());
+    if (emailExists) {
+      throw new Error('An account with this email address already exists. Please sign in.');
+    }
+
+    const phoneExists = users.some(u => u.phone && u.phone.replace(/\D/g, '') === userData.phone.replace(/\D/g, ''));
+    if (phoneExists) {
+      throw new Error('This mobile number is already linked to another account. Please sign in.');
     }
 
     users.push(userData);
