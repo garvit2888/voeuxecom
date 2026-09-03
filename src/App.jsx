@@ -26,6 +26,7 @@ import { FlipkartOpsAdmin } from './components/FlipkartOpsAdmin';
 import { CustomerAuthModal } from './components/CustomerAuthModal';
 import { CustomerProfilePage } from './components/CustomerProfilePage';
 import { InventoryQRPortal } from './components/InventoryQRPortal';
+import { ConfettiOverlay } from './components/ConfettiOverlay';
 
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating } = useShop();
@@ -312,6 +313,7 @@ const MainContent = () => {
       <main className="flex-1">{renderPage()}</main>
       <Footer />
 
+      <ConfettiOverlay />
       <CartDrawer />
       <CustomerAuthModal />
       <CarSelectorModal />
