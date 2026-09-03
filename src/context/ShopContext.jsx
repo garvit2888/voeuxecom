@@ -217,26 +217,53 @@ export const ShopProvider = ({ children }) => {
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  // Referral Link Tracking: Captures ?ref=... from URL search query on mount
-  const [referralCode, setReferralCode] = useState(() => {
+  // Used Vouchers Tracking: Stores redeemed one-time referral voucher codes
+  const [usedVouchers, setUsedVouchers] = useState(() => {
     try {
-      const searchParams = new URLSearchParams(window.location.search);
-      const ref = searchParams.get('ref');
-      if (ref) {
-        localStorage.setItem('voeux_ref_code', ref);
-        return ref;
-      }
-      return localStorage.getItem('voeux_ref_code') || null;
-    } catch(e) { return null; }
+      const saved = localStorage.getItem('voeux_used_vouchers');
+      return saved ? JSON.parse(saved) : [];
+    } catch(e) { return []; }
   });
 
-  const referralDiscount = referralCode ? 500 : 0;
+  const verifyAndApplyVoucher = async (inputCode) => {
+    const code = (inputCode || '').trim().toUpperCase();
 
-  useEffect(() => {
-    if (referralCode) {
-      addToast(`🎁 Referral link active! ₹500 Discount applied to checkout.`, 'success');
+    if (!code) {
+      throw new Error('Please enter a coupon or referral voucher code.');
     }
-  }, []);
+
+    // 1. Check if voucher code has ALREADY BEEN REDEEMED
+    const isUsed = usedVouchers.includes(code);
+    if (isUsed) {
+      throw new Error('This referral voucher code has already been redeemed and cannot be used again.');
+    }
+
+    // Double check with Firebase Cloud DB for one-time enforce
+    try {
+      const res = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${code}.json`);
+      const cloudRecord = await res.json();
+      if (cloudRecord) {
+        setUsedVouchers(prev => Array.from(new Set([...prev, code])));
+        localStorage.setItem('voeux_used_vouchers', JSON.stringify(Array.from(new Set([...usedVouchers, code]))));
+        throw new Error('This referral voucher code has already been redeemed.');
+      }
+    } catch(err) {
+      if (err.message && err.message.includes('already been redeemed')) {
+        throw err;
+      }
+    }
+
+    // 2. Validate Voucher Code Formats
+    if (code === 'VOEUX10') {
+      return { valid: true, type: 'PROMO', discountAmount: Math.round(cartTotal * 0.1), code };
+    }
+
+    if (code.startsWith('REF500') || code.includes('GARVIT') || code.includes('VOEUX500') || code.length >= 6) {
+      return { valid: true, type: 'REFERRAL_VOUCHER', discountAmount: 500, code };
+    }
+
+    throw new Error('Invalid code. Please check your email for the correct voucher code.');
+  };
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -330,18 +357,39 @@ export const ShopProvider = ({ children }) => {
         quantity: i.quantity,
         image: i.product.image
       })),
-      totalAmount: orderData.totalAmount || (cartTotal - referralDiscount),
+      totalAmount: orderData.totalAmount || cartTotal,
       shippingAddress: orderData.shippingAddress,
       paymentMethod: orderData.paymentMethod || 'COD',
       paymentId: orderData.paymentId || 'N/A',
       userEmail: user?.email || orderData.shippingAddress?.email || 'guest@voeux.in',
       userPhone: user?.phone || orderData.shippingAddress?.phone || 'N/A',
       referral: {
-        code: referralCode,
-        discountApplied: referralDiscount,
+        code: orderData.appliedVoucherCode || null,
+        discountApplied: orderData.discountAmount || 0,
         rewardVoucherCode: rewardVoucherCode
       }
     };
+
+    // If a one-time voucher was used, mark it as REDEEMED permanently!
+    if (orderData.appliedVoucherCode) {
+      const codeUpper = orderData.appliedVoucherCode.trim().toUpperCase();
+      const updatedUsed = Array.from(new Set([...usedVouchers, codeUpper]));
+      setUsedVouchers(updatedUsed);
+      try { localStorage.setItem('voeux_used_vouchers', JSON.stringify(updatedUsed)); } catch(e){}
+
+      // Sync REDEEMED status to Firebase
+      try {
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${codeUpper}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            redeemedBy: newOrder.userEmail,
+            orderId: newOrder.id,
+            redeemedAt: new Date().toISOString()
+          })
+        });
+      } catch(e){}
+    }
 
     const updatedOrders = [newOrder, ...orders];
     setOrders(updatedOrders);
@@ -355,25 +403,6 @@ export const ShopProvider = ({ children }) => {
         body: JSON.stringify(newOrder)
       });
     } catch(e){}
-
-    // Firebase Referral Tracking Sync
-    if (referralCode) {
-      try {
-        fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/referrals.json', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            referrerCode: referralCode,
-            buyerEmail: newOrder.userEmail,
-            buyerPhone: newOrder.userPhone,
-            orderId: newOrder.id,
-            totalAmount: newOrder.totalAmount,
-            rewardVoucherCode: rewardVoucherCode,
-            createdAt: new Date().toISOString()
-          })
-        });
-      } catch(e){}
-    }
 
     // Apps Script Order Notification & Voucher Email Sync
     try {
@@ -432,8 +461,7 @@ export const ShopProvider = ({ children }) => {
         placeOrder,
         isAuthModalOpen,
         setIsAuthModalOpen,
-        referralCode,
-        referralDiscount
+        verifyAndApplyVoucher
       }}
     >
       {children}

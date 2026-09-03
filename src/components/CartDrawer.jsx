@@ -14,16 +14,17 @@ export const CartDrawer = () => {
     user,
     setIsAuthModalOpen,
     placeOrder,
-    referralCode,
-    referralDiscount
+    verifyAndApplyVoucher
   } = useShop();
 
   const [step, setStep] = useState('cart'); // 'cart' | 'checkout' | 'success'
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('ONLINE'); // 'ONLINE' | 'COD'
   const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [verifyingCoupon, setVerifyingCoupon] = useState(false);
 
   const [addressData, setAddressData] = useState({
     fullName: user?.name || '',
@@ -37,18 +38,28 @@ export const CartDrawer = () => {
 
   if (!isCartOpen) return null;
 
-  const handleApplyCoupon = (e) => {
+  const handleApplyCoupon = async (e) => {
     e.preventDefault();
-    if (couponCode.toUpperCase() === 'VOEUX10') {
-      const discount = Math.round(cartTotal * 0.1);
-      setDiscountAmount(discount);
-      addToast('Coupon applied! 10% OFF', 'success');
-    } else {
-      addToast('Invalid coupon. Try VOEUX10', 'warning');
+    if (!couponCode.trim()) return;
+
+    setVerifyingCoupon(true);
+    try {
+      const res = await verifyAndApplyVoucher(couponCode);
+      if (res && res.valid) {
+        setDiscountAmount(res.discountAmount);
+        setAppliedVoucherCode(res.code);
+        addToast(`Code "${res.code}" applied! Saved ₹${res.discountAmount}`, 'success');
+      }
+    } catch (err) {
+      addToast(err.message || 'Invalid coupon code', 'warning');
+      setDiscountAmount(0);
+      setAppliedVoucherCode('');
+    } finally {
+      setVerifyingCoupon(false);
     }
   };
 
-  const finalTotal = Math.max(0, cartTotal - discountAmount - referralDiscount);
+  const finalTotal = Math.max(0, cartTotal - discountAmount);
 
   const handleAddressChange = (e) => {
     setAddressData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -101,7 +112,9 @@ export const CartDrawer = () => {
               totalAmount: finalTotal,
               shippingAddress: addressData,
               paymentMethod: 'RAZORPAY_ONLINE',
-              paymentId: response.razorpay_payment_id || 'PAY_' + Date.now()
+              paymentId: response.razorpay_payment_id || 'PAY_' + Date.now(),
+              appliedVoucherCode,
+              discountAmount
             });
             setLastPlacedOrder(placed);
             setStep('success');
@@ -123,7 +136,9 @@ export const CartDrawer = () => {
             totalAmount: finalTotal,
             shippingAddress: addressData,
             paymentMethod: 'ONLINE_UPI',
-            paymentId: 'PAY_' + Date.now()
+            paymentId: 'PAY_' + Date.now(),
+            appliedVoucherCode,
+            discountAmount
           });
           setLastPlacedOrder(placed);
           setStep('success');
@@ -134,7 +149,9 @@ export const CartDrawer = () => {
           totalAmount: finalTotal,
           shippingAddress: addressData,
           paymentMethod: 'ONLINE_UPI',
-          paymentId: 'PAY_' + Date.now()
+          paymentId: 'PAY_' + Date.now(),
+          appliedVoucherCode,
+          discountAmount
         });
         setLastPlacedOrder(placed);
         setStep('success');
@@ -145,7 +162,9 @@ export const CartDrawer = () => {
         totalAmount: finalTotal,
         shippingAddress: addressData,
         paymentMethod: 'COD',
-        paymentId: 'COD_' + Date.now()
+        paymentId: 'COD_' + Date.now(),
+        appliedVoucherCode,
+        discountAmount
       });
       setLastPlacedOrder(placed);
       setStep('success');
@@ -260,13 +279,17 @@ export const CartDrawer = () => {
                 <form onSubmit={handleApplyCoupon} className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Discount code (e.g. VOEUX10)"
+                    placeholder="Enter referral code / coupon"
                     value={couponCode}
                     onChange={e => setCouponCode(e.target.value)}
-                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition uppercase"
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition uppercase font-semibold"
                   />
-                  <button type="submit" className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer">
-                    Apply
+                  <button
+                    type="submit"
+                    disabled={verifyingCoupon}
+                    className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer disabled:opacity-50"
+                  >
+                    {verifyingCoupon ? 'Verifying...' : 'Apply'}
                   </button>
                 </form>
 
@@ -277,15 +300,9 @@ export const CartDrawer = () => {
                     <span className="font-semibold text-gray-900">₹{cartTotal.toLocaleString('en-IN')}</span>
                   </div>
                   {discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-bold">
-                      <span>Discount (VOEUX10)</span>
+                    <div className="flex justify-between text-emerald-600 font-bold bg-emerald-50 p-2 rounded-xl border border-emerald-100">
+                      <span>🎁 Voucher Discount ({appliedVoucherCode || 'VOEUX10'})</span>
                       <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
-                    </div>
-                  )}
-                  {referralDiscount > 0 && (
-                    <div className="flex justify-between text-purple-700 font-bold bg-purple-50 p-1.5 rounded-lg border border-purple-100">
-                      <span>🎁 Referral Discount</span>
-                      <span>-₹{referralDiscount.toLocaleString('en-IN')}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-gray-500">
