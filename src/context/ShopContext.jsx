@@ -217,7 +217,26 @@ export const ShopProvider = ({ children }) => {
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // Referral Link Tracking: Captures ?ref=... from URL search query on mount
+  const [referralCode, setReferralCode] = useState(() => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const ref = searchParams.get('ref');
+      if (ref) {
+        localStorage.setItem('voeux_ref_code', ref);
+        return ref;
+      }
+      return localStorage.getItem('voeux_ref_code') || null;
+    } catch(e) { return null; }
+  });
+
+  const referralDiscount = referralCode ? 500 : 0;
+
+  useEffect(() => {
+    if (referralCode) {
+      addToast(`🎁 Referral link active! ₹500 Discount applied to checkout.`, 'success');
+    }
+  }, []);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -298,6 +317,8 @@ export const ShopProvider = ({ children }) => {
   };
 
   const placeOrder = async (orderData) => {
+    const rewardVoucherCode = 'REF500-' + Math.floor(100000 + Math.random() * 900000);
+
     const newOrder = {
       id: 'VX-' + Math.floor(100000 + Math.random() * 900000),
       createdAt: new Date().toISOString(),
@@ -309,19 +330,24 @@ export const ShopProvider = ({ children }) => {
         quantity: i.quantity,
         image: i.product.image
       })),
-      totalAmount: orderData.totalAmount || cartTotal,
+      totalAmount: orderData.totalAmount || (cartTotal - referralDiscount),
       shippingAddress: orderData.shippingAddress,
       paymentMethod: orderData.paymentMethod || 'COD',
       paymentId: orderData.paymentId || 'N/A',
       userEmail: user?.email || orderData.shippingAddress?.email || 'guest@voeux.in',
-      userPhone: user?.phone || orderData.shippingAddress?.phone || 'N/A'
+      userPhone: user?.phone || orderData.shippingAddress?.phone || 'N/A',
+      referral: {
+        code: referralCode,
+        discountApplied: referralDiscount,
+        rewardVoucherCode: rewardVoucherCode
+      }
     };
 
     const updatedOrders = [newOrder, ...orders];
     setOrders(updatedOrders);
     try { localStorage.setItem('voeux_orders', JSON.stringify(updatedOrders)); } catch(e){}
 
-    // Firebase Sync
+    // Firebase Orders Sync
     try {
       fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/orders.json', {
         method: 'POST',
@@ -330,7 +356,26 @@ export const ShopProvider = ({ children }) => {
       });
     } catch(e){}
 
-    // Apps Script Order Notification Email Sync
+    // Firebase Referral Tracking Sync
+    if (referralCode) {
+      try {
+        fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/referrals.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            referrerCode: referralCode,
+            buyerEmail: newOrder.userEmail,
+            buyerPhone: newOrder.userPhone,
+            orderId: newOrder.id,
+            totalAmount: newOrder.totalAmount,
+            rewardVoucherCode: rewardVoucherCode,
+            createdAt: new Date().toISOString()
+          })
+        });
+      } catch(e){}
+    }
+
+    // Apps Script Order Notification & Voucher Email Sync
     try {
       fetch('https://script.google.com/macros/s/AKfycbz_placeholder/exec', {
         method: 'POST',
@@ -386,7 +431,9 @@ export const ShopProvider = ({ children }) => {
         orders,
         placeOrder,
         isAuthModalOpen,
-        setIsAuthModalOpen
+        setIsAuthModalOpen,
+        referralCode,
+        referralDiscount
       }}
     >
       {children}

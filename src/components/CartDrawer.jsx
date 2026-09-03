@@ -13,7 +13,9 @@ export const CartDrawer = () => {
     addToast,
     user,
     setIsAuthModalOpen,
-    placeOrder
+    placeOrder,
+    referralCode,
+    referralDiscount
   } = useShop();
 
   const [step, setStep] = useState('cart'); // 'cart' | 'checkout' | 'success'
@@ -46,7 +48,7 @@ export const CartDrawer = () => {
     }
   };
 
-  const finalTotal = Math.max(0, cartTotal - discountAmount);
+  const finalTotal = Math.max(0, cartTotal - discountAmount - referralDiscount);
 
   const handleAddressChange = (e) => {
     setAddressData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -280,6 +282,12 @@ export const CartDrawer = () => {
                       <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
                     </div>
                   )}
+                  {referralDiscount > 0 && (
+                    <div className="flex justify-between text-purple-700 font-bold bg-purple-50 p-1.5 rounded-lg border border-purple-100">
+                      <span>🎁 Referral Discount</span>
+                      <span>-₹{referralDiscount.toLocaleString('en-IN')}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-500">
                     <span>Shipping</span>
                     <span className="font-bold text-emerald-600">FREE</span>
@@ -507,6 +515,18 @@ export const CartDrawer = () => {
             <p className="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto">
               We have received your order. A receipt and confirmation email have been sent to <strong>{lastPlacedOrder.shippingAddress?.email}</strong>.
             </p>
+
+            {lastPlacedOrder.referral?.rewardVoucherCode && (
+              <div className="p-4 bg-purple-50 rounded-2xl border border-purple-200 text-left text-xs space-y-1.5">
+                <span className="text-[10px] font-black uppercase tracking-widest text-purple-700 block">🎁 REFERRAL REWARD UNLOCKED</span>
+                <p className="text-gray-900 font-bold">₹500 OFF Discount Voucher Code:</p>
+                <div className="bg-white border border-purple-300 rounded-xl p-2.5 flex items-center justify-between font-mono font-bold text-sm text-purple-900">
+                  <span>{lastPlacedOrder.referral.rewardVoucherCode}</span>
+                  <span className="text-[10px] bg-purple-600 text-white font-sans px-2 py-0.5 rounded-full uppercase">Emailed</span>
+                </div>
+                <p className="text-[11px] text-purple-700 font-medium">This ₹500 discount code has been sent to your email!</p>
+              </div>
+            )}
 
             <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left text-xs space-y-2">
               <div className="flex justify-between border-b border-gray-200/60 pb-2">

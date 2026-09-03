@@ -37,7 +37,57 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     
-    // ==================== 1. WAREHOUSE SHELF STORAGE SYNC ====================
+    // ==================== 1. NEW ORDER NOTIFICATION & REFERRAL VOUCHER EMAIL ====================
+    if (data.action === 'new_order' && data.order) {
+      var order = data.order;
+      var recipient = order.userEmail || (order.shippingAddress ? order.shippingAddress.email : '');
+      var orderId = order.id || 'VX-ORDER';
+      
+      var emailBody = "Dear Customer,\n\n" +
+        "Thank you for ordering with VOEUX® Car Electronics!\n\n" +
+        "==========================================\n" +
+        "VOEUX® DIRECT ORDER RECEIPT #" + orderId + "\n" +
+        "==========================================\n" +
+        "Order Date: " + (order.createdAt || new Date().toISOString()) + "\n" +
+        "Total Amount: ₹" + (order.totalAmount || 0) + "\n" +
+        "Payment Method: " + (order.paymentMethod || 'COD') + "\n" +
+        "Payment ID: " + (order.paymentId || 'N/A') + "\n\n" +
+        "SHIPPING ADDRESS:\n" +
+        (order.shippingAddress ? order.shippingAddress.fullName + "\n" + order.shippingAddress.street + ", " + order.shippingAddress.city + " - " + order.shippingAddress.pincode : "N/A") + "\n\n";
+
+      if (order.referral && order.referral.rewardVoucherCode) {
+        emailBody += "==========================================\n" +
+          "🎁 REFERRAL BONUS VOUCHER UNLOCKED!\n" +
+          "==========================================\n" +
+          "Voucher Code: " + order.referral.rewardVoucherCode + "\n" +
+          "Value: ₹500 OFF on your next VOEUX purchase\n" +
+          "Use this code during checkout or on WhatsApp to claim ₹500 OFF!\n" +
+          "==========================================\n\n";
+      }
+
+      emailBody += "WhatsApp Customer Support: +91 9999484530\n" +
+        "Official Office Email: voeuxoffice@gmail.com\n\n" +
+        "Thank you for choosing VOEUX®!";
+
+      // Email customer & office
+      if (recipient && recipient.indexOf('@') > -1) {
+        try {
+          GmailApp.sendEmail(recipient, "VOEUX® Order Receipt #" + orderId, emailBody, { name: "VOEUX® Official Store" });
+          GmailApp.sendEmail("voeuxoffice@gmail.com", "NEW ORDER RECEIVED #" + orderId + " - ₹" + order.totalAmount, emailBody, { name: "VOEUX® Store Bot" });
+        } catch(mErr) {
+          try {
+            MailApp.sendEmail({ to: recipient, subject: "VOEUX® Order Receipt #" + orderId, body: emailBody });
+            MailApp.sendEmail({ to: "voeuxoffice@gmail.com", subject: "NEW ORDER RECEIVED #" + orderId, body: emailBody });
+          } catch(e2){}
+        }
+      }
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ result: "success", orderId: orderId }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ==================== 2. WAREHOUSE SHELF STORAGE SYNC ====================
     if (data.action === 'sync_shelves' || data.action === 'save_shelf') {
       var props = PropertiesService.getScriptProperties();
       var existingRaw = props.getProperty('VOEUX_WAREHOUSE_SHELVES') || '[]';
