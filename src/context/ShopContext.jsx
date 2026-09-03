@@ -217,6 +217,7 @@ export const ShopProvider = ({ children }) => {
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
