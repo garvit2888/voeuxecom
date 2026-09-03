@@ -25,6 +25,7 @@ import { WarrantyPolicyPage } from './components/WarrantyPolicyPage';
 import { FlipkartOpsAdmin } from './components/FlipkartOpsAdmin';
 import { CustomerAuthModal } from './components/CustomerAuthModal';
 import { CustomerProfilePage } from './components/CustomerProfilePage';
+import { InventoryQRPortal } from './components/InventoryQRPortal';
 
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts } = useShop();
