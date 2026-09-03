@@ -14,10 +14,12 @@ export const CartDrawer = () => {
     user,
     setIsAuthModalOpen,
     placeOrder,
-    verifyAndApplyVoucher
+    verifyAndApplyVoucher,
+    cartStep,
+    setCartStep
   } = useShop();
 
-  const [step, setStep] = useState('cart'); // 'cart' | 'checkout' | 'success'
+  const [step, setStep] = useState(cartStep || 'cart');
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedVoucherCode, setAppliedVoucherCode] = useState('');
@@ -35,6 +37,14 @@ export const CartDrawer = () => {
     pincode: user?.pincode || '',
     state: 'Delhi'
   });
+
+  // Sync step when cartStep changes (e.g. Buy Now triggers checkout jump)
+  // Must be ABOVE the early return to satisfy React hooks rules
+  React.useEffect(() => {
+    if (isCartOpen) {
+      setStep(cartStep || 'cart');
+    }
+  }, [cartStep, isCartOpen]);
 
   if (!isCartOpen) return null;
 
@@ -183,7 +193,7 @@ export const CartDrawer = () => {
               {step === 'cart' ? 'Your Shopping Bag' : step === 'checkout' ? 'Express Checkout' : 'Order Confirmed'}
             </h2>
             <button
-              onClick={() => { setIsCartOpen(false); setStep('cart'); }}
+              onClick={() => { setIsCartOpen(false); setStep('cart'); setCartStep('cart'); }}
               className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition"
             >
               <X className="w-5 h-5" />
@@ -316,7 +326,13 @@ export const CartDrawer = () => {
                 </div>
 
                 <button
-                  onClick={() => setStep('checkout')}
+                  onClick={() => {
+                    if (!user) {
+                      setIsAuthModalOpen(true);
+                      return;
+                    }
+                    setStep('checkout');
+                  }}
                   className="w-full bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/20 cursor-pointer"
                 >
                   <span>Proceed to Checkout</span>

@@ -120,6 +120,9 @@ export const ShopProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [compareList, setCompareList] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  // cartStep: controls which step the CartDrawer starts on ('cart' | 'checkout')
+  // Used by buyNowCheckout to jump straight to checkout
+  const [cartStep, setCartStep] = useState('cart');
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCarSelectorOpen, setIsCarSelectorOpen] = useState(false);
@@ -214,6 +217,19 @@ export const ShopProvider = ({ children }) => {
       setSelectedProductModal(product);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Buy Now: adds product, jumps cart to checkout step, opens drawer
+  // Only call this when user is already confirmed logged in!
+  const buyNowCheckout = (product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id);
+      if (existing) return prev;
+      return [{ product, quantity: 1, car: selectedCar }];
+    });
+    addToast(`Proceeding to checkout for "${product.name}"`, 'success');
+    setCartStep('checkout');
+    setIsCartOpen(true);
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -468,7 +484,10 @@ export const ShopProvider = ({ children }) => {
         placeOrder,
         isAuthModalOpen,
         setIsAuthModalOpen,
-        verifyAndApplyVoucher
+        verifyAndApplyVoucher,
+        cartStep,
+        setCartStep,
+        buyNowCheckout
       }}
     >
       {children}

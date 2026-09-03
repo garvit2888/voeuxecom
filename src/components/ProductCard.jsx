@@ -5,7 +5,14 @@ import { ShoppingCart } from 'lucide-react';
 export const ProductCard = ({ product }) => {
   if (!product) return null;
 
-  const { setSelectedProductModal, addToCart, setIsCartOpen } = useShop();
+  const {
+    setSelectedProductModal,
+    addToCart,
+    setIsCartOpen,
+    user,
+    setIsAuthModalOpen,
+    buyNowCheckout
+  } = useShop();
 
   const discountPercent = Math.round(
     ((product.originalPrice - product.price) / product.originalPrice) * 100
@@ -13,13 +20,17 @@ export const ProductCard = ({ product }) => {
 
   const handleBuyNow = (e) => {
     e.stopPropagation();
-    addToCart(product, 1);
-    setIsCartOpen(true);
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    buyNowCheckout(product);
   };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart(product, 1);
+    setIsCartOpen(true);
   };
 
   return (
@@ -28,7 +39,7 @@ export const ProductCard = ({ product }) => {
       className="clean-card group relative flex flex-col justify-between overflow-hidden p-4 space-y-3 cursor-pointer transition-all duration-300"
     >
       
-      {/* Top Image Section - Fitted Design */}
+      {/* Top Image Section */}
       <div className="relative aspect-[4/3] bg-slate-50/80 rounded-xl overflow-hidden flex items-center justify-center p-2">
         <img
           src={product.image}
@@ -45,14 +56,14 @@ export const ProductCard = ({ product }) => {
           </h3>
         </div>
 
-        {/* Price & Discount Display */}
+        {/* Price & Discount */}
         <div className="pt-2 border-t border-gray-100 flex items-baseline justify-between gap-2">
           <div className="flex items-baseline gap-2">
             <span className="text-base sm:text-lg font-black text-gray-900">
-              ₹{product.price.toLocaleString('en-IN')}
+              &#8377;{product.price.toLocaleString('en-IN')}
             </span>
             <span className="text-xs text-gray-400 line-through">
-              ₹{product.originalPrice.toLocaleString('en-IN')}
+              &#8377;{product.originalPrice.toLocaleString('en-IN')}
             </span>
           </div>
           <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
@@ -60,7 +71,7 @@ export const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        {/* Direct Action Buttons: Clean Buy Now & Add to Cart */}
+        {/* Action Buttons */}
         <div className="pt-2 flex items-center gap-2">
           <button
             onClick={handleBuyNow}
@@ -77,7 +88,6 @@ export const ProductCard = ({ product }) => {
             <ShoppingCart className="w-4 h-4 text-[#3B429F]" />
           </button>
         </div>
-
       </div>
 
     </div>
