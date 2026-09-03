@@ -39,7 +39,7 @@ export const CustomerProfilePage = () => {
     );
   }
 
-  const userOrders = orders.filter(o => o.userEmail === user.email || o.userPhone === user.phone);
+  const userOrders = (orders || []).filter(o => o && ((o.userEmail && user?.email && o.userEmail === user.email) || (o.userPhone && user?.phone && o.userPhone === user.phone)));
 
   const handleSaveProfile = (e) => {
     e.preventDefault();

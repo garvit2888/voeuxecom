@@ -25,17 +25,20 @@ class ErrorBoundary extends Component {
             V
           </div>
           <h1 className="text-2xl font-bold tracking-tight">VOEUX® Car Electronics</h1>
-          <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-            Something went wrong while loading this page section. Please click below to refresh and reload the store.
-          </p>
+          <div className="p-4 bg-red-950/80 border border-red-800/80 text-red-200 text-xs font-mono text-left max-w-xl rounded-xl overflow-x-auto">
+            <p className="font-bold text-red-400">{this.state.error && this.state.error.toString()}</p>
+            <pre className="text-[10px] mt-2 opacity-80 whitespace-pre-wrap">{this.state.error && this.state.error.stack}</pre>
+          </div>
           <button
             onClick={() => {
               window.location.hash = '';
+              window.location.search = '';
+              localStorage.clear();
               window.location.reload();
             }}
             className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold py-3 px-6 rounded-xl transition shadow-lg cursor-pointer"
           >
-            Reload VOEUX Store
+            Clear Cache & Reload VOEUX Store
           </button>
         </div>
       );

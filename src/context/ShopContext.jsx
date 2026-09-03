@@ -217,11 +217,32 @@ export const ShopProvider = ({ children }) => {
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  // Used Vouchers Tracking: Stores redeemed one-time referral voucher codes
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_user');
+      if (!saved || saved === 'undefined') return null;
+      return JSON.parse(saved);
+    } catch(e) { return null; }
+  });
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_orders');
+      if (!saved || saved === 'undefined') return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) { return []; }
+  });
+
   const [usedVouchers, setUsedVouchers] = useState(() => {
     try {
       const saved = localStorage.getItem('voeux_used_vouchers');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved || saved === 'undefined') return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
     } catch(e) { return []; }
   });
 
@@ -232,54 +253,39 @@ export const ShopProvider = ({ children }) => {
       throw new Error('Please enter a coupon or referral voucher code.');
     }
 
-    // 1. Check if voucher code has ALREADY BEEN REDEEMED
-    const isUsed = usedVouchers.includes(code);
-    if (isUsed) {
+    // 1. Check if voucher code has ALREADY BEEN REDEEMED (local)
+    if (usedVouchers.includes(code)) {
       throw new Error('This referral voucher code has already been redeemed and cannot be used again.');
     }
 
-    // Double check with Firebase Cloud DB for one-time enforce
+    // 2. Double check with Firebase for cross-device one-time enforce
     try {
       const res = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${code}.json`);
       const cloudRecord = await res.json();
       if (cloudRecord) {
-        setUsedVouchers(prev => Array.from(new Set([...prev, code])));
-        localStorage.setItem('voeux_used_vouchers', JSON.stringify(Array.from(new Set([...usedVouchers, code]))));
+        const updated = Array.from(new Set([...usedVouchers, code]));
+        setUsedVouchers(updated);
+        try { localStorage.setItem('voeux_used_vouchers', JSON.stringify(updated)); } catch(e){}
         throw new Error('This referral voucher code has already been redeemed.');
       }
     } catch(err) {
       if (err.message && err.message.includes('already been redeemed')) {
         throw err;
       }
+      // Network error — fall through to local validation
     }
 
-    // 2. Validate Voucher Code Formats
+    // 3. Validate Voucher Code Formats
     if (code === 'VOEUX10') {
       return { valid: true, type: 'PROMO', discountAmount: Math.round(cartTotal * 0.1), code };
     }
 
-    if (code.startsWith('REF500') || code.includes('GARVIT') || code.includes('VOEUX500') || code.length >= 6) {
+    if (code.startsWith('REF500') || code.includes('GARVIT') || code.includes('VOEUX500')) {
       return { valid: true, type: 'REFERRAL_VOUCHER', discountAmount: 500, code };
     }
 
-    throw new Error('Invalid code. Please check your email for the correct voucher code.');
+    throw new Error('Invalid code. Please check your email for the correct referral voucher.');
   };
-
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-  const [user, setUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('voeux_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch(e) { return null; }
-  });
-
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('voeux_orders');
-      return saved ? JSON.parse(saved) : [];
-    } catch(e) { return []; }
-  });
 
   const loginUser = async (email, password) => {
     // Check local stored users or default user
