@@ -127,6 +127,66 @@ body {
   animation: float 3.5s ease-in-out infinite 1.75s;
 }
 
+/* ===== CART CELEBRATION ANIMATIONS ===== */
+
+/* Cart icon bounce when item added */
+@keyframes cart-bounce {
+  0%   { transform: scale(1) rotate(0deg); }
+  20%  { transform: scale(1.35) rotate(-12deg); }
+  40%  { transform: scale(1.2) rotate(10deg); }
+  60%  { transform: scale(1.3) rotate(-6deg); }
+  80%  { transform: scale(1.1) rotate(4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-cart-bounce {
+  animation: cart-bounce 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+}
+
+/* Glowing ring pulse around cart icon */
+@keyframes cart-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(59, 66, 159, 0.9); }
+  40%  { box-shadow: 0 0 0 10px rgba(59, 66, 159, 0.3); }
+  70%  { box-shadow: 0 0 0 16px rgba(59, 66, 159, 0.1); }
+  100% { box-shadow: 0 0 0 22px rgba(59, 66, 159, 0); }
+}
+
+.animate-cart-ring {
+  animation: cart-ring 0.8s ease-out forwards;
+  border-radius: 50%;
+}
+
+/* Confetti dot burst */
+@keyframes confetti-fly-1 { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(-24px,-32px) scale(0);opacity:0} }
+@keyframes confetti-fly-2 { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(20px,-36px) scale(0);opacity:0} }
+@keyframes confetti-fly-3 { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(30px,-20px) scale(0);opacity:0} }
+@keyframes confetti-fly-4 { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(-16px,-40px) scale(0);opacity:0} }
+@keyframes confetti-fly-5 { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(10px,-44px) scale(0);opacity:0} }
+@keyframes confetti-fly-6 { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(-32px,-18px) scale(0);opacity:0} }
+
+.confetti-dot { position:absolute; width:6px; height:6px; border-radius:50%; pointer-events:none; }
+.confetti-1 { background:#3B429F; animation: confetti-fly-1 0.7s ease-out forwards; }
+.confetti-2 { background:#f59e0b; animation: confetti-fly-2 0.65s ease-out forwards 0.05s; }
+.confetti-3 { background:#10b981; animation: confetti-fly-3 0.7s ease-out forwards 0.02s; }
+.confetti-4 { background:#ef4444; animation: confetti-fly-4 0.65s ease-out forwards 0.08s; }
+.confetti-5 { background:#8b5cf6; animation: confetti-fly-5 0.7s ease-out forwards; }
+.confetti-6 { background:#f97316; animation: confetti-fly-6 0.65s ease-out forwards 0.04s; }
+
+/* Rich Cart Toast slide-in */
+@keyframes cart-toast-in {
+  0%   { transform: translateX(110%); opacity: 0; }
+  60%  { transform: translateX(-6px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes cart-toast-out {
+  0%   { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(110%); opacity: 0; }
+}
+
+.animate-cart-toast-in  { animation: cart-toast-in  0.45s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.animate-cart-toast-out { animation: cart-toast-out 0.35s ease-in forwards; }
+
+
 /* Strict Print Isolation Rules - Hide website header, news ticker & chat widgets during print */
 @media print {
   body * {

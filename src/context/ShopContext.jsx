@@ -152,6 +152,9 @@ export const ShopProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState([]);
   const [selectedCar, setSelectedCar] = useState({ make: 'Hyundai', model: 'Creta', year: '2022' });
+  // Cart celebration — flipped true briefly when any item is added to cart
+  const [cartAnimating, setCartAnimating] = useState(false);
+  const [lastAddedProduct, setLastAddedProduct] = useState(null);
 
   // Persist cart to localStorage whenever it changes
   useEffect(() => {
@@ -186,7 +189,11 @@ export const ShopProvider = ({ children }) => {
       }
       return [...prev, { product, quantity, car: selectedCar }];
     });
-    addToast(`Added "${product.name}" to cart!`, 'success');
+    // Trigger celebration animation
+    setLastAddedProduct(product);
+    setCartAnimating(true);
+    setTimeout(() => { setCartAnimating(false); }, 900);
+    setTimeout(() => { setLastAddedProduct(null); }, 4000);
   };
 
   const removeFromCart = (productId) => {
@@ -519,7 +526,9 @@ export const ShopProvider = ({ children }) => {
         verifyAndApplyVoucher,
         cartStep,
         setCartStep,
-        buyNowCheckout
+        buyNowCheckout,
+        cartAnimating,
+        lastAddedProduct
       }}
     >
       {children}

@@ -28,7 +28,7 @@ import { CustomerProfilePage } from './components/CustomerProfilePage';
 import { InventoryQRPortal } from './components/InventoryQRPortal';
 
 const MainContent = () => {
-  const { activePage, setActivePage, productsList, toasts } = useShop();
+  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating } = useShop();
 
   // Scroll to top of viewport immediately whenever activePage route changes
   useEffect(() => {
@@ -273,12 +273,35 @@ const MainContent = () => {
       {/* Brand Splash Screen on Initial Load */}
       <SplashScreen />
 
-      {/* Toast Notification */}
+      {/* Added to Cart Celebration Pop-Up Card */}
+      {lastAddedProduct && (
+        <div className="fixed top-16 sm:top-20 right-3 sm:right-6 z-[120] animate-cart-toast-in max-w-xs sm:max-w-sm bg-slate-950 text-white p-4 rounded-2xl shadow-2xl border border-indigo-500/40 flex items-center gap-3.5">
+          <div className="w-12 h-12 bg-white rounded-xl p-1 shrink-0 overflow-hidden flex items-center justify-center border border-slate-700">
+            <img src={lastAddedProduct.image} alt={lastAddedProduct.name} className="w-full h-full object-contain" />
+          </div>
+          <div className="flex-1 min-w-0 space-y-0.5 text-left">
+            <div className="flex items-center gap-1 text-emerald-400 font-extrabold text-xs">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Product added to cart!</span>
+            </div>
+            <h4 className="text-xs font-bold text-white truncate leading-tight">{lastAddedProduct.name}</h4>
+            <p className="text-[11px] text-gray-400 font-semibold">₹{lastAddedProduct.price?.toLocaleString('en-IN')}</p>
+          </div>
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="px-3 py-2 bg-[#3B429F] hover:bg-[#2B308B] text-white text-[11px] font-extrabold rounded-xl transition shrink-0 cursor-pointer shadow-md"
+          >
+            View Cart
+          </button>
+        </div>
+      )}
+
+      {/* Standard Toast Notifications */}
       <div className="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-xs pointer-events-none">
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className="bg-gray-900 text-white p-3 rounded-lg text-xs shadow-xl flex items-center gap-2 pointer-events-auto"
+            className="bg-gray-900 text-white p-3 rounded-lg text-xs shadow-xl flex items-center gap-2 pointer-events-auto border border-gray-800"
           >
             <span>{toast.message}</span>
           </div>

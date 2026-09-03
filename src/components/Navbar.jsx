@@ -11,7 +11,8 @@ export const Navbar = () => {
     setIsCartOpen,
     setSelectedProductModal,
     user,
-    setIsAuthModalOpen
+    setIsAuthModalOpen,
+    cartAnimating
   } = useShop();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -147,15 +148,29 @@ export const Navbar = () => {
                 <User className="w-5 h-5" />
               </button>
 
-              {/* Cart Icon with Red Counter Badge */}
+              {/* Cart Icon with Red Counter Badge + Celebration Animation */}
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="relative p-1.5 hover:text-white transition cursor-pointer"
                 aria-label="View Cart"
               >
-                <ShoppingCart className="w-5 h-5" />
+                {/* Confetti burst dots */}
+                {cartAnimating && (
+                  <>
+                    <span className="confetti-dot confetti-1" style={{top:'-4px',left:'-4px'}} />
+                    <span className="confetti-dot confetti-2" style={{top:'-4px',right:'-4px'}} />
+                    <span className="confetti-dot confetti-3" style={{top:'4px',right:'-8px'}} />
+                    <span className="confetti-dot confetti-4" style={{top:'-8px',left:'4px'}} />
+                    <span className="confetti-dot confetti-5" style={{top:'-6px',left:'50%'}} />
+                    <span className="confetti-dot confetti-6" style={{top:'0px',left:'-8px'}} />
+                  </>
+                )}
+                {/* Ring glow wrapper */}
+                <span className={`inline-flex rounded-full p-0.5 ${cartAnimating ? 'animate-cart-ring' : ''}`}>
+                  <ShoppingCart className={`w-5 h-5 ${cartAnimating ? 'animate-cart-bounce text-yellow-300' : ''}`} />
+                </span>
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-slate-950">
+                  <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-slate-950 transition-all ${cartAnimating ? 'scale-125' : 'scale-100'}`}>
                     {cartCount}
                   </span>
                 )}
