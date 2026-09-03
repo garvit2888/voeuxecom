@@ -23,7 +23,12 @@ export const ProductDetailPage = () => {
     selectedProductModal,
     setActivePage,
     recentlyViewed,
-    productsList
+    productsList,
+    addToCart,
+    setIsCartOpen,
+    user,
+    setIsAuthModalOpen,
+    buyNowCheckout
   } = useShop();
 
   const product = selectedProductModal;
@@ -230,8 +235,11 @@ export const ProductDetailPage = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => {
-                    addToCart(product, 1);
-                    setIsCartOpen(true);
+                    if (!user) {
+                      setIsAuthModalOpen(true);
+                      return;
+                    }
+                    buyNowCheckout(product);
                   }}
                   className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 cursor-pointer text-center"
                 >
@@ -241,6 +249,7 @@ export const ProductDetailPage = () => {
                 <button
                   onClick={() => {
                     addToCart(product, 1);
+                    setIsCartOpen(true);
                   }}
                   className="px-5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl transition flex items-center justify-center gap-2 text-xs font-bold cursor-pointer"
                 >
