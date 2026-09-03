@@ -129,9 +129,9 @@ export const CartDrawer = () => {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_TXaJQ9omK770rd',
       amount: finalTotal * 100,
       currency: 'INR',
-      name: 'VOEUX® Electronics',
+      name: '',
       description: `Order — ${cart.length} item(s)`,
-      image: '/images/voeux_logo.png',
+      image: window.location.origin + '/images/voeux_logo.png',
       prefill: {
         name: addressData.fullName,
         email: addressData.email,
