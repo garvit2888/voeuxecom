@@ -21,7 +21,21 @@ export const ShopProvider = ({ children }) => {
     return hash;
   };
 
-  const [selectedProductModal, _setSelectedProductModal] = useState(null);
+  const [selectedProductModal, _setSelectedProductModal] = useState(() => {
+    // Restore product page on reload from URL hash
+    try {
+      const hash = (window.location.hash || '').replace('#', '').trim();
+      if (hash.startsWith('product-detail')) {
+        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
+        const pid = urlParams.get('id');
+        if (pid) {
+          const found = PRODUCTS.find(p => p.id === pid);
+          if (found) return found;
+        }
+      }
+    } catch(e) {}
+    return null;
+  });
   const [productsList, setProductsList] = useState(PRODUCTS);
 
   useEffect(() => {
@@ -116,7 +130,15 @@ export const ShopProvider = ({ children }) => {
       });
     }
   };
-  const [cart, setCart] = useState([]);
+  // Cart: persisted to localStorage so it survives page reloads
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_cart');
+      if (!saved || saved === 'undefined') return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) { return []; }
+  });
   const [wishlist, setWishlist] = useState([]);
   const [compareList, setCompareList] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -130,6 +152,11 @@ export const ShopProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState([]);
   const [selectedCar, setSelectedCar] = useState({ make: 'Hyundai', model: 'Creta', year: '2022' });
+
+  // Persist cart to localStorage whenever it changes
+  useEffect(() => {
+    try { localStorage.setItem('voeux_cart', JSON.stringify(cart)); } catch(e) {}
+  }, [cart]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -219,15 +246,15 @@ export const ShopProvider = ({ children }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Buy Now: adds product, jumps cart to checkout step, opens drawer
-  // Only call this when user is already confirmed logged in!
+  // Buy Now: adds product to cart (persisted) AND opens checkout directly.
+  // Item stays in cart even if user abandons the checkout.
   const buyNowCheckout = (product) => {
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
-      if (existing) return prev;
-      return [{ product, quantity: 1, car: selectedCar }];
+      if (existing) return prev; // already in cart, don't duplicate
+      return [...prev, { product, quantity: 1, car: selectedCar }];
     });
-    addToast(`Proceeding to checkout for "${product.name}"`, 'success');
+    addToast(`Added to cart — proceeding to checkout`, 'success');
     setCartStep('checkout');
     setIsCartOpen(true);
   };
