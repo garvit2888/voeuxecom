@@ -87,6 +87,54 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // ==================== 1B. ABANDONED CART AUTOMATED RECOVERY EMAIL ====================
+    if (data.action === 'abandoned_cart_email' && data.cartSession) {
+      var session = data.cartSession;
+      var recipient = session.userEmail || session.email;
+      var recipientName = session.userName || session.name || 'Valued Customer';
+      var recoveryUrl = session.recoveryUrl || ('https://voeux.in/#restore-cart=' + (session.id || ''));
+      var items = session.cart || [];
+      
+      var itemsListStr = items.map(function(item) {
+        var p = item.product || item;
+        var qty = item.quantity || 1;
+        var price = p.price ? ('₹' + (typeof p.price === 'number' ? p.price.toLocaleString('en-IN') : p.price)) : '';
+        return "• " + (p.name || 'VOEUX Product') + " (Qty: " + qty + ") " + price;
+      }).join('\n');
+
+      var emailSubject = "🛒 Don't leave your VOEUX® items behind! Complete your order now";
+      var emailText = "Dear " + recipientName + ",\n\n" +
+        "We noticed you left items in your shopping bag at VOEUX® Official Store:\n\n" +
+        itemsListStr + "\n\n" +
+        "Your reserved items are still waiting for you! Click the link below to resume your order directly with your items saved and account signed in:\n\n" +
+        recoveryUrl + "\n\n" +
+        "Need help completing your order? Chat with us on WhatsApp: +91 9999484530\n\n" +
+        "Thank you for choosing VOEUX® Car Electronics!";
+
+      if (recipient && recipient.indexOf('@') > -1) {
+        try {
+          GmailApp.sendEmail(recipient, emailSubject, emailText, {
+            name: "VOEUX® Shopping Care",
+            replyTo: "voeuxexperience@gmail.com"
+          });
+        } catch(mErr) {
+          try {
+            MailApp.sendEmail({
+              to: recipient,
+              subject: emailSubject,
+              body: emailText,
+              name: "VOEUX® Shopping Care",
+              replyTo: "voeuxexperience@gmail.com"
+            });
+          } catch(e2){}
+        }
+      }
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ result: "success", sessionSent: session.id }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // ==================== 2. WAREHOUSE SHELF STORAGE SYNC ====================
     if (data.action === 'sync_shelves' || data.action === 'save_shelf') {
       var props = PropertiesService.getScriptProperties();
@@ -548,3 +596,69 @@ function notifyError(errorMsg) {
 // 7. Time: 10:30 AM – 11:30 AM (IST = GMT+5:30, so set at 5:00–6:00 AM UTC)
 // 8. Save
 // =============================================================================
+
+// =============================================================================
+// ABANDONED CART CRON DISPATCHER — Runs hourly via Apps Script Time Trigger
+// Checks Firebase /abandoned_carts.json for carts older than 1 hour (3600000 ms)
+// with status === 'PENDING' and emailSent !== true
+// =============================================================================
+function processAbandonedCartsCron() {
+  try {
+    var firebaseUrl = 'https://voeux-warehouse-default-rtdb.firebaseio.com/abandoned_carts.json';
+    var response = UrlFetchApp.fetch(firebaseUrl, { muteHttpExceptions: true });
+    if (response.getResponseCode() !== 200) return;
+    
+    var data = JSON.parse(response.getContentText());
+    if (!data) return;
+
+    var now = Date.now();
+    var ONE_HOUR_MS = 60 * 60 * 1000; // 1 hour
+
+    Object.keys(data).forEach(function(key) {
+      var session = data[key];
+      if (!session) return;
+
+      var isPending = session.status === 'PENDING';
+      var notSent = !session.emailSent;
+      var age = now - (session.timestamp || 0);
+
+      if (isPending && notSent && age >= ONE_HOUR_MS && session.userEmail) {
+        var recipient = session.userEmail;
+        var recipientName = session.userName || 'Valued Customer';
+        var recoveryUrl = session.recoveryUrl || ('https://voeux.in/#restore-cart=' + key);
+        var items = session.cart || [];
+
+        var itemsListStr = items.map(function(item) {
+          var p = item.product || item;
+          var qty = item.quantity || 1;
+          var price = p.price ? ('₹' + (typeof p.price === 'number' ? p.price.toLocaleString('en-IN') : p.price)) : '';
+          return "• " + (p.name || 'VOEUX Product') + " (Qty: " + qty + ") " + price;
+        }).join('\n');
+
+        var emailSubject = "🛒 Don't leave your VOEUX® items behind! Complete your order now";
+        var emailText = "Dear " + recipientName + ",\n\n" +
+          "We saved the items in your VOEUX® shopping bag:\n\n" +
+          itemsListStr + "\n\n" +
+          "Click the link below to resume your checkout directly with all your products ready and account signed in:\n\n" +
+          recoveryUrl + "\n\n" +
+          "WhatsApp Customer Support: +91 9999484530\n\n" +
+          "Thank you for choosing VOEUX® Car Electronics!";
+
+        try {
+          GmailApp.sendEmail(recipient, emailSubject, emailText, { name: "VOEUX® Shopping Care" });
+        } catch(e) {}
+
+        // Mark as emailSent = true in Firebase
+        try {
+          UrlFetchApp.fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/abandoned_carts/' + key + '/emailSent.json', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            payload: JSON.stringify(true)
+          });
+        } catch(e2){}
+      }
+    });
+  } catch(err) {
+    Logger.log('Abandoned Cart Cron Error: ' + err.toString());
+  }
+}

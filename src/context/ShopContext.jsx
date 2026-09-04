@@ -165,6 +165,136 @@ export const ShopProvider = ({ children }) => {
     try { localStorage.setItem('voeux_cart', JSON.stringify(cart)); } catch(e) {}
   }, [cart]);
 
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
+
+  // 1. Auto Restore Abandoned Cart & Auto Sign-In from Deep Link (#restore-cart=<token>)
+  useEffect(() => {
+    const restoreCartFromHash = async () => {
+      try {
+        const fullUrl = window.location.href;
+        if (fullUrl.includes('restore-cart=') || fullUrl.includes('restore=')) {
+          let token = '';
+          if (fullUrl.includes('restore-cart=')) {
+            token = fullUrl.split('restore-cart=')[1].split('&')[0];
+          } else if (fullUrl.includes('restore=')) {
+            token = fullUrl.split('restore=')[1].split('&')[0];
+          }
+          token = decodeURIComponent(token).trim();
+
+          if (token) {
+            const res = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/abandoned_carts/${token}.json`);
+            if (res.ok) {
+              const sessionData = await res.json();
+              if (sessionData && sessionData.cart && Array.isArray(sessionData.cart) && sessionData.cart.length > 0) {
+                // Restore cart state
+                setCart(sessionData.cart);
+                try { localStorage.setItem('voeux_cart', JSON.stringify(sessionData.cart)); } catch(e){}
+
+                // Auto sign-in if user email present and not signed in
+                if (sessionData.userEmail) {
+                  const restoredUser = {
+                    name: sessionData.userName || sessionData.userEmail.split('@')[0],
+                    email: sessionData.userEmail,
+                    phone: sessionData.userPhone || '9999999999'
+                  };
+                  setUser(restoredUser);
+                  try { localStorage.setItem('voeux_user', JSON.stringify(restoredUser)); } catch(e){}
+                }
+
+                // Open checkout drawer directly
+                setCartStep('checkout');
+                setIsCartOpen(true);
+                addToast('🎉 Welcome back! Your saved items and account have been restored.', 'success');
+              }
+            }
+          }
+        }
+      } catch (err) {}
+    };
+
+    restoreCartFromHash();
+  }, []);
+
+  // 2. Track & Sync Abandoned Cart Session to Firebase
+  useEffect(() => {
+    if (!cart || cart.length === 0) return;
+
+    const userEmail = user?.email || localStorage.getItem('voeux_checkout_email');
+    if (!userEmail) return;
+
+    const userName = user?.name || userEmail.split('@')[0];
+    const userPhone = user?.phone || '';
+
+    let sessionId = localStorage.getItem('voeux_current_abandoned_cart_id');
+    if (!sessionId) {
+      sessionId = `AC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      localStorage.setItem('voeux_current_abandoned_cart_id', sessionId);
+    }
+
+    const recoveryUrl = `${window.location.origin}/#restore-cart=${sessionId}`;
+
+    const cartSession = {
+      id: sessionId,
+      userEmail,
+      userName,
+      userPhone,
+      cart,
+      timestamp: Date.now(),
+      status: 'PENDING',
+      emailSent: false,
+      recoveryUrl
+    };
+
+    localStorage.setItem('voeux_current_abandoned_cart_data', JSON.stringify(cartSession));
+
+    // Sync to Firebase RTDB
+    try {
+      fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/abandoned_carts/${sessionId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cartSession)
+      });
+    } catch (e) {}
+  }, [cart, user]);
+
+  // 3. 1-Hour Timer Check — Sends Automated Email via Google Apps Script if > 1 hour and still PENDING
+  useEffect(() => {
+    const checkAndDispatchAbandonedEmails = async () => {
+      try {
+        const raw = localStorage.getItem('voeux_current_abandoned_cart_data');
+        if (!raw) return;
+        const session = JSON.parse(raw);
+        if (!session || session.status !== 'PENDING' || session.emailSent) return;
+
+        const ageMs = Date.now() - (session.timestamp || 0);
+        const ONE_HOUR = 60 * 60 * 1000; // 1 hour (3600000ms)
+
+        if (ageMs >= ONE_HOUR && session.userEmail) {
+          // Send automated recovery email via Apps Script
+          try {
+            fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain' },
+              body: JSON.stringify({ action: 'abandoned_cart_email', cartSession: session })
+            });
+
+            fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/abandoned_carts/${session.id}/emailSent.json`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(true)
+            });
+          } catch(e){}
+
+          session.emailSent = true;
+          localStorage.setItem('voeux_current_abandoned_cart_data', JSON.stringify(session));
+        }
+      } catch (e) {}
+    };
+
+    const interval = setInterval(checkAndDispatchAbandonedEmails, 60000); // Check every 60s
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -501,6 +631,20 @@ export const ShopProvider = ({ children }) => {
         body: JSON.stringify({ action: 'new_order', order: newOrder })
       });
     } catch(e){}
+
+    // Clear abandoned cart tracking session once order is placed
+    const currentAbandonedId = localStorage.getItem('voeux_current_abandoned_cart_id');
+    if (currentAbandonedId) {
+      try {
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/abandoned_carts/${currentAbandonedId}/status.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify('COMPLETED')
+        });
+      } catch (e) {}
+      localStorage.removeItem('voeux_current_abandoned_cart_id');
+      localStorage.removeItem('voeux_current_abandoned_cart_data');
+    }
 
     setCart([]);
     addToast(`Order #${newOrder.id} placed successfully!`, 'success');
