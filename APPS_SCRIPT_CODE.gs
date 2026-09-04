@@ -69,17 +69,25 @@ function doPost(e) {
         "Official Office Email: voeuxoffice@gmail.com\n\n" +
         "Thank you for choosing VOEUX®!";
 
-      // Email customer & office
+      // 1. ALWAYS Send Instant Order Alert to VOEUX Office
+      var subjectOffice = "🚨 NEW ORDER RECEIVED #" + orderId + " — ₹" + (order.totalAmount || 0);
+      var officeEmail = "voeuxoffice@gmail.com";
+      try {
+        MailApp.sendEmail({ to: officeEmail, subject: subjectOffice, body: emailBody, name: "VOEUX® Store Bot" });
+      } catch(mErr1) {
+        try {
+          GmailApp.sendEmail(officeEmail, subjectOffice, emailBody, { name: "VOEUX® Store Bot" });
+        } catch(e1){}
+      }
+
+      // 2. Send Order Receipt Email to Customer (if valid email provided)
       if (recipient && recipient.indexOf('@') > -1) {
         var subjectCust = "VOEUX® Order Receipt #" + orderId;
-        var subjectOffice = "NEW ORDER RECEIVED #" + orderId + " - ₹" + order.totalAmount;
         try {
           MailApp.sendEmail({ to: recipient, subject: subjectCust, body: emailBody, name: "VOEUX® Official Store" });
-          MailApp.sendEmail({ to: "voeuxoffice@gmail.com", subject: subjectOffice, body: emailBody, name: "VOEUX® Store Bot" });
-        } catch(mErr) {
+        } catch(mErr2) {
           try {
             GmailApp.sendEmail(recipient, subjectCust, emailBody, { name: "VOEUX® Official Store" });
-            GmailApp.sendEmail("voeuxoffice@gmail.com", subjectOffice, emailBody, { name: "VOEUX® Store Bot" });
           } catch(e2){}
         }
       }
