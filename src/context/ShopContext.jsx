@@ -56,9 +56,11 @@ export const ShopProvider = ({ children }) => {
   }, []);
 
   const [activePage, _setActivePageState] = useState(() => getPageFromHash());
+  const [pageTransitionKey, setPageTransitionKey] = useState(0);
 
   const setActivePage = (page, skipHistory = false) => {
     _setActivePageState(page);
+    setPageTransitionKey(prev => prev + 1);
     if (!skipHistory) {
       if (page === 'home') {
         window.history.pushState({ page }, '', window.location.pathname);
@@ -89,6 +91,7 @@ export const ShopProvider = ({ children }) => {
       }
 
       _setActivePageState(targetPage);
+      setPageTransitionKey(prev => prev + 1);
       window.scrollTo(0, 0);
     };
 
@@ -118,6 +121,7 @@ export const ShopProvider = ({ children }) => {
     _setSelectedProductModal(current);
     if (product) {
       _setActivePageState('product-detail');
+      setPageTransitionKey(prev => prev + 1);
       window.history.pushState({ page: 'product-detail', productId: product.id }, '', `#product-detail?id=${product.id}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -528,7 +532,8 @@ export const ShopProvider = ({ children }) => {
         setCartStep,
         buyNowCheckout,
         cartAnimating,
-        lastAddedProduct
+        lastAddedProduct,
+        pageTransitionKey
       }}
     >
       {children}

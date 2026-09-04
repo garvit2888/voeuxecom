@@ -126,7 +126,7 @@ export const CartDrawer = () => {
     }
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_TXaJQ9omK770rd',
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TXq1ludSll63Cn',
       amount: finalTotal * 100,
       currency: 'INR',
       name: 'VOEUX®',

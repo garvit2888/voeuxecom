@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import { useShop } from '../context/ShopContext';
 
 export const SplashScreen = () => {
+  const { pageTransitionKey } = useShop();
   const [show, setShow] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // Start smooth fade out at 1.4s
+    setShow(true);
+    setFadeOut(false);
+
+    // Start smooth fade out at 350ms
     const timer1 = setTimeout(() => {
       setFadeOut(true);
-    }, 1400);
+    }, 350);
 
-    // Completely unmount splash screen from DOM at 2.0s
+    // Unmount splash screen at 500ms (0.5 seconds total)
     const timer2 = setTimeout(() => {
       setShow(false);
-    }, 2000);
+    }, 500);
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
-  }, []);
+  }, [pageTransitionKey]);
 
   if (!show) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] bg-white flex flex-col items-center justify-center select-none transition-opacity duration-700 ease-in-out ${
+      className={`fixed inset-0 z-[99999] bg-white flex flex-col items-center justify-center select-none transition-opacity duration-150 ease-in-out ${
         fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -33,7 +38,7 @@ export const SplashScreen = () => {
         <img
           src="/images/voeux_logo.png"
           alt="VOEUX®"
-          className="w-32 sm:w-40 md:w-48 h-auto object-contain transition-transform duration-700 transform scale-100 hover:scale-105"
+          className="w-32 sm:w-40 md:w-48 h-auto object-contain transition-transform duration-300 transform scale-100 animate-pulse"
         />
       </div>
     </div>
