@@ -633,7 +633,13 @@ export const ShopProvider = ({ children }) => {
 
 
   const placeOrder = async (orderData) => {
-    const rewardVoucherCode = 'REF500-' + Math.floor(100000 + Math.random() * 900000);
+    // Referral reward voucher is ONLY generated if user came via a referral link (?ref=...) or used a referral voucher
+    const activeReferrer = sessionStorage.getItem('voeux_active_referrer');
+    const isReferralOrder = Boolean(
+      activeReferrer ||
+      (orderData.appliedVoucherCode && orderData.appliedVoucherCode.trim().toUpperCase().startsWith('REF'))
+    );
+    const rewardVoucherCode = isReferralOrder ? ('REF500-' + Math.floor(100000 + Math.random() * 900000)) : null;
 
     const newOrder = {
       id: 'VX-' + Math.floor(100000 + Math.random() * 900000),
@@ -653,7 +659,7 @@ export const ShopProvider = ({ children }) => {
       userEmail: user?.email || orderData.shippingAddress?.email || 'guest@voeuxtechnologies.in',
       userPhone: user?.phone || orderData.shippingAddress?.phone || 'N/A',
       referral: {
-        code: orderData.appliedVoucherCode || null,
+        code: activeReferrer || orderData.appliedVoucherCode || null,
         discountApplied: orderData.discountAmount || 0,
         rewardVoucherCode: rewardVoucherCode
       }
@@ -697,6 +703,7 @@ export const ShopProvider = ({ children }) => {
     try {
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'new_order', order: newOrder })
       });

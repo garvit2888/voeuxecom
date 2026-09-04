@@ -33,10 +33,16 @@ import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating } = useShop();
 
-  // Scroll to top of viewport immediately whenever activePage route changes
+  // Capture incoming referral parameters (?ref=9999999999 or #ref=...)
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activePage]);
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refParam = urlParams.get('ref') || (window.location.hash.includes('ref=') ? window.location.hash.split('ref=')[1] : null);
+      if (refParam) {
+        sessionStorage.setItem('voeux_active_referrer', refParam);
+      }
+    } catch (e) {}
+  }, []);
 
   // Secret admin orders dashboard & test page — accessible via #orders, #admin-orders, #admin-test-garvit2888
   useEffect(() => {

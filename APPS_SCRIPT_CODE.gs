@@ -71,13 +71,15 @@ function doPost(e) {
 
       // Email customer & office
       if (recipient && recipient.indexOf('@') > -1) {
+        var subjectCust = "VOEUX® Order Receipt #" + orderId;
+        var subjectOffice = "NEW ORDER RECEIVED #" + orderId + " - ₹" + order.totalAmount;
         try {
-          GmailApp.sendEmail(recipient, "VOEUX® Order Receipt #" + orderId, emailBody, { name: "VOEUX® Official Store" });
-          GmailApp.sendEmail("voeuxoffice@gmail.com", "NEW ORDER RECEIVED #" + orderId + " - ₹" + order.totalAmount, emailBody, { name: "VOEUX® Store Bot" });
+          MailApp.sendEmail({ to: recipient, subject: subjectCust, body: emailBody, name: "VOEUX® Official Store" });
+          MailApp.sendEmail({ to: "voeuxoffice@gmail.com", subject: subjectOffice, body: emailBody, name: "VOEUX® Store Bot" });
         } catch(mErr) {
           try {
-            MailApp.sendEmail({ to: recipient, subject: "VOEUX® Order Receipt #" + orderId, body: emailBody });
-            MailApp.sendEmail({ to: "voeuxoffice@gmail.com", subject: "NEW ORDER RECEIVED #" + orderId, body: emailBody });
+            GmailApp.sendEmail(recipient, subjectCust, emailBody, { name: "VOEUX® Official Store" });
+            GmailApp.sendEmail("voeuxoffice@gmail.com", subjectOffice, emailBody, { name: "VOEUX® Store Bot" });
           } catch(e2){}
         }
       }
