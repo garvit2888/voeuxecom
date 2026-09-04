@@ -205,7 +205,7 @@ export const Navbar = () => {
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-6 w-auto object-contain brightness-0 invert"
+            className="h-6 w-auto object-contain"
           />
         </div>
 
