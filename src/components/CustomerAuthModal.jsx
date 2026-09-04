@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { X, Lock, Mail, Phone, User, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { X, Lock, Mail, Phone, User, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export const CustomerAuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, loginUser, registerUser, addToast } = useShop();
@@ -20,15 +20,18 @@ export const CustomerAuthModal = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   if (!isAuthModalOpen) return null;
 
   const handleChange = (e) => {
+    setErrorMsg(''); // Clear inline error on any field change
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleModeSwitch = (newMode) => {
     setMode(newMode);
+    setErrorMsg('');
     setFormData({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: '', city: '', pincode: '', state: 'Delhi' });
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -36,34 +39,35 @@ export const CustomerAuthModal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
 
     try {
       if (mode === 'login') {
         if (!formData.email || !formData.password) {
-          addToast('Please enter your email or mobile number and password', 'warning');
+          setErrorMsg('Please enter your email or mobile number and password');
           setLoading(false);
           return;
         }
         await loginUser(formData.email, formData.password);
       } else {
         if (!formData.name || !formData.email || !formData.phone || !formData.password) {
-          addToast('Please fill in all required fields', 'warning');
+          setErrorMsg('Please fill in all required fields');
           setLoading(false);
           return;
         }
         if (formData.phone.replace(/\D/g, '').length !== 10) {
-          addToast('Please enter a valid 10-digit mobile number', 'warning');
+          setErrorMsg('Please enter a valid 10-digit mobile number');
           setLoading(false);
           return;
         }
         if (formData.password.length < 6) {
-          addToast('Password must be at least 6 characters', 'warning');
+          setErrorMsg('Password must be at least 6 characters');
           setLoading(false);
           return;
         }
         if (formData.password !== formData.confirmPassword) {
-          addToast('Passwords do not match. Please re-enter.', 'warning');
+          setErrorMsg('Passwords do not match. Please re-enter.');
           setLoading(false);
           return;
         }
@@ -72,7 +76,7 @@ export const CustomerAuthModal = () => {
       }
       setIsAuthModalOpen(false);
     } catch (err) {
-      addToast(err.message || 'Authentication failed', 'error');
+      setErrorMsg(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -81,7 +85,7 @@ export const CustomerAuthModal = () => {
   return (
     <div className="fixed inset-0 z-[200] overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden text-left">
-        
+
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-gray-100">
           <div>
@@ -120,8 +124,16 @@ export const CustomerAuthModal = () => {
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {/* Form — autoComplete="off" blocks browser from pre-filling saved credentials */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4" autoComplete="off">
+
+          {/* ── Inline Error Banner — appears above all inputs ── */}
+          {errorMsg && (
+            <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+              <span className="text-xs font-semibold text-red-700 leading-snug">{errorMsg}</span>
+            </div>
+          )}
 
           {/* Full Name — register only */}
           {mode === 'register' && (
@@ -130,9 +142,13 @@ export const CustomerAuthModal = () => {
               <div className="relative">
                 <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type="text" name="name" required
-                  value={formData.name} onChange={handleChange}
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Enter your full name"
+                  autoComplete="new-password"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
               </div>
@@ -148,9 +164,12 @@ export const CustomerAuthModal = () => {
               <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
                 type={mode === 'login' ? 'text' : 'email'}
-                name="email" required
-                value={formData.email} onChange={handleChange}
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
                 placeholder={mode === 'login' ? 'Registered email or 10-digit mobile number' : 'name@example.com'}
+                autoComplete="new-password"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
             </div>
@@ -163,9 +182,14 @@ export const CustomerAuthModal = () => {
               <div className="relative">
                 <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type="tel" name="phone" required
-                  value={formData.phone} onChange={handleChange}
-                  placeholder="9876543210" maxLength={10}
+                  type="tel"
+                  name="phone"
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="9876543210"
+                  maxLength={10}
+                  autoComplete="new-password"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
               </div>
@@ -174,14 +198,19 @@ export const CustomerAuthModal = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-[11px] font-semibold text-gray-600 mb-1">Password *{mode === 'register' && ' (min. 6 characters)'}</label>
+            <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+              Password *{mode === 'register' && ' (min. 6 characters)'}
+            </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
                 type={showPassword ? 'text' : 'password'}
-                name="password" required
-                value={formData.password} onChange={handleChange}
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="••••••••"
+                autoComplete="new-password"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
               <button
@@ -203,9 +232,12 @@ export const CustomerAuthModal = () => {
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword" required
-                  value={formData.confirmPassword} onChange={handleChange}
+                  name="confirmPassword"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   placeholder="Re-enter password"
+                  autoComplete="new-password"
                   className={`w-full bg-gray-50 border rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 focus:bg-white focus:outline-none transition ${
                     formData.confirmPassword && formData.confirmPassword !== formData.password
                       ? 'border-red-400 focus:border-red-500'
@@ -235,11 +267,14 @@ export const CustomerAuthModal = () => {
           {/* Optional Address — register only */}
           {mode === 'register' && (
             <div className="space-y-3 pt-2 border-t border-gray-100">
-              <p className="text-[11px] font-bold text-gray-600">Default Shipping Address <span className="text-gray-400 font-normal">(Optional — saves time at checkout)</span></p>
+              <p className="text-[11px] font-bold text-gray-600">
+                Default Shipping Address <span className="text-gray-400 font-normal">(Optional — saves time at checkout)</span>
+              </p>
               <input
                 type="text" name="address"
                 value={formData.address} onChange={handleChange}
                 placeholder="House No, Street, Landmark"
+                autoComplete="new-password"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
               <div className="grid grid-cols-2 gap-2">
@@ -247,12 +282,14 @@ export const CustomerAuthModal = () => {
                   type="text" name="city"
                   value={formData.city} onChange={handleChange}
                   placeholder="City"
+                  autoComplete="new-password"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
                 <input
                   type="text" name="pincode"
                   value={formData.pincode} onChange={handleChange}
                   placeholder="6-digit Pincode"
+                  autoComplete="new-password"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
                 />
               </div>
