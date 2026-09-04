@@ -3,7 +3,7 @@ import { useShop } from '../context/ShopContext';
 import { Package, User, Gift, Share2, Phone, Mail, Edit2, Plus, LogOut, CheckCircle, Truck, MapPin, ChevronRight, X } from 'lucide-react';
 
 export const CustomerProfilePage = () => {
-  const { user, logoutUser, orders, setActivePage, addToast } = useShop();
+  const { user, logoutUser, orders, setActivePage, addToast, voeuxCashBalance } = useShop();
   const [activeTab, setActiveTab] = useState('profile'); // 'orders' | 'profile' | 'rewards' | 'referral'
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -340,18 +340,34 @@ export const CustomerProfilePage = () => {
               <div className="space-y-6">
                 <div className="border-b border-gray-200 pb-4">
                   <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    VOEUX Rewards
+                    VOEUX Rewards Cash
                   </h2>
                 </div>
 
-                <div className="border border-gray-200 rounded-2xl p-8 text-center space-y-3 bg-white">
-                  <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mx-auto text-yellow-600">
+                <div className="border border-gray-200 rounded-3xl p-8 text-center space-y-4 bg-white shadow-xs">
+                  <div className="w-16 h-16 bg-[#3B429F]/10 rounded-2xl flex items-center justify-center mx-auto text-[#3B429F]">
                     <Gift className="w-8 h-8" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">0 VOEUX Cash Balance</h3>
-                  <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                    Earn 5% VOEUX Cash back on every car audio & stereo purchase. Redeem points directly on your next checkout!
+                  <div>
+                    <h3 className="text-3xl font-black text-gray-900">{voeuxCashBalance} VOEUX Cash</h3>
+                    <p className="text-xs text-[#3B429F] font-bold mt-1">1 Point = ₹1 Discount Value</p>
+                  </div>
+                  <p className="text-xs text-gray-600 max-w-md mx-auto leading-relaxed">
+                    Earn 5% VOEUX Cash back on every order placed! Redeem your points directly during checkout for instant discounts.
                   </p>
+                  
+                  <div className="pt-2 border-t border-gray-100 max-w-md mx-auto text-xs space-y-2">
+                    <div className="flex justify-between text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-200/60 font-medium">
+                      <span>Minimum Points to Redeem:</span>
+                      <span className="font-bold text-gray-900">150 Points (₹150 Value)</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-200/60 font-medium">
+                      <span>Redemption Status:</span>
+                      <span className={voeuxCashBalance >= 150 ? 'font-bold text-emerald-600' : 'font-bold text-amber-700'}>
+                        {voeuxCashBalance >= 150 ? 'Ready to Redeem at Checkout' : `Need ${150 - voeuxCashBalance} more points`}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

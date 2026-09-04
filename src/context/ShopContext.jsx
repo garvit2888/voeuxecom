@@ -279,11 +279,100 @@ export const ShopProvider = ({ children }) => {
 
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('voeux_user');
-      if (!saved || saved === 'undefined') return null;
+      const saved = localStorage.getItem('voeux_user') || sessionStorage.getItem('voeux_user');
+      if (!saved || saved === 'undefined' || saved === 'null') return null;
       return JSON.parse(saved);
     } catch(e) { return null; }
   });
+
+  // Always keep user state in sync with both localStorage and sessionStorage
+  useEffect(() => {
+    if (user) {
+      try {
+        localStorage.setItem('voeux_user', JSON.stringify(user));
+        sessionStorage.setItem('voeux_user', JSON.stringify(user));
+      } catch (e) {}
+    }
+  }, [user]);
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_orders');
+      if (!saved || saved === 'undefined') return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) { return []; }
+  });
+
+  // Fetch Live Orders from Firebase RTDB for the logged-in user
+  const fetchLiveUserOrders = async (currentUser) => {
+    if (!currentUser || (!currentUser.email && !currentUser.phone)) return;
+    try {
+      const res = await fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/orders.json');
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          const allOrders = Object.values(data);
+          const userEmailClean = (currentUser.email || '').toLowerCase().trim();
+          const userPhoneClean = (currentUser.phone || '').replace(/\D/g, '');
+
+          const matchedOrders = allOrders.filter(ord => {
+            if (!ord) return false;
+            const ordEmail = (ord.userEmail || ord.shippingAddress?.email || '').toLowerCase().trim();
+            const ordPhone = (ord.userPhone || ord.shippingAddress?.phone || ord.shippingAddress?.mobile || '').replace(/\D/g, '');
+            const emailMatch = userEmailClean && ordEmail === userEmailClean;
+            const phoneMatch = userPhoneClean && userPhoneClean.length >= 10 && ordPhone === userPhoneClean;
+            return emailMatch || phoneMatch;
+          });
+
+          matchedOrders.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+          const map = new Map();
+          matchedOrders.forEach(o => { if (o && o.id) map.set(o.id, o); });
+          orders.forEach(o => { if (o && o.id) map.set(o.id, o); });
+          const combined = Array.from(map.values());
+          combined.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+          setOrders(combined);
+          try { localStorage.setItem('voeux_orders', JSON.stringify(combined)); } catch(e){}
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch live user orders:', err);
+    }
+  };
+
+  // Sync user orders from Firebase whenever user mounts/logs in
+  useEffect(() => {
+    if (user) {
+      fetchLiveUserOrders(user);
+    }
+  }, [user?.email, user?.phone]);
+
+  // VOEUX Cash State & Redemption System (1 Point = ₹1)
+  const [isVoeuxCashApplied, setIsVoeuxCashApplied] = useState(false);
+
+  const voeuxCashBalance = useMemo(() => {
+    if (!user) return 0;
+    if (typeof user.voeuxCash === 'number') return user.voeuxCash;
+    return 150; // Starter balance
+  }, [user]);
+
+  const toggleVoeuxCash = () => {
+    if (!user) {
+      addToast('Please sign in to redeem your VOEUX Cash points.', 'warning');
+      setIsAuthModalOpen(true);
+      return;
+    }
+    if (voeuxCashBalance < 150) {
+      addToast(`Minimum 150 VOEUX Cash points required to redeem at checkout. (Current Balance: ${voeuxCashBalance} points)`, 'warning');
+      return;
+    }
+    setIsVoeuxCashApplied(prev => !prev);
+    if (!isVoeuxCashApplied) {
+      addToast(`VOEUX Cash applied! ₹${voeuxCashBalance} discount added to checkout.`, 'success');
+    }
+  };
 
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
@@ -388,15 +477,6 @@ export const ShopProvider = ({ children }) => {
     const interval = setInterval(checkAndDispatch, 60000);
     return () => clearInterval(interval);
   }, []);
-
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('voeux_orders');
-      if (!saved || saved === 'undefined') return [];
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch(e) { return []; }
-  });
 
   const [usedVouchers, setUsedVouchers] = useState(() => {
     try {
@@ -723,8 +803,36 @@ export const ShopProvider = ({ children }) => {
       localStorage.removeItem('voeux_current_abandoned_cart_data');
     }
 
+    // Earn 5% cashback as VOEUX Cash points on every order placed
+    const earnedCash = Math.max(10, Math.floor((newOrder.totalAmount || cartTotal) * 0.05));
+    const redeemedCash = (isVoeuxCashApplied && user && voeuxCashBalance >= 150) ? Math.min(voeuxCashBalance, orderData.totalAmount || cartTotal) : 0;
+
+    if (user) {
+      const updatedCash = Math.max(0, voeuxCashBalance - redeemedCash + earnedCash);
+      const updatedUser = { ...user, voeuxCash: updatedCash };
+      setUser(updatedUser);
+      try {
+        localStorage.setItem('voeux_user', JSON.stringify(updatedUser));
+        sessionStorage.setItem('voeux_user', JSON.stringify(updatedUser));
+      } catch(e){}
+
+      // Sync user VOEUX Cash to Firebase DB
+      try {
+        if (updatedUser.email) {
+          const userKey = updatedUser.email.replace(/[.#$\[\]]/g, '_');
+          fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/users_cash/${userKey}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ voeuxCash: updatedCash, updatedAt: new Date().toISOString() })
+          });
+        }
+      } catch(e){}
+    }
+
+    setIsVoeuxCashApplied(false);
+
     setCart([]);
-    addToast(`Order #${newOrder.id} placed successfully!`, 'success');
+    addToast(`Order #${newOrder.id} placed successfully! ${user ? `(+${earnedCash} VOEUX Cash earned)` : ''}`, 'success');
     return newOrder;
   };
 
@@ -769,6 +877,11 @@ export const ShopProvider = ({ children }) => {
         logoutUser,
         resetUserPassword,
         orders,
+        fetchLiveUserOrders,
+        voeuxCashBalance,
+        isVoeuxCashApplied,
+        setIsVoeuxCashApplied,
+        toggleVoeuxCash,
         placeOrder,
         isAuthModalOpen,
         setIsAuthModalOpen,

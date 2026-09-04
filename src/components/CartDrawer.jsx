@@ -16,7 +16,10 @@ export const CartDrawer = () => {
     placeOrder,
     verifyAndApplyVoucher,
     cartStep,
-    setCartStep
+    setCartStep,
+    voeuxCashBalance,
+    isVoeuxCashApplied,
+    toggleVoeuxCash
   } = useShop();
 
   const [step, setStep] = useState(cartStep || 'cart');
@@ -27,6 +30,9 @@ export const CartDrawer = () => {
   const [loading, setLoading] = useState(false);
   const [verifyingCoupon, setVerifyingCoupon] = useState(false);
   const [paymentCancelled, setPaymentCancelled] = useState(false);
+
+  const voeuxCashDiscountAmount = (isVoeuxCashApplied && voeuxCashBalance >= 150) ? Math.min(voeuxCashBalance, Math.max(0, cartTotal - discountAmount)) : 0;
+  const finalTotal = Math.max(0, cartTotal - discountAmount - voeuxCashDiscountAmount);
 
   const [addressData, setAddressData] = useState({
     fullName: user?.name || '',
@@ -84,8 +90,6 @@ export const CartDrawer = () => {
       setVerifyingCoupon(false);
     }
   };
-
-  const finalTotal = Math.max(0, cartTotal - discountAmount);
 
   const handleAddressChange = (e) => {
     setAddressData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -145,7 +149,8 @@ export const CartDrawer = () => {
           paymentMethod: 'RAZORPAY_ONLINE',
           paymentId: response.razorpay_payment_id || 'PAY_' + Date.now(),
           appliedVoucherCode,
-          discountAmount
+          discountAmount,
+          voeuxCashRedeemed: voeuxCashDiscountAmount
         });
         setLastPlacedOrder(placed);
         setStep('success');
@@ -289,6 +294,40 @@ export const CartDrawer = () => {
                   </button>
                 </form>
 
+                {/* VOEUX Cash Redemption Section */}
+                {user && (
+                  <div className="p-3 bg-[#3B429F]/5 border border-[#3B429F]/20 rounded-xl space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-slate-900">VOEUX Cash Balance</span>
+                        <span className="bg-[#3B429F] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                          {voeuxCashBalance} Pts (₹{voeuxCashBalance})
+                        </span>
+                      </div>
+                      {voeuxCashBalance >= 150 ? (
+                        <button
+                          type="button"
+                          onClick={toggleVoeuxCash}
+                          className={`text-[11px] font-extrabold px-3 py-1 rounded-lg transition cursor-pointer ${
+                            isVoeuxCashApplied ? 'bg-emerald-600 text-white' : 'bg-[#3B429F] text-white hover:bg-[#2B308B]'
+                          }`}
+                        >
+                          {isVoeuxCashApplied ? 'Redeemed' : 'Redeem'}
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-200">
+                          Min 150 pts required
+                        </span>
+                      )}
+                    </div>
+                    {voeuxCashBalance < 150 && (
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        Earn 5% points on every order! Minimum 150 points required to redeem at checkout.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Subtotal Calculation */}
                 <div className="space-y-2 text-xs pt-2 border-t border-gray-100">
                   <div className="flex justify-between text-gray-500">
@@ -297,8 +336,14 @@ export const CartDrawer = () => {
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-emerald-600 font-bold bg-emerald-50 p-2 rounded-xl border border-emerald-100">
-                      <span>🎁 Voucher Discount ({appliedVoucherCode || 'VOEUX10'})</span>
+                      <span>Voucher Discount ({appliedVoucherCode || 'VOEUX10'})</span>
                       <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
+                    </div>
+                  )}
+                  {voeuxCashDiscountAmount > 0 && (
+                    <div className="flex justify-between text-[#3B429F] font-bold bg-indigo-50 p-2 rounded-xl border border-indigo-100">
+                      <span>VOEUX Cash Redeemed ({voeuxCashDiscountAmount} Pts)</span>
+                      <span>-₹{voeuxCashDiscountAmount.toLocaleString('en-IN')}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-gray-500">
