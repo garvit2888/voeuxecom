@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
-import { Search, ShoppingCart, Menu, X, User } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, User, ChevronRight } from 'lucide-react';
 
 export const Navbar = () => {
   const {
@@ -183,15 +183,15 @@ export const Navbar = () => {
       </header>
 
       {/* ==================== MOBILE FLOATING CAPSULE NAVIGATION BAR ==================== */}
-      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-sm mx-auto bg-slate-950 text-white rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl border border-slate-800 backdrop-blur-lg">
+      <div className="lg:hidden fixed bottom-6 left-4 right-4 z-[90] max-w-sm mx-auto bg-[#3B429F] text-white rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl border border-indigo-400/30 backdrop-blur-lg">
         {/* Left: Mobile Menu Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="flex items-center gap-1.5 text-white font-bold text-xs p-1 cursor-pointer"
+          className="flex items-center gap-1.5 text-white font-bold text-xs p-1 cursor-pointer hover:opacity-90 active:scale-95 transition"
           aria-label="Toggle Mobile Menu"
         >
-          {isMobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
-          <span className="text-xs font-bold tracking-wider uppercase">Menu</span>
+          {isMobileMenuOpen ? <Menu className="w-5 h-5 text-white opacity-80" /> : <Menu className="w-5 h-5 text-white" />}
+          <span className="text-xs font-black tracking-wider uppercase">Menu</span>
         </button>
 
         {/* Center: Brand Logo */}
@@ -205,7 +205,7 @@ export const Navbar = () => {
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX® Logo"
-            className="h-6 w-auto object-contain"
+            className="h-6 w-auto object-contain brightness-0 invert"
           />
         </div>
 
@@ -213,7 +213,7 @@ export const Navbar = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={handleAccountClick}
-            className="p-1 text-slate-200 hover:text-white transition"
+            className="p-1 text-white hover:text-indigo-100 transition cursor-pointer active:scale-95"
             aria-label="Account"
           >
             <User className="w-5 h-5" />
@@ -221,12 +221,12 @@ export const Navbar = () => {
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative p-1 text-slate-200 hover:text-white transition"
+            className="relative p-1 text-white hover:text-indigo-100 transition cursor-pointer active:scale-95"
             aria-label="Cart"
           >
             <ShoppingCart className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center border border-[#3B429F]">
                 {cartCount}
               </span>
             )}
@@ -236,80 +236,42 @@ export const Navbar = () => {
 
       {/* Mobile Drawer Menu Modal */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[85] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl p-6 space-y-4 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-gray-200 text-left">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-gray-900">
-                <User className="w-4 h-4 text-[#3B429F]" />
-                <span>{user ? `Account: ${user.name}` : 'Welcome Guest'}</span>
-              </div>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 z-[85] bg-black/65 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200"
+        >
+          {/* Inner Drawer — stopPropagation prevents inner click from closing menu */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#3B429F] rounded-t-[32px] p-5 pt-3 space-y-3 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-indigo-400/30 text-left"
+          >
+            {/* Top Handle Indicator */}
+            <div className="w-12 h-1.5 bg-white/40 rounded-full mx-auto my-1.5" />
 
-            {/* Mobile Account Button */}
-            <button
-              onClick={() => {
-                handleAccountClick();
-                setIsMobileMenuOpen(false);
-              }}
-              className="w-full bg-indigo-50 border border-indigo-100 text-[#3B429F] font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-between"
-            >
-              <span>{user ? 'My Profile & Orders' : 'Sign In / Create Account'}</span>
-              <User className="w-4 h-4" />
-            </button>
-
-            {/* Mobile Search Bar */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-100 text-gray-900 placeholder-gray-500 text-xs rounded-xl pl-9 pr-3 py-2.5 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#3B429F]"
-              />
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-
-              {searchResults.length > 0 && searchQuery && (
-                <div className="mt-2 bg-white rounded-xl shadow-lg border border-gray-200 divide-y divide-gray-100 max-h-48 overflow-y-auto">
-                  {searchResults.map(p => (
-                    <div
-                      key={p.id}
-                      onClick={() => {
-                        setSelectedProductModal(p);
-                        setSearchQuery('');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="p-2.5 flex items-center gap-3 active:bg-gray-100 cursor-pointer"
-                    >
-                      <img src={p.image} alt={p.name} className="w-8 h-8 object-cover rounded bg-gray-100" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-900 truncate">{p.name}</p>
-                        <p className="text-[10px] text-[#3B429F] font-bold">₹{p.price.toLocaleString('en-IN')}</p>
-                      </div>
+            {/* Mobile Nav Links - Sleek White Premium Cards */}
+            <div className="space-y-2.5 pt-1">
+              {navLinks.map(link => {
+                const isActive = activePage === link.id;
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => {
+                      setActivePage(link.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-between cursor-pointer active:scale-[0.98] ${
+                      isActive
+                        ? 'bg-white text-[#3B429F] shadow-lg shadow-indigo-950/40 ring-2 ring-white/60'
+                        : 'bg-white/95 hover:bg-white text-gray-900 shadow-md'
+                    }`}
+                  >
+                    <span className="tracking-tight text-sm font-extrabold">{link.label}</span>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center transition ${isActive ? 'bg-[#3B429F] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                      <ChevronRight className="w-4 h-4" />
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Nav Links */}
-            <div className="grid grid-cols-2 gap-2.5 text-xs">
-              {navLinks.map(link => (
-                <button
-                  key={link.id}
-                  onClick={() => {
-                    setActivePage(link.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`p-3 rounded-xl text-left font-bold transition ${
-                    activePage === link.id ? 'bg-[#3B429F] text-white shadow-sm' : 'bg-gray-50 text-gray-800 border border-gray-200'
-                  }`}
-                >
-                  {link.label}
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
