@@ -215,7 +215,6 @@ export const CartDrawer = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-gray-900">Your shopping bag is empty</h3>
-                    <p className="text-xs text-gray-500 mt-1">Discover our high-performance car electronics.</p>
                   </div>
                   <button
                     onClick={() => setIsCartOpen(false)}
