@@ -38,10 +38,16 @@ const MainContent = () => {
     window.scrollTo(0, 0);
   }, [activePage]);
 
-  // Secret admin test page — accessible via URL fragment #admin-test-garvit2888
+  // Secret admin orders dashboard & test page — accessible via #orders, #admin-orders, #admin-test-garvit2888
   useEffect(() => {
     const checkSecretRoute = () => {
-      if (window.location.hash === '#admin-test-garvit2888') {
+      const hash = window.location.hash;
+      if (
+        hash === '#admin-test-garvit2888' ||
+        hash === '#orders' ||
+        hash === '#admin-orders' ||
+        hash === '#all-orders'
+      ) {
         setActivePage('admin-test-payment');
       }
     };

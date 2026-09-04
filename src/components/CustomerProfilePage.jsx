@@ -211,7 +211,7 @@ export const CustomerProfilePage = () => {
 
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-gray-400" />
-                      <span>{user.email || 'customer@voeux.in'}</span>
+                      <span>{user.email || 'customer@voeuxtechnologies.in'}</span>
                       <button
                         onClick={() => {
                           setEditProfileData({

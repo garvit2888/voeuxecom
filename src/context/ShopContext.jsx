@@ -650,7 +650,7 @@ export const ShopProvider = ({ children }) => {
       shippingAddress: orderData.shippingAddress,
       paymentMethod: orderData.paymentMethod || 'COD',
       paymentId: orderData.paymentId || 'N/A',
-      userEmail: user?.email || orderData.shippingAddress?.email || 'guest@voeux.in',
+      userEmail: user?.email || orderData.shippingAddress?.email || 'guest@voeuxtechnologies.in',
       userPhone: user?.phone || orderData.shippingAddress?.phone || 'N/A',
       referral: {
         code: orderData.appliedVoucherCode || null,
@@ -693,9 +693,9 @@ export const ShopProvider = ({ children }) => {
       });
     } catch(e){}
 
-    // Apps Script Order Notification & Voucher Email Sync
+    // Apps Script Order Notification & Voucher Email & Google Sheet Sync
     try {
-      fetch('https://script.google.com/macros/s/AKfycbz_placeholder/exec', {
+      fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'new_order', order: newOrder })

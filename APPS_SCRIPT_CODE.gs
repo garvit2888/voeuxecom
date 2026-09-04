@@ -37,7 +37,7 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     
-    // ==================== 1. NEW ORDER NOTIFICATION & REFERRAL VOUCHER EMAIL ====================
+    // ==================== 1. NEW ORDER NOTIFICATION, GOOGLE SHEET LOGGING & VOUCHER EMAIL ====================
     if (data.action === 'new_order' && data.order) {
       var order = data.order;
       var recipient = order.userEmail || (order.shippingAddress ? order.shippingAddress.email : '');
@@ -82,6 +82,66 @@ function doPost(e) {
         }
       }
 
+      // ========== SAVE ORDER DETAILS TO GOOGLE SHEET ==========
+      try {
+        var ss = SpreadsheetApp.getActiveSpreadsheet();
+        if (ss) {
+          var orderSheet = ss.getSheetByName("Orders");
+          if (!orderSheet) {
+            orderSheet = ss.insertSheet("Orders");
+          }
+          if (orderSheet.getLastRow() === 0) {
+            orderSheet.appendRow([
+              "Order Date & Time",
+              "Order ID",
+              "Customer Name",
+              "Customer Email",
+              "Customer Phone",
+              "Items Purchased",
+              "Total Amount (₹)",
+              "Payment ID",
+              "Payment Method",
+              "Shipping Address",
+              "Order Status"
+            ]);
+          }
+          
+          var itemsFormatted = "";
+          if (order.items && Array.isArray(order.items)) {
+            itemsFormatted = order.items.map(function(it) {
+              var pName = it.name || (it.product && it.product.name) || 'VOEUX Product';
+              var qty = it.quantity || 1;
+              var price = it.price || (it.product && it.product.price) || 0;
+              return pName + " (Qty: " + qty + ", Price: ₹" + price + ")";
+            }).join("; ");
+          }
+
+          var addrStr = order.shippingAddress ? (
+            (order.shippingAddress.fullName || '') + ", " +
+            (order.shippingAddress.street || '') + ", " +
+            (order.shippingAddress.city || '') + " - " +
+            (order.shippingAddress.pincode || '') + " (Ph: " +
+            (order.shippingAddress.phone || order.shippingAddress.mobile || '') + ")"
+          ) : 'N/A';
+
+          orderSheet.appendRow([
+            order.createdAt || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+            orderId,
+            order.shippingAddress ? (order.shippingAddress.fullName || order.userName || 'Customer') : (order.userName || 'Customer'),
+            recipient,
+            order.shippingAddress ? (order.shippingAddress.phone || order.shippingAddress.mobile || 'N/A') : 'N/A',
+            itemsFormatted,
+            order.totalAmount || 0,
+            order.paymentId || 'N/A',
+            order.paymentMethod || 'Razorpay',
+            addrStr,
+            order.status || 'ORDER PLACED'
+          ]);
+        }
+      } catch(sheetErr) {
+        Logger.log("Order Sheet Append Error: " + sheetErr.toString());
+      }
+
       return ContentService
         .createTextOutput(JSON.stringify({ result: "success", orderId: orderId }))
         .setMimeType(ContentService.MimeType.JSON);
@@ -92,7 +152,7 @@ function doPost(e) {
       var session = data.cartSession;
       var recipient = session.userEmail || session.email;
       var recipientName = session.userName || session.name || 'Valued Customer';
-      var recoveryUrl = session.recoveryUrl || ('https://voeux.in/#restore-cart=' + (session.id || ''));
+      var recoveryUrl = session.recoveryUrl || ('https://voeuxtechnologies.in/#restore-cart=' + (session.id || ''));
       var items = session.cart || [];
       
       var itemsListStr = items.map(function(item) {
@@ -224,7 +284,7 @@ function doPost(e) {
         "==========================================\n\n" +
         "WhatsApp Customer Support: +91 9999484530 (Mon-Sat 11 AM - 6 PM)\n" +
         "Official Email: voeuxexperience@gmail.com\n" +
-        "Website: https://voeux.in\n\n" +
+        "Website: https://voeuxtechnologies.in\n\n" +
         "Thank you for choosing VOEUX® Car Electronics!";
         
       try {
@@ -652,7 +712,7 @@ function processAbandonedCartsCron() {
       if (isPending && notSent && age >= ONE_HOUR_MS && session.userEmail) {
         var recipient = session.userEmail;
         var recipientName = session.userName || 'Valued Customer';
-        var recoveryUrl = session.recoveryUrl || ('https://voeux.in/#restore-cart=' + key);
+        var recoveryUrl = session.recoveryUrl || ('https://voeuxtechnologies.in/#restore-cart=' + key);
         var items = session.cart || [];
 
         var itemsListStr = items.map(function(item) {
