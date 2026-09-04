@@ -27,6 +27,8 @@ import { CustomerAuthModal } from './components/CustomerAuthModal';
 import { CustomerProfilePage } from './components/CustomerProfilePage';
 import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
+import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
+
 
 const MainContent = () => {
   const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating } = useShop();
@@ -36,8 +38,23 @@ const MainContent = () => {
     window.scrollTo(0, 0);
   }, [activePage]);
 
+  // Secret admin test page — accessible via URL fragment #admin-test-garvit2888
+  useEffect(() => {
+    const checkSecretRoute = () => {
+      if (window.location.hash === '#admin-test-garvit2888') {
+        setActivePage('admin-test-payment');
+      }
+    };
+    checkSecretRoute();
+    window.addEventListener('hashchange', checkSecretRoute);
+    return () => window.removeEventListener('hashchange', checkSecretRoute);
+  }, [setActivePage]);
+
+
   const renderPage = () => {
     switch (activePage) {
+      case 'admin-test-payment':
+        return <AdminTestPaymentPage />;
       case 'voeux-ops':
       case 'flipkart-admin':
         return <FlipkartOpsAdmin />;
