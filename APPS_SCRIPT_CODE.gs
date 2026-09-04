@@ -94,7 +94,14 @@ function doPost(e) {
 
       // ========== SAVE ORDER DETAILS TO GOOGLE SHEET ==========
       try {
-        var ss = SpreadsheetApp.getActiveSpreadsheet();
+        var SPREADSHEET_ID = "1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E";
+        var ss = null;
+        try {
+          ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        } catch(eOpen) {
+          ss = SpreadsheetApp.getActiveSpreadsheet();
+        }
+
         if (ss) {
           var orderSheet = ss.getSheetByName("Orders");
           if (!orderSheet) {
@@ -261,7 +268,14 @@ function doPost(e) {
     }
 
     // ==================== 2. WARRANTY REGISTRATION & EMAIL ====================
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var SPREADSHEET_ID = "1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E";
+    var sheet = null;
+    try {
+      var ssW = SpreadsheetApp.openById(SPREADSHEET_ID);
+      sheet = ssW.getSheetByName("Warranty Registrations") || ssW.getActiveSheet();
+    } catch(eW) {
+      sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    }
     sheet.appendRow([
       data.certificateId || '',
       data.name || '',

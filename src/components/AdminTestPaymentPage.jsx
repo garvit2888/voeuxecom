@@ -18,7 +18,7 @@ const TEST_PRODUCT = {
   badge: 'ADMIN TEST'
 };
 
-const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/';
+const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E/edit';
 
 export const AdminTestPaymentPage = () => {
   const { addToCart, buyNowCheckout, user, setIsAuthModalOpen, addToast, orders: localOrders } = useShop();
