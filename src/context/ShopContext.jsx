@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { PRODUCTS } from '../data/products';
 import { fetchLiveFlipkartPrice } from '../utils/flipkartPriceScraper';
 
