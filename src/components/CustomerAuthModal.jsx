@@ -41,7 +41,7 @@ export const CustomerAuthModal = () => {
     try {
       if (mode === 'login') {
         if (!formData.email || !formData.password) {
-          addToast('Please enter your email and password', 'warning');
+          addToast('Please enter your email or mobile number and password', 'warning');
           setLoading(false);
           return;
         }
@@ -139,15 +139,18 @@ export const CustomerAuthModal = () => {
             </div>
           )}
 
-          {/* Email */}
+          {/* Email or Phone for Login / Email for Register */}
           <div>
-            <label className="block text-[11px] font-semibold text-gray-600 mb-1">Email Address *</label>
+            <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+              {mode === 'login' ? 'Email Address or Mobile Number *' : 'Email Address *'}
+            </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
-                type="email" name="email" required
+                type={mode === 'login' ? 'text' : 'email'}
+                name="email" required
                 value={formData.email} onChange={handleChange}
-                placeholder="name@example.com"
+                placeholder={mode === 'login' ? 'Registered email or 10-digit mobile number' : 'name@example.com'}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
             </div>

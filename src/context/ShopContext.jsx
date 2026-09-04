@@ -342,26 +342,49 @@ export const ShopProvider = ({ children }) => {
     throw new Error('Invalid code. Please check your email for the correct referral voucher.');
   };
 
-  const loginUser = async (email, password) => {
-    // Check local stored users or default user
+  const loginUser = async (identifier, password) => {
+    const inputClean = (identifier || '').trim().toLowerCase();
+    const phoneClean = (identifier || '').replace(/\D/g, '');
+
     const usersRaw = localStorage.getItem('voeux_users_db') || '[]';
     let users = [];
     try { users = JSON.parse(usersRaw); } catch(e){}
 
-    let found = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-    
+    let found = users.find(u => {
+      const emailMatches = u.email && u.email.trim().toLowerCase() === inputClean;
+      const phoneMatches = phoneClean && phoneClean.length >= 10 && u.phone && u.phone.replace(/\D/g, '') === phoneClean;
+      const passMatches = u.password === password;
+      return (emailMatches || phoneMatches) && passMatches;
+    });
+
+    // Check remote Firebase registered database if not found locally
     if (!found) {
-      // Demo / auto-login fallback if password is valid length
-      if (password.length >= 4) {
-        found = {
-          name: email.split('@')[0],
-          email: email.toLowerCase(),
-          phone: '9999999999',
-          password
-        };
-      } else {
-        throw new Error('Invalid email or password');
-      }
+      try {
+        const res = await fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/users.json');
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            const firebaseUsers = Object.values(data);
+            found = firebaseUsers.find(u => {
+              const emailMatches = u.email && u.email.trim().toLowerCase() === inputClean;
+              const phoneMatches = phoneClean && phoneClean.length >= 10 && u.phone && u.phone.replace(/\D/g, '') === phoneClean;
+              const passMatches = u.password === password;
+              return (emailMatches || phoneMatches) && passMatches;
+            });
+            if (found) {
+              const existsLocally = users.some(u => u.email?.toLowerCase() === found.email?.toLowerCase());
+              if (!existsLocally) {
+                users.push(found);
+                localStorage.setItem('voeux_users_db', JSON.stringify(users));
+              }
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
+    if (!found) {
+      throw new Error('No registered account found with these credentials. Please check your details or create a new account.');
     }
 
     setUser(found);

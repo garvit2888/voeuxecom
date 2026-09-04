@@ -13,12 +13,12 @@ export const SplashScreen = () => {
     // Start smooth fade out at 350ms
     const timer1 = setTimeout(() => {
       setFadeOut(true);
-    }, 350);
+    }, 450);
 
     // Unmount splash screen at 500ms (0.5 seconds total)
     const timer2 = setTimeout(() => {
       setShow(false);
-    }, 500);
+    }, 900);
 
     return () => {
       clearTimeout(timer1);
@@ -30,9 +30,8 @@ export const SplashScreen = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] bg-white flex flex-col items-center justify-center select-none transition-opacity duration-150 ease-in-out ${
-        fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-[99999] bg-white flex flex-col items-center justify-center select-none transition-opacity duration-150 ease-in-out ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
     >
       <div className="flex flex-col items-center justify-center -mt-16 sm:mt-0 p-4">
         <img
