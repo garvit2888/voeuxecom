@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { X, Lock, Mail, Phone, User, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { X, Lock, Mail, Phone, User, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle, KeyRound } from 'lucide-react';
 
 export const CustomerAuthModal = () => {
-  const { isAuthModalOpen, setIsAuthModalOpen, loginUser, registerUser, addToast } = useShop();
+  const { isAuthModalOpen, setIsAuthModalOpen, loginUser, registerUser, resetUserPassword, addToast } = useShop();
 
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -50,7 +50,8 @@ export const CustomerAuthModal = () => {
           return;
         }
         await loginUser(formData.email, formData.password);
-      } else {
+        setIsAuthModalOpen(false);
+      } else if (mode === 'register') {
         if (!formData.name || !formData.email || !formData.phone || !formData.password) {
           setErrorMsg('Please fill in all required fields');
           setLoading(false);
@@ -73,10 +74,34 @@ export const CustomerAuthModal = () => {
         }
         const { confirmPassword, ...userData } = formData;
         await registerUser(userData);
+        setIsAuthModalOpen(false);
+      } else if (mode === 'forgot') {
+        if (!formData.email) {
+          setErrorMsg('Please enter your registered email address or 10-digit mobile number');
+          setLoading(false);
+          return;
+        }
+        if (!formData.password) {
+          setErrorMsg('Please enter your new password');
+          setLoading(false);
+          return;
+        }
+        if (formData.password.length < 6) {
+          setErrorMsg('New password must be at least 6 characters');
+          setLoading(false);
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setErrorMsg('Passwords do not match. Please re-enter.');
+          setLoading(false);
+          return;
+        }
+        await resetUserPassword(formData.email, formData.password);
+        setMode('login');
+        setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
       }
-      setIsAuthModalOpen(false);
     } catch (err) {
-      setErrorMsg(err.message || 'Authentication failed. Please check your credentials.');
+      setErrorMsg(err.message || 'Action failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -91,12 +116,12 @@ export const CustomerAuthModal = () => {
           <div>
             <span className="text-[10px] font-black uppercase tracking-widest text-[#3B429F]">VOEUX® OFFICIAL STORE</span>
             <h2 className="text-xl font-black text-gray-900 tracking-tight mt-0.5">
-              {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+              {mode === 'login' ? 'Welcome Back' : mode === 'register' ? 'Create Account' : 'Reset Password'}
             </h2>
           </div>
           <button
             onClick={() => setIsAuthModalOpen(false)}
-            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition"
+            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -135,6 +160,14 @@ export const CustomerAuthModal = () => {
             </div>
           )}
 
+          {/* Forgot Password Intro Banner */}
+          {mode === 'forgot' && (
+            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-xs text-[#3B429F]">
+              <KeyRound className="w-4 h-4 shrink-0" />
+              <span>Enter your registered email or phone and set your new password.</span>
+            </div>
+          )}
+
           {/* Full Name — register only */}
           {mode === 'register' && (
             <div>
@@ -155,20 +188,20 @@ export const CustomerAuthModal = () => {
             </div>
           )}
 
-          {/* Email or Phone for Login / Email for Register */}
+          {/* Email or Phone */}
           <div>
             <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-              {mode === 'login' ? 'Email Address or Mobile Number *' : 'Email Address *'}
+              {mode === 'login' || mode === 'forgot' ? 'Email Address or Mobile Number *' : 'Email Address *'}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
-                type={mode === 'login' ? 'text' : 'email'}
+                type={mode === 'register' ? 'email' : 'text'}
                 name="email"
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder={mode === 'login' ? 'Registered email or 10-digit mobile number' : 'name@example.com'}
+                placeholder={mode === 'register' ? 'name@example.com' : 'Registered email or 10-digit mobile number'}
                 autoComplete="new-password"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
@@ -198,9 +231,20 @@ export const CustomerAuthModal = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-              Password *{mode === 'register' && ' (min. 6 characters)'}
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[11px] font-semibold text-gray-600">
+                {mode === 'forgot' ? 'New Password *' : 'Password *'}{mode !== 'login' && ' (min. 6 characters)'}
+              </label>
+              {mode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => handleModeSwitch('forgot')}
+                  className="text-[11px] font-semibold text-[#3B429F] hover:underline cursor-pointer"
+                >
+                  Forgot Password?
+                </button>
+              )}
+            </div>
             <div className="relative">
               <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
@@ -209,7 +253,7 @@ export const CustomerAuthModal = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder={mode === 'forgot' ? 'Enter new password' : '••••••••'}
                 autoComplete="new-password"
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition"
               />
@@ -224,10 +268,10 @@ export const CustomerAuthModal = () => {
             </div>
           </div>
 
-          {/* Confirm Password — register only */}
-          {mode === 'register' && (
+          {/* Confirm Password — register & forgot mode */}
+          {(mode === 'register' || mode === 'forgot') && (
             <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Confirm Password *</label>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Confirm {mode === 'forgot' ? 'New ' : ''}Password *</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
@@ -301,9 +345,29 @@ export const CustomerAuthModal = () => {
             disabled={loading}
             className="w-full bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-60"
           >
-            <span>{loading ? 'Please wait...' : mode === 'login' ? 'Sign In to Account' : 'Create My Account'}</span>
+            <span>
+              {loading
+                ? 'Please wait...'
+                : mode === 'login'
+                ? 'Sign In to Account'
+                : mode === 'register'
+                ? 'Create My Account'
+                : 'Reset & Update Password'}
+            </span>
             <ArrowRight className="w-4 h-4" />
           </button>
+
+          {mode === 'forgot' && (
+            <div className="text-center pt-1">
+              <button
+                type="button"
+                onClick={() => handleModeSwitch('login')}
+                className="text-xs font-semibold text-gray-500 hover:text-[#3B429F] transition cursor-pointer"
+              >
+                ← Back to Sign In
+              </button>
+            </div>
+          )}
         </form>
 
         {/* Footer */}

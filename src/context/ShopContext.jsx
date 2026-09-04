@@ -538,6 +538,100 @@ export const ShopProvider = ({ children }) => {
     addToast('Signed out of account', 'info');
   };
 
+  const resetUserPassword = async (identifier, newPassword) => {
+    const inputClean = (identifier || '').trim().toLowerCase();
+    const phoneClean = (identifier || '').replace(/\D/g, '');
+
+    const usersRaw = localStorage.getItem('voeux_users_db') || '[]';
+    let users = [];
+    try { users = JSON.parse(usersRaw); } catch(e){}
+
+    let userIdx = users.findIndex(u => {
+      const emailMatches = u.email && u.email.trim().toLowerCase() === inputClean;
+      const phoneMatches = phoneClean && phoneClean.length >= 10 && u.phone && u.phone.replace(/\D/g, '') === phoneClean;
+      return emailMatches || phoneMatches;
+    });
+
+    let targetUser = userIdx > -1 ? users[userIdx] : null;
+    let firebaseKey = null;
+
+    try {
+      const res = await fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/users.json');
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          Object.entries(data).forEach(([key, u]) => {
+            const emailMatches = u.email && u.email.trim().toLowerCase() === inputClean;
+            const phoneMatches = phoneClean && phoneClean.length >= 10 && u.phone && u.phone.replace(/\D/g, '') === phoneClean;
+            if (emailMatches || phoneMatches) {
+              targetUser = u;
+              firebaseKey = key;
+            }
+          });
+        }
+      }
+    } catch(err) {}
+
+    if (!targetUser) {
+      throw new Error('No registered account found with this email address or mobile number.');
+    }
+
+    targetUser.password = newPassword;
+
+    if (userIdx > -1) {
+      users[userIdx].password = newPassword;
+    } else {
+      users.push(targetUser);
+    }
+    localStorage.setItem('voeux_users_db', JSON.stringify(users));
+
+    const activeUserRaw = localStorage.getItem('voeux_user');
+    if (activeUserRaw) {
+      try {
+        const activeUser = JSON.parse(activeUserRaw);
+        if (activeUser.email?.toLowerCase() === targetUser.email?.toLowerCase()) {
+          activeUser.password = newPassword;
+          localStorage.setItem('voeux_user', JSON.stringify(activeUser));
+          setUser(activeUser);
+        }
+      } catch(e) {}
+    }
+
+    try {
+      if (firebaseKey) {
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/users/${firebaseKey}/password.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newPassword)
+        });
+      } else {
+        fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/users.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(targetUser)
+        });
+      }
+    } catch(e) {}
+
+    if (targetUser.email) {
+      try {
+        fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'password_reset_email',
+            userEmail: targetUser.email,
+            userName: targetUser.name || 'Valued Customer'
+          })
+        });
+      } catch(e) {}
+    }
+
+    addToast('Password updated successfully! Please sign in with your new password.', 'success');
+    return targetUser;
+  };
+
+
   const placeOrder = async (orderData) => {
     const rewardVoucherCode = 'REF500-' + Math.floor(100000 + Math.random() * 900000);
 
@@ -666,6 +760,7 @@ export const ShopProvider = ({ children }) => {
         loginUser,
         registerUser,
         logoutUser,
+        resetUserPassword,
         orders,
         placeOrder,
         isAuthModalOpen,

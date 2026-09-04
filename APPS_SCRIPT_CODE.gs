@@ -135,6 +135,33 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // ==================== 1C. PASSWORD RESET EMAIL NOTIFICATION ====================
+    if (data.action === 'password_reset_email' && data.userEmail) {
+      var recipient = data.userEmail;
+      var recipientName = data.userName || 'Valued Customer';
+      var emailSubject = "🔒 Your VOEUX® Account Password Has Been Reset";
+      var emailText = "Dear " + recipientName + ",\n\n" +
+        "Your password for your VOEUX® Official Store account has been updated successfully.\n\n" +
+        "If you performed this action, no further steps are needed.\n" +
+        "If you did not request this password change, please contact our support team immediately on WhatsApp: +91 9999484530.\n\n" +
+        "Thank you for choosing VOEUX® Car Electronics!";
+
+      if (recipient && recipient.indexOf('@') > -1) {
+        try {
+          GmailApp.sendEmail(recipient, emailSubject, emailText, { name: "VOEUX® Account Security" });
+        } catch(mErr) {
+          try {
+            MailApp.sendEmail({ to: recipient, subject: emailSubject, body: emailText, name: "VOEUX® Account Security" });
+          } catch(e2){}
+        }
+      }
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ result: "success" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+
     // ==================== 2. WAREHOUSE SHELF STORAGE SYNC ====================
     if (data.action === 'sync_shelves' || data.action === 'save_shelf') {
       var props = PropertiesService.getScriptProperties();
