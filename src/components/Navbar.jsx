@@ -49,7 +49,21 @@ export const Navbar = () => {
         {/* News Ticker Banner */}
         <div className="bg-[#3B429F] text-white text-[11px] py-1.5 overflow-hidden relative border-b border-indigo-900/40">
           <div className="animate-news-ticker tracking-wide font-semibold">
-            For WhatsApp Orders use code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> for extra discount on all Car Electronics! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For WhatsApp Orders use code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> for extra discount on all Car Electronics!
+            🎉 Get 10% OFF — enter code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> in the coupon code box at checkout! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🎉 Get 10% OFF — enter code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> in the coupon code box at checkout!
+          </div>
+        </div>
+
+        {/* Mobile-Only: VOEUX Logo Row below the ticker */}
+        <div className="lg:hidden flex items-center px-4 py-2.5 bg-slate-950 border-b border-slate-800">
+          <div
+            className="cursor-pointer"
+            onClick={() => setActivePage('home')}
+          >
+            <img
+              src="/images/voeux_logo.png"
+              alt="VOEUX® Electronics"
+              className="h-7 w-auto object-contain"
+            />
           </div>
         </div>
 
