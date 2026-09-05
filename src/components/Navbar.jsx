@@ -49,7 +49,7 @@ export const Navbar = () => {
         {/* News Ticker Banner */}
         <div className="bg-[#3B429F] text-white text-[11px] py-1.5 overflow-hidden relative border-b border-indigo-900/40">
           <div className="animate-news-ticker tracking-wide font-semibold">
-            🎉 Get 10% OFF — enter code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> in the coupon code box at checkout! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🎉 Get 10% OFF — enter code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> in the coupon code box at checkout!
+            Get 10% OFF — enter code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Get 10% OFF — enter code <span className="text-yellow-300 font-extrabold bg-indigo-900/80 px-2 py-0.5 rounded border border-yellow-300/40">VOEUX10</span>
           </div>
         </div>
 

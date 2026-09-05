@@ -86,10 +86,16 @@ export const CartDrawer = () => {
     try {
       const res = await verifyAndApplyVoucher(couponCode);
       if (res && res.valid) {
+        const previousCode = appliedVoucherCode;
         setDiscountAmount(res.discountAmount);
         setAppliedVoucherCode(res.code);
         setCouponError('');
-        addToast(`Code "${res.code}" applied! Saved ₹${res.discountAmount}`, 'success');
+
+        if (previousCode && previousCode !== res.code) {
+          addToast(`Applied "${res.code}" (Replaced "${previousCode}" — only one coupon code allowed per order)`, 'success');
+        } else {
+          addToast(`Code "${res.code}" applied! Saved ₹${res.discountAmount}`, 'success');
+        }
       }
     } catch (err) {
       const errMsg = err.message || 'Invalid coupon code';
