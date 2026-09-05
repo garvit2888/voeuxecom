@@ -449,6 +449,32 @@ export const CartDrawer = () => {
                 </div>
               )}
 
+              {/* Order Items Preview Card */}
+              {cart.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <ShoppingCart className="w-4 h-4 text-[#3B429F]" />
+                      <span>Order Items ({cart.length})</span>
+                    </span>
+                    <span className="text-[11px] font-bold text-[#3B429F]">Subtotal: ₹{cartTotal.toLocaleString('en-IN')}</span>
+                  </h3>
+
+                  <div className="bg-gray-50/80 border border-gray-200/80 rounded-2xl p-3 space-y-2 max-h-36 overflow-y-auto">
+                    {cart.map(item => (
+                      <div key={item.product.id} className="flex items-center gap-3 text-xs">
+                        <img src={item.product.image} alt={item.product.name} className="w-10 h-10 object-contain bg-white rounded-lg p-1 border border-gray-200 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-900 truncate">{item.product.name}</p>
+                          <p className="text-[11px] text-gray-500">Qty: {item.quantity} × ₹{item.product.price.toLocaleString('en-IN')}</p>
+                        </div>
+                        <span className="font-extrabold text-gray-900">₹{(item.product.price * item.quantity).toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Shipping Address Section */}
               <div className="space-y-3">
                 <h3 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
@@ -537,9 +563,137 @@ export const CartDrawer = () => {
                 </div>
               </div>
 
+              {/* Promo Code & Rewards Section in Checkout */}
+              <div className="pt-3 border-t border-gray-100 space-y-2.5">
+                <h3 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#3B429F]" />
+                  <span>Coupons & Referral Vouchers</span>
+                </h3>
+
+                {/* Promo Code Input Box */}
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter referral code / coupon"
+                      value={couponCode}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleApplyCoupon(e);
+                        }
+                      }}
+                      onChange={e => {
+                        setCouponCode(e.target.value);
+                        if (couponError) setCouponError('');
+                      }}
+                      className={`flex-1 bg-gray-50 border rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:outline-none transition uppercase font-semibold ${
+                        couponError ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-[#3B429F]'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={verifyingCoupon}
+                      className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer disabled:opacity-50"
+                    >
+                      {verifyingCoupon ? 'Verifying...' : 'Apply'}
+                    </button>
+                  </div>
+
+                  {/* Coupon Error Banner */}
+                  {couponError && (
+                    <div className="flex items-start gap-2 p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
+                      <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                      <span>{couponError}</span>
+                    </div>
+                  )}
+
+                  {/* Applied Coupon Success Banner */}
+                  {appliedVoucherCode && !couponError && (
+                    <div className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>Code <strong>{appliedVoucherCode}</strong> applied (-₹{discountAmount})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAppliedVoucherCode('');
+                          setDiscountAmount(0);
+                          setCouponCode('');
+                          setCouponError('');
+                          addToast('Coupon code removed', 'info');
+                        }}
+                        className="text-emerald-700 hover:text-emerald-900 underline text-[11px] font-bold cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* VOEUX Cash Redemption Section */}
+                {user && (
+                  <div className="p-3 bg-[#3B429F]/5 border border-[#3B429F]/20 rounded-xl space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-slate-900">VOEUX Cash Balance</span>
+                        <span className="bg-[#3B429F] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                          {voeuxCashBalance} Pts (₹{voeuxCashBalance})
+                        </span>
+                      </div>
+                      {voeuxCashBalance >= 150 ? (
+                        <button
+                          type="button"
+                          onClick={toggleVoeuxCash}
+                          className={`text-[11px] font-extrabold px-3 py-1 rounded-lg transition cursor-pointer ${
+                            isVoeuxCashApplied ? 'bg-emerald-600 text-white' : 'bg-[#3B429F] text-white hover:bg-[#2B308B]'
+                          }`}
+                        >
+                          {isVoeuxCashApplied ? 'Redeemed' : 'Redeem'}
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-200">
+                          Min 150 pts required
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Price Breakdown Card */}
+              <div className="space-y-2 text-xs pt-3 border-t border-gray-100 bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200/80">
+                <div className="flex justify-between text-gray-500">
+                  <span>Subtotal ({cart.length} items)</span>
+                  <span className="font-semibold text-gray-900">₹{cartTotal.toLocaleString('en-IN')}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-bold bg-emerald-50 p-2 rounded-xl border border-emerald-100">
+                    <span>Voucher Discount ({appliedVoucherCode || 'PROMO'})</span>
+                    <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                {voeuxCashDiscountAmount > 0 && (
+                  <div className="flex justify-between text-[#3B429F] font-bold bg-indigo-50 p-2 rounded-xl border border-indigo-100">
+                    <span>VOEUX Cash Redeemed ({voeuxCashDiscountAmount} Pts)</span>
+                    <span>-₹{voeuxCashDiscountAmount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-gray-500">
+                  <span>Shipping</span>
+                  <span className="font-bold text-emerald-600">FREE Express Shipping</span>
+                </div>
+                <div className="flex justify-between text-sm font-black text-gray-900 pt-2 border-t border-gray-200">
+                  <span>Total Amount Payable</span>
+                  <span className="text-[#3B429F]">₹{finalTotal.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
               {/* Payment Info */}
-              <div className="pt-3 border-t border-gray-100">
-                <div className="flex items-center gap-3 p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
+              <div className="pt-2 border-t border-gray-100">
+                <div className="flex items-center gap-3 p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
                   <CreditCard className="w-5 h-5 text-[#3B429F] shrink-0" />
                   <div>
                     <p className="text-xs font-bold text-gray-900">Razorpay Secure Payment</p>
