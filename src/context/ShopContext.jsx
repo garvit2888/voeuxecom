@@ -494,12 +494,11 @@ export const ShopProvider = ({ children }) => {
       throw new Error('Please enter a coupon or referral voucher code.');
     }
 
-    // 1. Check if voucher code has ALREADY BEEN REDEEMED (local)
+    // 1. Check if voucher code has ALREADY BEEN REDEEMED locally or in cloud used_vouchers DB
     if (usedVouchers.includes(code)) {
-      throw new Error('This referral voucher code has already been redeemed and cannot be used again.');
+      throw new Error(`Referral voucher "${code}" has already been redeemed and cannot be used again.`);
     }
 
-    // 2. Double check with Firebase for cross-device one-time enforce
     try {
       const res = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${code}.json`);
       const cloudRecord = await res.json();
@@ -507,25 +506,107 @@ export const ShopProvider = ({ children }) => {
         const updated = Array.from(new Set([...usedVouchers, code]));
         setUsedVouchers(updated);
         try { localStorage.setItem('voeux_used_vouchers', JSON.stringify(updated)); } catch(e){}
-        throw new Error('This referral voucher code has already been redeemed.');
+        throw new Error(`Referral voucher "${code}" has already been redeemed.`);
       }
     } catch(err) {
       if (err.message && err.message.includes('already been redeemed')) {
         throw err;
       }
-      // Network error — fall through to local validation
     }
 
-    // 3. Validate Voucher Code Formats
+    // 2. Standard Static Promo Codes (Universal)
     if (code === 'VOEUX10') {
       return { valid: true, type: 'PROMO', discountAmount: Math.round(cartTotal * 0.1), code };
     }
-
-    if (code.startsWith('REF500') || code.includes('GARVIT') || code.includes('VOEUX500')) {
-      return { valid: true, type: 'REFERRAL_VOUCHER', discountAmount: 500, code };
+    if (code === 'VOEUX500' || code === 'GARVIT500') {
+      return { valid: true, type: 'PROMO', discountAmount: 500, code };
     }
 
-    throw new Error('Invalid code. Please check your email for the correct referral voucher.');
+    // 3. Specific Referral Voucher Lookup & Account Verification
+    let voucherRecord = null;
+
+    // A. Check Firebase /valid_vouchers/${code}.json
+    try {
+      const vRes = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/valid_vouchers/${code}.json`);
+      if (vRes.ok) {
+        const vData = await vRes.json();
+        if (vData) voucherRecord = vData;
+      }
+    } catch(e) {}
+
+    // B. Check Firebase /orders.json to see if this reward voucher code was issued for a previous order
+    if (!voucherRecord) {
+      try {
+        const oRes = await fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/orders.json');
+        if (oRes.ok) {
+          const oData = await oRes.json();
+          if (oData) {
+            const allOrders = Object.values(oData);
+            const foundOrder = allOrders.find(ord => ord?.referral?.rewardVoucherCode === code);
+            if (foundOrder) {
+              voucherRecord = {
+                code: code,
+                discountAmount: 500,
+                assignedToEmail: foundOrder.userEmail || foundOrder.shippingAddress?.email,
+                assignedToPhone: foundOrder.userPhone || foundOrder.shippingAddress?.phone,
+                status: 'ACTIVE'
+              };
+            }
+          }
+        }
+      } catch(e) {}
+    }
+
+    // C. Check local orders state
+    if (!voucherRecord && orders && orders.length > 0) {
+      const foundLocal = orders.find(ord => ord?.referral?.rewardVoucherCode === code);
+      if (foundLocal) {
+        voucherRecord = {
+          code: code,
+          discountAmount: 500,
+          assignedToEmail: foundLocal.userEmail || foundLocal.shippingAddress?.email,
+          assignedToPhone: foundLocal.userPhone || foundLocal.shippingAddress?.phone,
+          status: 'ACTIVE'
+        };
+      }
+    }
+
+    // If code is not found anywhere
+    if (!voucherRecord) {
+      throw new Error(`Invalid voucher code "${code}". Please check your email or account for your official referral code.`);
+    }
+
+    // Status check
+    if (voucherRecord.status === 'REDEEMED') {
+      throw new Error(`Referral voucher "${code}" has already been redeemed.`);
+    }
+
+    // Account Scoping Enforcement: Check if this specific voucher belongs to the logged in account
+    const assignedEmail = (voucherRecord.assignedToEmail || '').toLowerCase().trim();
+    const assignedPhone = (voucherRecord.assignedToPhone || '').replace(/\D/g, '');
+
+    const currentEmail = (user?.email || '').toLowerCase().trim();
+    const currentPhone = (user?.phone || '').replace(/\D/g, '');
+
+    if (assignedEmail || (assignedPhone && assignedPhone.length >= 10)) {
+      if (!user) {
+        throw new Error(`This referral voucher (${code}) is assigned to ${assignedEmail || assignedPhone}. Please sign in to your account to redeem it.`);
+      }
+
+      const emailMatches = assignedEmail && currentEmail && assignedEmail === currentEmail;
+      const phoneMatches = assignedPhone && assignedPhone.length >= 10 && currentPhone && currentPhone.length >= 10 && assignedPhone === currentPhone;
+
+      if (!emailMatches && !phoneMatches) {
+        throw new Error(`This referral voucher (${code}) belongs to another account (${assignedEmail || assignedPhone}) and cannot be used on this account.`);
+      }
+    }
+
+    return {
+      valid: true,
+      type: 'REFERRAL_VOUCHER',
+      discountAmount: voucherRecord.discountAmount || 500,
+      code: code
+    };
   };
 
   const loginUser = async (identifier, password) => {
@@ -752,7 +833,7 @@ export const ShopProvider = ({ children }) => {
       setUsedVouchers(updatedUsed);
       try { localStorage.setItem('voeux_used_vouchers', JSON.stringify(updatedUsed)); } catch(e){}
 
-      // Sync REDEEMED status to Firebase
+      // Sync REDEEMED status to Firebase used_vouchers & valid_vouchers
       try {
         fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${codeUpper}.json`, {
           method: 'PUT',
@@ -761,6 +842,30 @@ export const ShopProvider = ({ children }) => {
             redeemedBy: newOrder.userEmail,
             orderId: newOrder.id,
             redeemedAt: new Date().toISOString()
+          })
+        });
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/valid_vouchers/${codeUpper}/status.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify('REDEEMED')
+        });
+      } catch(e){}
+    }
+
+    // Register newly generated reward voucher in Firebase valid_vouchers database
+    if (rewardVoucherCode) {
+      try {
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/valid_vouchers/${rewardVoucherCode}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: rewardVoucherCode,
+            discountAmount: 500,
+            assignedToEmail: newOrder.userEmail,
+            assignedToPhone: newOrder.userPhone,
+            status: 'ACTIVE',
+            createdAt: new Date().toISOString(),
+            generatedByOrderId: newOrder.id
           })
         });
       } catch(e){}

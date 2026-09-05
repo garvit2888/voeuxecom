@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { X, ShoppingCart, Trash2, Plus, Minus, CheckCircle, ArrowRight, MapPin, CreditCard, ShieldCheck, User, Truck, ChevronRight } from 'lucide-react';
+import { X, ShoppingCart, Trash2, Plus, Minus, CheckCircle, ArrowRight, MapPin, CreditCard, ShieldCheck, User, Truck, ChevronRight, AlertCircle } from 'lucide-react';
 
 export const CartDrawer = () => {
   const {
@@ -24,6 +24,7 @@ export const CartDrawer = () => {
 
   const [step, setStep] = useState(cartStep || 'cart');
   const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedVoucherCode, setAppliedVoucherCode] = useState('');
   const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
@@ -72,7 +73,14 @@ export const CartDrawer = () => {
 
   const handleApplyCoupon = async (e) => {
     e.preventDefault();
-    if (!couponCode.trim()) return;
+    setCouponError('');
+
+    if (!couponCode.trim()) {
+      const emptyMsg = 'Please enter a coupon or referral code.';
+      setCouponError(emptyMsg);
+      addToast(emptyMsg, 'warning');
+      return;
+    }
 
     setVerifyingCoupon(true);
     try {
@@ -80,12 +88,15 @@ export const CartDrawer = () => {
       if (res && res.valid) {
         setDiscountAmount(res.discountAmount);
         setAppliedVoucherCode(res.code);
+        setCouponError('');
         addToast(`Code "${res.code}" applied! Saved ₹${res.discountAmount}`, 'success');
       }
     } catch (err) {
-      addToast(err.message || 'Invalid coupon code', 'warning');
+      const errMsg = err.message || 'Invalid coupon code';
+      setCouponError(errMsg);
       setDiscountAmount(0);
       setAppliedVoucherCode('');
+      addToast(errMsg, 'error');
     } finally {
       setVerifyingCoupon(false);
     }
@@ -277,22 +288,60 @@ export const CartDrawer = () => {
               <div className="p-6 bg-white border-t border-gray-100 space-y-4">
                 
                 {/* Promo Code Box */}
-                <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Enter referral code / coupon"
-                    value={couponCode}
-                    onChange={e => setCouponCode(e.target.value)}
-                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:border-[#3B429F] focus:outline-none transition uppercase font-semibold"
-                  />
-                  <button
-                    type="submit"
-                    disabled={verifyingCoupon}
-                    className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer disabled:opacity-50"
-                  >
-                    {verifyingCoupon ? 'Verifying...' : 'Apply'}
-                  </button>
-                </form>
+                <div className="space-y-2">
+                  <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter referral code / coupon"
+                      value={couponCode}
+                      onChange={e => {
+                        setCouponCode(e.target.value);
+                        if (couponError) setCouponError('');
+                      }}
+                      className={`flex-1 bg-gray-50 border rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:outline-none transition uppercase font-semibold ${
+                        couponError ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-[#3B429F]'
+                      }`}
+                    />
+                    <button
+                      type="submit"
+                      disabled={verifyingCoupon}
+                      className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer disabled:opacity-50"
+                    >
+                      {verifyingCoupon ? 'Verifying...' : 'Apply'}
+                    </button>
+                  </form>
+
+                  {/* Coupon Error Banner */}
+                  {couponError && (
+                    <div className="flex items-start gap-2 p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
+                      <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                      <span>{couponError}</span>
+                    </div>
+                  )}
+
+                  {/* Applied Coupon Success Banner */}
+                  {appliedVoucherCode && !couponError && (
+                    <div className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>Code <strong>{appliedVoucherCode}</strong> applied (-₹{discountAmount})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAppliedVoucherCode('');
+                          setDiscountAmount(0);
+                          setCouponCode('');
+                          setCouponError('');
+                          addToast('Coupon code removed', 'info');
+                        }}
+                        className="text-emerald-700 hover:text-emerald-900 underline text-[11px] font-bold cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* VOEUX Cash Redemption Section */}
                 {user && (
