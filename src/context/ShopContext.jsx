@@ -14,6 +14,25 @@ const getUserCartKey = (u) => {
 };
 
 export const ShopProvider = ({ children }) => {
+  // User state declared first to prevent TDZ ReferenceError in dependent hooks and effects
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_user') || sessionStorage.getItem('voeux_user');
+      if (!saved || saved === 'undefined' || saved === 'null') return null;
+      return JSON.parse(saved);
+    } catch(e) { return null; }
+  });
+
+  // Always keep user state in sync with both localStorage and sessionStorage
+  useEffect(() => {
+    if (user) {
+      try {
+        localStorage.setItem('voeux_user', JSON.stringify(user));
+        sessionStorage.setItem('voeux_user', JSON.stringify(user));
+      } catch (e) {}
+    }
+  }, [user]);
+
   // Helper to parse page name from URL Hash & Search Params for browser navigation & mobile QR scans
   const getPageFromHash = () => {
     const hash = (window.location.hash || '').replace('#', '').trim();
@@ -146,12 +165,7 @@ export const ShopProvider = ({ children }) => {
   // Cart: persisted to localStorage so it survives page reloads per account
   const [cart, setCart] = useState(() => {
     try {
-      const activeUser = (() => {
-        const saved = localStorage.getItem('voeux_user') || sessionStorage.getItem('voeux_user');
-        if (!saved || saved === 'undefined' || saved === 'null') return null;
-        return JSON.parse(saved);
-      })();
-      const key = getUserCartKey(activeUser);
+      const key = getUserCartKey(user);
       const saved = localStorage.getItem(key);
       if (saved && saved !== 'undefined') {
         const parsed = JSON.parse(saved);
@@ -323,23 +337,7 @@ export const ShopProvider = ({ children }) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const [user, setUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('voeux_user') || sessionStorage.getItem('voeux_user');
-      if (!saved || saved === 'undefined' || saved === 'null') return null;
-      return JSON.parse(saved);
-    } catch(e) { return null; }
-  });
 
-  // Always keep user state in sync with both localStorage and sessionStorage
-  useEffect(() => {
-    if (user) {
-      try {
-        localStorage.setItem('voeux_user', JSON.stringify(user));
-        sessionStorage.setItem('voeux_user', JSON.stringify(user));
-      } catch (e) {}
-    }
-  }, [user]);
 
   const [orders, setOrders] = useState(() => {
     try {
