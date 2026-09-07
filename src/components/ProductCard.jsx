@@ -17,14 +17,14 @@ export const ProductCard = ({ product }) => {
     >
       
       {/* Top Image Section */}
-      <div className="relative aspect-[4/3] bg-slate-50/80 rounded-xl overflow-hidden flex items-center justify-center p-2">
+      <div className="relative aspect-square bg-slate-50/90 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-gray-100/60">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
         />
         {discountPercent > 0 && (
-          <span className="absolute top-1.5 right-1.5 text-[9px] sm:text-[11px] font-extrabold text-emerald-700 bg-emerald-100/90 px-1.5 py-0.5 rounded-md">
+          <span className="absolute top-1.5 right-1.5 text-[9px] sm:text-[11px] font-extrabold text-emerald-700 bg-emerald-100/90 px-1.5 py-0.5 rounded-md shadow-xs">
             {discountPercent}% OFF
           </span>
         )}
