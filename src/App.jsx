@@ -126,18 +126,20 @@ const MainContent = () => {
                   <div
                     key={cat.id}
                     onClick={() => setActivePage(cat.id)}
-                    className="clean-card group p-3.5 sm:p-5 cursor-pointer flex flex-col justify-between"
+                    className="clean-card group p-3 sm:p-5 cursor-pointer flex flex-col justify-between items-center text-center transition hover:shadow-md border border-gray-100 rounded-2xl bg-white"
                   >
-                    <div className="space-y-1 sm:space-y-2">
-                      <h3 className="text-xs sm:text-base font-bold text-gray-900 group-hover:text-[#3B429F] transition line-clamp-1">{cat.name}</h3>
-                      <p className="text-[10px] sm:text-xs text-gray-500 line-clamp-2">{cat.description}</p>
+                    <div className="w-full h-32 sm:h-44 bg-gray-50/80 rounded-xl p-2 sm:p-3 flex items-center justify-center overflow-hidden mb-2.5 group-hover:bg-indigo-50/30 transition">
+                      <img
+                        src={cat.image}
+                        alt={cat.name}
+                        className="w-full h-full object-contain transform group-hover:scale-105 transition duration-300"
+                      />
                     </div>
-
-                    <div className="pt-3 sm:pt-4 flex items-center justify-between">
-                      <span className="text-[10px] sm:text-xs font-bold text-[#3B429F] flex items-center gap-1">
-                        Explore <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition" />
-                      </span>
-                      <img src={cat.image} alt={cat.name} className="w-8 h-8 sm:w-12 sm:h-12 object-cover rounded bg-gray-100" />
+                    <div className="w-full text-center">
+                      <h3 className="text-xs sm:text-base font-bold text-gray-900 group-hover:text-[#3B429F] transition">{cat.name}</h3>
+                      {cat.description && (
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 line-clamp-1">{cat.description}</p>
+                      )}
                     </div>
                   </div>
                 ))}
