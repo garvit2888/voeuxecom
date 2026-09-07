@@ -121,23 +121,23 @@ const MainContent = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {CATEGORIES.map(cat => (
                   <div
                     key={cat.id}
                     onClick={() => setActivePage(cat.id)}
-                    className="clean-card group p-5 cursor-pointer flex flex-col justify-between"
+                    className="clean-card group p-3.5 sm:p-5 cursor-pointer flex flex-col justify-between"
                   >
-                    <div className="space-y-2">
-                      <h3 className="text-base font-bold text-gray-900 group-hover:text-[#3B429F] transition">{cat.name}</h3>
-                      <p className="text-xs text-gray-500 line-clamp-2">{cat.description}</p>
+                    <div className="space-y-1 sm:space-y-2">
+                      <h3 className="text-xs sm:text-base font-bold text-gray-900 group-hover:text-[#3B429F] transition line-clamp-1">{cat.name}</h3>
+                      <p className="text-[10px] sm:text-xs text-gray-500 line-clamp-2">{cat.description}</p>
                     </div>
 
-                    <div className="pt-4 flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#3B429F] flex items-center gap-1">
-                        Explore <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
+                    <div className="pt-3 sm:pt-4 flex items-center justify-between">
+                      <span className="text-[10px] sm:text-xs font-bold text-[#3B429F] flex items-center gap-1">
+                        Explore <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition" />
                       </span>
-                      <img src={cat.image} alt={cat.name} className="w-12 h-12 object-cover rounded bg-gray-100" />
+                      <img src={cat.image} alt={cat.name} className="w-8 h-8 sm:w-12 sm:h-12 object-cover rounded bg-gray-100" />
                     </div>
                   </div>
                 ))}
@@ -155,7 +155,7 @@ const MainContent = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
                 {productsList.slice(0, 4).map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
