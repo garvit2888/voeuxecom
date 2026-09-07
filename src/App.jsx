@@ -31,7 +31,7 @@ import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 
 
 const MainContent = () => {
-  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating } = useShop();
+  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating, setSelectedProductModal } = useShop();
 
   // Capture incoming referral parameters (?ref=9999999999 or #ref=...)
   useEffect(() => {
@@ -164,22 +164,23 @@ const MainContent = () => {
 
             {/* Clean What's New Drop Highlight */}
             <section className="container mx-auto px-4">
-              <div className="bg-black text-white rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-900 shadow-xl">
-                <div className="space-y-3 max-w-lg">
-                  <h3 className="text-2xl font-black leading-tight">
+              <div className="bg-black text-white rounded-2xl p-4 sm:p-8 flex flex-row items-center justify-between gap-3 sm:gap-6 border border-slate-900 shadow-xl">
+                <div className="space-y-2 sm:space-y-3 flex-1 min-w-0">
+                  <h3 className="text-xs sm:text-2xl font-black leading-tight">
                     VOEUX® Android 10.1" Dual Knob Piano Buttons (4GB/64GB) Stereo
                   </h3>
                   <button
                     onClick={() => {
-                      window.open('https://www.flipkart.com/voeux-android-10-1-dual-knob-piano-buttons-4gb-64gb-car-multimedia-player-stereo/p/itm4f6bce63370ea?pid=CDPHJ9ARWNKNAHCJ&lid=LSTCDPHJ9ARWNKNAHCJITYXYO&marketplace=FLIPKART&q=voeux+piano+dual+knob+&store=search.flipkart.com&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=5363074a-e955-46d7-b64f-d87734da1a22.CDPHJ9ARWNKNAHCJ.SEARCH&ppt=sp&ppn=sp&ssid=bx1j33hn280000001786093465039&qH=8c13c5ea026e2c9a&ov_redirect=true&ov_redirect=true', '_blank');
+                      const found = (productsList || []).find(p => p && p.id === 'voeux-hyperdrive-lite-9') || (PRODUCTS || []).find(p => p && p.id === 'voeux-hyperdrive-lite-9');
+                      if (found) setSelectedProductModal(found);
                     }}
-                    className="btn-primary text-xs py-2.5 px-5 flex items-center gap-2"
+                    className="btn-primary text-[10px] sm:text-xs py-1.5 sm:py-2.5 px-2.5 sm:px-5 flex items-center gap-1 sm:gap-2 cursor-pointer"
                   >
-                    <span>Explore VOEUX 10.1" Dual Knob Piano Buttons</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span className="truncate">Explore VOEUX 10.1" Dual Knob Piano Buttons</span>
+                    <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                   </button>
                 </div>
-                <div className="bg-slate-900/60 p-2 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-center shrink-0 w-full md:w-80 h-56 overflow-hidden">
+                <div className="bg-slate-900/60 p-1.5 sm:p-2 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-center shrink-0 w-24 h-20 sm:w-80 sm:h-56 overflow-hidden">
                   <img src="/images/voeux_dual_knob_piano_stereo.jpg" alt="VOEUX Dual Knob Piano Buttons Stereo" className="w-full h-full object-cover rounded-xl" />
                 </div>
               </div>
