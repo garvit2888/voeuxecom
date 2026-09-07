@@ -4,6 +4,15 @@ import { fetchLiveFlipkartPrice } from '../utils/flipkartPriceScraper';
 
 const ShopContext = createContext();
 
+// Helper to construct isolated cart storage keys per authenticated user account or guest session
+const getUserCartKey = (u) => {
+  if (u && (u.email || u.phone)) {
+    const id = (u.email || u.phone).toLowerCase().trim().replace(/[^a-z0-9_@.-]/g, '_');
+    return `voeux_cart_${id}`;
+  }
+  return 'voeux_guest_cart';
+};
+
 export const ShopProvider = ({ children }) => {
   // Helper to parse page name from URL Hash & Search Params for browser navigation & mobile QR scans
   const getPageFromHash = () => {
@@ -134,13 +143,21 @@ export const ShopProvider = ({ children }) => {
       });
     }
   };
-  // Cart: persisted to localStorage so it survives page reloads
+  // Cart: persisted to localStorage so it survives page reloads per account
   const [cart, setCart] = useState(() => {
     try {
-      const saved = localStorage.getItem('voeux_cart');
-      if (!saved || saved === 'undefined') return [];
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
+      const activeUser = (() => {
+        const saved = localStorage.getItem('voeux_user') || sessionStorage.getItem('voeux_user');
+        if (!saved || saved === 'undefined' || saved === 'null') return null;
+        return JSON.parse(saved);
+      })();
+      const key = getUserCartKey(activeUser);
+      const saved = localStorage.getItem(key);
+      if (saved && saved !== 'undefined') {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+      return [];
     } catch(e) { return []; }
   });
   const [wishlist, setWishlist] = useState([]);
@@ -160,10 +177,27 @@ export const ShopProvider = ({ children }) => {
   const [cartAnimating, setCartAnimating] = useState(false);
   const [lastAddedProduct, setLastAddedProduct] = useState(null);
 
-  // Persist cart to localStorage whenever it changes
+  // Persist cart to user-scoped localStorage key whenever cart or user changes
   useEffect(() => {
-    try { localStorage.setItem('voeux_cart', JSON.stringify(cart)); } catch(e) {}
-  }, [cart]);
+    const key = getUserCartKey(user);
+    try { localStorage.setItem(key, JSON.stringify(cart)); } catch(e) {}
+  }, [cart, user]);
+
+  // Sync cart state when user session changes (login / register / logout)
+  useEffect(() => {
+    const key = getUserCartKey(user);
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved && saved !== 'undefined') {
+        const parsed = JSON.parse(saved);
+        setCart(Array.isArray(parsed) ? parsed : []);
+      } else {
+        setCart([]);
+      }
+    } catch(e) {
+      setCart([]);
+    }
+  }, [user?.email, user?.phone]);
 
 
 
@@ -408,10 +442,9 @@ export const ShopProvider = ({ children }) => {
               const sessionData = await res.json();
               if (sessionData && sessionData.cart && Array.isArray(sessionData.cart) && sessionData.cart.length > 0) {
                 setCart(sessionData.cart);
-                try { localStorage.setItem('voeux_cart', JSON.stringify(sessionData.cart)); } catch(e){}
-
+                let restoredUser = null;
                 if (sessionData.userEmail) {
-                  const restoredUser = {
+                  restoredUser = {
                     name: sessionData.userName || sessionData.userEmail.split('@')[0],
                     email: sessionData.userEmail,
                     phone: sessionData.userPhone || '9999999999'
@@ -419,6 +452,8 @@ export const ShopProvider = ({ children }) => {
                   setUser(restoredUser);
                   try { localStorage.setItem('voeux_user', JSON.stringify(restoredUser)); } catch(e){}
                 }
+                const cartKey = getUserCartKey(restoredUser || user);
+                try { localStorage.setItem(cartKey, JSON.stringify(sessionData.cart)); } catch(e){}
 
                 setCartStep('checkout');
                 setIsCartOpen(true);
@@ -668,6 +703,22 @@ export const ShopProvider = ({ children }) => {
 
     setUser(found);
     localStorage.setItem('voeux_user', JSON.stringify(found));
+    try { sessionStorage.setItem('voeux_user', JSON.stringify(found)); } catch(e){}
+
+    // Load the user's specific cart or set to empty array if none exists
+    const userCartKey = getUserCartKey(found);
+    try {
+      const savedCart = localStorage.getItem(userCartKey);
+      if (savedCart && savedCart !== 'undefined') {
+        const parsed = JSON.parse(savedCart);
+        setCart(Array.isArray(parsed) ? parsed : []);
+      } else {
+        setCart([]);
+      }
+    } catch(e) {
+      setCart([]);
+    }
+
     addToast(`Welcome back, ${found.name}!`, 'success');
     return found;
   };
@@ -691,6 +742,14 @@ export const ShopProvider = ({ children }) => {
     localStorage.setItem('voeux_users_db', JSON.stringify(users));
     setUser(userData);
     localStorage.setItem('voeux_user', JSON.stringify(userData));
+    try { sessionStorage.setItem('voeux_user', JSON.stringify(userData)); } catch(e){}
+
+    // Brand new registered account ALWAYS starts with an empty cart
+    const newCartKey = getUserCartKey(userData);
+    setCart([]);
+    try {
+      localStorage.setItem(newCartKey, JSON.stringify([]));
+    } catch(e) {}
 
     // Firebase Sync
     try {
@@ -708,8 +767,12 @@ export const ShopProvider = ({ children }) => {
   const logoutUser = () => {
     setUser(null);
     setCart([]);
-    localStorage.removeItem('voeux_user');
-    localStorage.removeItem('voeux_cart');
+    try {
+      localStorage.removeItem('voeux_user');
+      sessionStorage.removeItem('voeux_user');
+      localStorage.removeItem('voeux_cart');
+      localStorage.removeItem('voeux_guest_cart');
+    } catch(e) {}
     addToast('Signed out of account', 'info');
   };
 
@@ -951,6 +1014,12 @@ export const ShopProvider = ({ children }) => {
     setIsVoeuxCashApplied(false);
 
     setCart([]);
+    try {
+      const userCartKey = getUserCartKey(user);
+      localStorage.setItem(userCartKey, JSON.stringify([]));
+      localStorage.removeItem('voeux_cart');
+      localStorage.removeItem('voeux_guest_cart');
+    } catch(e) {}
     addToast(`Order #${newOrder.id} placed successfully! ${user ? `(+${earnedCash} VOEUX Cash earned)` : ''}`, 'success');
     return newOrder;
   };
