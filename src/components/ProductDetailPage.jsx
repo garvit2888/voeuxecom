@@ -248,8 +248,10 @@ export const ProductDetailPage = () => {
 
                 <button
                   onClick={() => {
-                    addToCart(product, 1);
-                    setIsCartOpen(true);
+                    const added = addToCart(product, 1);
+                    if (added) {
+                      setIsCartOpen(true);
+                    }
                   }}
                   className="px-5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl transition flex items-center justify-center gap-2 text-xs font-bold cursor-pointer"
                 >

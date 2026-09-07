@@ -184,6 +184,11 @@ export const ShopProvider = ({ children }) => {
   };
 
   const addToCart = (product, quantity = 1) => {
+    if (!user) {
+      addToast('Please sign in or create an account to add items to your cart.', 'warning');
+      setIsAuthModalOpen(true);
+      return false;
+    }
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
       if (existing) {
@@ -200,6 +205,7 @@ export const ShopProvider = ({ children }) => {
     setCartAnimating(true);
     setTimeout(() => { setCartAnimating(false); }, 900);
     setTimeout(() => { setLastAddedProduct(null); }, 4000);
+    return true;
   };
 
   const removeFromCart = (productId) => {
@@ -262,6 +268,11 @@ export const ShopProvider = ({ children }) => {
   // Buy Now: adds product to cart (persisted) AND opens checkout directly.
   // Item stays in cart even if user abandons the checkout.
   const buyNowCheckout = (product) => {
+    if (!user) {
+      addToast('Please sign in or create an account to proceed with checkout.', 'warning');
+      setIsAuthModalOpen(true);
+      return false;
+    }
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
       if (existing) return prev; // already in cart, don't duplicate
@@ -270,6 +281,7 @@ export const ShopProvider = ({ children }) => {
     addToast(`Added to cart — proceeding to checkout`, 'success');
     setCartStep('checkout');
     setIsCartOpen(true);
+    return true;
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -695,7 +707,9 @@ export const ShopProvider = ({ children }) => {
 
   const logoutUser = () => {
     setUser(null);
+    setCart([]);
     localStorage.removeItem('voeux_user');
+    localStorage.removeItem('voeux_cart');
     addToast('Signed out of account', 'info');
   };
 
