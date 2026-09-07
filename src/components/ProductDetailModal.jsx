@@ -96,50 +96,10 @@ export const ProductDetailModal = () => {
             
             {/* Image Box - Borderless Pure Fitted Design */}
             <div
-              onClick={() => !is360Mode && setIsZoomOpen(true)}
+              onClick={() => setIsZoomOpen(true)}
               className="relative aspect-[4/3] rounded-2xl overflow-hidden flex items-center justify-center group cursor-pointer"
             >
-              
-              {/* 360 Spin Viewer Toggle Pill */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIs360Mode(!is360Mode);
-                }}
-                className={`absolute top-3 left-3 z-10 text-[11px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition shadow-sm ${
-                  is360Mode ? 'bg-[#3B429F] text-white shadow-indigo-900/40' : 'bg-white/95 text-gray-800 border border-gray-200 hover:bg-gray-100'
-                }`}
-              >
-                <RotateCw className={`w-3.5 h-3.5 ${is360Mode ? 'animate-spin' : ''}`} />
-                <span>{is360Mode ? '360° Drag Mode Active' : '360° Interactive Spin'}</span>
-              </button>
-
-              {/* Zoom Pill Indicator */}
-              {!is360Mode && (
-                <div className="absolute bottom-2 right-2 z-10 bg-white/95 text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-gray-200 backdrop-blur-sm shadow-sm group-hover:scale-105 transition">
-                  <ZoomIn className="w-3 h-3 text-[#3B429F]" />
-                  <span>Click to Zoom</span>
-                </div>
-              )}
-
-              {is360Mode ? (
-                <div
-                  onMouseMove={handleDrag360}
-                  className="w-full h-full flex flex-col items-center justify-center cursor-grab active:cursor-grabbing select-none"
-                >
-                  <img
-                    src={selectedImg}
-                    alt={product.name}
-                    style={{ transform: `rotateY(${rotationAngle}deg)` }}
-                    className="w-full h-full object-contain"
-                  />
-                  <p className="absolute bottom-2 text-[10px] text-gray-800 bg-white/95 px-3 py-1 rounded-full border border-gray-200 shadow-sm font-semibold">
-                    ← Drag left or right to rotate →
-                  </p>
-                </div>
-              ) : (
-                <img src={selectedImg} alt={product.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-              )}
+              <img src={selectedImg} alt={product.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
             </div>
 
             {/* Thumbnail Carousel Bar */}
@@ -147,12 +107,9 @@ export const ProductDetailModal = () => {
               {product.gallery.map((img, idx) => (
                 <button
                   key={idx}
-                  onClick={() => {
-                    setSelectedImg(img);
-                    setIs360Mode(false);
-                  }}
+                  onClick={() => setSelectedImg(img)}
                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition shrink-0 ${
-                    selectedImg === img && !is360Mode ? 'border-[#3B429F] shadow-md ring-2 ring-indigo-200' : 'border-gray-200 opacity-70 hover:opacity-100'
+                    selectedImg === img ? 'border-[#3B429F] shadow-md ring-2 ring-indigo-200' : 'border-gray-200 opacity-70 hover:opacity-100'
                   }`}
                 >
                   <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
@@ -189,23 +146,8 @@ export const ProductDetailModal = () => {
                 <span className="text-sm text-gray-400 line-through">
                   ₹{product.originalPrice.toLocaleString('en-IN')}
                 </span>
-                <span className="text-xs font-bold text-emerald-600">
-                  {discountPercent}% off
-                </span>
               </div>
               <p className="text-[10px] text-gray-500 font-medium">(MRP Inclusive of all taxes)</p>
-
-              {/* Clean Offer Lines */}
-              <div className="pt-2 text-xs space-y-1 font-medium text-gray-700">
-                <p className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  <span>For WhatsApp Orders use code <strong className="font-mono font-bold text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">VOEUX10</strong> for extra discount on all Car Electronics</span>
-                </p>
-                <p className="flex items-center gap-2 text-gray-600">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                  <span>Extra 5% off on all Prepaid UPI</span>
-                </p>
-              </div>
             </div>
 
             {/* Primary Action Buttons */}
