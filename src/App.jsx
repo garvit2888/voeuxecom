@@ -69,6 +69,10 @@ const MainContent = () => {
         return <AdminTestPaymentPage />;
       case 'voeux-ops':
       case 'flipkart-admin':
+      case 'flipkart-automation':
+      case 'flipkart-api':
+      case 'flipkart-sync':
+      case 'flipkart-developer':
         return <FlipkartOpsAdmin />;
       case 'inventory-qr':
       case 'warehouse-qr':

@@ -47,6 +47,7 @@ export const Footer = () => {
               <li><button onClick={() => setActivePage('warranty')} className="hover:text-cyan-400 transition cursor-pointer">Warranty Register Portal</button></li>
               <li><button onClick={() => setActivePage('contact-us')} className="hover:text-cyan-400 transition cursor-pointer">Contact Support</button></li>
               <li><button onClick={() => setActivePage('terms')} className="hover:text-cyan-400 transition cursor-pointer">Terms & Conditions</button></li>
+              <li><button onClick={() => setActivePage('flipkart-automation')} className="hover:text-cyan-400 transition cursor-pointer">Flipkart Seller API Portal</button></li>
             </ul>
           </div>
 
