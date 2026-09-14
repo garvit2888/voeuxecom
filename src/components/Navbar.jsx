@@ -53,20 +53,6 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile-Only: VOEUX Logo Row below the ticker */}
-        <div className="lg:hidden flex items-center px-4 py-2.5 bg-slate-950 border-b border-slate-800">
-          <div
-            className="cursor-pointer"
-            onClick={() => setActivePage('home')}
-          >
-            <img
-              src="/images/voeux_logo.png"
-              alt="VOEUX® Electronics"
-              className="h-7 w-auto object-contain"
-            />
-          </div>
-        </div>
-
         {/* Noise-Style Desktop Header: Single Line, Proper Spacing */}
         <nav className="hidden lg:block px-6 py-3.5">
           <div className="container mx-auto flex items-center justify-between gap-6">

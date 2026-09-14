@@ -72,7 +72,10 @@ export const Hero = () => {
       <div className="md:hidden relative min-h-screen bg-black text-white flex flex-col items-center justify-center pt-2 pb-24 px-4 overflow-x-hidden">
 
         {/* IMAGE STACK: Spans 100% full width touching left & right phone screen edges */}
-        <div className="relative -mx-4 w-[calc(100%+2rem)] h-80 sm:h-96 overflow-hidden flex items-center justify-center">
+        <div
+          onClick={() => setSelectedProductModal(slides[currentSlide]?.featuredProduct)}
+          className="relative -mx-4 w-[calc(100%+2rem)] h-80 sm:h-96 overflow-hidden flex items-center justify-center cursor-pointer"
+        >
           {/* Top gradient fade */}
           <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
 
@@ -96,33 +99,24 @@ export const Hero = () => {
         </div>
 
         {/* TEXT STACK: Directly below edge-to-edge image */}
-        <div className="w-full mt-3 space-y-4 text-left min-h-[200px] relative px-1">
+        <div className="w-full mt-3 space-y-4 text-left min-h-[160px] relative px-1">
           {slides.map((s, idx) => (
             <div
               key={idx}
-              className={`transition-all duration-500 ease-in-out space-y-3.5 ${
+              onClick={() => setSelectedProductModal(s.featuredProduct)}
+              className={`transition-all duration-500 ease-in-out space-y-3.5 cursor-pointer ${
                 idx === currentSlide
                   ? 'opacity-100 translate-y-0 relative z-10'
                   : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
               }`}
             >
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white hover:text-gray-200 transition">
                 {s.title}
               </h1>
 
               <p className="text-sm text-gray-300 font-medium leading-relaxed">
                 {s.tagline}
               </p>
-
-              <div className="pt-1">
-                <button
-                  onClick={() => setSelectedProductModal(s.featuredProduct)}
-                  className="w-full bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#2B308B] text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl cursor-pointer"
-                >
-                  <span>{s.ctaText}</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
-              </div>
             </div>
           ))}
 
@@ -131,7 +125,10 @@ export const Hero = () => {
             {slides.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentSlide(idx)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentSlide(idx);
+                }}
                 aria-label={`Go to slide ${idx + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   currentSlide === idx ? 'w-7 bg-white' : 'w-1.5 bg-gray-700'
@@ -146,7 +143,10 @@ export const Hero = () => {
       {/* ========== DESKTOP LAYOUT ONLY ========== */}
       <div className="hidden md:block bg-black">
         <div className="container mx-auto px-4 py-10">
-          <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden">
+          <div
+            onClick={() => setSelectedProductModal(slides[currentSlide]?.featuredProduct)}
+            className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden cursor-pointer group"
+          >
 
             {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
             <div className="absolute right-6 top-8 bottom-8 w-[55%] flex items-center justify-end pointer-events-none z-0">
@@ -157,10 +157,10 @@ export const Hero = () => {
                   alt={s.title}
                   loading="eager"
                   fetchPriority="high"
-                  className={`absolute right-4 max-h-full max-w-[85%] object-contain object-right transition-all duration-500 ease-in-out ${
+                  className={`absolute right-4 max-h-full max-w-[85%] object-contain object-right transition-all duration-500 ease-in-out group-hover:scale-105 ${
                     idx === currentSlide
-                      ? 'opacity-95 scale-100'
-                      : 'opacity-0 scale-95 pointer-events-none'
+                      ? 'opacity-95'
+                      : 'opacity-0 pointer-events-none'
                   }`}
                 />
               ))}
@@ -180,21 +180,12 @@ export const Hero = () => {
                       : 'opacity-0 translate-y-4 absolute inset-0 pointer-events-none z-0'
                   }`}
                 >
-                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight group-hover:text-cyan-400 transition">
                     {s.title}
                   </h1>
                   <p className="text-base text-gray-300 font-medium leading-relaxed">
                     {s.tagline}
                   </p>
-                  <div className="pt-2 flex items-center gap-3">
-                    <button
-                      onClick={() => setSelectedProductModal(s.featuredProduct)}
-                      className="bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg cursor-pointer"
-                    >
-                      <span>{s.ctaText}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
@@ -204,7 +195,10 @@ export const Hero = () => {
               {slides.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setCurrentSlide(idx)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentSlide(idx);
+                  }}
                   aria-label={`Go to slide ${idx + 1}`}
                   className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                     currentSlide === idx ? 'w-8 bg-[#3B429F]' : 'w-2 bg-gray-600 hover:bg-gray-400'
@@ -215,14 +209,20 @@ export const Hero = () => {
 
             {/* Prev & Next Arrows Desktop */}
             <button
-              onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+              }}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Previous Slide"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentSlide(prev => (prev + 1) % slides.length);
+              }}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Next Slide"
             >
