@@ -273,10 +273,10 @@ export const Navbar = () => {
 
               {/* SECTION 1: SHOP */}
               <div className="space-y-4">
-                <h3 className="font-condensed text-2xl font-bold uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
+                <h3 className="font-condensed text-2xl font-normal uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
                   SHOP
                 </h3>
-                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-extrabold uppercase text-white tracking-wide">
+                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-normal uppercase text-white tracking-wide">
                   <button
                     onClick={() => { setActivePage('home'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
@@ -312,10 +312,10 @@ export const Navbar = () => {
 
               {/* SECTION 2: CONTACT US / HELP & INFORMATION */}
               <div className="space-y-4 pt-8">
-                <h3 className="font-condensed text-2xl font-bold uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
+                <h3 className="font-condensed text-2xl font-normal uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
                   CONTACT US
                 </h3>
-                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-extrabold uppercase text-white tracking-wide">
+                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-normal uppercase text-white tracking-wide">
                   <button
                     onClick={() => { setActivePage('about-us'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
@@ -363,10 +363,10 @@ export const Navbar = () => {
 
               {/* SECTION 3: TERMS & POLICIES */}
               <div className="space-y-4 pt-8">
-                <h3 className="font-condensed text-2xl font-bold uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
+                <h3 className="font-condensed text-2xl font-normal uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
                   POLICIES & TERMS
                 </h3>
-                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-extrabold uppercase text-white tracking-wide">
+                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-normal uppercase text-white tracking-wide">
                   <button
                     onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
@@ -402,7 +402,7 @@ export const Navbar = () => {
                   handleAccountClick();
                   setIsMobileMenuOpen(false);
                 }}
-                className="flex items-center gap-3 text-white hover:text-indigo-200 uppercase font-condensed text-xl font-bold tracking-wide transition cursor-pointer"
+                className="flex items-center gap-3 text-white hover:text-indigo-200 uppercase font-condensed text-xl font-normal tracking-wide transition cursor-pointer"
               >
                 <User className="w-6 h-6 text-indigo-300" />
                 <span>{user ? user.name : 'MY ACCOUNT / SIGN IN'}</span>
