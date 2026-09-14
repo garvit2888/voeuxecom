@@ -66,15 +66,15 @@ export const Hero = () => {
   }, [slides.length]);
 
   return (
-    <section className="bg-slate-950 md:bg-white border-b border-gray-200">
+    <section className="bg-black border-b border-gray-800">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center pt-2 pb-24 px-4 overflow-x-hidden">
+      <div className="md:hidden relative min-h-screen bg-black text-white flex flex-col items-center justify-center pt-2 pb-24 px-4 overflow-x-hidden">
 
         {/* IMAGE STACK: Spans 100% full width touching left & right phone screen edges */}
         <div className="relative -mx-4 w-[calc(100%+2rem)] h-80 sm:h-96 overflow-hidden flex items-center justify-center">
           {/* Top gradient fade */}
-          <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-slate-950 to-transparent pointer-events-none z-10" />
+          <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
 
           {slides.map((s, idx) => (
             <img
@@ -92,7 +92,7 @@ export const Hero = () => {
           ))}
 
           {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-slate-950 pointer-events-none z-10" />
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-black pointer-events-none z-10" />
         </div>
 
         {/* TEXT STACK: Directly below edge-to-edge image */}
@@ -117,7 +117,7 @@ export const Hero = () => {
               <div className="pt-1">
                 <button
                   onClick={() => setSelectedProductModal(s.featuredProduct)}
-                  className="w-full bg-black hover:bg-slate-900 active:bg-slate-800 text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition border border-slate-700 shadow-xl"
+                  className="w-full bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#2B308B] text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl cursor-pointer"
                 >
                   <span>{s.ctaText}</span>
                   <ArrowRight className="w-4.5 h-4.5" />
@@ -134,7 +134,7 @@ export const Hero = () => {
                 onClick={() => setCurrentSlide(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-7 bg-white' : 'w-1.5 bg-slate-700'
+                  currentSlide === idx ? 'w-7 bg-white' : 'w-1.5 bg-gray-700'
                 }`}
               />
             ))}
@@ -144,9 +144,9 @@ export const Hero = () => {
       </div>
 
       {/* ========== DESKTOP LAYOUT ONLY ========== */}
-      <div className="hidden md:block">
+      <div className="hidden md:block bg-black">
         <div className="container mx-auto px-4 py-10">
-          <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-slate-950 text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-slate-800 shadow-2xl overflow-hidden">
+          <div className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden">
 
             {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
             <div className="absolute right-6 top-8 bottom-8 w-[55%] flex items-center justify-end pointer-events-none z-0">
@@ -167,7 +167,7 @@ export const Hero = () => {
             </div>
 
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent max-w-2xl pointer-events-none z-1" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent max-w-2xl pointer-events-none z-1" />
 
             {/* STACKED TEXT CONTENT */}
             <div className="relative z-10 max-w-xl text-left w-full">
@@ -189,7 +189,7 @@ export const Hero = () => {
                   <div className="pt-2 flex items-center gap-3">
                     <button
                       onClick={() => setSelectedProductModal(s.featuredProduct)}
-                      className="bg-black hover:bg-slate-900 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition border border-slate-700 shadow-lg cursor-pointer"
+                      className="bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg cursor-pointer"
                     >
                       <span>{s.ctaText}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -207,7 +207,7 @@ export const Hero = () => {
                   onClick={() => setCurrentSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
                   className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    currentSlide === idx ? 'w-8 bg-cyan-400' : 'w-2 bg-gray-600 hover:bg-gray-400'
+                    currentSlide === idx ? 'w-8 bg-[#3B429F]' : 'w-2 bg-gray-600 hover:bg-gray-400'
                   }`}
                 />
               ))}
@@ -216,23 +216,21 @@ export const Hero = () => {
             {/* Prev & Next Arrows Desktop */}
             <button
               onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Previous Slide"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-indigo-500/30 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
               aria-label="Next Slide"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-
           </div>
         </div>
       </div>
-
     </section>
   );
 };
