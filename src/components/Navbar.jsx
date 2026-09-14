@@ -323,12 +323,6 @@ export const Navbar = () => {
                     WARRANTY REGISTER PORTAL
                   </button>
                   <button
-                    onClick={() => { setActivePage('warranty-policy'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    REPAIRS & WARRANTY POLICY
-                  </button>
-                  <button
                     onClick={() => { setActivePage('join-us'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
@@ -347,25 +341,13 @@ export const Navbar = () => {
                     onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
-                    PRIVACY POLICY
-                  </button>
-                  <button
-                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    REFUND POLICY
-                  </button>
-                  <button
-                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    SHIPPING POLICY
-                  </button>
-                  <button
-                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
                     TERMS AND CONDITIONS
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('warranty-policy'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    REPAIRS & WARRANTY POLICY
                   </button>
                 </div>
               </div>

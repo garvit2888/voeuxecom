@@ -117,7 +117,7 @@ export const Hero = () => {
               <div className="pt-1">
                 <button
                   onClick={() => setSelectedProductModal(s.featuredProduct)}
-                  className="w-full bg-[#3B429F] active:bg-[#2B308B] text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-xl shadow-indigo-900/60"
+                  className="w-full bg-black hover:bg-slate-900 active:bg-slate-800 text-white text-sm font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition border border-slate-700 shadow-xl"
                 >
                   <span>{s.ctaText}</span>
                   <ArrowRight className="w-4.5 h-4.5" />
@@ -134,7 +134,7 @@ export const Hero = () => {
                 onClick={() => setCurrentSlide(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-7 bg-cyan-400' : 'w-1.5 bg-slate-700'
+                  currentSlide === idx ? 'w-7 bg-white' : 'w-1.5 bg-slate-700'
                 }`}
               />
             ))}
@@ -189,7 +189,7 @@ export const Hero = () => {
                   <div className="pt-2 flex items-center gap-3">
                     <button
                       onClick={() => setSelectedProductModal(s.featuredProduct)}
-                      className="bg-[#3B429F] hover:bg-[#2B308B] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-900/40 cursor-pointer"
+                      className="bg-black hover:bg-slate-900 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition border border-slate-700 shadow-lg cursor-pointer"
                     >
                       <span>{s.ctaText}</span>
                       <ArrowRight className="w-4 h-4" />
