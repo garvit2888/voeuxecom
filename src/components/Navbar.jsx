@@ -278,12 +278,6 @@ export const Navbar = () => {
                 </h3>
                 <div className="space-y-3 font-condensed text-xl sm:text-2xl font-normal uppercase text-white tracking-wide">
                   <button
-                    onClick={() => { setActivePage('home'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    ALL PRODUCTS
-                  </button>
-                  <button
                     onClick={() => { setActivePage('android-players'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
@@ -323,12 +317,6 @@ export const Navbar = () => {
                     ABOUT US
                   </button>
                   <button
-                    onClick={() => { setActivePage('contact-us'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    CONTACT INFORMATION
-                  </button>
-                  <button
                     onClick={() => { setActivePage('warranty'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
@@ -341,22 +329,10 @@ export const Navbar = () => {
                     REPAIRS & WARRANTY POLICY
                   </button>
                   <button
-                    onClick={() => { setActivePage('installation'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    INSTALLATION GUIDE & HELP
-                  </button>
-                  <button
                     onClick={() => { setActivePage('join-us'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
                     DISTRIBUTOR PROGRAM
-                  </button>
-                  <button
-                    onClick={() => { setActivePage('dealers'); setIsMobileMenuOpen(false); }}
-                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
-                  >
-                    DEALER LOCATOR
                   </button>
                 </div>
               </div>
