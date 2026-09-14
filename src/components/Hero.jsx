@@ -110,7 +110,7 @@ export const Hero = () => {
                   : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
               }`}
             >
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white hover:text-gray-200 transition">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
                 {s.title}
               </h1>
 
@@ -180,7 +180,7 @@ export const Hero = () => {
                       : 'opacity-0 translate-y-4 absolute inset-0 pointer-events-none z-0'
                   }`}
                 >
-                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight group-hover:text-cyan-400 transition">
+                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
                     {s.title}
                   </h1>
                   <p className="text-base text-gray-300 font-medium leading-relaxed">
