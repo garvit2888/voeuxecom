@@ -252,41 +252,163 @@ export const Navbar = () => {
       {isMobileMenuOpen && (
         <div
           onClick={() => setIsMobileMenuOpen(false)}
-          className="lg:hidden fixed inset-0 z-[85] bg-black/65 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-200"
+          className="lg:hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-md flex justify-start animate-in fade-in duration-200"
         >
-          {/* Inner Drawer — stopPropagation prevents inner click from closing menu */}
+          {/* Inner Side Drawer Panel — dark navy blue background with white condensed uppercase text */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#3B429F] rounded-t-[32px] p-5 pt-3 space-y-3 max-h-[80vh] overflow-y-auto mb-20 shadow-2xl border-t border-indigo-400/30 text-left"
+            className="relative w-[85%] max-w-sm h-full bg-[#181C4F] text-white p-6 sm:p-8 overflow-y-auto flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-300 text-left"
           >
-            {/* Top Handle Indicator */}
-            <div className="w-12 h-1.5 bg-white/40 rounded-full mx-auto my-1.5" />
+            <div>
+              {/* Top X Close Button */}
+              <div className="flex items-center justify-between pb-6">
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1 -ml-1 text-white hover:text-indigo-200 transition cursor-pointer"
+                  aria-label="Close menu"
+                >
+                  <X className="w-8 h-8 stroke-[2.5]" />
+                </button>
+              </div>
 
-            {/* Mobile Nav Links - Sleek White Premium Cards */}
-            <div className="space-y-2.5 pt-1">
-              {navLinks.map(link => {
-                const isActive = activePage === link.id;
-                return (
+              {/* SECTION 1: SHOP */}
+              <div className="space-y-4">
+                <h3 className="font-condensed text-2xl font-bold uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
+                  SHOP
+                </h3>
+                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-extrabold uppercase text-white tracking-wide">
                   <button
-                    key={link.id}
-                    onClick={() => {
-                      setActivePage(link.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`w-full p-4 rounded-2xl font-black text-xs transition-all flex items-center justify-between cursor-pointer active:scale-[0.98] ${
-                      isActive
-                        ? 'bg-white text-[#3B429F] shadow-lg shadow-indigo-950/40 ring-2 ring-white/60'
-                        : 'bg-white/95 hover:bg-white text-gray-900 shadow-md'
-                    }`}
+                    onClick={() => { setActivePage('home'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
-                    <span className="tracking-tight text-sm font-extrabold">{link.label}</span>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center transition ${isActive ? 'bg-[#3B429F] text-white' : 'bg-gray-100 text-gray-400'}`}>
-                      <ChevronRight className="w-4 h-4" />
-                    </div>
+                    ALL PRODUCTS
                   </button>
-                );
-              })}
+                  <button
+                    onClick={() => { setActivePage('android-players'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    ANDROID CAR PLAYERS
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('car-speakers'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    CAR SPEAKERS
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('speakers-soundbars'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    SPEAKERS & SOUNDBARS
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('amplifiers'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    CAR AMPLIFIERS
+                  </button>
+                </div>
+              </div>
+
+              {/* SECTION 2: CONTACT US / HELP & INFORMATION */}
+              <div className="space-y-4 pt-8">
+                <h3 className="font-condensed text-2xl font-bold uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
+                  CONTACT US
+                </h3>
+                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-extrabold uppercase text-white tracking-wide">
+                  <button
+                    onClick={() => { setActivePage('about-us'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    ABOUT US
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('contact-us'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    CONTACT INFORMATION
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('warranty'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    WARRANTY REGISTER PORTAL
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('warranty-policy'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    REPAIRS & WARRANTY POLICY
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('installation'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    INSTALLATION GUIDE & HELP
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('join-us'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    DISTRIBUTOR PROGRAM
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('dealers'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    DEALER LOCATOR
+                  </button>
+                </div>
+              </div>
+
+              {/* SECTION 3: TERMS & POLICIES */}
+              <div className="space-y-4 pt-8">
+                <h3 className="font-condensed text-2xl font-bold uppercase tracking-wider text-white border-b border-indigo-400/20 pb-2">
+                  POLICIES & TERMS
+                </h3>
+                <div className="space-y-3 font-condensed text-xl sm:text-2xl font-extrabold uppercase text-white tracking-wide">
+                  <button
+                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    PRIVACY POLICY
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    REFUND POLICY
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    SHIPPING POLICY
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('terms'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    TERMS AND CONDITIONS
+                  </button>
+                </div>
+              </div>
             </div>
+
+            {/* Bottom Account Footer Link */}
+            <div className="pt-10 mt-8 border-t border-indigo-400/20">
+              <button
+                onClick={() => {
+                  handleAccountClick();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-3 text-white hover:text-indigo-200 uppercase font-condensed text-xl font-bold tracking-wide transition cursor-pointer"
+              >
+                <User className="w-6 h-6 text-indigo-300" />
+                <span>{user ? user.name : 'MY ACCOUNT / SIGN IN'}</span>
+              </button>
+            </div>
+
           </div>
         </div>
       )}
