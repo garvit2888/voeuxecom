@@ -565,6 +565,12 @@ export const ShopProvider = ({ children }) => {
     } catch(e) { return []; }
   });
 
+  // Helper to isolate used promo codes per user account
+  const getUserUsedPromosKey = (u, email, phone) => {
+    const id = (u?.email || u?.phone || email || phone || 'guest').toLowerCase().trim().replace(/[^a-z0-9_@.-]/g, '_');
+    return `voeux_used_promos_${id}`;
+  };
+
   const verifyAndApplyVoucher = async (inputCode) => {
     const code = (inputCode || '').trim().toUpperCase();
 
@@ -572,32 +578,65 @@ export const ShopProvider = ({ children }) => {
       throw new Error('Please enter a coupon or referral voucher code.');
     }
 
-    // 1. Check if voucher code has ALREADY BEEN REDEEMED locally or in cloud used_vouchers DB
-    if (usedVouchers.includes(code)) {
-      throw new Error(`Referral voucher "${code}" has already been redeemed and cannot be used again.`);
+    const currentEmail = (user?.email || '').toLowerCase().trim();
+    const currentPhone = (user?.phone || '').replace(/\D/g, '');
+    const accountId = currentEmail || currentPhone || '';
+
+    // 1. Account-specific check: Ensure code has not been used by this account
+    if (accountId) {
+      const userPromosKey = getUserUsedPromosKey(user, currentEmail, currentPhone);
+      let localUsed = [];
+      try {
+        const saved = localStorage.getItem(userPromosKey);
+        if (saved) localUsed = JSON.parse(saved);
+      } catch(e) {}
+
+      if (localUsed.includes(code)) {
+        throw new Error(`Coupon code "${code}" has already been used on your account.`);
+      }
+
+      // Check Firebase cloud DB for account-specific used promo codes
+      if (currentEmail) {
+        const userKey = currentEmail.replace(/[.#$\[\]]/g, '_');
+        try {
+          const promoRes = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/user_used_promos/${userKey}/${code}.json`);
+          const cloudPromoRecord = await promoRes.json();
+          if (cloudPromoRecord) {
+            if (!localUsed.includes(code)) {
+              localUsed.push(code);
+              try { localStorage.setItem(userPromosKey, JSON.stringify(localUsed)); } catch(e){}
+            }
+            throw new Error(`Coupon code "${code}" has already been used on your account.`);
+          }
+        } catch(err) {
+          if (err.message && err.message.includes('already been used')) throw err;
+        }
+      }
+
+      // Check past orders of this account
+      const hasUsedInOrders = (orders || []).some(ord => {
+        const emailMatch = currentEmail && (ord.userEmail || ord.shippingAddress?.email || '').toLowerCase().trim() === currentEmail;
+        const phoneMatch = currentPhone && (ord.userPhone || ord.shippingAddress?.phone || '').replace(/\D/g, '') === currentPhone;
+        const codeMatch = (ord.appliedVoucherCode || ord.referral?.rewardVoucherCode) === code;
+        return (emailMatch || phoneMatch) && codeMatch;
+      });
+
+      if (hasUsedInOrders) {
+        throw new Error(`Coupon code "${code}" has already been used on a previous order with your account.`);
+      }
     }
 
-    try {
-      const res = await fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${code}.json`);
-      const cloudRecord = await res.json();
-      if (cloudRecord) {
-        const updated = Array.from(new Set([...usedVouchers, code]));
-        setUsedVouchers(updated);
-        try { localStorage.setItem('voeux_used_vouchers', JSON.stringify(updated)); } catch(e){}
-        throw new Error(`Referral voucher "${code}" has already been redeemed.`);
-      }
-    } catch(err) {
-      if (err.message && err.message.includes('already been redeemed')) {
-        throw err;
-      }
-    }
-
-    // 2. Standard Static Promo Codes (Universal)
+    // 2. Standard Static Promo Codes (Universal — 1 use per account)
     if (code === 'VOEUX10') {
       return { valid: true, type: 'PROMO', discountAmount: Math.round(cartTotal * 0.1), code };
     }
     if (code === 'VOEUX500' || code === 'GARVIT500') {
       return { valid: true, type: 'PROMO', discountAmount: 500, code };
+    }
+
+    // 3. Dynamic Single-Use Referral Vouchers Check
+    if (usedVouchers.includes(code)) {
+      throw new Error(`Referral voucher "${code}" has already been redeemed and cannot be used again.`);
     }
 
     // 3. Specific Referral Voucher Lookup & Account Verification
@@ -662,9 +701,6 @@ export const ShopProvider = ({ children }) => {
     // Account Scoping Enforcement: Check if this specific voucher belongs to the logged in account
     const assignedEmail = (voucherRecord.assignedToEmail || '').toLowerCase().trim();
     const assignedPhone = (voucherRecord.assignedToPhone || '').replace(/\D/g, '');
-
-    const currentEmail = (user?.email || '').toLowerCase().trim();
-    const currentPhone = (user?.phone || '').replace(/\D/g, '');
 
     if (assignedEmail || (assignedPhone && assignedPhone.length >= 10)) {
       if (!user) {
@@ -1089,6 +1125,48 @@ export const ShopProvider = ({ children }) => {
             body: JSON.stringify({ voeuxCash: updatedCash, updatedAt: new Date().toISOString() })
           });
         }
+      } catch(e){}
+    }
+
+    // Record applied promo code as used for this account
+    if (newOrder.appliedVoucherCode) {
+      const usedCode = newOrder.appliedVoucherCode.trim().toUpperCase();
+      const userEmail = (user?.email || newOrder.shippingAddress?.email || '').toLowerCase().trim();
+      const userPhone = (user?.phone || newOrder.shippingAddress?.phone || '').replace(/\D/g, '');
+
+      // 1. Account local storage key
+      const userPromosKey = getUserUsedPromosKey(user, userEmail, userPhone);
+      try {
+        const existing = JSON.parse(localStorage.getItem(userPromosKey) || '[]');
+        if (!existing.includes(usedCode)) {
+          existing.push(usedCode);
+          localStorage.setItem(userPromosKey, JSON.stringify(existing));
+        }
+      } catch(e) {}
+
+      // 2. Account Firebase DB
+      if (userEmail) {
+        try {
+          const userKey = userEmail.replace(/[.#$\[\]]/g, '_');
+          fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/user_used_promos/${userKey}/${usedCode}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: usedCode, usedAt: new Date().toISOString(), orderId: newOrder.id })
+          });
+        } catch(e) {}
+      }
+
+      // 3. Global used vouchers list
+      const updatedVouchers = Array.from(new Set([...usedVouchers, usedCode]));
+      setUsedVouchers(updatedVouchers);
+      try { localStorage.setItem('voeux_used_vouchers', JSON.stringify(updatedVouchers)); } catch(e){}
+
+      try {
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/used_vouchers/${usedCode}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ redeemedAt: new Date().toISOString(), orderId: newOrder.id })
+        });
       } catch(e){}
     }
 
