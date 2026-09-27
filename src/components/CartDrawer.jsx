@@ -71,9 +71,39 @@ export const CartDrawer = () => {
 
   if (!isCartOpen) return null;
 
+  const handleToggleVoeuxCash = () => {
+    if (!user) {
+      addToast('Please sign in to redeem your VOEUX Cash points.', 'warning');
+      setIsAuthModalOpen(true);
+      return;
+    }
+    if (voeuxCashBalance < 150) {
+      addToast(`Minimum 150 VOEUX Cash points required to redeem at checkout. (Current Balance: ${voeuxCashBalance} points)`, 'warning');
+      return;
+    }
+
+    if (!isVoeuxCashApplied && (appliedVoucherCode || discountAmount > 0)) {
+      const prev = appliedVoucherCode;
+      setAppliedVoucherCode('');
+      setDiscountAmount(0);
+      setCouponCode('');
+      setCouponError('');
+      addToast(`VOEUX Cash applied! Promo code "${prev || 'Voucher'}" removed (cannot be combined).`, 'info');
+    }
+
+    toggleVoeuxCash();
+  };
+
   const handleApplyCoupon = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setCouponError('');
+
+    if (isVoeuxCashApplied) {
+      const msg = 'VOEUX Cash cannot be combined with promo codes or vouchers. Remove VOEUX Cash to use a coupon code.';
+      setCouponError(msg);
+      addToast(msg, 'warning');
+      return;
+    }
 
     if (!couponCode.trim()) {
       const emptyMsg = 'Please enter a coupon or referral code.';
@@ -300,22 +330,31 @@ export const CartDrawer = () => {
                       type="text"
                       placeholder="Enter referral code / coupon"
                       value={couponCode}
+                      disabled={isVoeuxCashApplied}
                       onChange={e => {
                         setCouponCode(e.target.value);
                         if (couponError) setCouponError('');
                       }}
-                      className={`flex-1 bg-gray-50 border rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:outline-none transition uppercase font-semibold ${
+                      className={`flex-1 bg-gray-50 border rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:outline-none transition uppercase font-semibold disabled:opacity-60 ${
                         couponError ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-[#3B429F]'
                       }`}
                     />
                     <button
                       type="submit"
-                      disabled={verifyingCoupon}
+                      disabled={verifyingCoupon || isVoeuxCashApplied}
                       className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer disabled:opacity-50"
                     >
                       {verifyingCoupon ? 'Verifying...' : 'Apply'}
                     </button>
                   </form>
+
+                  {/* VOEUX Cash Active Notice */}
+                  {isVoeuxCashApplied && (
+                    <div className="flex items-center gap-2 p-2 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-[11px] font-semibold">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>VOEUX Cash active (promo codes disabled while active).</span>
+                    </div>
+                  )}
 
                   {/* Coupon Error Banner */}
                   {couponError && (
@@ -362,7 +401,7 @@ export const CartDrawer = () => {
                       {voeuxCashBalance >= 150 ? (
                         <button
                           type="button"
-                          onClick={toggleVoeuxCash}
+                          onClick={handleToggleVoeuxCash}
                           className={`text-[11px] font-extrabold px-3 py-1 rounded-lg transition cursor-pointer ${
                             isVoeuxCashApplied ? 'bg-emerald-600 text-white' : 'bg-[#3B429F] text-white hover:bg-[#2B308B]'
                           }`}
@@ -583,6 +622,7 @@ export const CartDrawer = () => {
                       type="text"
                       placeholder="Enter referral code / coupon"
                       value={couponCode}
+                      disabled={isVoeuxCashApplied}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
@@ -593,19 +633,27 @@ export const CartDrawer = () => {
                         setCouponCode(e.target.value);
                         if (couponError) setCouponError('');
                       }}
-                      className={`flex-1 bg-gray-50 border rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:outline-none transition uppercase font-semibold ${
+                      className={`flex-1 bg-gray-50 border rounded-xl px-3 py-2 text-xs text-gray-900 focus:bg-white focus:outline-none transition uppercase font-semibold disabled:opacity-60 ${
                         couponError ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-[#3B429F]'
                       }`}
                     />
                     <button
                       type="button"
                       onClick={handleApplyCoupon}
-                      disabled={verifyingCoupon}
+                      disabled={verifyingCoupon || isVoeuxCashApplied}
                       className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer disabled:opacity-50"
                     >
                       {verifyingCoupon ? 'Verifying...' : 'Apply'}
                     </button>
                   </div>
+
+                  {/* VOEUX Cash Active Notice */}
+                  {isVoeuxCashApplied && (
+                    <div className="flex items-center gap-2 p-2 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-[11px] font-semibold">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>VOEUX Cash active (promo codes disabled while active).</span>
+                    </div>
+                  )}
 
                   {/* Coupon Error Banner */}
                   {couponError && (
@@ -652,7 +700,7 @@ export const CartDrawer = () => {
                       {voeuxCashBalance >= 150 ? (
                         <button
                           type="button"
-                          onClick={toggleVoeuxCash}
+                          onClick={handleToggleVoeuxCash}
                           className={`text-[11px] font-extrabold px-3 py-1 rounded-lg transition cursor-pointer ${
                             isVoeuxCashApplied ? 'bg-emerald-600 text-white' : 'bg-[#3B429F] text-white hover:bg-[#2B308B]'
                           }`}

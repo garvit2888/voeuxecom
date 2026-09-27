@@ -393,14 +393,45 @@ export const ShopProvider = ({ children }) => {
     }
   }, [user?.email, user?.phone]);
 
+  // Helper to isolate VOEUX Cash per user account
+  const getUserCashKey = (u) => {
+    if (u && (u.email || u.phone)) {
+      const id = (u.email || u.phone).toLowerCase().trim().replace(/[^a-z0-9_@.-]/g, '_');
+      return `voeux_cash_${id}`;
+    }
+    return null;
+  };
+
   // VOEUX Cash State & Redemption System (1 Point = ₹1)
   const [isVoeuxCashApplied, setIsVoeuxCashApplied] = useState(false);
 
   const voeuxCashBalance = useMemo(() => {
     if (!user) return 0;
-    if (typeof user.voeuxCash === 'number') return user.voeuxCash;
-    return 150; // Starter balance
-  }, [user]);
+
+    // 1. Check account-specific localStorage key
+    const cashKey = getUserCashKey(user);
+    if (cashKey) {
+      try {
+        const savedCash = localStorage.getItem(cashKey);
+        if (savedCash !== null && savedCash !== undefined && !isNaN(Number(savedCash))) {
+          return Number(savedCash);
+        }
+      } catch(e) {}
+    }
+
+    // 2. Check user object voeuxCash
+    if (typeof user.voeuxCash === 'number' && !isNaN(user.voeuxCash)) {
+      return user.voeuxCash;
+    }
+
+    // 3. Registered user starter balance
+    return 150;
+  }, [user, user?.email, user?.phone, user?.voeuxCash]);
+
+  // Auto-reset applied VOEUX cash state whenever user logs out or switches accounts
+  useEffect(() => {
+    setIsVoeuxCashApplied(false);
+  }, [user?.email, user?.phone]);
 
   const toggleVoeuxCash = () => {
     if (!user) {
@@ -415,6 +446,8 @@ export const ShopProvider = ({ children }) => {
     setIsVoeuxCashApplied(prev => !prev);
     if (!isVoeuxCashApplied) {
       addToast(`VOEUX Cash applied! ₹${voeuxCashBalance} discount added to checkout.`, 'success');
+    } else {
+      addToast('VOEUX Cash removed.', 'info');
     }
   };
 
@@ -700,8 +733,26 @@ export const ShopProvider = ({ children }) => {
     }
 
     setUser(found);
+    setIsVoeuxCashApplied(false);
     localStorage.setItem('voeux_user', JSON.stringify(found));
     try { sessionStorage.setItem('voeux_user', JSON.stringify(found)); } catch(e){}
+
+    // Fetch user's live VOEUX Cash from account-specific key or Firebase
+    const cashKey = getUserCashKey(found);
+    if (cashKey && found.email) {
+      try {
+        const userKey = found.email.replace(/[.#$\[\]]/g, '_');
+        fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/users_cash/${userKey}.json`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && typeof data.voeuxCash === 'number') {
+              localStorage.setItem(cashKey, data.voeuxCash.toString());
+              setUser(prev => prev ? { ...prev, voeuxCash: data.voeuxCash } : prev);
+            }
+          })
+          .catch(() => {});
+      } catch(e) {}
+    }
 
     // Load the user's specific cart or set to empty array if none exists
     const userCartKey = getUserCartKey(found);
@@ -736,14 +787,23 @@ export const ShopProvider = ({ children }) => {
       throw new Error('This mobile number is already linked to another account. Please sign in.');
     }
 
-    users.push(userData);
+    const starterCash = 150;
+    const newUserData = { ...userData, voeuxCash: starterCash };
+
+    users.push(newUserData);
     localStorage.setItem('voeux_users_db', JSON.stringify(users));
-    setUser(userData);
-    localStorage.setItem('voeux_user', JSON.stringify(userData));
-    try { sessionStorage.setItem('voeux_user', JSON.stringify(userData)); } catch(e){}
+    setUser(newUserData);
+    setIsVoeuxCashApplied(false);
+    localStorage.setItem('voeux_user', JSON.stringify(newUserData));
+    try { sessionStorage.setItem('voeux_user', JSON.stringify(newUserData)); } catch(e){}
+
+    const newCashKey = getUserCashKey(newUserData);
+    if (newCashKey) {
+      try { localStorage.setItem(newCashKey, starterCash.toString()); } catch(e){}
+    }
 
     // Brand new registered account ALWAYS starts with an empty cart
-    const newCartKey = getUserCartKey(userData);
+    const newCartKey = getUserCartKey(newUserData);
     setCart([]);
     try {
       localStorage.setItem(newCartKey, JSON.stringify([]));
@@ -754,16 +814,17 @@ export const ShopProvider = ({ children }) => {
       fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/users.json', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(newUserData)
       });
     } catch(e){}
 
-    addToast(`Account created! Welcome ${userData.name}`, 'success');
-    return userData;
+    addToast(`Account created! Welcome ${newUserData.name}`, 'success');
+    return newUserData;
   };
 
   const logoutUser = () => {
     setUser(null);
+    setIsVoeuxCashApplied(false);
     setCart([]);
     try {
       localStorage.removeItem('voeux_user');
@@ -994,6 +1055,28 @@ export const ShopProvider = ({ children }) => {
       try {
         localStorage.setItem('voeux_user', JSON.stringify(updatedUser));
         sessionStorage.setItem('voeux_user', JSON.stringify(updatedUser));
+      } catch(e){}
+
+      // Save to account-specific cash key
+      const cashKey = getUserCashKey(updatedUser);
+      if (cashKey) {
+        try { localStorage.setItem(cashKey, updatedCash.toString()); } catch(e){}
+      }
+
+      // Update local voeux_users_db
+      try {
+        const usersRaw = localStorage.getItem('voeux_users_db') || '[]';
+        let users = JSON.parse(usersRaw);
+        if (Array.isArray(users)) {
+          const idx = users.findIndex(u => 
+            (u.email && updatedUser.email && u.email.toLowerCase() === updatedUser.email.toLowerCase()) ||
+            (u.phone && updatedUser.phone && u.phone.replace(/\D/g, '') === updatedUser.phone.replace(/\D/g, ''))
+          );
+          if (idx > -1) {
+            users[idx].voeuxCash = updatedCash;
+            localStorage.setItem('voeux_users_db', JSON.stringify(users));
+          }
+        }
       } catch(e){}
 
       // Sync user VOEUX Cash to Firebase DB
