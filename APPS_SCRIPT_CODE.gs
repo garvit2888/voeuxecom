@@ -413,33 +413,58 @@ function runFlipkartOrderAutomation() {
 
 // ── STEP 1: OAuth2 Token ──────────────────────────────────────────────────
 function getFlipkartAccessToken() {
-  var url = FLIPKART_BASE_URL + '/oauth-token';
-  var options = {
-    method: 'POST',
+  var tokenUrl = 'https://api.flipkart.net/oauth-service/oauth/token?grant_type=client_credentials&scope=Seller_Api';
+  var authHeader = 'Basic ' + Utilities.base64Encode(FLIPKART_APP_ID + ':' + FLIPKART_APP_SECRET);
+
+  // Method 1: GET request with Basic Auth & query params (standard Flipkart Seller OAuth endpoint)
+  var optionsGet = {
+    method: 'GET',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Basic ' + Utilities.base64Encode(FLIPKART_APP_ID + ':' + FLIPKART_APP_SECRET)
+      'Authorization': authHeader
     },
-    payload: 'grant_type=client_credentials',
     muteHttpExceptions: true
   };
 
   try {
-    var response = UrlFetchApp.fetch(url, options);
+    var response = UrlFetchApp.fetch(tokenUrl, optionsGet);
     var code = response.getResponseCode();
     var body = response.getContentText();
-    Logger.log('Auth response [' + code + ']: ' + body);
+    Logger.log('Auth GET response [' + code + ']: ' + body);
 
     if (code === 200) {
       var data = JSON.parse(body);
-      return data.access_token || null;
+      if (data.access_token) return data.access_token;
     }
-    Logger.log('Auth failed — HTTP ' + code);
-    return null;
   } catch (e) {
-    Logger.log('Auth exception: ' + e.toString());
-    return null;
+    Logger.log('Auth GET exception: ' + e.toString());
   }
+
+  // Method 2: POST request fallback
+  var optionsPost = {
+    method: 'POST',
+    headers: {
+      'Authorization': authHeader,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    payload: 'grant_type=client_credentials&scope=Seller_Api',
+    muteHttpExceptions: true
+  };
+
+  try {
+    var postResponse = UrlFetchApp.fetch('https://api.flipkart.net/oauth-service/oauth/token', optionsPost);
+    var postCode = postResponse.getResponseCode();
+    var postBody = postResponse.getContentText();
+    Logger.log('Auth POST response [' + postCode + ']: ' + postBody);
+
+    if (postCode === 200) {
+      var postData = JSON.parse(postBody);
+      if (postData.access_token) return postData.access_token;
+    }
+  } catch (e) {
+    Logger.log('Auth POST exception: ' + e.toString());
+  }
+
+  return null;
 }
 
 // ── STEP 2: Fetch Today's Shipments ──────────────────────────────────────
