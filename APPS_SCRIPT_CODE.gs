@@ -597,10 +597,13 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
       var batchResp = UrlFetchApp.fetch(batchUrl, batchOptions);
       if (batchResp.getResponseCode() === 200) {
         var batchBlob = batchResp.getBlob();
-        batchBlob.setContentType('application/pdf');
-        batchBlob.setName('Flipkart_Merged_Invoices_Labels.pdf');
-        pdfAttachments.push(batchBlob);
-        Logger.log('Merged batch PDF downloaded successfully (' + batchBlob.getBytes().length + ' bytes)');
+        var bSize = batchBlob.getBytes().length;
+        if (bSize > 0) {
+          batchBlob.setContentType('application/pdf');
+          batchBlob.setName('Flipkart_Merged_Invoices_Labels.pdf');
+          pdfAttachments.push(batchBlob);
+          Logger.log('Merged batch PDF downloaded successfully (' + bSize + ' bytes)');
+        }
       }
     } catch(bErr) {
       Logger.log('Batch PDF download notice: ' + bErr.toString());
@@ -630,10 +633,15 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
 
       if (code === 200) {
         var pdfBlob = response.getBlob();
-        pdfBlob.setContentType('application/pdf');
-        pdfBlob.setName('Invoice_' + sid + '.pdf');
-        pdfAttachments.push(pdfBlob);
-        Logger.log('Saved PDF attachment for ' + sid + ' (' + pdfBlob.getBytes().length + ' bytes)');
+        var size = pdfBlob.getBytes().length;
+        if (size > 0) {
+          pdfBlob.setContentType('application/pdf');
+          pdfBlob.setName('Invoice_' + sid + '.pdf');
+          pdfAttachments.push(pdfBlob);
+          Logger.log('Saved PDF attachment for ' + sid + ' (' + size + ' bytes)');
+        } else {
+          Logger.log('PDF not ready yet on Flipkart for ' + sid + ' (0 bytes)');
+        }
       }
     } catch (e) {
       Logger.log('downloadPDF exception for ' + sid + ': ' + e.toString());
