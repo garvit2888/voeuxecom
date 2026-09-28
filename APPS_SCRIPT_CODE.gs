@@ -474,10 +474,8 @@ function fetchTodaysShipments(accessToken) {
   var payload = {
     filter: {
       type: 'preDispatch',
-      states: ['APPROVED'],
-      hold: false
-    },
-    pagination: { pageSize: 20, pageNumber: 1 }
+      states: ['APPROVED']
+    }
   };
 
   var options = {
