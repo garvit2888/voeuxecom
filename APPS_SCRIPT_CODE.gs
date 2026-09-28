@@ -551,7 +551,10 @@ function filterEligibleShipments(accessToken, shipments) {
 // ── STEP 4: Pack Orders ────────────────────────────────────────────────────
 function packOrders(accessToken, shipmentIds) {
   var url = FLIPKART_BASE_URL + '/v3/shipments/labels';
-  var payload = { shipmentIds: shipmentIds };
+  var shipmentsList = shipmentIds.map(function(id) {
+    return { shipmentId: id };
+  });
+  var payload = { shipments: shipmentsList };
 
   var options = {
     method: 'POST',
@@ -566,7 +569,7 @@ function packOrders(accessToken, shipmentIds) {
 
   try {
     var response = UrlFetchApp.fetch(url, options);
-    Logger.log('Pack response [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 200));
+    Logger.log('Pack response [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 300));
   } catch (e) {
     Logger.log('packOrders exception: ' + e.toString());
   }
@@ -597,15 +600,18 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
       Logger.log('PDF download [' + sid + '] HTTP ' + code);
 
       if (code === 200) {
-        var blob = response.getBlob().setName('Invoice_' + sid + '.pdf');
-        pdfAttachments.push(blob);
+        var bytes = response.getBytes();
+        if (bytes && bytes.length > 0) {
+          var pdfBlob = Utilities.newBlob(bytes, 'application/pdf', 'Invoice_' + sid + '.pdf');
+          pdfAttachments.push(pdfBlob);
+        }
       }
     } catch (e) {
       Logger.log('downloadPDF exception for ' + sid + ': ' + e.toString());
     }
 
     // Brief pause between requests to avoid rate limiting
-    if (i < shipmentIds.length - 1) Utilities.sleep(800);
+    if (i < shipmentIds.length - 1) Utilities.sleep(500);
   }
 
   return pdfAttachments;
@@ -629,7 +635,7 @@ function dispatchOrders(accessToken, shipmentIds) {
 
   try {
     var response = UrlFetchApp.fetch(url, options);
-    Logger.log('Dispatch response [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 200));
+    Logger.log('Dispatch response [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 300));
   } catch (e) {
     Logger.log('dispatchOrders exception: ' + e.toString());
   }
@@ -641,8 +647,10 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments) {
   var subject = 'VOEUX® Flipkart Orders — ' + today + ' (' + eligibleShipments.length + ' orders)';
 
   var orderLines = eligibleShipments.map(function(s, idx) {
-    return (idx + 1) + '. Order ID: ' + (s.shipmentId || s.id || 'N/A') +
-      ' | Product: ' + (s.product || s.productName || s.items && s.items[0] && s.items[0].title || 'VOEUX Item');
+    var item = (s.orderItems && s.orderItems[0]) || (s.items && s.items[0]) || {};
+    var itemTitle = item.title || item.sku || item.fsn || s.productName || 'VOEUX Item';
+    var sid = s.shipmentId || s.id || 'N/A';
+    return (idx + 1) + '. Order ID: ' + sid + ' | Product: ' + itemTitle;
   }).join('\n');
 
   var body = 'Good morning, VOEUX® Team!\n\n' +
