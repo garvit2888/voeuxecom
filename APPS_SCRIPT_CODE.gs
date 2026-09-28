@@ -471,23 +471,13 @@ function getFlipkartAccessToken() {
 function fetchTodaysShipments(accessToken) {
   var url = FLIPKART_BASE_URL + '/v3/shipments/filter/';
 
-  // Date range: today in IST
-  var now = new Date();
-  var istOffset = 5.5 * 60 * 60 * 1000;
-  var istNow = new Date(now.getTime() + istOffset);
-  var startOfDay = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate(), 0, 0, 0, 0);
-  var endOfDay   = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate(), 23, 59, 59, 0);
-
   var payload = {
     filter: {
+      type: 'preDispatch',
       states: ['APPROVED'],
-      orderDate: {
-        from: startOfDay.toISOString(),
-        to: endOfDay.toISOString()
-      }
+      hold: false
     },
-    pagination: { pageSize: 20, pageNumber: 1 },
-    sort: { field: 'orderDate', order: 'asc' }
+    pagination: { pageSize: 20, pageNumber: 1 }
   };
 
   var options = {
