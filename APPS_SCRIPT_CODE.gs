@@ -579,6 +579,36 @@ function packOrders(accessToken, shipmentIds) {
 function downloadInvoicePDFs(accessToken, shipmentIds) {
   var pdfAttachments = [];
 
+  // 1. First attempt: Download single merged PDF for all shipments (up to 50)
+  if (shipmentIds.length > 0) {
+    try {
+      var batchIds = shipmentIds.slice(0, 50).join(',');
+      var batchUrl = FLIPKART_BASE_URL + '/v3/shipments/' + batchIds + '/labelOnly/pdf';
+      var batchOptions = {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+          'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+        },
+        payload: JSON.stringify({ shipmentIds: shipmentIds.slice(0, 50) }),
+        muteHttpExceptions: true
+      };
+      var batchResp = UrlFetchApp.fetch(batchUrl, batchOptions);
+      if (batchResp.getResponseCode() === 200) {
+        var batchBytes = batchResp.getContent();
+        if (batchBytes && batchBytes.length > 0) {
+          var mergedBlob = Utilities.newBlob(batchBytes, 'application/pdf', 'Flipkart_Merged_Invoices_Labels.pdf');
+          pdfAttachments.push(mergedBlob);
+          Logger.log('Merged batch PDF downloaded successfully (' + batchBytes.length + ' bytes)');
+        }
+      }
+    } catch(bErr) {
+      Logger.log('Batch PDF download notice: ' + bErr.toString());
+    }
+  }
+
+  // 2. Individual PDF downloads
   for (var i = 0; i < shipmentIds.length; i++) {
     var sid = shipmentIds[i];
     var url = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labelOnly/pdf';
@@ -600,7 +630,7 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
       Logger.log('PDF download [' + sid + '] HTTP ' + code);
 
       if (code === 200) {
-        var bytes = response.getBytes();
+        var bytes = response.getContent();
         if (bytes && bytes.length > 0) {
           var pdfBlob = Utilities.newBlob(bytes, 'application/pdf', 'Invoice_' + sid + '.pdf');
           pdfAttachments.push(pdfBlob);
@@ -610,8 +640,7 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
       Logger.log('downloadPDF exception for ' + sid + ': ' + e.toString());
     }
 
-    // Brief pause between requests to avoid rate limiting
-    if (i < shipmentIds.length - 1) Utilities.sleep(500);
+    if (i < shipmentIds.length - 1) Utilities.sleep(300);
   }
 
   return pdfAttachments;
