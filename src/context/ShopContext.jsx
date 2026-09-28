@@ -424,8 +424,8 @@ export const ShopProvider = ({ children }) => {
       return user.voeuxCash;
     }
 
-    // 3. Registered user starter balance
-    return 150;
+    // 3. Registered user initial balance
+    return 0;
   }, [user, user?.email, user?.phone, user?.voeuxCash]);
 
   // Auto-reset applied VOEUX cash state whenever user logs out or switches accounts
@@ -823,7 +823,7 @@ export const ShopProvider = ({ children }) => {
       throw new Error('This mobile number is already linked to another account. Please sign in.');
     }
 
-    const starterCash = 150;
+    const starterCash = 0;
     const newUserData = { ...userData, voeuxCash: starterCash };
 
     users.push(newUserData);
@@ -986,6 +986,8 @@ export const ShopProvider = ({ children }) => {
         image: i.product.image
       })),
       totalAmount: orderData.totalAmount || cartTotal,
+      shippingFee: orderData.shippingFee || 0,
+      appliedVoucherCode: orderData.appliedVoucherCode || null,
       shippingAddress: orderData.shippingAddress,
       paymentMethod: orderData.paymentMethod || 'COD',
       paymentId: orderData.paymentId || 'N/A',

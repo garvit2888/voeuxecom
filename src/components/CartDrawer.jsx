@@ -32,8 +32,17 @@ export const CartDrawer = () => {
   const [verifyingCoupon, setVerifyingCoupon] = useState(false);
   const [paymentCancelled, setPaymentCancelled] = useState(false);
 
+  const hasAmpProduct = cart.some(item => 
+    item && item.product && (
+      item.product.category === 'amplifiers' || 
+      item.product.id?.toLowerCase().includes('amp') || 
+      item.product.name?.toUpperCase().includes('AMP')
+    )
+  );
+  const shippingFee = hasAmpProduct ? 150 : 0;
+
   const voeuxCashDiscountAmount = (isVoeuxCashApplied && voeuxCashBalance >= 150) ? Math.min(voeuxCashBalance, Math.max(0, cartTotal - discountAmount)) : 0;
-  const finalTotal = Math.max(0, cartTotal - discountAmount - voeuxCashDiscountAmount);
+  const finalTotal = Math.max(0, cartTotal - discountAmount - voeuxCashDiscountAmount + shippingFee);
 
   const [addressData, setAddressData] = useState({
     fullName: user?.name || '',
@@ -192,6 +201,7 @@ export const CartDrawer = () => {
       handler: async function (response) {
         const placed = await placeOrder({
           totalAmount: finalTotal,
+          shippingFee,
           shippingAddress: addressData,
           paymentMethod: 'RAZORPAY_ONLINE',
           paymentId: response.razorpay_payment_id || 'PAY_' + Date.now(),
@@ -442,7 +452,11 @@ export const CartDrawer = () => {
                   )}
                   <div className="flex justify-between text-gray-500">
                     <span>Shipping</span>
-                    <span className="font-bold text-emerald-600">FREE</span>
+                    {shippingFee > 0 ? (
+                      <span className="font-bold text-amber-800">₹150 (AMP Shipping)</span>
+                    ) : (
+                      <span className="font-bold text-emerald-600">FREE</span>
+                    )}
                   </div>
                   <div className="flex justify-between text-base font-black text-gray-900 pt-2 border-t border-gray-100">
                     <span>Estimated Total</span>
@@ -737,7 +751,11 @@ export const CartDrawer = () => {
                 )}
                 <div className="flex justify-between text-gray-500">
                   <span>Shipping</span>
-                  <span className="font-bold text-emerald-600">FREE Express Shipping</span>
+                  {shippingFee > 0 ? (
+                    <span className="font-bold text-amber-800">₹150 (AMP Order Shipping)</span>
+                  ) : (
+                    <span className="font-bold text-emerald-600">FREE Express Shipping</span>
+                  )}
                 </div>
                 <div className="flex justify-between text-sm font-black text-gray-900 pt-2 border-t border-gray-200">
                   <span>Total Amount Payable</span>
