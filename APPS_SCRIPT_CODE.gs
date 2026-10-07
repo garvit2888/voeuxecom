@@ -407,15 +407,34 @@ function runFlipkartOrderAutomation() {
     var readyShipmentIds = readyShipments.map(function(s) { return s.shipmentId || s.id; });
 
     // STEP 6: Dispatch orders (ONLY READY ONES)
-    if (readyShipmentIds.length > 0) {
-      dispatchOrders(accessToken, readyShipmentIds);
-      Logger.log('STEP 6: Dispatch API called for ' + readyShipmentIds.length + ' ready orders.');
+    if (readyShipments.length > 0) {
+      var locationGroups = {};
+      readyShipments.forEach(function(s) {
+        var loc = s.locationId || 'default';
+        var sid = s.shipmentId || s.id;
+        if (!locationGroups[loc]) locationGroups[loc] = [];
+        locationGroups[loc].push(sid);
+      });
+
+      Object.keys(locationGroups).forEach(function(loc) {
+        dispatchOrders(accessToken, locationGroups[loc], loc !== 'default' ? loc : null);
+      });
+      Logger.log('STEP 6: Dispatch API called for ' + readyShipments.length + ' ready orders across ' + Object.keys(locationGroups).length + ' locations.');
     } else {
       Logger.log('STEP 6: Skipped dispatch. No orders ready.');
     }
 
+    // STEP 6B: Fetch SKUs from Order API since Shipment API doesn't return them
+    var allOrderItemIds = [];
+    eligibleShipments.forEach(function(s) {
+      if (s.orderItems && s.orderItems[0] && s.orderItems[0].id) {
+        allOrderItemIds.push(s.orderItems[0].id);
+      }
+    });
+    var skuMap = fetchSKUs(accessToken, allOrderItemIds);
+
     // STEP 7: Email all PDFs to office
-    sendInvoicesToOffice(pdfAttachments, eligibleShipments);
+    sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap);
     Logger.log('STEP 7: Invoices emailed to ' + OFFICE_EMAIL);
 
     Logger.log('=== Automation Completed Successfully ===');
@@ -737,10 +756,47 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
   return pdfAttachments;
 }
 
+// ── STEP 5B: Helper to Fetch SKUs ─────────────────────────────────────────
+function fetchSKUs(accessToken, orderItemIds) {
+  var skuMap = {};
+  if (!orderItemIds || orderItemIds.length === 0) return skuMap;
+  
+  try {
+    // API limits to 50/100 at a time, we'll just slice first 50
+    var chunk = orderItemIds.slice(0, 50).join(',');
+    var url = 'https://api.flipkart.net/sellers/v2/orders?orderItemIds=' + chunk;
+    
+    var response = UrlFetchApp.fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      },
+      muteHttpExceptions: true
+    });
+    
+    if (response.getResponseCode() === 200) {
+      var data = JSON.parse(response.getContentText());
+      if (data.orderItems) {
+        data.orderItems.forEach(function(item) {
+          if (item.orderItemId && item.sku) {
+            skuMap[item.orderItemId] = item.sku;
+          }
+        });
+      }
+    }
+  } catch(e) {
+    Logger.log('fetchSKUs exception: ' + e.toString());
+  }
+  return skuMap;
+}
+
 // ── STEP 6: Dispatch Orders ───────────────────────────────────────────────
-function dispatchOrders(accessToken, shipmentIds) {
+function dispatchOrders(accessToken, shipmentIds, locationId) {
   var url = FLIPKART_BASE_URL + '/v3/shipments/dispatch';
   var payload = { shipmentIds: shipmentIds };
+  if (locationId) {
+    payload.locationId = locationId;
+  }
 
   var options = {
     method: 'POST',
@@ -761,8 +817,9 @@ function dispatchOrders(accessToken, shipmentIds) {
   }
 }
 
-function sendInvoicesToOffice(pdfAttachments, eligibleShipments) {
+function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap) {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'dd MMM yyyy');
+  skuMap = skuMap || {};
   
   var readyShipments = [];
   var upcomingShipments = [];
@@ -784,14 +841,16 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments) {
 
   function formatShipmentLines(shipmentsArray) {
     return shipmentsArray.map(function(s, idx) {
-      // Correctly extract SKU for Flipkart API
+      // Correctly extract SKU using skuMap mapped via orderItemIds
       var sku = 'VOEUX Item';
-      if (s.subShipments && s.subShipments[0] && s.subShipments[0].items && s.subShipments[0].items[0] && s.subShipments[0].items[0].sku) {
+      var orderItemId = s.orderItems && s.orderItems[0] ? s.orderItems[0].id : null;
+      
+      if (orderItemId && skuMap[orderItemId]) {
+        sku = skuMap[orderItemId];
+      } else if (s.subShipments && s.subShipments[0] && s.subShipments[0].items && s.subShipments[0].items[0] && s.subShipments[0].items[0].sku) {
         sku = s.subShipments[0].items[0].sku;
       } else if (s.orderItems && s.orderItems[0] && s.orderItems[0].sku) {
         sku = s.orderItems[0].sku;
-      } else if (s.orderItems && s.orderItems[0] && s.orderItems[0].title) {
-        sku = s.orderItems[0].title;
       }
       
       var orderId = s.orderId || (s.orderItems && s.orderItems[0] ? s.orderItems[0].orderId : null) || s.shipmentId || s.id || 'N/A';
