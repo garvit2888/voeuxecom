@@ -747,31 +747,62 @@ function dispatchOrders(accessToken, shipmentIds) {
   }
 }
 
-// ── STEP 7: Email invoices to office ─────────────────────────────────────
 function sendInvoicesToOffice(pdfAttachments, eligibleShipments) {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'dd MMM yyyy');
-  var subject = 'VOEUX® Flipkart Orders — ' + today + ' (' + eligibleShipments.length + ' orders)';
+  
+  var readyShipments = [];
+  var upcomingShipments = [];
 
-  var orderLines = eligibleShipments.map(function(s, idx) {
-    var item = (s.orderItems && s.orderItems[0]) || (s.items && s.items[0]) || {};
-    var itemTitle = item.sku || item.title || item.fsn || s.productName || 'VOEUX Item';
-    var orderId = s.orderId || item.orderId || s.shipmentId || s.id || 'N/A';
-    return (idx + 1) + '. Order ID: ' + orderId + ' | Product: ' + itemTitle;
-  }).join('\n');
+  eligibleShipments.forEach(function(s) {
+    var sid = s.shipmentId || s.id;
+    // Check if a PDF was successfully downloaded for this shipment
+    var hasPdf = pdfAttachments.some(function(blob) {
+      var name = blob.getName();
+      return name.indexOf(sid) > -1 || name === 'Flipkart_All_Labels.pdf'; 
+    });
+    
+    if (hasPdf) {
+      readyShipments.push(s);
+    } else {
+      upcomingShipments.push(s);
+    }
+  });
+
+  function formatShipmentLines(shipmentsArray) {
+    return shipmentsArray.map(function(s, idx) {
+      // Correctly extract SKU for Flipkart API
+      var sku = 'VOEUX Item';
+      if (s.subShipments && s.subShipments[0] && s.subShipments[0].items && s.subShipments[0].items[0] && s.subShipments[0].items[0].sku) {
+        sku = s.subShipments[0].items[0].sku;
+      } else if (s.orderItems && s.orderItems[0] && s.orderItems[0].sku) {
+        sku = s.orderItems[0].sku;
+      } else if (s.orderItems && s.orderItems[0] && s.orderItems[0].title) {
+        sku = s.orderItems[0].title;
+      }
+      
+      var orderId = s.orderId || (s.orderItems && s.orderItems[0] ? s.orderItems[0].orderId : null) || s.shipmentId || s.id || 'N/A';
+      return (idx + 1) + '. Order ID: ' + orderId + ' | SKU: ' + sku;
+    }).join('\n');
+  }
+
+  var orderLinesReady = formatShipmentLines(readyShipments);
+  var orderLinesUpcoming = formatShipmentLines(upcomingShipments);
 
   var body = 'Good morning, VOEUX® Team!\n\n' +
     'Today\'s Flipkart orders have been automatically processed.\n\n' +
-    '=== ORDER SUMMARY — ' + today + ' ===\n' +
-    'Total Orders: ' + eligibleShipments.length + '\n\n' +
-    orderLines + '\n\n' +
+    '=== 📦 READY TO SHIP (' + readyShipments.length + ' orders) ===\n' +
+    (readyShipments.length > 0 ? orderLinesReady : 'No orders are currently packed and ready.') + '\n\n' +
+    '=== ⏳ UPCOMING / PENDING (' + upcomingShipments.length + ' orders) ===\n' +
+    (upcomingShipments.length > 0 ? orderLinesUpcoming : 'No upcoming orders.') + '\n\n' +
     '=== ACTIONS COMPLETED ===\n' +
-    '✓ Orders marked as PACKED on Flipkart\n' +
-    '✓ Invoices/labels downloaded\n' +
-    '✓ Orders DISPATCHED — courier pickup scheduled\n\n' +
-    'Invoice PDFs are attached to this email.\n' +
-    'Please prepare and package the above orders for handover to the courier.\n\n' +
+    '✓ Labels downloaded for Ready orders\n' +
+    '✓ Ready orders DISPATCHED — courier pickup scheduled\n\n' +
+    'Invoice PDFs for the Ready orders are attached to this email.\n' +
+    'Please pack the Upcoming orders on the Flipkart Dashboard so they can be processed in the next run.\n\n' +
     'VOEUX® Automated Operations\n' +
     'voeuxtechnologies.in';
+
+  var subject = 'VOEUX® Flipkart Orders — ' + today + ' (' + readyShipments.length + ' Ready, ' + upcomingShipments.length + ' Upcoming)';
 
   var emailOptions = {
     name: 'VOEUX® Operations',
