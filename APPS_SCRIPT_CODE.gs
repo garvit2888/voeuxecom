@@ -396,9 +396,23 @@ function runFlipkartOrderAutomation() {
     var pdfAttachments = downloadInvoicePDFs(accessToken, shipmentIds);
     Logger.log('STEP 5: Downloaded ' + pdfAttachments.length + ' invoice PDFs.');
 
-    // STEP 6: Dispatch orders
-    dispatchOrders(accessToken, shipmentIds);
-    Logger.log('STEP 6: Dispatch API called for all orders.');
+    // STEP 5B: Identify Ready Shipments for Dispatch
+    var readyShipments = eligibleShipments.filter(function(s) {
+      var sid = s.shipmentId || s.id;
+      return pdfAttachments.some(function(blob) {
+        var name = blob.getName();
+        return name.indexOf(sid) > -1 || name === 'Flipkart_All_Labels.pdf';
+      });
+    });
+    var readyShipmentIds = readyShipments.map(function(s) { return s.shipmentId || s.id; });
+
+    // STEP 6: Dispatch orders (ONLY READY ONES)
+    if (readyShipmentIds.length > 0) {
+      dispatchOrders(accessToken, readyShipmentIds);
+      Logger.log('STEP 6: Dispatch API called for ' + readyShipmentIds.length + ' ready orders.');
+    } else {
+      Logger.log('STEP 6: Skipped dispatch. No orders ready.');
+    }
 
     // STEP 7: Email all PDFs to office
     sendInvoicesToOffice(pdfAttachments, eligibleShipments);
@@ -809,20 +823,33 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments) {
     replyTo: 'voeuxexperience@gmail.com'
   };
 
+  var attachments = [];
   if (pdfAttachments && pdfAttachments.length > 0) {
-    emailOptions.attachments = pdfAttachments;
+    attachments = attachments.concat(pdfAttachments);
+  }
+  
+  // Attach a debug JSON of the first shipment so we can find the exact location of the SKU
+  if (eligibleShipments && eligibleShipments.length > 0) {
+    try {
+      var debugBlob = Utilities.newBlob(JSON.stringify(eligibleShipments[0], null, 2), 'application/json', 'debug_shipment.json');
+      attachments.push(debugBlob);
+    } catch(e) {}
+  }
+  
+  if (attachments.length > 0) {
+    emailOptions.attachments = attachments;
   }
 
   try {
     GmailApp.sendEmail(OFFICE_EMAIL, subject, body, emailOptions);
-    Logger.log('Email sent to ' + OFFICE_EMAIL + ' with ' + (pdfAttachments ? pdfAttachments.length : 0) + ' attachments.');
+    Logger.log('Email sent to ' + OFFICE_EMAIL + ' with ' + attachments.length + ' attachments.');
   } catch (mailErr) {
     Logger.log('Gmail failed, trying MailApp: ' + mailErr.toString());
     MailApp.sendEmail({
       to: OFFICE_EMAIL,
       subject: subject,
       body: body,
-      attachments: pdfAttachments || [],
+      attachments: attachments,
       name: 'VOEUX® Operations',
       replyTo: 'voeuxexperience@gmail.com'
     });
