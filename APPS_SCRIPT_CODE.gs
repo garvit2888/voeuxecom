@@ -470,11 +470,12 @@ function getFlipkartAccessToken() {
 // ── STEP 2: Fetch Today's Shipments ──────────────────────────────────────
 function fetchTodaysShipments(accessToken) {
   var url = FLIPKART_BASE_URL + '/v3/shipments/filter/';
-
+  var allShipments = [];
+  
   var payload = {
     filter: {
       type: 'preDispatch',
-      states: ['APPROVED']
+      states: ['APPROVED', 'PACKED', 'READY_TO_DISPATCH']
     }
   };
 
@@ -493,16 +494,52 @@ function fetchTodaysShipments(accessToken) {
     var response = UrlFetchApp.fetch(url, options);
     var code = response.getResponseCode();
     var body = response.getContentText();
-    Logger.log('Filter shipments [' + code + ']: ' + body.substring(0, 300));
+    Logger.log('Filter shipments (Page 1) [' + code + ']');
 
     if (code === 200) {
       var data = JSON.parse(body);
-      return data.shipments || data.data || [];
+      allShipments = allShipments.concat(data.shipments || data.data || []);
+      
+      var hasMore = data.hasMore;
+      var nextUrl = data.nextPageUrl;
+      var page = 2;
+      
+      // Handle Pagination
+      while (hasMore && nextUrl) {
+        var fetchNextUrl = FLIPKART_BASE_URL.replace('/sellers', '') + nextUrl;
+        if (nextUrl.indexOf('/sellers') > -1) {
+          fetchNextUrl = 'https://api.flipkart.net' + nextUrl;
+        }
+        
+        var nextOptions = {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+          },
+          muteHttpExceptions: true
+        };
+        
+        var nextResp = UrlFetchApp.fetch(fetchNextUrl, nextOptions);
+        var nextCode = nextResp.getResponseCode();
+        
+        if (nextCode === 200) {
+          var nextData = JSON.parse(nextResp.getContentText());
+          allShipments = allShipments.concat(nextData.shipments || nextData.data || []);
+          hasMore = nextData.hasMore;
+          nextUrl = nextData.nextPageUrl;
+          Logger.log('Filter shipments (Page ' + page + ') fetched.');
+          page++;
+        } else {
+          Logger.log('Pagination failed with code ' + nextCode);
+          hasMore = false;
+        }
+      }
     }
-    return [];
+    return allShipments;
   } catch (e) {
     Logger.log('fetchShipments exception: ' + e.toString());
-    return [];
+    return allShipments;
   }
 }
 
@@ -717,9 +754,9 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments) {
 
   var orderLines = eligibleShipments.map(function(s, idx) {
     var item = (s.orderItems && s.orderItems[0]) || (s.items && s.items[0]) || {};
-    var itemTitle = item.title || item.sku || item.fsn || s.productName || 'VOEUX Item';
-    var sid = s.shipmentId || s.id || 'N/A';
-    return (idx + 1) + '. Order ID: ' + sid + ' | Product: ' + itemTitle;
+    var itemTitle = item.sku || item.title || item.fsn || s.productName || 'VOEUX Item';
+    var orderId = s.orderId || item.orderId || s.shipmentId || s.id || 'N/A';
+    return (idx + 1) + '. Order ID: ' + orderId + ' | Product: ' + itemTitle;
   }).join('\n');
 
   var body = 'Good morning, VOEUX® Team!\n\n' +
