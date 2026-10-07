@@ -393,18 +393,15 @@ function runFlipkartOrderAutomation() {
     Logger.log('STEP 4: Pack API called for ' + shipmentIds.length + ' orders.');
 
     // STEP 5: Download invoice PDFs
-    var pdfAttachments = downloadInvoicePDFs(accessToken, shipmentIds);
-    Logger.log('STEP 5: Downloaded ' + pdfAttachments.length + ' invoice PDFs.');
+    var downloadResult = downloadInvoicePDFs(accessToken, shipmentIds);
+    var pdfAttachments = downloadResult.attachments;
+    var readyShipmentIds = downloadResult.readySids;
+    Logger.log('STEP 5: Downloaded merged PDF. Identified ' + readyShipmentIds.length + ' ready shipments.');
 
     // STEP 5B: Identify Ready Shipments for Dispatch
     var readyShipments = eligibleShipments.filter(function(s) {
-      var sid = s.shipmentId || s.id;
-      return pdfAttachments.some(function(blob) {
-        var name = blob.getName();
-        return name.indexOf(sid) > -1 || name === 'Flipkart_All_Labels.pdf';
-      });
+      return readyShipmentIds.indexOf(s.shipmentId || s.id) > -1;
     });
-    var readyShipmentIds = readyShipments.map(function(s) { return s.shipmentId || s.id; });
 
     // STEP 6: Dispatch orders (ONLY READY ONES)
     if (readyShipments.length > 0) {
@@ -434,7 +431,7 @@ function runFlipkartOrderAutomation() {
     var skuMap = fetchSKUs(accessToken, allOrderItemIds);
 
     // STEP 7: Email all PDFs to office
-    sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap);
+    sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds);
     Logger.log('STEP 7: Invoices emailed to ' + OFFICE_EMAIL);
 
     Logger.log('=== Automation Completed Successfully ===');
@@ -646,48 +643,17 @@ function packOrders(accessToken, shipmentIds) {
 }
 
 // ── STEP 5: Download Invoice PDFs ─────────────────────────────────────────
-// Uses GET /v3/shipments/{ids}/labels — fetches Flipkart-generated merged label PDF
-// for already-approved/packed shipments (does NOT require Pack API to succeed first)
 function downloadInvoicePDFs(accessToken, shipmentIds) {
   var pdfAttachments = [];
+  var validSids = [];
 
-  if (shipmentIds.length === 0) return pdfAttachments;
+  if (shipmentIds.length === 0) return { attachments: pdfAttachments, readySids: validSids };
 
-  // Strategy 1: GET merged PDF for all shipments at once (Flipkart-generated labels)
-  try {
-    var batchIds = shipmentIds.slice(0, 25).join(','); // max 25 per GET
-    var mergedUrl = FLIPKART_BASE_URL + '/v3/shipments/' + batchIds + '/labels';
-    var mergedResp = UrlFetchApp.fetch(mergedUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-      },
-      muteHttpExceptions: true
-    });
-    var mergedCode = mergedResp.getResponseCode();
-    Logger.log('Merged GET labels HTTP ' + mergedCode);
-    if (mergedCode === 200) {
-      var mergedBlob = mergedResp.getBlob();
-      var mergedSize = mergedBlob.getBytes().length;
-      if (mergedSize > 0) {
-        mergedBlob.setContentType('application/pdf');
-        mergedBlob.setName('Flipkart_All_Labels.pdf');
-        pdfAttachments.push(mergedBlob);
-        Logger.log('Merged labels PDF OK (' + mergedSize + ' bytes)');
-      } else {
-        Logger.log('Merged GET labels returned 0 bytes');
-      }
-    }
-  } catch(e) {
-    Logger.log('Merged GET labels exception: ' + e.toString());
-  }
-
-  // Strategy 2: Individual GET labels per shipment
+  // Step A: Check each shipment individually to see if the label is ACTUALLY generated
   for (var i = 0; i < shipmentIds.length; i++) {
     var sid = shipmentIds[i];
-
-    // Try GET /labels first (fetch Flipkart-generated label)
+    var isReady = false;
+    
     try {
       var getUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labels';
       var getResp = UrlFetchApp.fetch(getUrl, {
@@ -698,62 +664,58 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
         },
         muteHttpExceptions: true
       });
-      var getCode = getResp.getResponseCode();
-      Logger.log('GET label [' + sid + '] HTTP ' + getCode);
-
-      if (getCode === 200) {
-        var getBlob = getResp.getBlob();
-        var getSize = getBlob.getBytes().length;
-        if (getSize > 0) {
-          getBlob.setContentType('application/pdf');
-          getBlob.setName('Label_' + sid + '.pdf');
-          pdfAttachments.push(getBlob);
-          Logger.log('Got label for ' + sid + ' (' + getSize + ' bytes)');
-          if (i < shipmentIds.length - 1) Utilities.sleep(200);
-          continue;
+      if (getResp.getResponseCode() === 200 && getResp.getBlob().getBytes().length > 0) {
+        isReady = true;
+      } else {
+        var postUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labelOnly/pdf';
+        var postResp = UrlFetchApp.fetch(postUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/json',
+            'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+          },
+          payload: JSON.stringify({ shipmentIds: [sid] }),
+          muteHttpExceptions: true
+        });
+        if (postResp.getResponseCode() === 200 && postResp.getBlob().getBytes().length > 0) {
+          isReady = true;
         }
       }
-    } catch(e2) {
-      Logger.log('GET label exception for ' + sid + ': ' + e2.toString());
+    } catch(e) {}
+    
+    if (isReady) {
+      validSids.push(sid);
     }
-
-    // Fallback: POST labelOnly/pdf
-    try {
-      var postUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labelOnly/pdf';
-      var postResp = UrlFetchApp.fetch(postUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken,
-          'Content-Type': 'application/json',
-          'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-        },
-        payload: JSON.stringify({ shipmentIds: [sid] }),
-        muteHttpExceptions: true
-      });
-      var postCode = postResp.getResponseCode();
-      Logger.log('POST labelOnly/pdf [' + sid + '] HTTP ' + postCode);
-
-      if (postCode === 200) {
-        var postBlob = postResp.getBlob();
-        var postSize = postBlob.getBytes().length;
-        if (postSize > 0) {
-          postBlob.setContentType('application/pdf');
-          postBlob.setName('Invoice_' + sid + '.pdf');
-          pdfAttachments.push(postBlob);
-          Logger.log('Got fallback PDF for ' + sid + ' (' + postSize + ' bytes)');
-        } else {
-          Logger.log('Label not ready for ' + sid + ' (both methods returned 0 bytes)');
-        }
-      }
-    } catch(e3) {
-      Logger.log('POST labelOnly/pdf exception for ' + sid + ': ' + e3.toString());
-    }
-
-    if (i < shipmentIds.length - 1) Utilities.sleep(200);
   }
 
-  Logger.log('Total PDF attachments collected: ' + pdfAttachments.length);
-  return pdfAttachments;
+  // Step B: Download ONE merged PDF for all valid shipments
+  if (validSids.length > 0) {
+    try {
+      var batchIds = validSids.slice(0, 25).join(','); 
+      var mergedUrl = FLIPKART_BASE_URL + '/v3/shipments/' + batchIds + '/labels';
+      var mergedResp = UrlFetchApp.fetch(mergedUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+        },
+        muteHttpExceptions: true
+      });
+      if (mergedResp.getResponseCode() === 200) {
+        var mergedBlob = mergedResp.getBlob();
+        if (mergedBlob.getBytes().length > 0) {
+          mergedBlob.setContentType('application/pdf');
+          mergedBlob.setName('VOEUX_Merged_Labels.pdf');
+          pdfAttachments.push(mergedBlob);
+        }
+      }
+    } catch(e) {
+      Logger.log('Merged labels exception: ' + e.toString());
+    }
+  }
+
+  return { attachments: pdfAttachments, readySids: validSids };
 }
 
 // ── STEP 5B: Helper to Fetch SKUs ─────────────────────────────────────────
@@ -817,22 +779,17 @@ function dispatchOrders(accessToken, shipmentIds, locationId) {
   }
 }
 
-function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap) {
+function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds) {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'dd MMM yyyy');
   skuMap = skuMap || {};
+  readyShipmentIds = readyShipmentIds || [];
   
   var readyShipments = [];
   var upcomingShipments = [];
 
   eligibleShipments.forEach(function(s) {
     var sid = s.shipmentId || s.id;
-    // Check if a PDF was successfully downloaded for this shipment
-    var hasPdf = pdfAttachments.some(function(blob) {
-      var name = blob.getName();
-      return name.indexOf(sid) > -1 || name === 'Flipkart_All_Labels.pdf'; 
-    });
-    
-    if (hasPdf) {
+    if (readyShipmentIds.indexOf(sid) > -1) {
       readyShipments.push(s);
     } else {
       upcomingShipments.push(s);
