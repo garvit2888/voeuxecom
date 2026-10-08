@@ -132,13 +132,13 @@ export const JoinUsPage = () => {
             </div>
 
             <div className="p-4 rounded-xl border border-gray-200/80 space-y-1.5">
-              <h4 className="font-extrabold text-gray-900 text-sm">Audio Installers</h4>
-              <p className="text-gray-600">Professional car audio setup & wiring technicians.</p>
+              <h4 className="font-extrabold text-gray-900 text-sm">Exclusive Price List</h4>
+              <p className="text-gray-600">Get special VOEUX products distributor price list exclusively only for the distributors.</p>
             </div>
 
             <div className="p-4 rounded-xl border border-gray-200/80 space-y-1.5">
-              <h4 className="font-extrabold text-gray-900 text-sm">E-commerce Sellers</h4>
-              <p className="text-gray-600">Online auto parts sellers & digital marketplace partners.</p>
+              <h4 className="font-extrabold text-gray-900 text-sm">Sales Incentives</h4>
+              <p className="text-gray-600">Get incentives for sales. Contact now to know more about our program.</p>
             </div>
           </div>
         </div>
