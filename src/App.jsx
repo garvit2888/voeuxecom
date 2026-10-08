@@ -118,21 +118,21 @@ const MainContent = () => {
             <Hero />
 
             {/* Clean Categories Grid */}
-            <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center">
-              <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
+            <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center py-10">
+              <div className="flex items-center justify-between mb-8 sm:mb-12 border-b border-gray-200 pb-4">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">Shop by Category</h2>
+                  <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900">Shop by Category</h2>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10">
                 {CATEGORIES.map(cat => (
                   <div
                     key={cat.id}
                     onClick={() => setActivePage(cat.id)}
-                    className="clean-card group p-3 sm:p-5 cursor-pointer flex flex-col justify-between items-center text-center transition hover:shadow-md border border-gray-100 rounded-2xl bg-white"
+                    className="clean-card group p-4 sm:p-6 cursor-pointer flex flex-col justify-between items-center text-center transition hover:shadow-md border border-gray-100 rounded-2xl bg-white"
                   >
-                    <div className="w-full h-32 sm:h-44 bg-gray-50/80 rounded-xl p-2 sm:p-3 flex items-center justify-center overflow-hidden mb-2.5 group-hover:bg-indigo-50/30 transition">
+                    <div className="w-full h-40 sm:h-64 bg-gray-50/80 rounded-xl p-3 sm:p-5 flex items-center justify-center overflow-hidden mb-4 group-hover:bg-indigo-50/30 transition">
                       <img
                         src={cat.image}
                         alt={cat.name}
@@ -140,9 +140,9 @@ const MainContent = () => {
                       />
                     </div>
                     <div className="w-full text-center">
-                      <h3 className="text-xs sm:text-base font-bold text-gray-900 group-hover:text-[#3B429F] transition">{cat.name}</h3>
+                      <h3 className="text-base sm:text-xl font-bold text-gray-900 group-hover:text-[#3B429F] transition">{cat.name}</h3>
                       {cat.description && (
-                        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 line-clamp-1">{cat.description}</p>
+                        <p className="text-[11px] sm:text-sm text-gray-500 mt-1.5 line-clamp-1">{cat.description}</p>
                       )}
                     </div>
                   </div>
@@ -151,17 +151,17 @@ const MainContent = () => {
             </section>
 
             {/* Bestsellers Grid */}
-            <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center">
-              <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
+            <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center py-10">
+              <div className="flex items-center justify-between mb-8 sm:mb-12 border-b border-gray-200 pb-4">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">Best Selling Electronics</h2>
+                  <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900">Best Selling Electronics</h2>
                 </div>
-                <button onClick={() => setActivePage('android-players')} className="btn-secondary text-xs flex items-center gap-1">
-                  View All <ArrowRight className="w-3.5 h-3.5" />
+                <button onClick={() => setActivePage('android-players')} className="btn-secondary text-sm sm:text-base flex items-center gap-1.5">
+                  View All <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-10">
                 {productsList.slice(0, 4).map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -169,24 +169,24 @@ const MainContent = () => {
             </section>
 
             {/* ========== JOIN US / OFFICIAL DISTRIBUTOR PROGRAM BANNER ========== */}
-            <section className="min-h-[100dvh] flex flex-col justify-center py-12 px-6 sm:px-12 bg-black text-white relative overflow-hidden text-left shadow-2xl">
-              <div className="container mx-auto relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-                <div className="space-y-3 max-w-2xl">
-                  <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+            <section className="min-h-[100dvh] flex flex-col justify-center py-20 px-6 sm:px-16 bg-black text-white relative overflow-hidden text-left shadow-2xl">
+              <div className="container mx-auto relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12">
+                <div className="space-y-6 max-w-3xl">
+                  <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
                     Partner With VOEUX® — Official Distributor Program
                   </h2>
-                  <p className="text-slate-300 text-xs sm:text-sm font-medium leading-relaxed">
+                  <p className="text-slate-300 text-base sm:text-xl font-medium leading-relaxed">
                     Join India's fastest growing automotive electronics brand. Expand your business with our high-demand Android stereos, soundbars, amplifiers, and car accessories with direct factory support.
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
                   <button
                     onClick={() => setActivePage('join-us')}
-                    className="px-6 py-3.5 rounded-xl bg-white hover:bg-gray-100 text-[#3B429F] font-extrabold text-xs tracking-wide transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                    className="px-8 py-5 rounded-2xl bg-white hover:bg-gray-100 text-[#3B429F] font-extrabold text-lg sm:text-xl tracking-wide transition flex items-center justify-center gap-3 shadow-lg cursor-pointer"
                   >
                     <span>Explore Distributor Program</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
                 </div>
               </div>
