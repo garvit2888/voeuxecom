@@ -83,7 +83,7 @@ export const SplashScreen = () => {
           {/* Sleek Loading Progress Line Top */}
           <div className="absolute top-0 left-0 w-full h-1 bg-white/10 z-10">
             <div 
-              className="h-full bg-[#3B429F] shadow-[0_0_12px_rgba(59,66,159,0.9)] transition-all duration-75 ease-linear"
+              className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.9)] transition-all duration-75 ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -91,7 +91,7 @@ export const SplashScreen = () => {
           {/* Sleek Loading Progress Line Bottom */}
           <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10 z-10">
             <div 
-              className="h-full bg-[#3B429F] shadow-[0_0_12px_rgba(59,66,159,0.9)] transition-all duration-75 ease-linear"
+              className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.9)] transition-all duration-75 ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
