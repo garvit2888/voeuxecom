@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export const SplashScreen = () => {
@@ -7,6 +7,7 @@ export const SplashScreen = () => {
   const [fadeOut, setFadeOut] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(false);
   const [progress, setProgress] = useState(0);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     const hasPlayed = sessionStorage.getItem('voeux_intro_played');
@@ -64,10 +65,16 @@ export const SplashScreen = () => {
       {isFirstLoad ? (
         <div className="relative w-full h-full flex flex-col items-center justify-center bg-black">
           <video
+            ref={videoRef}
             src="/voeux_intro.mov"
             autoPlay
             muted
             playsInline
+            onCanPlay={() => {
+              if (videoRef.current) {
+                videoRef.current.playbackRate = 1.3;
+              }
+            }}
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleVideoEnd}
             onError={handleVideoEnd}
