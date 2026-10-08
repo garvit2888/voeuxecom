@@ -18,20 +18,28 @@ export const JoinUsPage = () => {
     <div className="min-h-screen bg-white text-gray-900 font-sans text-left">
       
       {/* ==================== HERO HEADER SECTION ==================== */}
-      <section className="relative bg-gradient-to-b from-slate-950 via-[#191C42] to-slate-950 text-white py-20 px-6 sm:px-12 overflow-hidden">
-        {/* Subtle Ambient Accent Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[#3B429F]/20 blur-3xl rounded-full pointer-events-none" />
+      <section className="relative bg-slate-900 text-white py-24 px-6 sm:px-12 overflow-hidden group transition-all duration-700">
+        
+        {/* Creative Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black z-0" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-20 blur-3xl group-hover:opacity-40 transition-opacity duration-1000 z-0 pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto space-y-6 relative z-10 text-center">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+        <div className="max-w-4xl mx-auto space-y-6 relative z-10 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
+          
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-2 hover:bg-white/10 transition-colors">
+            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+            <span className="text-xs font-bold text-indigo-300 tracking-widest uppercase">Business Partnership</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400">
             VOEUX® Official Distributor Program
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed font-normal">
+          <p className="text-slate-300 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
             Expand your automotive retail & distribution business by partnering with VOEUX® — India's premier distributor of smart car stereos, soundbars, amplifiers, and car audio systems.
           </p>
 
-          <div className="pt-4 flex flex-col items-center justify-center gap-3">
+          <div className="pt-6 flex flex-col items-center justify-center gap-4">
             <a
               href={whatsappUrl}
               target="_blank"
