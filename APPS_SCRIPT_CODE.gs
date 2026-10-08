@@ -386,10 +386,24 @@ function runFlipkartOrderAutomation() {
       return;
     }
 
+    // STEP 3B: Ignore shipments already packed/handed to the team on a PREVIOUS day (left over)
+    var processedLog = loadProcessedShipments();
+    var todayStr = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+    var carryoverShipments = [];
+    var todaysShipments = [];
+    eligibleShipments.forEach(function(s) {
+      var why = leftoverReason(s, processedLog, todayStr);
+      Logger.log('Shipment ' + (s.orderId || (s.orderItems && s.orderItems[0] && s.orderItems[0].orderId) || '?') +
+        ' | status=' + getShipmentStatus(s) + ' | updatedAt=' + getShipmentUpdatedAt(s) + ' | ' + (why ? 'IGNORED: ' + why : 'today'));
+      if (why) carryoverShipments.push(s); else todaysShipments.push(s);
+    });
+    eligibleShipments = todaysShipments;
+    Logger.log('STEP 3B: Ignoring ' + carryoverShipments.length + ' leftover shipment(s) from previous days; ' + eligibleShipments.length + ' for today.');
+
     var shipmentIds = eligibleShipments.map(function(s) { return s.shipmentId; });
 
     // STEP 4: Pack each order
-    packOrders(accessToken, shipmentIds);
+    packOrders(accessToken, eligibleShipments);
     Logger.log('STEP 4: Pack API called for ' + shipmentIds.length + ' orders.');
 
     // STEP 5: Download invoice PDFs
@@ -397,6 +411,9 @@ function runFlipkartOrderAutomation() {
     var pdfAttachments = downloadResult.attachments;
     var readyShipmentIds = downloadResult.readySids;
     Logger.log('STEP 5: Downloaded merged PDF. Identified ' + readyShipmentIds.length + ' ready shipments.');
+
+    // Remember today's handed-over shipments so tomorrow they are ignored
+    saveProcessedShipments(processedLog, readyShipmentIds, todayStr);
 
     // STEP 5B: Identify Ready Shipments for Dispatch
     var readyShipments = eligibleShipments.filter(function(s) {
@@ -421,23 +438,93 @@ function runFlipkartOrderAutomation() {
       Logger.log('STEP 6: Skipped dispatch. No orders ready.');
     }
 
+    // STEP 6A: Leftovers from earlier days are not in the email/PDF, but still try to dispatch them
+    if (carryoverShipments.length > 0) {
+      var coGroups = {};
+      carryoverShipments.forEach(function(s) {
+        var loc = s.locationId || 'default';
+        if (!coGroups[loc]) coGroups[loc] = [];
+        coGroups[loc].push(s.shipmentId || s.id);
+      });
+      Object.keys(coGroups).forEach(function(loc) {
+        dispatchOrders(accessToken, coGroups[loc], loc !== 'default' ? loc : null);
+      });
+    }
+
     // STEP 6B: Fetch SKUs from Order API since Shipment API doesn't return them
     var allOrderItemIds = [];
     eligibleShipments.forEach(function(s) {
-      if (s.orderItems && s.orderItems[0] && s.orderItems[0].id) {
-        allOrderItemIds.push(s.orderItems[0].id);
-      }
+      (s.orderItems || []).forEach(function(it) { if (it.id) allOrderItemIds.push(it.id); });
     });
     var skuMap = fetchSKUs(accessToken, allOrderItemIds);
+    var titleMap = fetchProductTitles(accessToken, Object.keys(skuMap).map(function(k) { return skuMap[k]; }));
 
     // STEP 7: Email all PDFs to office
-    sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds);
+    sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds, titleMap);
     Logger.log('STEP 7: Invoices emailed to ' + OFFICE_EMAIL);
 
     Logger.log('=== Automation Completed Successfully ===');
   } catch (err) {
     Logger.log('CRITICAL ERROR in automation: ' + err.toString());
     notifyError('Automation failed: ' + err.toString());
+  }
+}
+
+// Order IDs to always ignore (e.g. already handed over before this feature existed)
+var MANUAL_IGNORE_ORDER_IDS = ['OD438814891465862100'];
+
+function getShipmentStatus(s) {
+  var st = s.status || s.state || (s.orderItems && s.orderItems[0] && (s.orderItems[0].status || s.orderItems[0].state)) || '';
+  return String(st).toUpperCase();
+}
+
+function getShipmentUpdatedAt(s) {
+  return s.updatedAt || (s.orderItems && s.orderItems[0] && s.orderItems[0].updatedAt) || '';
+}
+
+// Returns a reason string if this shipment was already packed/handed over before today, else ''
+function leftoverReason(s, processedLog, todayStr) {
+  var sid = s.shipmentId || s.id;
+  var orderId = s.orderId || (s.orderItems && s.orderItems[0] && s.orderItems[0].orderId) || '';
+
+  if (orderId && MANUAL_IGNORE_ORDER_IDS.indexOf(orderId) > -1) return 'on manual ignore list';
+
+  var seen = processedLog[sid];
+  if (seen && seen < todayStr) return 'already given to team on ' + seen;
+
+  // Flipkart says it was already packed, and last changed before today => packed on an earlier day
+  var st = getShipmentStatus(s);
+  var upd = getShipmentUpdatedAt(s);
+  if (upd && (st === 'PACKED' || st === 'READY_TO_DISPATCH' || st === 'PACKING_IN_PROGRESS')) {
+    var updDay = Utilities.formatDate(new Date(upd), 'Asia/Kolkata', 'yyyy-MM-dd');
+    if (updDay < todayStr) return 'packed on ' + updDay;
+  }
+  return '';
+}
+
+
+// ── Tracks shipments already handed to the team, so they're not repeated on later days ──
+function loadProcessedShipments() {
+  try {
+    var raw = PropertiesService.getScriptProperties().getProperty('FLIPKART_PROCESSED_SHIPMENTS');
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    Logger.log('loadProcessedShipments error: ' + e.toString());
+    return {};
+  }
+}
+
+function saveProcessedShipments(log, newSids, todayStr) {
+  try {
+    (newSids || []).forEach(function(sid) {
+      if (!log[sid]) log[sid] = todayStr; // keep the FIRST day it was handed over
+    });
+    // Drop entries older than 45 days to keep storage small
+    var cutoff = Utilities.formatDate(new Date(new Date().getTime() - 45 * 86400000), 'Asia/Kolkata', 'yyyy-MM-dd');
+    Object.keys(log).forEach(function(k) { if (log[k] < cutoff) delete log[k]; });
+    PropertiesService.getScriptProperties().setProperty('FLIPKART_PROCESSED_SHIPMENTS', JSON.stringify(log));
+  } catch (e) {
+    Logger.log('saveProcessedShipments error: ' + e.toString());
   }
 }
 
@@ -615,31 +702,155 @@ function filterEligibleShipments(accessToken, shipments) {
   }
 }
 
-// ── STEP 4: Pack Orders ────────────────────────────────────────────────────
-function packOrders(accessToken, shipmentIds) {
-  var url = FLIPKART_BASE_URL + '/v3/shipments/labels';
-  var shipmentsList = shipmentIds.map(function(id) {
-    return { shipmentId: id };
-  });
-  var payload = { shipments: shipmentsList };
+// ── STEP 4: Accept / Pack Orders ───────────────────────────────────────────
+// Defaults used when Flipkart's shipment data doesn't give us the values.
+var PACK_DEFAULT_TAX_RATE = 18;     // GST % — change if your products use another rate
+var PACK_SELLER_STATE_CODE = 'IN-DL'; // Seller (Delhi) — same state => CGST+SGST, else IGST
+var PACK_DEFAULT_DIMS = { length: 15, breadth: 16, height: 8, weight: 1.282 };
 
-  var options = {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'Content-Type': 'application/json',
-      'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-    },
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  try {
-    var response = UrlFetchApp.fetch(url, options);
-    Logger.log('Pack response [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 300));
-  } catch (e) {
-    Logger.log('packOrders exception: ' + e.toString());
+function findDimKey(obj, regex) {
+  // Recursively find first numeric value whose key matches regex
+  if (!obj || typeof obj !== 'object') return null;
+  for (var k in obj) {
+    var v = obj[k];
+    if (regex.test(k) && v !== null && v !== '' && !isNaN(parseFloat(v)) && typeof v !== 'object') return parseFloat(v);
+    if (v && typeof v === 'object') {
+      var r = findDimKey(v, regex);
+      if (r !== null) return r;
+    }
   }
+  return null;
+}
+
+var LISTING_DIMS_CACHE = {};
+// Reads the package size/weight saved on the Flipkart listing for this SKU
+function getListingDims(accessToken, sku) {
+  if (!sku) return null;
+  if (LISTING_DIMS_CACHE.hasOwnProperty(sku)) return LISTING_DIMS_CACHE[sku];
+  var dims = null;
+  try {
+    var resp = UrlFetchApp.fetch('https://api.flipkart.net/sellers/listings/v3/' + encodeURIComponent(sku), {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + accessToken, 'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID },
+      muteHttpExceptions: true
+    });
+    var code = resp.getResponseCode();
+    var body = resp.getContentText();
+    if (code === 200) {
+      var data = JSON.parse(body);
+      var l = findDimKey(data, /length/i), b = findDimKey(data, /breadth|width/i),
+          h = findDimKey(data, /height/i), w = findDimKey(data, /weight/i);
+      if (l && b && h && w) dims = { length: l, breadth: b, height: h, weight: w };
+      else Logger.log('Listing ' + sku + ' had no full dimensions: ' + body.substring(0, 500));
+    } else {
+      Logger.log('Listing lookup failed ' + sku + ' [' + code + ']: ' + body.substring(0, 300));
+    }
+  } catch (e) {
+    Logger.log('getListingDims exception: ' + e.toString());
+  }
+  LISTING_DIMS_CACHE[sku] = dims;
+  return dims;
+}
+
+function buildPackEntry(s, skuMap, accessToken) {
+  var sid = s.shipmentId || s.id;
+  var items = s.orderItems || [];
+  var orderId = s.orderId || (items[0] && items[0].orderId) || '';
+  var buyerState = (s.deliveryAddress && s.deliveryAddress.stateCode) || '';
+  var sameState = buyerState === PACK_SELLER_STATE_CODE;
+  var rate = PACK_DEFAULT_TAX_RATE;
+  var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+
+  // Priority: shipment's own dims -> SKU listing dims -> default
+  var dims = null;
+  if (s.subShipments && s.subShipments[0] && s.subShipments[0].dimensions) {
+    dims = s.subShipments[0].dimensions;
+  }
+  if (!dims && items[0]) {
+    dims = getListingDims(accessToken, skuMap[String(items[0].id || items[0].orderItemId)]);
+  }
+  if (!dims) {
+    Logger.log('Using DEFAULT dimensions for shipment ' + sid);
+    dims = PACK_DEFAULT_DIMS;
+  }
+
+  // Flipkart splits GST itself; the API only accepts orderItemId, taxRate, quantity
+  var taxItems = items.map(function(it) {
+    return {
+      orderItemId: String(it.id || it.orderItemId),
+      quantity: it.quantity || 1,
+      taxRate: rate
+    };
+  });
+
+  var entry = {
+    shipmentId: sid,
+    invoices: [{
+      orderId: orderId,
+      invoiceNumber: 'VX-' + String(sid).replace(/[^A-Za-z0-9]/g, '').substring(0, 12).toUpperCase(),
+      invoiceDate: today
+    }],
+    taxItems: taxItems,
+    subShipments: [{
+      subShipmentId: 'A',
+      dimensions: {
+        length: Number(dims.length),
+        breadth: Number(dims.breadth),
+        height: Number(dims.height),
+        weight: Number(dims.weight)
+      }
+    }]
+  };
+  if (s.locationId) entry.locationId = s.locationId;
+  return entry;
+}
+
+function packOrders(accessToken, shipments) {
+  var url = FLIPKART_BASE_URL + '/v3/shipments/labels';
+  var okCount = 0;
+  var itemIds = [];
+  shipments.forEach(function(sh) {
+    (sh.orderItems || []).forEach(function(it) { if (it.id) itemIds.push(it.id); });
+  });
+  var skuMap = fetchSKUs(accessToken, itemIds);
+
+  // One shipment per call so a single failure doesn't block the rest
+  for (var i = 0; i < shipments.length; i++) {
+    var s = shipments[i];
+    var sid = s.shipmentId || s.id;
+    try {
+      var payload = { shipments: [buildPackEntry(s, skuMap, accessToken)] };
+      var response = UrlFetchApp.fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+          'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+        },
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      });
+      var code = response.getResponseCode();
+      var body = response.getContentText();
+      var packOk = false;
+      if (code >= 200 && code < 300) {
+        try {
+          var rs = (JSON.parse(body).shipments || [])[0];
+          packOk = !rs || rs.processingStatus !== 'FAILURE';
+          if (!packOk) Logger.log('Pack rejected ' + sid + ': ' + rs.errorCode + ' - ' + rs.errorMessage);
+        } catch (pe) { packOk = true; }
+      } else {
+        Logger.log('Pack FAILED ' + sid + ' [' + code + ']: ' + body.substring(0, 600));
+        Logger.log('Pack payload was: ' + JSON.stringify(payload));
+      }
+      if (packOk) okCount++;
+    } catch (e) {
+      Logger.log('packOrders exception for ' + sid + ': ' + e.toString());
+    }
+  }
+  Logger.log('Pack API accepted ' + okCount + '/' + shipments.length + ' shipments.');
+  // Give Flipkart time to generate labels before we download them
+  if (okCount > 0) Utilities.sleep(20000);
 }
 
 // ── STEP 5: Download Invoice PDFs ─────────────────────────────────────────
@@ -719,36 +930,50 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
 }
 
 // ── STEP 5B: Helper to Fetch SKUs ─────────────────────────────────────────
+// Calls Flipkart with retries so a temporary error (rate limit / 5xx / timeout) doesn't blank the email
+function fetchWithRetry(url, options, label) {
+  var lastCode = null, lastBody = '';
+  for (var attempt = 1; attempt <= 4; attempt++) {
+    try {
+      var resp = UrlFetchApp.fetch(url, options);
+      lastCode = resp.getResponseCode();
+      lastBody = resp.getContentText();
+      if (lastCode === 200) return lastBody;
+      Logger.log(label + ' attempt ' + attempt + ' failed [' + lastCode + ']: ' + lastBody.substring(0, 200));
+      if (lastCode !== 429 && lastCode < 500) break; // not a temporary error
+    } catch (e) {
+      Logger.log(label + ' attempt ' + attempt + ' exception: ' + e.toString());
+    }
+    Utilities.sleep(2000 * attempt);
+  }
+  return null;
+}
+
 function fetchSKUs(accessToken, orderItemIds) {
   var skuMap = {};
   if (!orderItemIds || orderItemIds.length === 0) return skuMap;
-  
-  try {
-    // API limits to 50/100 at a time, we'll just slice first 50
-    var chunk = orderItemIds.slice(0, 50).join(',');
-    var url = 'https://api.flipkart.net/sellers/v2/orders?orderItemIds=' + chunk;
-    
-    var response = UrlFetchApp.fetch(url, {
+
+  for (var i = 0; i < orderItemIds.length; i += 50) {
+    var chunk = orderItemIds.slice(i, i + 50).join(',');
+    var body = fetchWithRetry('https://api.flipkart.net/sellers/v2/orders?orderItemIds=' + chunk, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': 'Bearer ' + accessToken,
+        'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
       },
       muteHttpExceptions: true
-    });
-    
-    if (response.getResponseCode() === 200) {
-      var data = JSON.parse(response.getContentText());
-      if (data.orderItems) {
-        data.orderItems.forEach(function(item) {
-          if (item.orderItemId && item.sku) {
-            skuMap[item.orderItemId] = item.sku;
-          }
+    }, 'fetchSKUs');
+    if (body) {
+      try {
+        (JSON.parse(body).orderItems || []).forEach(function(item) {
+          if (item.orderItemId && item.sku) skuMap[item.orderItemId] = item.sku;
         });
+      } catch (e) {
+        Logger.log('fetchSKUs parse error: ' + e.toString());
       }
     }
-  } catch(e) {
-    Logger.log('fetchSKUs exception: ' + e.toString());
   }
+  Logger.log('fetchSKUs: resolved ' + Object.keys(skuMap).length + '/' + orderItemIds.length + ' SKUs.');
   return skuMap;
 }
 
@@ -779,7 +1004,111 @@ function dispatchOrders(accessToken, shipmentIds, locationId) {
   }
 }
 
-function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds) {
+// Fetches the product title shown on Flipkart for each SKU (max 10 per request)
+function fetchProductTitles(accessToken, skus) {
+  var titleMap = {};
+  var unique = [];
+  (skus || []).forEach(function(s) { if (s && unique.indexOf(s) === -1) unique.push(s); });
+  for (var i = 0; i < unique.length; i += 10) {
+    var chunk = unique.slice(i, i + 10);
+    var body = fetchWithRetry('https://api.flipkart.net/sellers/listings/v3/details', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
+        'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+      },
+      payload: JSON.stringify({ sku_ids: chunk }),
+      muteHttpExceptions: true
+    }, 'fetchProductTitles');
+    if (body) {
+      try {
+        var avail = (JSON.parse(body).available) || {};
+        Object.keys(avail).forEach(function(k) {
+          var title = findStringKey(avail[k], /^product_title$/i);
+          if (title) titleMap[k] = title;
+        });
+      } catch (e) {
+        Logger.log('fetchProductTitles parse error: ' + e.toString());
+      }
+    }
+  }
+  Logger.log('fetchProductTitles: resolved ' + Object.keys(titleMap).length + '/' + unique.length + ' titles.');
+  return titleMap;
+}
+
+function findStringKey(obj, regex) {
+  if (!obj || typeof obj !== 'object') return null;
+  for (var k in obj) {
+    var v = obj[k];
+    if (regex.test(k) && typeof v === 'string' && v) return v;
+    if (v && typeof v === 'object') {
+      var r = findStringKey(v, regex);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+// Builds the "what to pack" summary: item title, number of orders, quantity per order
+function buildPackingSummary(readyShipments, skuMap, titleMap) {
+  var groups = {};
+  var order = [];
+  readyShipments.forEach(function(s) {
+    (s.orderItems || []).forEach(function(it) {
+      var sku = skuMap[it.id] || 'Unknown SKU';
+      var qty = it.quantity || 1;
+      if (!groups[sku]) { groups[sku] = { orders: 0, qtyCount: {} }; order.push(sku); }
+      groups[sku].orders++;
+      groups[sku].qtyCount[qty] = (groups[sku].qtyCount[qty] || 0) + 1;
+    });
+  });
+  // One row per (product, quantity-per-order) so e.g. qty 1 and qty 2 orders are separate lines
+  var rows = [];
+  order.forEach(function(sku) {
+    var g = groups[sku];
+    Object.keys(g.qtyCount).map(Number).sort(function(a, b) { return a - b; }).forEach(function(q) {
+      var n = g.qtyCount[q];
+      rows.push({ product: titleMap[sku] || sku, sku: sku, orders: n, qty: q, total: n * q });
+    });
+  });
+  return rows;
+}
+
+function escapeHtml(t) {
+  return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function packingSummaryText(rows) {
+  if (!rows.length) return 'No orders to pack.';
+  return rows.map(function(r, i) {
+    return (i + 1) + ') ' + r.product + '\n' +
+      '    SKU: ' + r.sku + '\n' +
+      '    Orders: ' + r.orders + '\n' +
+      '    Quantity in each order: ' + r.qty + '\n' +
+      '    Total units to pack: ' + r.total;
+  }).join('\n\n');
+}
+
+function packingSummaryHtml(rows, totalOrders) {
+  var th = 'style="border:1px solid #999;padding:8px;background:#222;color:#fff;text-align:left;"';
+  var td = 'style="border:1px solid #999;padding:8px;vertical-align:top;"';
+  var tdc = 'style="border:1px solid #999;padding:8px;text-align:center;vertical-align:top;"';
+  var html = '<h3 style="margin:16px 0 6px;">Orders for today ' + totalOrders + ' FLIPKART</h3>';
+  if (!rows.length) return html + '<p>No orders to pack.</p>';
+  html += '<table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;">' +
+    '<tr><th ' + th + '>S.No</th><th ' + th + '>Product</th><th ' + th + '>SKU</th>' +
+    '<th ' + th + '>No. of Orders</th><th ' + th + '>Qty in Each Order</th><th ' + th + '>Total Units</th></tr>';
+  rows.forEach(function(r, i) {
+    html += '<tr><td ' + tdc + '>' + (i + 1) + '</td><td ' + td + '>' + escapeHtml(r.product) + '</td>' +
+      '<td ' + td + '>' + escapeHtml(r.sku) + '</td><td ' + tdc + '>' + r.orders + '</td>' +
+      '<td ' + tdc + '><b>' + r.qty + '</b></td><td ' + tdc + '>' + r.total + '</td></tr>';
+  });
+  return html + '</table>';
+}
+
+function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds, titleMap) {
+  titleMap = titleMap || {};
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'dd MMM yyyy');
   skuMap = skuMap || {};
   readyShipmentIds = readyShipmentIds || [];
@@ -818,6 +1147,8 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readySh
   var orderLinesReady = formatShipmentLines(readyShipments);
   var orderLinesUpcoming = formatShipmentLines(upcomingShipments);
 
+  var packingRows = buildPackingSummary(readyShipments, skuMap, titleMap);
+
   var body = 'Good morning, VOEUX® Team!\n\n' +
     'Today\'s Flipkart orders have been automatically processed.\n\n' +
     '=== 📦 READY TO SHIP (' + readyShipments.length + ' orders) ===\n' +
@@ -830,7 +1161,9 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readySh
     'Invoice PDFs for the Ready orders are attached to this email.\n' +
     'Please pack the Upcoming orders on the Flipkart Dashboard so they can be processed in the next run.\n\n' +
     'VOEUX® Automated Operations\n' +
-    'voeuxtechnologies.in';
+    'voeuxtechnologies.in\n\n' +
+    'Orders for today ' + readyShipments.length + ' FLIPKART\n\n' +
+    packingSummaryText(packingRows);
 
   var subject = 'VOEUX® Flipkart Orders — ' + today + ' (' + readyShipments.length + ' Ready, ' + upcomingShipments.length + ' Upcoming)';
 
@@ -844,14 +1177,13 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readySh
     attachments = attachments.concat(pdfAttachments);
   }
   
-  // Attach a debug JSON of the first shipment so we can find the exact location of the SKU
-  if (eligibleShipments && eligibleShipments.length > 0) {
-    try {
-      var debugBlob = Utilities.newBlob(JSON.stringify(eligibleShipments[0], null, 2), 'application/json', 'debug_shipment.json');
-      attachments.push(debugBlob);
-    } catch(e) {}
-  }
-  
+  // Build an HTML version so the packing list shows as a proper table
+  var htmlBody = '<div style="font-family:Arial,sans-serif;font-size:14px;">' +
+    '<pre style="font-family:Arial,sans-serif;font-size:14px;white-space:pre-wrap;margin:0;">' +
+    escapeHtml(body.split('Orders for today')[0]) + '</pre>' +
+    packingSummaryHtml(packingRows, readyShipments.length) + '</div>';
+  emailOptions.htmlBody = htmlBody;
+
   if (attachments.length > 0) {
     emailOptions.attachments = attachments;
   }
@@ -865,6 +1197,7 @@ function sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readySh
       to: OFFICE_EMAIL,
       subject: subject,
       body: body,
+      htmlBody: htmlBody,
       attachments: attachments,
       name: 'VOEUX® Operations',
       replyTo: 'voeuxexperience@gmail.com'

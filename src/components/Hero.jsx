@@ -95,7 +95,13 @@ export const Hero = () => {
           ))}
 
           {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-black pointer-events-none z-10" />
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
+
+          {/* Left gradient fade */}
+          <div className="absolute top-0 bottom-0 left-0 w-8 bg-gradient-to-r from-black to-transparent pointer-events-none z-10" />
+
+          {/* Right gradient fade */}
+          <div className="absolute top-0 bottom-0 right-0 w-8 bg-gradient-to-l from-black to-transparent pointer-events-none z-10" />
         </div>
 
         {/* TEXT STACK: Directly below edge-to-edge image */}
@@ -141,11 +147,11 @@ export const Hero = () => {
       </div>
 
       {/* ========== DESKTOP LAYOUT ONLY ========== */}
-      <div className="hidden md:block bg-black">
-        <div className="container mx-auto px-4 py-10">
+      <div className="hidden md:block bg-black w-full min-h-[100dvh]">
+        <div className="w-full h-full min-h-[100dvh]">
           <div
             onClick={() => setSelectedProductModal(slides[currentSlide]?.featuredProduct)}
-            className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden cursor-pointer group"
+            className="relative w-full min-h-[100dvh] bg-black text-white flex items-center p-12 lg:p-20 border-b border-gray-800 overflow-hidden cursor-pointer group"
           >
 
             {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}

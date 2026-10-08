@@ -118,7 +118,7 @@ const MainContent = () => {
             <Hero />
 
             {/* Clean Categories Grid */}
-            <section className="container mx-auto px-4">
+            <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center">
               <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">Shop by Category</h2>
@@ -151,7 +151,7 @@ const MainContent = () => {
             </section>
 
             {/* Bestsellers Grid */}
-            <section className="container mx-auto px-4">
+            <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center">
               <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">Best Selling Electronics</h2>
@@ -168,30 +168,9 @@ const MainContent = () => {
               </div>
             </section>
 
-            {/* Clean What's New Drop Highlight */}
-            <section className="container mx-auto px-4">
-              <div className="bg-black text-white rounded-2xl p-4 sm:p-8 flex flex-row items-center justify-between gap-3 sm:gap-6 border border-slate-900 shadow-xl">
-                <div className="space-y-2 sm:space-y-3 flex-1 min-w-0">
-                  <h3 className="text-xs sm:text-2xl font-black leading-tight">
-                    VOEUX® Android 10.1" Dual Knob Piano Buttons (4GB/64GB) Stereo
-                  </h3>
-                  <button
-                    onClick={() => {
-                      const found = (productsList || []).find(p => p && p.id === 'voeux-hyperdrive-lite-9') || (PRODUCTS || []).find(p => p && p.id === 'voeux-hyperdrive-lite-9');
-                      if (found) setSelectedProductModal(found);
-                    }}
-                    className="btn-primary text-[10px] sm:text-xs py-1.5 sm:py-2.5 px-2.5 sm:px-5 flex items-center gap-1 sm:gap-2 cursor-pointer"
-                  >
-                    <span className="truncate">Explore VOEUX 10.1" Dual Knob Piano Buttons</span>
-                    <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                  </button>
-                </div>
-              </div>
-            </section>
-
             {/* ========== JOIN US / OFFICIAL DISTRIBUTOR PROGRAM BANNER ========== */}
-            <section className="mt-16 py-12 px-6 sm:px-12 bg-black text-white rounded-3xl relative overflow-hidden text-left border border-slate-900 shadow-2xl">
-              <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+            <section className="min-h-[100dvh] flex flex-col justify-center py-12 px-6 sm:px-12 bg-black text-white relative overflow-hidden text-left shadow-2xl">
+              <div className="container mx-auto relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
                 <div className="space-y-3 max-w-2xl">
                   <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
                     Partner With VOEUX® — Official Distributor Program
