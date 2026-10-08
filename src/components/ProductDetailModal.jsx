@@ -35,8 +35,8 @@ export const ProductDetailModal = () => {
   const [selectedImg, setSelectedImg] = useState(product.image);
   const [is360Mode, setIs360Mode] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
-  const [checkMake, setCheckMake] = useState('Hyundai');
-  const [checkModel, setCheckModel] = useState('Creta');
+  const [checkMake, setCheckMake] = useState('');
+  const [checkModel, setCheckModel] = useState('');
   const [checkYear, setCheckYear] = useState('2024');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [includeFrame, setIncludeFrame] = useState(false);
@@ -178,25 +178,18 @@ export const ProductDetailModal = () => {
                 {includeFrame && (
                   <div className="pt-2 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Make</label>
-                      <select value={checkMake} onChange={(e) => { setCheckMake(e.target.value); setCheckModel(CAR_MODELS.find(c => c.make === e.target.value)?.models[0] || ''); }} className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white">
-                        {CAR_MODELS.map(c => <option key={c.make} value={c.make}>{c.make}</option>)}
-                        <option value="Other">Other</option>
-                      </select>
+                      <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Make / Brand</label>
+                      <input type="text" value={checkMake} onChange={(e) => setCheckMake(e.target.value)} placeholder="e.g. Hyundai" className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white" />
                     </div>
                     <div>
                       <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Model</label>
-                      {checkMake === 'Other' ? (
-                        <input type="text" value={checkModel} onChange={(e) => setCheckModel(e.target.value)} placeholder="e.g. Duster" className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white" />
-                      ) : (
-                        <select value={checkModel} onChange={(e) => setCheckModel(e.target.value)} className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white">
-                          {(CAR_MODELS.find(c => c.make === checkMake)?.models || []).map(m => <option key={m} value={m}>{m}</option>)}
-                        </select>
-                      )}
+                      <input type="text" value={checkModel} onChange={(e) => setCheckModel(e.target.value)} placeholder="e.g. Creta" className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white" />
                     </div>
                     <div>
                       <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Year</label>
-                      <input type="text" value={checkYear} onChange={(e) => setCheckYear(e.target.value)} placeholder="e.g. 2021" className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white" />
+                      <select value={checkYear} onChange={(e) => setCheckYear(e.target.value)} className="w-full text-[10px] p-1.5 rounded-lg border border-gray-200 bg-white">
+                        {Array.from({length: 27}, (_, i) => 2026 - i).map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
                     </div>
                   </div>
                 )}

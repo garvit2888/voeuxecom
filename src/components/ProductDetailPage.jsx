@@ -40,8 +40,8 @@ export const ProductDetailPage = () => {
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   const [includeFrame, setIncludeFrame] = useState(false);
-  const [carMake, setCarMake] = useState('Hyundai');
-  const [carModel, setCarModel] = useState('Creta');
+  const [carMake, setCarMake] = useState('');
+  const [carModel, setCarModel] = useState('');
   const [carYear, setCarYear] = useState('2024');
 
   // Accordion state for Description, Key Features & Specifications
@@ -205,25 +205,18 @@ export const ProductDetailPage = () => {
                 {includeFrame && (
                   <div className="pt-3 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Make</label>
-                      <select value={carMake} onChange={(e) => { setCarMake(e.target.value); setCarModel(CAR_MODELS.find(c => c.make === e.target.value)?.models[0] || ''); }} className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white">
-                        {CAR_MODELS.map(c => <option key={c.make} value={c.make}>{c.make}</option>)}
-                        <option value="Other">Other</option>
-                      </select>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Make / Brand</label>
+                      <input type="text" value={carMake} onChange={(e) => setCarMake(e.target.value)} placeholder="e.g. Hyundai" className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Model</label>
-                      {carMake === 'Other' ? (
-                        <input type="text" value={carModel} onChange={(e) => setCarModel(e.target.value)} placeholder="e.g. Duster" className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white" />
-                      ) : (
-                        <select value={carModel} onChange={(e) => setCarModel(e.target.value)} className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white">
-                          {(CAR_MODELS.find(c => c.make === carMake)?.models || []).map(m => <option key={m} value={m}>{m}</option>)}
-                        </select>
-                      )}
+                      <input type="text" value={carModel} onChange={(e) => setCarModel(e.target.value)} placeholder="e.g. Creta" className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Year</label>
-                      <input type="text" value={carYear} onChange={(e) => setCarYear(e.target.value)} placeholder="e.g. 2021" className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white" />
+                      <select value={carYear} onChange={(e) => setCarYear(e.target.value)} className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white">
+                        {Array.from({length: 27}, (_, i) => 2026 - i).map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
                     </div>
                   </div>
                 )}
