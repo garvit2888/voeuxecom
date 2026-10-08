@@ -154,8 +154,17 @@ export const Hero = () => {
             className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden cursor-pointer group"
           >
 
+            {/* Top gradient fade */}
+            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
+            {/* Bottom gradient fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
+            {/* Left gradient fade */}
+            <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-black to-transparent pointer-events-none z-20" />
+            {/* Right gradient fade */}
+            <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-black to-transparent pointer-events-none z-20" />
+
             {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
-            <div className="absolute right-6 top-8 bottom-8 w-[55%] flex items-center justify-end pointer-events-none z-0">
+            <div className="absolute inset-0 pointer-events-none z-0">
               {slides.map((s, idx) => (
                 <img
                   key={idx}
@@ -163,9 +172,9 @@ export const Hero = () => {
                   alt={s.title}
                   loading="eager"
                   fetchPriority="high"
-                  className={`absolute right-4 max-h-full max-w-[85%] object-contain object-right transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                  className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 ease-in-out group-hover:scale-105 ${
                     idx === currentSlide
-                      ? 'opacity-95'
+                      ? 'opacity-100'
                       : 'opacity-0 pointer-events-none'
                   }`}
                 />
@@ -173,10 +182,10 @@ export const Hero = () => {
             </div>
 
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent max-w-2xl pointer-events-none z-1" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent max-w-4xl pointer-events-none z-10" />
 
             {/* STACKED TEXT CONTENT */}
-            <div className="relative z-10 max-w-xl text-left w-full">
+            <div className="relative z-30 max-w-xl text-left w-full">
               {slides.map((s, idx) => (
                 <div
                   key={idx}
