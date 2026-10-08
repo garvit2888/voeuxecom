@@ -8,18 +8,6 @@ export const LiveChatWidget = () => {
 
   return (
     <>
-      {/* Blue Register for Warranty Button (Smooth Floating Up/Down Animation) */}
-      <div className="fixed bottom-32 sm:bottom-5 left-4 sm:left-6 z-50 animate-float-slow">
-        <button
-          onClick={() => setActivePage('warranty-registration')}
-          className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-full bg-[#2874F0] hover:bg-[#1C5CBD] text-white shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-1.5 font-bold text-[11px] sm:text-xs shadow-blue-600/30 border border-blue-400/50 cursor-pointer"
-          title="Register Your Product Warranty"
-        >
-          <ShieldCheck className="hidden sm:inline-block w-3.5 h-3.5 text-yellow-300 shrink-0" />
-          <span className="font-bold tracking-tight">Register Warranty</span>
-        </button>
-      </div>
-
       {/* WhatsApp Official Support Button (Smooth Floating Up/Down Animation) */}
       <div className="fixed bottom-32 sm:bottom-5 right-4 sm:right-6 z-50 animate-float-delayed">
         <a

@@ -130,20 +130,17 @@ const MainContent = () => {
                   <div
                     key={cat.id}
                     onClick={() => setActivePage(cat.id)}
-                    className="clean-card group p-4 sm:p-6 cursor-pointer flex flex-col justify-between items-center text-center transition hover:shadow-md border border-gray-100 rounded-2xl bg-white"
+                    className="group cursor-pointer flex flex-col justify-between items-center text-center transition"
                   >
-                    <div className="w-full h-40 sm:h-64 bg-gray-50/80 rounded-xl p-3 sm:p-5 flex items-center justify-center overflow-hidden mb-4 group-hover:bg-indigo-50/30 transition">
+                    <div className="w-full h-48 sm:h-80 flex items-center justify-center overflow-hidden mb-4">
                       <img
                         src={cat.image}
                         alt={cat.name}
-                        className="w-full h-full object-contain transform group-hover:scale-105 transition duration-300"
+                        className="w-full h-full object-contain transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500"
                       />
                     </div>
                     <div className="w-full text-center">
-                      <h3 className="text-base sm:text-xl font-bold text-gray-900 group-hover:text-[#3B429F] transition">{cat.name}</h3>
-                      {cat.description && (
-                        <p className="text-[11px] sm:text-sm text-gray-500 mt-1.5 line-clamp-1">{cat.description}</p>
-                      )}
+                      <h3 className="text-lg sm:text-2xl font-bold text-gray-900 group-hover:text-[#3B429F] transition-colors">{cat.name}</h3>
                     </div>
                   </div>
                 ))}
@@ -156,9 +153,6 @@ const MainContent = () => {
                 <div>
                   <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900">Best Selling Electronics</h2>
                 </div>
-                <button onClick={() => setActivePage('android-players')} className="btn-secondary text-sm sm:text-base flex items-center gap-1.5">
-                  View All <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-10">
@@ -169,24 +163,29 @@ const MainContent = () => {
             </section>
 
             {/* ========== JOIN US / OFFICIAL DISTRIBUTOR PROGRAM BANNER ========== */}
-            <section className="min-h-[100dvh] flex flex-col justify-center py-20 px-6 sm:px-16 bg-black text-white relative overflow-hidden text-left shadow-2xl">
+            <section className="group min-h-[100dvh] flex flex-col justify-center py-20 px-6 sm:px-16 bg-black text-white relative overflow-hidden text-left hover:shadow-[0_0_50px_rgba(59,66,159,0.3)] transition-shadow duration-700">
+              {/* Premium Glow Background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black z-0" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-20 blur-3xl group-hover:opacity-40 transition-opacity duration-1000 z-0 pointer-events-none" />
+              
               <div className="container mx-auto relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12">
-                <div className="space-y-6 max-w-3xl">
-                  <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
+                <div className="space-y-6 max-w-3xl transform transition-transform duration-700 group-hover:translate-x-2">
+                  <h2 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400">
                     Partner With VOEUX® — Official Distributor Program
                   </h2>
-                  <p className="text-slate-300 text-base sm:text-xl font-medium leading-relaxed">
+                  <p className="text-slate-300 text-base sm:text-xl font-medium leading-relaxed group-hover:text-white transition-colors duration-500">
                     Join India's fastest growing automotive electronics brand. Expand your business with our high-demand Android stereos, soundbars, amplifiers, and car accessories with direct factory support.
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto transform transition-transform duration-700 group-hover:-translate-x-2">
                   <button
                     onClick={() => setActivePage('join-us')}
-                    className="px-8 py-5 rounded-2xl bg-white hover:bg-gray-100 text-[#3B429F] font-extrabold text-lg sm:text-xl tracking-wide transition flex items-center justify-center gap-3 shadow-lg cursor-pointer"
+                    className="relative px-8 py-5 rounded-2xl bg-white text-[#3B429F] font-extrabold text-lg sm:text-xl tracking-wide flex items-center justify-center gap-3 overflow-hidden group/btn shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-shadow cursor-pointer"
                   >
-                    <span>Explore Distributor Program</span>
-                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-white transition-transform duration-500 group-hover/btn:scale-105" />
+                    <span className="relative z-10 transition-transform duration-500 group-hover/btn:-translate-x-1">Explore Distributor Program</span>
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 relative z-10 transition-transform duration-500 group-hover/btn:translate-x-2" />
                   </button>
                 </div>
               </div>
