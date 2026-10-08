@@ -172,14 +172,14 @@ export const Hero = () => {
               ))}
               
               {/* Image Boundary Gradient Fades */}
-              <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
-              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
-              <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-black to-transparent pointer-events-none z-20" />
-              <div className="absolute top-0 bottom-0 right-0 w-12 bg-gradient-to-l from-black to-transparent pointer-events-none z-20" />
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
+              <div className="absolute top-0 bottom-0 left-0 w-48 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none z-20" />
+              <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-black to-transparent pointer-events-none z-20" />
             </div>
 
-            {/* Dark Gradient Overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent max-w-2xl pointer-events-none z-1" />
+            {/* Dark Gradient Overlay for text readability (extended) */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent max-w-[65%] pointer-events-none z-1" />
 
             {/* STACKED TEXT CONTENT */}
             <div className="relative z-10 max-w-xl text-left w-full">
