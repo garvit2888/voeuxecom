@@ -17,11 +17,11 @@ export const ProductCard = ({ product }) => {
     >
       
       {/* Top Image Section */}
-      <div className="relative aspect-square rounded-3xl overflow-hidden flex items-center justify-center bg-gray-50/50">
+      <div className="relative aspect-square rounded-3xl overflow-hidden flex items-center justify-center bg-gray-50/50 p-3">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
         />
       </div>
 
