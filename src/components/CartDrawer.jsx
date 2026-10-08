@@ -440,7 +440,7 @@ export const CartDrawer = () => {
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-emerald-600 font-bold bg-emerald-50 p-2 rounded-xl border border-emerald-100">
-                      <span>Voucher Discount ({appliedVoucherCode || 'VOEUX10'})</span>
+                      <span>Voucher Discount ({appliedVoucherCode || 'VOEUX5'})</span>
                       <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
                     </div>
                   )}

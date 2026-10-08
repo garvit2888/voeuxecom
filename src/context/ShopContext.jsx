@@ -627,8 +627,8 @@ export const ShopProvider = ({ children }) => {
     }
 
     // 2. Standard Static Promo Codes (Universal — 1 use per account)
-    if (code === 'VOEUX10') {
-      return { valid: true, type: 'PROMO', discountAmount: Math.round(cartTotal * 0.1), code };
+    if (code === 'VOEUX5') {
+      return { valid: true, type: 'PROMO', discountAmount: Math.round(cartTotal * 0.05), code };
     }
     if (code === 'VOEUX500' || code === 'GARVIT500') {
       return { valid: true, type: 'PROMO', discountAmount: 500, code };
