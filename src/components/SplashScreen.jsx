@@ -78,7 +78,7 @@ export const SplashScreen = () => {
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleVideoEnd}
             onError={handleVideoEnd}
-            className="w-full h-full object-contain"
+            className="w-full h-full md:max-w-4xl lg:max-w-5xl md:max-h-[85vh] object-contain"
           />
           {/* Sleek Loading Progress Line Top */}
           <div className="absolute top-0 left-0 w-full h-1 bg-white/10 z-10">
