@@ -11,7 +11,7 @@ export const Hero = () => {
     {
       title: 'VOEUX® Premium X80 Series Dual Knob 10.1" Stereo',
       subtitle: '4GB RAM + 64GB ROM • Dual Rotary Knobs',
-      tagline: '4GB RAM + 64GB ROM • Dual Metallic Knobs • Wireless CarPlay & Android Auto',
+      tagline: '4GB RAM + 64GB ROM • Dual Knobs • Wireless CarPlay & Android Auto',
       image: '/images/voeux_x80_hero_bg.jpg',
       ctaText: 'Explore X80 Stereo',
       actionPage: 'android-players',

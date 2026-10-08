@@ -28,8 +28,7 @@ export const PRODUCTS = [
       '4GB RAM + 64GB Storage',
       'Dual Knob Premium Design',
       'AHD Rear View Camera Included',
-      'Built-in Bluetooth, Wi-Fi & GPS',
-      'Supports USB, AUX & Steering Controls'
+      'Built-in Bluetooth, Wi-Fi & GPS'
     ],
     fullSpecs: {
       'Display Size': '10.1 Inch IPS High-Definition Touchscreen',
@@ -58,7 +57,6 @@ export const PRODUCTS = [
       'Dual Knob Premium Design',
       'AHD Rear View Camera Included',
       'Built-in Bluetooth, Wi-Fi & GPS',
-      'Supports USB, AUX, and Steering Controls',
       'Double DIN Universal Fit'
     ],
     reviews: [],
