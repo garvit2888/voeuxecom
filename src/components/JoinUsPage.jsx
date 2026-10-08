@@ -25,11 +25,6 @@ export const JoinUsPage = () => {
         <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-20 blur-3xl group-hover:opacity-40 transition-opacity duration-1000 z-0 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto space-y-6 relative z-10 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
-          
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-2 hover:bg-white/10 transition-colors">
-            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-            <span className="text-xs font-bold text-indigo-300 tracking-widest uppercase">Business Partnership</span>
-          </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400">
             VOEUX® Official Distributor Program
@@ -151,23 +146,32 @@ export const JoinUsPage = () => {
           </div>
         </div>
 
-        {/* ==================== FINAL CALL TO ACTION ==================== */}
-        <div className="py-12 px-8 rounded-3xl bg-slate-950 text-white space-y-6 text-center shadow-2xl relative overflow-hidden">
-          <div className="max-w-2xl mx-auto space-y-3 relative z-10">
-            <h3 className="text-2xl sm:text-4xl font-black text-white">
+      </section>
+
+      {/* ==================== FINAL CALL TO ACTION ==================== */}
+      <section className="relative w-full bg-slate-900 text-white py-20 px-6 sm:px-12 text-center overflow-hidden group transition-all duration-700">
+        
+        {/* Creative Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black z-0" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-20 blur-3xl group-hover:opacity-40 transition-opacity duration-1000 z-0 pointer-events-none" />
+
+        <div className="max-w-3xl mx-auto space-y-8 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
+          
+          <div className="space-y-4">
+            <h3 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400">
               Ready To Grow With VOEUX®?
             </h3>
-            <p className="text-slate-300 text-xs sm:text-sm font-medium">
+            <p className="text-slate-300 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
               Click below to send an instant inquiry to our distributor onboard manager via WhatsApp.
             </p>
           </div>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm tracking-wide transition flex items-center justify-center gap-2.5 shadow-xl cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm tracking-wide transition flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-950/40 cursor-pointer"
             >
               <MessageSquare className="w-5 h-5" />
               <span>INQUIRE NOW ON WHATSAPP</span>
@@ -182,13 +186,13 @@ export const JoinUsPage = () => {
             </a>
           </div>
 
-          <div className="pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-[#3B429F]" /> voeuxexperience@gmail.com</span>
-            <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#3B429F]" /> Head Office: New Delhi, India</span>
+          <div className="pt-8 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+            <span className="flex items-center gap-1.5"><Mail className="w-4 h-4 text-[#3B429F]" /> voeuxexperience@gmail.com</span>
+            <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-[#3B429F]" /> Head Office: New Delhi, India</span>
           </div>
         </div>
-
       </section>
+
 
     </div>
   );
