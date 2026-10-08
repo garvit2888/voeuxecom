@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
+import { CAR_MODELS } from '../data/products';
 import { ProductCard } from './ProductCard';
 import {
   ShieldCheck,
@@ -37,6 +38,11 @@ export const ProductDetailPage = () => {
   const [is360Mode, setIs360Mode] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  const [includeFrame, setIncludeFrame] = useState(false);
+  const [carMake, setCarMake] = useState('Hyundai');
+  const [carModel, setCarModel] = useState('Creta');
+  const [carYear, setCarYear] = useState('2024');
 
   // Accordion state for Description, Key Features & Specifications
   const [openAccordions, setOpenAccordions] = useState({
@@ -81,6 +87,14 @@ export const ProductDetailPage = () => {
   const discountPercent = Math.round(
     ((product.originalPrice - product.price) / product.originalPrice) * 100
   );
+
+  const finalProduct = {
+    ...product,
+    id: includeFrame ? `${product.id}-frame` : product.id,
+    name: includeFrame ? `${product.name} + Frame (${carMake} ${carModel} ${carYear})` : product.name,
+    price: includeFrame ? product.price + 1000 : product.price,
+    originalPrice: includeFrame ? product.originalPrice + 1000 : product.originalPrice
+  };
 
   return (
     <div className="bg-white min-h-screen">
@@ -163,14 +177,58 @@ export const ProductDetailPage = () => {
             <div className="space-y-2 py-4 border-y border-gray-200">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-extrabold text-gray-900">
-                  ₹{product.price.toLocaleString('en-IN')}
+                  ₹{finalProduct.price.toLocaleString('en-IN')}
                 </span>
                 <span className="text-base text-gray-400 line-through">
-                  ₹{product.originalPrice.toLocaleString('en-IN')}
+                  ₹{finalProduct.originalPrice.toLocaleString('en-IN')}
                 </span>
               </div>
               <p className="text-[11px] text-gray-500 font-medium">(MRP Inclusive of all taxes)</p>
             </div>
+
+            {/* Frame Checkbox & Car Details (Only for Android Players) */}
+            {product.category === 'android-players' && (
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={includeFrame}
+                    onChange={(e) => setIncludeFrame(e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-[#3B429F] focus:ring-[#3B429F]"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-gray-900">Include Custom Fitting Frame</p>
+                    <p className="text-xs text-gray-500 font-medium">+ ₹1,000 to total price</p>
+                  </div>
+                </label>
+
+                {includeFrame && (
+                  <div className="pt-3 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Make</label>
+                      <select value={carMake} onChange={(e) => { setCarMake(e.target.value); setCarModel(CAR_MODELS.find(c => c.make === e.target.value)?.models[0] || ''); }} className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white">
+                        {CAR_MODELS.map(c => <option key={c.make} value={c.make}>{c.make}</option>)}
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Model</label>
+                      {carMake === 'Other' ? (
+                        <input type="text" value={carModel} onChange={(e) => setCarModel(e.target.value)} placeholder="e.g. Duster" className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white" />
+                      ) : (
+                        <select value={carModel} onChange={(e) => setCarModel(e.target.value)} className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white">
+                          {(CAR_MODELS.find(c => c.make === carMake)?.models || []).map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Year</label>
+                      <input type="text" value={carYear} onChange={(e) => setCarYear(e.target.value)} placeholder="e.g. 2021" className="w-full text-xs p-2 rounded-lg border border-gray-200 bg-white" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Primary Action Buttons */}
             <div className="space-y-2.5 pt-1">
@@ -181,7 +239,7 @@ export const ProductDetailPage = () => {
                       setIsAuthModalOpen(true);
                       return;
                     }
-                    buyNowCheckout(product);
+                    buyNowCheckout(finalProduct);
                   }}
                   className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 cursor-pointer text-center"
                 >
@@ -190,7 +248,7 @@ export const ProductDetailPage = () => {
 
                 <button
                   onClick={() => {
-                    const added = addToCart(product, 1);
+                    const added = addToCart(finalProduct, 1);
                     if (added) {
                       setIsCartOpen(true);
                     }
