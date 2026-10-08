@@ -6,6 +6,7 @@ export const SplashScreen = () => {
   const [show, setShow] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const hasPlayed = sessionStorage.getItem('voeux_intro_played');
@@ -45,6 +46,13 @@ export const SplashScreen = () => {
     }, 500); // 500ms fade out transition
   };
 
+  const handleTimeUpdate = (e) => {
+    const video = e.target;
+    if (video.duration) {
+      setProgress((video.currentTime / video.duration) * 100);
+    }
+  };
+
   if (!show) return null;
 
   return (
@@ -54,15 +62,25 @@ export const SplashScreen = () => {
       } ${isFirstLoad ? 'bg-black' : 'bg-white'}`}
     >
       {isFirstLoad ? (
-        <video
-          src="/voeux_intro.mov"
-          autoPlay
-          muted
-          playsInline
-          onEnded={handleVideoEnd}
-          onError={handleVideoEnd}
-          className="w-full h-full object-contain"
-        />
+        <div className="relative w-full h-full flex flex-col items-center justify-center bg-black">
+          <video
+            src="/voeux_intro.mov"
+            autoPlay
+            muted
+            playsInline
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleVideoEnd}
+            onError={handleVideoEnd}
+            className="w-full h-full object-contain"
+          />
+          {/* Sleek Loading Progress Line */}
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10 z-10">
+            <div 
+              className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] transition-all duration-75 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center -mt-16 sm:mt-0 p-4">
           <img
