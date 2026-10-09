@@ -652,11 +652,13 @@ function fetchTodaysShipments(accessToken) {
           hasMore = false;
         }
       }
+    } else {
+      throw new Error('Flipkart returned HTTP ' + code + ' error: ' + body);
     }
     return allShipments;
   } catch (e) {
     Logger.log('fetchShipments exception: ' + e.toString());
-    return allShipments;
+    throw e; // Throw upwards so the main function triggers the error email
   }
 }
 

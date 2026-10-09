@@ -33,16 +33,22 @@ export const WarrantyPolicyPage = () => {
           
           <ul className="space-y-2.5 text-xs text-gray-700 leading-relaxed list-disc list-inside pl-1">
             <li>
-              If your product has a technical issue, you can request a replacement within 7 days of delivery.
+              Replacement within 7 days is applicable ONLY if the product is physically damaged during transit or has a major issue upon delivery.
+            </li>
+            <li>
+              Prior to dispatch, our team records a video of your product being packed. To claim a replacement for transit damage, the customer MUST record a clear unboxing video upon receiving the package.
+            </li>
+            <li>
+              Courier charges for sending the product back for any issues or warranty claims will be incurred by the customer.
             </li>
             <li>
               The product will be physically checked. If a genuine technical issue is found, we will issue a fresh replacement. If no issue is found, the same unit will be returned.
             </li>
             <li>
-              Replacement can be requested if the customer establishes that the product delivered was physically damaged within 24 hours of receipt (supported by unboxing video).
+              Warranty and replacement are strictly VOID if the warranty seal is broken or any tampering with the product is detected. In such cases, the same tampered product will be couriered back to the customer and VOEUX® will not be held liable.
             </li>
             <li>
-              If a ticket is raised post 7 days of delivery and within the warranty period, product is replaced with an equivalent condition product, post testing.
+              If a ticket is raised post 7 days of delivery and within the warranty period, the product will be replaced with an equivalent condition product, post testing.
             </li>
           </ul>
         </section>
