@@ -39,7 +39,12 @@ export const CartDrawer = () => {
       item.product.name?.toUpperCase().includes('AMP')
     )
   );
-  const shippingFee = hasAmpProduct ? 150 : 0;
+  
+  const hasBundleProduct = cart.some(item => 
+    item && item.product && item.product.isBundle
+  );
+  
+  const shippingFee = hasBundleProduct ? 399 : (hasAmpProduct ? 150 : 0);
 
   const voeuxCashDiscountAmount = (isVoeuxCashApplied && voeuxCashBalance >= 150) ? Math.min(voeuxCashBalance, Math.max(0, cartTotal - discountAmount)) : 0;
   const finalTotal = Math.max(0, cartTotal - discountAmount - voeuxCashDiscountAmount + shippingFee);

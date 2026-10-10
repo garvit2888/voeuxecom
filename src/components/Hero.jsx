@@ -47,6 +47,16 @@ export const Hero = () => {
       actionPage: 'android-players',
       featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0],
       mobilePadding: 'p-5'
+    },
+    {
+      title: 'VOEUX® Complete Audio Upgrade Bundles',
+      subtitle: 'Making premium audio more accessible',
+      tagline: 'Premium Android Stereo + 4 High-Bass Speakers + Custom Frame • Unbeatable Value',
+      image: '/images/bundle_x80.png',
+      ctaText: 'Explore Combo Bundles',
+      actionPage: 'bundles',
+      featuredProduct: PRODUCTS.find(p => p.id === 'bundle-x80-4-speakers-frame'),
+      mobilePadding: 'p-5'
     }
   ];
 
