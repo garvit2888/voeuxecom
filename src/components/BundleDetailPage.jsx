@@ -57,9 +57,9 @@ export const BundleDetailPage = ({ bundle }) => {
 
   const tabs = [
     { id: 'overview', label: 'Bundle Overview' },
-    { id: 'player', label: 'Android Player Details' },
-    { id: 'speakers', label: 'Speaker Details' },
-    { id: 'frame', label: 'Fitting Frame Details' }
+    { id: 'player', label: playerProduct?.name || 'Android Player' },
+    { id: 'speakers', label: speakerVariant === 'all-6' ? speaker6?.name : speakerVariant === 'all-6.5' ? speaker65?.name : 'Mixed Speakers (6" & 6.5")' },
+    { id: 'frame', label: 'Custom Fitting Frame' }
   ];
 
   return (
@@ -212,23 +212,84 @@ export const BundleDetailPage = ({ bundle }) => {
 
             {activeTab === 'speakers' && (
               <div className="space-y-8">
-                {(speakerVariant === 'all-6' || speakerVariant === 'mix') && (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-black text-gray-900 border-b pb-2">6-Inch Speaker Details (SVX-001)</h3>
-                    <div className="flex flex-col sm:flex-row items-start gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                      <img src={speaker6.image} alt={speaker6.name} className="w-full sm:w-24 h-auto sm:h-24 object-contain rounded-xl bg-white border border-gray-200 p-2" />
-                      <p className="text-sm text-gray-600 leading-relaxed">{speaker6.description}</p>
+                {speakerVariant === 'mix' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* 6-Inch Column */}
+                    <div className="space-y-6">
+                      <div className="flex flex-col items-start gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-100 h-full">
+                        <img src={speaker6.image} alt={speaker6.name} className="w-full max-w-[200px] mx-auto h-auto object-contain rounded-xl bg-white border border-gray-200 p-2" />
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 text-center">2x {speaker6.name}</h3>
+                          <p className="text-sm text-gray-600 mt-2 leading-relaxed">{speaker6.description}</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3 w-full mt-4">
+                          {Object.entries(speaker6.fullSpecs || {}).map(([k, v]) => (
+                            <div key={k} className="py-2 border-b border-gray-100">
+                              <span className="block text-[10px] uppercase font-bold text-gray-400">{k}</span>
+                              <span className="block text-sm font-semibold text-gray-900">{v}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    {/* 6.5-Inch Column */}
+                    <div className="space-y-6">
+                      <div className="flex flex-col items-start gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-100 h-full">
+                        <img src={speaker65.image} alt={speaker65.name} className="w-full max-w-[200px] mx-auto h-auto object-contain rounded-xl bg-white border border-gray-200 p-2" />
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 text-center">2x {speaker65.name}</h3>
+                          <p className="text-sm text-gray-600 mt-2 leading-relaxed">{speaker65.description}</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3 w-full mt-4">
+                          {Object.entries(speaker65.fullSpecs || {}).map(([k, v]) => (
+                            <div key={k} className="py-2 border-b border-gray-100">
+                              <span className="block text-[10px] uppercase font-bold text-gray-400">{k}</span>
+                              <span className="block text-sm font-semibold text-gray-900">{v}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-                
-                {(speakerVariant === 'all-6.5' || speakerVariant === 'mix') && (
+                ) : (
                   <div className="space-y-6">
-                    <h3 className="text-lg font-black text-gray-900 border-b pb-2">6.5-Inch Speaker Details (SVX-005)</h3>
-                    <div className="flex flex-col sm:flex-row items-start gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                      <img src={speaker65.image} alt={speaker65.name} className="w-full sm:w-24 h-auto sm:h-24 object-contain rounded-xl bg-white border border-gray-200 p-2" />
-                      <p className="text-sm text-gray-600 leading-relaxed">{speaker65.description}</p>
-                    </div>
+                    {speakerVariant === 'all-6' ? (
+                      <>
+                        <div className="flex flex-col sm:flex-row items-start gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                          <img src={speaker6.image} alt={speaker6.name} className="w-full sm:w-32 h-auto sm:h-32 object-contain rounded-xl bg-white border border-gray-200 p-2" />
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900">4x {speaker6.name}</h3>
+                            <p className="text-sm text-gray-600 mt-2 leading-relaxed">{speaker6.description}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {Object.entries(speaker6.fullSpecs || {}).map(([k, v]) => (
+                            <div key={k} className="py-2 border-b border-gray-100">
+                              <span className="block text-[10px] uppercase font-bold text-gray-400">{k}</span>
+                              <span className="block text-sm font-semibold text-gray-900">{v}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex flex-col sm:flex-row items-start gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                          <img src={speaker65.image} alt={speaker65.name} className="w-full sm:w-32 h-auto sm:h-32 object-contain rounded-xl bg-white border border-gray-200 p-2" />
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900">4x {speaker65.name}</h3>
+                            <p className="text-sm text-gray-600 mt-2 leading-relaxed">{speaker65.description}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {Object.entries(speaker65.fullSpecs || {}).map(([k, v]) => (
+                            <div key={k} className="py-2 border-b border-gray-100">
+                              <span className="block text-[10px] uppercase font-bold text-gray-400">{k}</span>
+                              <span className="block text-sm font-semibold text-gray-900">{v}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
