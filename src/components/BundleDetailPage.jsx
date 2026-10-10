@@ -3,7 +3,7 @@ import { useShop } from '../context/ShopContext';
 import { ArrowLeft, ShoppingCart, MessageSquare, ShieldCheck, RefreshCw, Truck, ChevronDown, Package } from 'lucide-react';
 
 export const BundleDetailPage = ({ bundle }) => {
-  const { setActivePage, addToCart, setIsCartOpen, productsList, user, setIsAuthModalOpen } = useShop();
+  const { setActivePage, addToCart, setIsCartOpen, productsList, user, setIsAuthModalOpen, buyNowCheckout, addToast } = useShop();
   
   const [activeTab, setActiveTab] = useState('overview');
   const [speakerVariant, setSpeakerVariant] = useState('all-6'); // 'all-6', 'all-6.5', 'mix'
@@ -65,9 +65,9 @@ export const BundleDetailPage = ({ bundle }) => {
     }
   }
 
-  const handleBuyNow = () => {
-    if (!user) {
-      setIsAuthModalOpen(true);
+  const handleAddToCart = () => {
+    if (!carMake.trim() || !carModel.trim()) {
+      addToast('Please enter your car Make and Model for the custom fitting frame.', 'error');
       return;
     }
     const cartItem = {
@@ -82,6 +82,28 @@ export const BundleDetailPage = ({ bundle }) => {
     };
     addToCart(cartItem, 1);
     setIsCartOpen(true);
+  };
+
+  const handleBuyNowCheckout = () => {
+    if (!carMake.trim() || !carModel.trim()) {
+      addToast('Please enter your car Make and Model for the custom fitting frame.', 'error');
+      return;
+    }
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    const cartItem = {
+      ...bundle,
+      price: finalPrice,
+      originalPrice: finalMrp,
+      selectedVariant: speakerVariant,
+      carMake,
+      carModel,
+      carYear,
+      noCouponAllowed: true
+    };
+    buyNowCheckout(cartItem);
   };
 
   const getPriceForVariant = (variant) => {
@@ -197,9 +219,32 @@ export const BundleDetailPage = ({ bundle }) => {
 
             {/* Actions */}
             <div className="space-y-2.5 pt-1">
-              <button onClick={handleBuyNow} className="w-full bg-[#3B429F] hover:bg-[#2B308B] text-white text-sm font-extrabold py-3.5 rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
-                <ShoppingCart className="w-5 h-5" />
-                Add Bundle to Cart
+              <div className="flex gap-2">
+                <button
+                  onClick={handleBuyNowCheckout}
+                  className="flex-1 bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-xl transition shadow-lg shadow-indigo-900/20 cursor-pointer text-center"
+                >
+                  Buy Now
+                </button>
+
+                <button
+                  onClick={handleAddToCart}
+                  className="px-5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl transition flex items-center justify-center gap-2 text-xs font-bold cursor-pointer"
+                >
+                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-[#3B429F]" />
+                  <span className="hidden sm:inline">Add to Cart</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => {
+                  const waText = encodeURIComponent(`hi i have a query regarding the voeux bundle offer`);
+                  window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
+                }}
+                className="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Order via WhatsApp</span>
               </button>
             </div>
           </div>
