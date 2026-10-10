@@ -49,7 +49,9 @@ function doPost(e) {
         "VOEUX® DIRECT ORDER RECEIPT #" + orderId + "\n" +
         "==========================================\n" +
         "Order Date: " + (order.createdAt || new Date().toISOString()) + "\n" +
-        "Total Amount: ₹" + (order.totalAmount || 0) + "\n" +
+        "Total Paid: ₹" + (order.totalAmount || 0) + "\n" +
+        (order.appliedVoucherCode ? "Coupon/Referral Applied: " + order.appliedVoucherCode + "\n" : "") +
+        (order.referral && order.referral.discountApplied ? "Discount Saved: -₹" + order.referral.discountApplied + "\n" : "") +
         "Payment Method: " + (order.paymentMethod || 'COD') + "\n" +
         "Payment ID: " + (order.paymentId || 'N/A') + "\n\n" +
         "SHIPPING ADDRESS:\n" +
@@ -115,7 +117,8 @@ function doPost(e) {
               "Customer Email",
               "Customer Phone",
               "Items Purchased",
-              "Total Amount (₹)",
+              "Total Paid (₹)",
+              "Discount/Coupon Applied",
               "Payment ID",
               "Payment Method",
               "Shipping Address",
@@ -149,6 +152,7 @@ function doPost(e) {
             order.shippingAddress ? (order.shippingAddress.phone || order.shippingAddress.mobile || 'N/A') : 'N/A',
             itemsFormatted,
             order.totalAmount || 0,
+            order.appliedVoucherCode ? (order.appliedVoucherCode + " (-₹" + (order.referral ? order.referral.discountApplied || 0 : 0) + ")") : 'None',
             order.paymentId || 'N/A',
             order.paymentMethod || 'Razorpay',
             addrStr,

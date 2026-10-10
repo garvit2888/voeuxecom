@@ -706,6 +706,25 @@ ${addrStr}`;
                                 <span className="text-slate-500">Payment Method:</span>
                                 <span className="text-slate-900 font-bold">{order.paymentMethod || 'Razorpay LIVE'}</span>
                               </div>
+                              
+                              <div className="flex justify-between border-b border-gray-100 pb-2 bg-slate-50 p-1.5 rounded-lg">
+                                <span className="text-slate-600 font-bold">Total Paid / Due:</span>
+                                <span className="font-black text-slate-900">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
+                              </div>
+
+                              {order.appliedVoucherCode && (
+                                <div className="flex justify-between border-b border-gray-100 pb-2">
+                                  <span className="text-slate-500">Coupon/Referral Code:</span>
+                                  <span className="font-bold text-amber-600 uppercase bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">{order.appliedVoucherCode}</span>
+                                </div>
+                              )}
+                              
+                              {order.referral && order.referral.discountApplied > 0 && (
+                                <div className="flex justify-between border-b border-gray-100 pb-2">
+                                  <span className="text-slate-500">Discount Applied:</span>
+                                  <span className="font-bold text-amber-600">-₹{Number(order.referral.discountApplied).toLocaleString('en-IN')}</span>
+                                </div>
+                              )}
 
                               {order.referral && order.referral.rewardVoucherCode && (
                                 <div className="mt-2 bg-indigo-50 border border-indigo-100 rounded-xl p-3 space-y-1">
