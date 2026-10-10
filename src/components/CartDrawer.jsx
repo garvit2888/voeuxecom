@@ -49,12 +49,13 @@ export const CartDrawer = () => {
   // Enforce no-coupon rule if cart contains bundle
   useEffect(() => {
     if (hasBundleProduct && appliedVoucherCode) {
-      if (typeof removeVoucher === 'function') removeVoucher();
+      setAppliedVoucherCode('');
+      setDiscountAmount(0);
       setCouponCode('');
       setCouponError('');
       addToast('Coupons cannot be applied to orders containing bundles.', 'warning');
     }
-  }, [hasBundleProduct, appliedVoucherCode, removeVoucher, addToast]);
+  }, [hasBundleProduct, appliedVoucherCode, addToast]);
 
   const voeuxCashDiscountAmount = (isVoeuxCashApplied && voeuxCashBalance >= 150) ? Math.min(voeuxCashBalance, Math.max(0, cartTotal - discountAmount)) : 0;
   const finalTotal = Math.max(0, cartTotal - discountAmount - voeuxCashDiscountAmount + shippingFee);
