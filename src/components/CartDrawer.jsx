@@ -478,7 +478,7 @@ export const CartDrawer = () => {
                   <div className="flex justify-between text-gray-500">
                     <span>Shipping</span>
                     {shippingFee > 0 ? (
-                      <span className="font-bold text-gray-900">₹150</span>
+                      <span className="font-bold text-gray-900">₹{shippingFee}</span>
                     ) : (
                       <span className="font-bold text-emerald-600">FREE</span>
                     )}
@@ -777,7 +777,7 @@ export const CartDrawer = () => {
                 <div className="flex justify-between text-gray-500">
                   <span>Shipping</span>
                   {shippingFee > 0 ? (
-                    <span className="font-bold text-gray-900">₹150</span>
+                    <span className="font-bold text-gray-900">₹{shippingFee}</span>
                   ) : (
                     <span className="font-bold text-emerald-600">FREE Express Shipping</span>
                   )}
