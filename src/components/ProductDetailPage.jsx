@@ -350,11 +350,7 @@ export const ProductDetailPage = () => {
 
         {/* A+ Rich Content Section */}
         {product.aPlusContent && product.aPlusContent.length > 0 && (
-          <div className="border-t border-gray-200 pt-12 pb-8 text-left space-y-10">
-            <div className="text-center">
-              <span className="text-[10px] font-bold tracking-widest text-[#3B429F] uppercase">A+ Premium Features</span>
-              <h2 className="text-2xl font-extrabold text-gray-900 mt-0.5">Explore In Detail</h2>
-            </div>
+          <div className="border-t border-gray-200 pt-8 pb-8 text-left space-y-10">
             <div className="space-y-12 lg:space-y-16">
               {product.aPlusContent.map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center text-center space-y-5 max-w-4xl mx-auto">
