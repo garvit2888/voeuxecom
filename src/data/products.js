@@ -448,8 +448,8 @@ const RAW_PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: true,
-    image: '/images/voeux_hero_banner.jpg',
-    gallery: ['/images/voeux_hero_banner.jpg'],
+    image: '/images/bundle_x80.png',
+    gallery: ['/images/bundle_x80.png'],
     bundleConfig: {
       player: 'voeux-x80-dual-knob',
       hasFrame: true,
@@ -475,8 +475,8 @@ const RAW_PRODUCTS = [
     isNew: true,
     isTrending: false,
     isBestseller: false,
-    image: '/images/voeux_hero_banner.jpg',
-    gallery: ['/images/voeux_hero_banner.jpg'],
+    image: '/images/bundle_ts7.png',
+    gallery: ['/images/bundle_ts7.png'],
     bundleConfig: {
       player: 'voeux-9inch-ts7-android',
       hasFrame: true,
@@ -502,8 +502,8 @@ const RAW_PRODUCTS = [
     isNew: true,
     isTrending: false,
     isBestseller: false,
-    image: '/images/voeux_hero_banner.jpg',
-    gallery: ['/images/voeux_hero_banner.jpg'],
+    image: '/images/bundle_single_knob.png',
+    gallery: ['/images/bundle_single_knob.png'],
     bundleConfig: {
       player: 'voeux-single-knob-piano',
       hasFrame: true,
