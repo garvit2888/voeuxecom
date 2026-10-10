@@ -373,6 +373,68 @@ const RAW_PRODUCTS = [
     reviews: [],
     launchDate: '2026-08-26',
     stock: 50
+  },
+  {
+    id: 'voeux-svx005-6-5inch-speakers',
+    name: 'Voeux Premium 2 Way 6.5" 75W RMS Coaxial Speaker (380W) (SVX-005)',
+    category: 'car-speakers',
+    price: 3500,
+    originalPrice: 8500,
+    flipkartUrl: '',
+    isNew: true,
+    isTrending: true,
+    isBestseller: true,
+    image: '/images/voeux_svx001_coaxial_speakers.png',
+    gallery: [
+      '/images/voeux_svx001_coaxial_speakers.png',
+      '/images/voeux_svx001_front.png',
+      '/images/voeux_svx001_side.png',
+      '/images/voeux_svx001_back.png',
+      '/images/voeux_svx001_box.png'
+    ],
+    aPlusContent: [
+      { image: '/images/voeux_svx001_front.png', title: 'Premium Front Face & Tweeter', description: 'Crystal-clear high frequencies delivered by the precision-engineered central tweeter, housed within an ultra-durable injection-molded polypropylene cone.' },
+      { image: '/images/voeux_svx001_side.png', title: 'Slim Profile Design', description: 'The SVX-005 features a slim and universal form factor that easily installs into most vehicle door panels without requiring extra modifications or bulky spacers.' },
+      { image: '/images/voeux_svx001_back.png', title: 'Heavy-Duty Magnet Construction', description: 'Powered by a high-density, oversized magnet structure and dual voice coils designed to push powerful, deep bass without distortion even at peak volumes.' }
+    ],
+    shortSpecs: [
+      '1 Pair of 6.5-Inch (16.51 cm) Coaxial Speakers',
+      '380W Peak Power Output / 75W RMS',
+      'Dual Voice Coil Technology (93 dB)',
+      'Polypropylene Cone with Rubber Surround',
+      '20 Hz – 20,000 Hz Wide Frequency Response',
+      'Universal Door Mount Fitment (Pack of 2)'
+    ],
+    fullSpecs: {
+      'Brand & Model': 'Voeux Premium 2 Way 6.5inch Coaxial Speaker (SVX-005)',
+      'Type & Shape': 'Coaxial 2-Way, Round',
+      'Peak Power Handling': '380 W (Dynamic Power: 380 W, Rated: 75W RMS)',
+      'Sensitivity & Response': '93 dB High Sensitivity, 20 Hz – 20,000 Hz +/- 3db Frequency Response',
+      'Technology Used': 'Dual Voice Coil Technology, 2-Way Coaxial Speaker Design, Polypropylene Cone with Rubber Surround, Ferrite Magnet Structure, Metal Mesh Grill for Protection, Wide Frequency Response Tuning, Heat-Resistant Voice Coil Construction',
+      'Mount Type & Placement': 'Door Mount, Door Mounted (Universal For Car)',
+      'Materials & Finish': 'Carbon Mica, Kevlar, Polypropylene, Paper, Rubber, Ferrite Magnet, Metal Mesh Grill, Matte Grey Aesthetics',
+      'Dimensions & Weight': 'Width: 16 cm | Height: 16 cm | Depth: 7.5 cm | Diameter: 16.51 cm | Weight: 1 kg',
+      'In the Box': '1 Pair of our Premium 6.5-Inch Speakers',
+      'Performance Features': 'High Sensitivity: 91 dB for loud and clear sound even at lower volumes, Low Distortion Output for Crisp and Accurate Sound Reproduction, Optimized for Bass-Heavy Music Playback, Wide Sound Dispersion for Balanced In-Car Audio, Enhanced Heat Dissipation for Long-Lasting Performance',
+      'Installation Instructions': 'Prior to beginning, ensure the car battery is disconnected for safety. Begin by removing the factory speaker grilles or interior door panels with the correct removal tools. If you are upgrading, carefully unplug the existing speakers from the vehicle\'s wiring harness. Position your new VOEUX SVX-005 speakers into the mounting slots, ensuring they are perfectly aligned. Link the speaker wires to the terminals, paying close attention to correct polarity (+ to +, - to -). Firmly fasten the speakers into place using the included hardware or original screws. Replace the door panels or covers securely. Finally, reconnect the battery, power on your system to test the audio output, and fine-tune your head unit settings to experience the full range of your new speakers.',
+      'Warranty Summary': '12 Months Domestic Warranty on Manufacturing Defects',
+      'Covered in Warranty': 'Warranty covers manufacturing defects in the hardware components of the product.',
+      'Not Covered in Warranty': 'Warranty does not cover physical damage, water damage, burnt units, unauthorized modifications, accessories, or issues arising from improper installation.',
+      'Warranty Service Type': 'Customer needs to call or email the customer support. The product will be repaired or replaced at the nearest service center or picked up for service.'
+    },
+    compatibility: ['Universal Door Mount Fit For All Car Models'],
+    description: 'Elevate your driving experience with the SVX-005 6.5-Inch Coaxial Car Speakers, engineered to deliver crystal-clear highs, punchy mids, and deep, powerful bass. These 380W high-performance speakers feature a dual voice coil design and a precision-tuned sound profile that ensures high-volume output without distortion, bringing your favorite music to life with professional clarity. Boasting a sleek, premium finish to enhance your car’s interior, the SVX-005 is designed for easy door-mount installation and is universally compatible with most factory and aftermarket audio systems. Whether you are upgrading your stock setup or customizing your vehicle’s sound, these lightweight yet durable speakers are built to provide a superior acoustic experience on every journey.',
+    features: [
+      '6.5-Inch (16.51 cm) 2-Way Coaxial Speaker Design',
+      '380W Peak Output / 75W RMS Power',
+      'High-Sensitivity 93 dB Sound Output',
+      'Polypropylene Cone with Rubber Surround',
+      'Wide Frequency Response Tuning (20Hz-20kHz)',
+      'Heat-Resistant Dual Voice Coil Technology'
+    ],
+    reviews: [],
+    launchDate: '2026-10-10',
+    stock: 50
   }
 ];
 
