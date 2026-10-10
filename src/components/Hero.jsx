@@ -68,6 +68,15 @@ export const Hero = () => {
     });
   }, []);
 
+  const handleSlideClick = (slide) => {
+    if (slide.actionPage === 'bundles') {
+      setActivePage('bundles');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setSelectedProductModal(slide.featuredProduct);
+    }
+  };
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
@@ -83,7 +92,7 @@ export const Hero = () => {
 
         {/* IMAGE STACK: Spans 100% full width touching left & right phone screen edges */}
         <div
-          onClick={() => setSelectedProductModal(slides[currentSlide]?.featuredProduct)}
+          onClick={() => handleSlideClick(slides[currentSlide])}
           className="relative -mx-4 w-[calc(100%+2rem)] h-80 sm:h-96 overflow-hidden flex items-center justify-center cursor-pointer"
         >
           {/* Top gradient fade */}
@@ -160,7 +169,7 @@ export const Hero = () => {
       <div className="hidden md:block bg-black">
         <div className="container mx-auto px-4 py-10">
           <div
-            onClick={() => setSelectedProductModal(slides[currentSlide]?.featuredProduct)}
+            onClick={() => handleSlideClick(slides[currentSlide])}
             className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden cursor-pointer group"
           >
 
