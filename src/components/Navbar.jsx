@@ -264,6 +264,12 @@ export const Navbar = () => {
                 </h3>
                 <div className="space-y-3 font-condensed text-xl sm:text-2xl font-normal uppercase text-white tracking-wide">
                   <button
+                    onClick={() => { setActivePage('bundles'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition font-bold text-emerald-300 hover:text-emerald-200 cursor-pointer"
+                  >
+                    COMBO BUNDLES
+                  </button>
+                  <button
                     onClick={() => { setActivePage('android-players'); setIsMobileMenuOpen(false); }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
