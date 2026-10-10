@@ -49,7 +49,7 @@ export const Hero = () => {
       mobilePadding: 'p-5'
     },
     {
-      title: 'VOEUX® Complete Audio Upgrade Bundles',
+      title: 'VOEUX® Complete Audio Video Upgrade Bundles',
       subtitle: 'Making premium audio more accessible',
       tagline: 'Premium Android Stereo + 4 High-Bass Speakers + Custom Frame • Unbeatable Value',
       image: '/images/bundle_x80.png',
