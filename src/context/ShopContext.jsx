@@ -983,7 +983,11 @@ export const ShopProvider = ({ children }) => {
         name: i.product.name,
         price: i.product.price,
         quantity: i.quantity,
-        image: i.product.image
+        image: i.product.image,
+        carMake: i.product.carMake,
+        carModel: i.product.carModel,
+        carYear: i.product.carYear,
+        selectedVariant: i.product.selectedVariant
       })),
       totalAmount: orderData.totalAmount || cartTotal,
       shippingFee: orderData.shippingFee || 0,

@@ -54,6 +54,16 @@ function doPost(e) {
         (order.referral && order.referral.discountApplied ? "Discount Saved: -₹" + order.referral.discountApplied + "\n" : "") +
         "Payment Method: " + (order.paymentMethod || 'COD') + "\n" +
         "Payment ID: " + (order.paymentId || 'N/A') + "\n\n" +
+        "ITEMS ORDERED:\n" +
+        (order.items ? order.items.map(function(it) {
+           var extras = [];
+           if (it.carMake) extras.push("Make: " + it.carMake);
+           if (it.carModel) extras.push("Model: " + it.carModel);
+           if (it.carYear) extras.push("Year: " + it.carYear);
+           if (it.selectedVariant) extras.push("Variant: " + it.selectedVariant);
+           var extraStr = extras.length > 0 ? " [" + extras.join(", ") + "]" : "";
+           return "- " + it.name + " (x" + (it.quantity||1) + ")" + extraStr;
+        }).join("\n") : "N/A") + "\n\n" +
         "SHIPPING ADDRESS:\n" +
         (order.shippingAddress ? order.shippingAddress.fullName + "\n" + order.shippingAddress.street + ", " + order.shippingAddress.city + " - " + order.shippingAddress.pincode : "N/A") + "\n\n";
 
@@ -132,8 +142,17 @@ function doPost(e) {
               var pName = it.name || (it.product && it.product.name) || 'VOEUX Product';
               var qty = it.quantity || 1;
               var price = it.price || (it.product && it.product.price) || 0;
-              return pName + " (Qty: " + qty + ", Price: ₹" + price + ")";
-            }).join("; ");
+              
+              var extras = [];
+              if (it.carMake) extras.push("Make: " + it.carMake);
+              if (it.carModel) extras.push("Model: " + it.carModel);
+              if (it.carYear) extras.push("Year: " + it.carYear);
+              if (it.selectedVariant) extras.push("Variant: " + it.selectedVariant);
+              
+              var extraStr = extras.length > 0 ? " [" + extras.join(", ") + "]" : "";
+
+              return pName + " (Qty: " + qty + ", Price: ₹" + price + ")" + extraStr;
+            }).join(" | ");
           }
 
           var addrStr = order.shippingAddress ? (
