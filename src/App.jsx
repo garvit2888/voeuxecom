@@ -13,6 +13,7 @@ import { ContactUs } from './components/ContactUs';
 import { SupportFAQ } from './components/SupportFAQ';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { ProductDetailPage } from './components/ProductDetailPage';
+import { BundleDetailPage } from './components/BundleDetailPage';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartDrawer } from './components/CartDrawer';
 import { CarSelectorModal } from './components/CarSelectorModal';
@@ -73,7 +74,7 @@ const PriceHikeCountdown = () => {
 
 
 const MainContent = () => {
-  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating, setSelectedProductModal } = useShop();
+  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating, setSelectedProductModal, selectedProductModal } = useShop();
 
   // Capture incoming referral parameters (?ref=9999999999 or #ref=...)
   useEffect(() => {
@@ -127,6 +128,8 @@ const MainContent = () => {
         return <CategoryPage categoryId="speakers-soundbars" />;
       case 'amplifiers':
         return <CategoryPage categoryId="amplifiers" />;
+      case 'bundles':
+        return <CategoryPage categoryId="bundles" />;
       case 'join-us':
       case 'distributor-program':
         return <JoinUsPage />;
@@ -148,7 +151,7 @@ const MainContent = () => {
       case 'terms':
         return <TermsAndConditions />;
       case 'product-detail':
-        return <ProductDetailPage />;
+        return selectedProductModal?.isBundle ? <BundleDetailPage bundle={selectedProductModal} /> : <ProductDetailPage />;
       case 'profile':
       case 'my-orders':
         return <CustomerProfilePage />;

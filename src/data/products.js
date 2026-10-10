@@ -1,8 +1,9 @@
 export const CATEGORIES = [
   { id: 'android-players', name: 'Android Players', icon: 'Tv', count: 4, description: '', image: '/images/android_player_1.png' },
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: '', image: '/images/soundbar_1.png' },
-  { id: 'car-speakers', name: 'Car Speakers', icon: 'Volume2', count: 1, description: '', image: '/images/voeux_svx001_coaxial_speakers.png' },
+  { id: 'car-speakers', name: 'Car Speakers', icon: 'Volume2', count: 2, description: '', image: '/images/voeux_svx001_coaxial_speakers.png' },
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: '', image: '/images/voeux_amp_board.jpg' },
+  { id: 'bundles', name: 'Combo Bundles', icon: 'Package', count: 3, description: 'Complete car audio packages at unbeatable prices.', image: '/images/voeux_hero_banner.jpg' },
 ];
 
 const RAW_PRODUCTS = [
@@ -435,6 +436,87 @@ const RAW_PRODUCTS = [
     reviews: [],
     launchDate: '2026-10-10',
     stock: 50
+  },
+  {
+    id: 'bundle-x80-4-speakers-frame',
+    name: 'Voeux X80 Android Player + 4 Speakers + Frame Combo',
+    category: 'bundles',
+    isBundle: true,
+    price: 13999,
+    originalPrice: 54997,
+    flipkartUrl: '',
+    isNew: true,
+    isTrending: true,
+    isBestseller: true,
+    image: '/images/voeux_hero_banner.jpg',
+    gallery: ['/images/voeux_hero_banner.jpg'],
+    bundleConfig: {
+      player: 'voeux-x80-dual-knob',
+      hasFrame: true,
+      speakersMode: 'selectable'
+    },
+    shortSpecs: ['Voeux X80 Android Stereo', '4 x High-Bass Speakers', 'Custom Fitting Frame'],
+    fullSpecs: {},
+    compatibility: ['Universal Double DIN Fit'],
+    description: 'Complete audio upgrade bundle featuring the Voeux X80 Android Stereo, 4 high-performance Voeux speakers, and a custom dashboard fitting frame. No coupon codes applicable.',
+    features: ['Voeux X80 Diamond 4GB+64GB Android Stereo', '4 x High-Bass Coaxial Speakers', 'Custom Double DIN Fitting Frame'],
+    reviews: [],
+    launchDate: '2026-10-10',
+    stock: 20
+  },
+  {
+    id: 'bundle-ts7-4-speakers-frame',
+    name: 'Voeux 9" TS7 Android Player + 4 Speakers + Frame Combo',
+    category: 'bundles',
+    isBundle: true,
+    price: 13999,
+    originalPrice: 54997,
+    flipkartUrl: '',
+    isNew: true,
+    isTrending: false,
+    isBestseller: false,
+    image: '/images/voeux_hero_banner.jpg',
+    gallery: ['/images/voeux_hero_banner.jpg'],
+    bundleConfig: {
+      player: 'voeux-9inch-ts7-android',
+      hasFrame: true,
+      speakersMode: 'selectable'
+    },
+    shortSpecs: ['9" TS7 Android Stereo', '4 x High-Bass Speakers', 'Custom Fitting Frame'],
+    fullSpecs: {},
+    compatibility: ['Universal Double DIN Fit'],
+    description: 'Complete audio upgrade bundle featuring the Voeux 9" TS7 Android Stereo, 4 high-performance Voeux speakers, and a custom dashboard fitting frame. No coupon codes applicable.',
+    features: ['Voeux 9" TS7 Android Stereo', '4 x High-Bass Coaxial Speakers', 'Custom Double DIN Fitting Frame'],
+    reviews: [],
+    launchDate: '2026-10-10',
+    stock: 20
+  },
+  {
+    id: 'bundle-single-knob-4-speakers-frame',
+    name: 'Voeux Single Knob Android Player + 4 Speakers + Frame Combo',
+    category: 'bundles',
+    isBundle: true,
+    price: 13999,
+    originalPrice: 54997,
+    flipkartUrl: '',
+    isNew: true,
+    isTrending: false,
+    isBestseller: false,
+    image: '/images/voeux_hero_banner.jpg',
+    gallery: ['/images/voeux_hero_banner.jpg'],
+    bundleConfig: {
+      player: 'voeux-single-knob-piano',
+      hasFrame: true,
+      speakersMode: 'selectable'
+    },
+    shortSpecs: ['Single Knob Android Stereo', '4 x High-Bass Speakers', 'Custom Fitting Frame'],
+    fullSpecs: {},
+    compatibility: ['Universal Double DIN Fit'],
+    description: 'Complete audio upgrade bundle featuring the Voeux Single Knob Piano Series Android Stereo, 4 high-performance Voeux speakers, and a custom dashboard fitting frame. No coupon codes applicable.',
+    features: ['Voeux Single Knob Piano Series Android Stereo', '4 x High-Bass Coaxial Speakers', 'Custom Double DIN Fitting Frame'],
+    reviews: [],
+    launchDate: '2026-10-10',
+    stock: 20
   }
 ];
 

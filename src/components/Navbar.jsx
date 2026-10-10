@@ -29,7 +29,7 @@ export const Navbar = () => {
     { id: 'android-players', label: 'Android Players' },
     { id: 'car-speakers', label: 'Car Speakers' },
     { id: 'speakers-soundbars', label: 'Speakers & Soundbars' },
-    { id: 'amplifiers', label: 'Car Amplifiers' },
+    { id: 'bundles', label: 'Combo Bundles' },
     { id: 'warranty', label: 'Register Warranty' }
   ];
 
