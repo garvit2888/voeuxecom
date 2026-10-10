@@ -589,10 +589,10 @@ export const CAR_MODELS = [
   { make: 'Toyota', models: ['Fortuner', 'Innova Hycross', 'Urban Cruiser Taisor', 'Glanza', 'Hilux'] }
 ];
 
-// Automatically increase Android Player prices by ₹2000 after Oct 11, 2026, 12:00 AM IST
+// Automatically increase Android Player prices by ₹1000 after Oct 11, 2026, 12:00 AM IST
 export const PRODUCTS = RAW_PRODUCTS.map(p => {
   if (p.category === 'android-players' && Date.now() >= new Date('2026-10-11T00:00:00+05:30').getTime()) {
-    return { ...p, price: p.price + 2000, originalPrice: p.originalPrice + 2000 };
+    return { ...p, price: p.price + 1000, originalPrice: p.originalPrice + 1000 };
   }
   return p;
 });
