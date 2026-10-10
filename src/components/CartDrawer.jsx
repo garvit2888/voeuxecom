@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { X, ShoppingCart, Trash2, Plus, Minus, CheckCircle, ArrowRight, MapPin, CreditCard, ShieldCheck, User, Truck, ChevronRight, AlertCircle } from 'lucide-react';
 
