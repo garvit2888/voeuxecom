@@ -348,6 +348,29 @@ export const ProductDetailPage = () => {
 
         </div>
 
+        {/* A+ Rich Content Section */}
+        {product.aPlusContent && product.aPlusContent.length > 0 && (
+          <div className="border-t border-gray-200 pt-12 pb-8 text-left space-y-10">
+            <div className="text-center">
+              <span className="text-[10px] font-bold tracking-widest text-[#3B429F] uppercase">A+ Premium Features</span>
+              <h2 className="text-2xl font-extrabold text-gray-900 mt-0.5">Explore In Detail</h2>
+            </div>
+            <div className="space-y-12 lg:space-y-16">
+              {product.aPlusContent.map((item, idx) => (
+                <div key={idx} className="flex flex-col items-center text-center space-y-5 max-w-4xl mx-auto">
+                  <div className="w-full rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50/50 p-2">
+                    <img src={item.image} alt={item.title} className="w-full h-auto object-contain max-h-[600px] rounded-2xl" />
+                  </div>
+                  <div className="px-6 max-w-2xl">
+                    <h3 className="text-xl sm:text-2xl font-black text-gray-900">{item.title}</h3>
+                    <p className="text-sm sm:text-base text-gray-600 mt-2 sm:mt-3 leading-relaxed font-medium">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* FAQs Dropdown Section */}
         <div className="border-t border-gray-200 pt-12 text-left space-y-6">
           <div>

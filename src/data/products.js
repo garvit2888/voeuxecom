@@ -324,8 +324,14 @@ const RAW_PRODUCTS = [
     image: '/images/voeux_svx001_coaxial_speakers.png',
     gallery: [
       '/images/voeux_svx001_coaxial_speakers.png',
-      '/images/voeux_svx001_gallery_1.png',
-      '/images/voeux_svx001_gallery_2.png'
+      '/images/voeux_svx001_front.jpg',
+      '/images/voeux_svx001_side.jpg',
+      '/images/voeux_svx001_back.jpg'
+    ],
+    aPlusContent: [
+      { image: '/images/voeux_svx001_front.jpg', title: 'Premium Front Face & Tweeter', description: 'Crystal-clear high frequencies delivered by the precision-engineered central tweeter, housed within an ultra-durable injection-molded polypropylene cone.' },
+      { image: '/images/voeux_svx001_side.jpg', title: 'Slim Profile Design', description: 'The SVX-001 features a slim and universal form factor that easily installs into most vehicle door panels without requiring extra modifications or bulky spacers.' },
+      { image: '/images/voeux_svx001_back.jpg', title: 'Heavy-Duty Magnet Construction', description: 'Powered by a high-density, oversized magnet structure and dual voice coils designed to push powerful, deep bass without distortion even at peak volumes.' }
     ],
     shortSpecs: [
       '1 Pair of 6-Inch (16 cm) Coaxial Speakers',
