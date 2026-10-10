@@ -16,9 +16,9 @@ const CONFIG = {
   scriptEmail: 'voeuxexperience@gmail.com',
   scheduleTime: '11:00 AM IST Daily',
   apiStatus: 'ACTIVE',
-  oauthStatus: 'VERIFIED (OAuth 2.0 Token Issued)',
   webhookEndpoint: 'https://voeuxtechnologies.in/api/flipkart/webhooks',
-  apiVersion: 'Flipkart Seller API v3.0 REST'
+  apiVersion: 'Flipkart Seller API v3.0 REST',
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec'
 };
 
 const SYNCED_PRODUCTS = [
@@ -75,6 +75,7 @@ export const FlipkartOpsAdmin = () => {
   const [showSecret, setShowSecret] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
   const [toast, setToast] = useState(null);
+  const [holidayMode, setHolidayMode] = useState(false);
 
   // Terminal log simulator state
   const [logs, setLogs] = useState([
@@ -135,6 +136,34 @@ export const FlipkartOpsAdmin = () => {
 
     setRunning(false);
     showToast('Automation test completed successfully! All APIs & Webhooks 100% operational.', 'success');
+  };
+
+  const triggerRealAutomation = () => {
+    setRunning(true);
+    showToast('Triggering Live Flipkart Automation Pipeline...', 'info');
+    fetch(`${CONFIG.appsScriptUrl}?action=run_flipkart_automation`, { mode: 'no-cors' })
+      .then(() => {
+        showToast('Live automation triggered! Check VOEUX Office email for logs.', 'success');
+        setRunning(false);
+      })
+      .catch((e) => {
+        showToast('Failed to trigger live automation.', 'warn');
+        setRunning(false);
+      });
+  };
+
+  const toggleHolidayMode = () => {
+    const newState = !holidayMode;
+    setHolidayMode(newState);
+    const apiState = newState ? 'false' : 'true'; // If holidayMode is true, auto is false
+    fetch(`${CONFIG.appsScriptUrl}?action=toggle_automation&state=${apiState}`, { mode: 'no-cors' })
+      .then(() => {
+        showToast(newState ? 'Holiday Mode ENABLED (Automation Paused)' : 'Holiday Mode DISABLED (Automation Active)', 'info');
+      })
+      .catch(() => {
+        showToast('Network error while toggling.', 'warn');
+        setHolidayMode(!newState); // revert
+      });
   };
 
   return (
@@ -500,10 +529,25 @@ export const FlipkartOpsAdmin = () => {
                   </ul>
                 </div>
 
+                <div className="flex items-center justify-between p-3 bg-slate-900 border border-slate-800 rounded-xl">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-bold text-white">Holiday Mode (Pause Automation)</div>
+                    <div className="text-xs text-slate-400">Disables daily processing while away.</div>
+                  </div>
+                  <button
+                    onClick={toggleHolidayMode}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${holidayMode ? 'bg-indigo-600' : 'bg-slate-700'}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${holidayMode ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
+                  </button>
+                </div>
+
                 <button
-                  onClick={runAutomationTest}
+                  onClick={triggerRealAutomation}
                   disabled={running}
-                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-indigo-900/40"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-900/40"
                 >
                   <Play className="w-4 h-4 fill-white" />
                   <span>Execute Order Pipeline Now</span>
