@@ -3,7 +3,7 @@ export const CATEGORIES = [
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: '', image: '/images/soundbar_1.png' },
   { id: 'car-speakers', name: 'Car Speakers', icon: 'Volume2', count: 2, description: '', image: '/images/voeux_svx001_coaxial_speakers.png' },
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: '', image: '/images/voeux_amp_board.jpg' },
-  { id: 'bundles', name: 'Combo Bundles', icon: 'Package', count: 3, description: 'Complete car audio packages at unbeatable prices.', image: '/images/voeux_hero_banner.jpg' },
+  { id: 'bundles', name: 'Combo Bundles', icon: 'Package', count: 3, description: 'Complete car audio packages at unbeatable prices.', image: '/images/bundle_x80.png' },
 ];
 
 const RAW_PRODUCTS = [
