@@ -47,28 +47,25 @@ const PriceHikeCountdown = () => {
   const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
   return (
-    <div className="w-full bg-red-600 text-white py-5 px-4 flex flex-col items-center justify-center border-b-4 border-red-800 shadow-inner">
-      <h3 className="text-lg sm:text-2xl font-black uppercase tracking-widest mb-3 animate-pulse text-center">
-        ⚠️ PRICE HIKE TONIGHT AT 12 AM ⚠️
-      </h3>
+    <div className="w-full bg-black text-white py-6 px-4 flex flex-col items-center justify-center border-b border-gray-800 shadow-inner">
       <div className="flex justify-center items-center gap-3 sm:gap-4 text-3xl sm:text-4xl font-black font-mono">
-        <div className="flex flex-col items-center bg-black/30 rounded-xl px-4 sm:px-6 py-2 shadow-lg">
+        <div className="flex flex-col items-center bg-gray-900 rounded-xl px-4 sm:px-6 py-2 shadow-lg border border-gray-800">
           <span>{String(hours).padStart(2, '0')}</span>
-          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-red-100">Hours</span>
+          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-gray-400">Hours</span>
         </div>
-        <span className="animate-pulse">:</span>
-        <div className="flex flex-col items-center bg-black/30 rounded-xl px-4 sm:px-6 py-2 shadow-lg">
+        <span className="animate-pulse text-gray-500">:</span>
+        <div className="flex flex-col items-center bg-gray-900 rounded-xl px-4 sm:px-6 py-2 shadow-lg border border-gray-800">
           <span>{String(minutes).padStart(2, '0')}</span>
-          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-red-100">Mins</span>
+          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-gray-400">Mins</span>
         </div>
-        <span className="animate-pulse">:</span>
-        <div className="flex flex-col items-center bg-black/30 rounded-xl px-4 sm:px-6 py-2 shadow-lg">
+        <span className="animate-pulse text-gray-500">:</span>
+        <div className="flex flex-col items-center bg-gray-900 rounded-xl px-4 sm:px-6 py-2 shadow-lg border border-gray-800">
           <span>{String(seconds).padStart(2, '0')}</span>
-          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-red-100">Secs</span>
+          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-gray-400">Secs</span>
         </div>
       </div>
-      <p className="text-xs sm:text-sm font-bold mt-4 max-w-2xl text-center text-red-50 px-2 leading-relaxed">
-        The prices of all VOEUX® Android Car Players will officially increase tonight. Secure yours now at the current discounted rate!
+      <p className="text-xs sm:text-sm font-bold mt-5 max-w-2xl text-center text-gray-300 px-2 leading-relaxed">
+        The prices of all VOEUX® Android Car Players will officially revise tonight. Secure yours now at the current discounted rate!
       </p>
     </div>
   );
