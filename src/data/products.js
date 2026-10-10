@@ -478,7 +478,7 @@ const RAW_PRODUCTS = [
     image: '/images/bundle_ts7.png',
     gallery: ['/images/bundle_ts7.png'],
     bundleConfig: {
-      player: 'voeux-9inch-ts7-android',
+      player: 'voeux-carbon-black-ts7-4-64',
       hasFrame: true,
       speakersMode: 'selectable'
     },
@@ -505,7 +505,7 @@ const RAW_PRODUCTS = [
     image: '/images/bundle_single_knob.png',
     gallery: ['/images/bundle_single_knob.png'],
     bundleConfig: {
-      player: 'voeux-single-knob-piano',
+      player: 'voeux-single-knob-piano-4-64',
       hasFrame: true,
       speakersMode: 'selectable'
     },

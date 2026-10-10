@@ -22,18 +22,47 @@ export const BundleDetailPage = ({ bundle }) => {
   const speaker65 = productsList.find(p => p.id === 'voeux-svx005-6-5inch-speakers') || {};
 
   // Calculate pricing based on speaker variant
+  const playerMrp = playerProduct.originalPrice || 0;
+  const speaker6Mrp = speaker6.originalPrice || 6999;
+  const speaker65Mrp = speaker65.originalPrice || 8500;
+
   let finalPrice = bundle.price;
   let finalMrp = bundle.originalPrice;
 
-  if (speakerVariant === 'all-6') {
-    finalPrice = 13999;
-    finalMrp = 54997;
-  } else if (speakerVariant === 'all-6.5') {
-    finalPrice = 16399;
-    finalMrp = 57999;
-  } else if (speakerVariant === 'mix') {
-    finalPrice = 15199;
-    finalMrp = 56498;
+  if (bundle.id === 'bundle-ts7-4-speakers-frame') {
+    if (speakerVariant === 'all-6') {
+      finalPrice = 10999;
+      finalMrp = playerMrp + (speaker6Mrp * 2);
+    } else if (speakerVariant === 'all-6.5') {
+      finalPrice = 12199;
+      finalMrp = playerMrp + (speaker65Mrp * 2);
+    } else if (speakerVariant === 'mix') {
+      finalPrice = 11599;
+      finalMrp = playerMrp + speaker6Mrp + speaker65Mrp;
+    }
+  } else if (bundle.id === 'bundle-single-knob-4-speakers-frame') {
+    if (speakerVariant === 'all-6') {
+      finalPrice = 13999;
+      finalMrp = playerMrp + (speaker6Mrp * 2);
+    } else if (speakerVariant === 'all-6.5') {
+      finalPrice = 16399;
+      finalMrp = playerMrp + (speaker65Mrp * 2);
+    } else if (speakerVariant === 'mix') {
+      finalPrice = 15199;
+      finalMrp = playerMrp + speaker6Mrp + speaker65Mrp;
+    }
+  } else {
+    // X80 bundle (keeping user's exact requested MRPs)
+    if (speakerVariant === 'all-6') {
+      finalPrice = 13999;
+      finalMrp = 54997;
+    } else if (speakerVariant === 'all-6.5') {
+      finalPrice = 16399;
+      finalMrp = 57999;
+    } else if (speakerVariant === 'mix') {
+      finalPrice = 15199;
+      finalMrp = 56498;
+    }
   }
 
   const handleBuyNow = () => {
@@ -53,6 +82,22 @@ export const BundleDetailPage = ({ bundle }) => {
     };
     addToCart(cartItem, 1);
     setIsCartOpen(true);
+  };
+
+  const getPriceForVariant = (variant) => {
+    if (bundle.id === 'bundle-ts7-4-speakers-frame') {
+      if (variant === 'all-6') return 10999;
+      if (variant === 'all-6.5') return 12199;
+      return 11599;
+    } else if (bundle.id === 'bundle-single-knob-4-speakers-frame') {
+      if (variant === 'all-6') return 13999;
+      if (variant === 'all-6.5') return 16399;
+      return 15199;
+    } else {
+      if (variant === 'all-6') return 13999;
+      if (variant === 'all-6.5') return 16399;
+      return 15199;
+    }
   };
 
   const tabs = [
@@ -116,15 +161,15 @@ export const BundleDetailPage = ({ bundle }) => {
               <div className="grid grid-cols-1 gap-2">
                 <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${speakerVariant === 'all-6' ? 'bg-indigo-50 border-[#3B429F]' : 'bg-white border-gray-200'}`}>
                   <input type="radio" name="speaker" value="all-6" checked={speakerVariant === 'all-6'} onChange={(e) => setSpeakerVariant(e.target.value)} className="text-[#3B429F]" />
-                  <span className="text-sm font-semibold text-gray-800">4x 6-Inch Speakers (₹13,999)</span>
+                  <span className="text-sm font-semibold text-gray-800">4x 6-Inch Speakers (₹{getPriceForVariant('all-6').toLocaleString('en-IN')})</span>
                 </label>
                 <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${speakerVariant === 'all-6.5' ? 'bg-indigo-50 border-[#3B429F]' : 'bg-white border-gray-200'}`}>
                   <input type="radio" name="speaker" value="all-6.5" checked={speakerVariant === 'all-6.5'} onChange={(e) => setSpeakerVariant(e.target.value)} className="text-[#3B429F]" />
-                  <span className="text-sm font-semibold text-gray-800">4x 6.5-Inch Speakers (₹16,399)</span>
+                  <span className="text-sm font-semibold text-gray-800">4x 6.5-Inch Speakers (₹{getPriceForVariant('all-6.5').toLocaleString('en-IN')})</span>
                 </label>
                 <label className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${speakerVariant === 'mix' ? 'bg-indigo-50 border-[#3B429F]' : 'bg-white border-gray-200'}`}>
                   <input type="radio" name="speaker" value="mix" checked={speakerVariant === 'mix'} onChange={(e) => setSpeakerVariant(e.target.value)} className="text-[#3B429F]" />
-                  <span className="text-sm font-semibold text-gray-800">2x 6-Inch + 2x 6.5-Inch Speakers (₹15,199)</span>
+                  <span className="text-sm font-semibold text-gray-800">2x 6-Inch + 2x 6.5-Inch Speakers (₹{getPriceForVariant('mix').toLocaleString('en-IN')})</span>
                 </label>
               </div>
             </div>
