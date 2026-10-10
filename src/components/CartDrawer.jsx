@@ -114,6 +114,14 @@ export const CartDrawer = () => {
       return;
     }
 
+    const hasBundle = cart.some(item => item.isBundle || item.noCouponAllowed);
+    if (hasBundle) {
+      const msg = '* COUPON CODES ARE NOT APPLICABLE ON THIS BUNDLE';
+      setCouponError(msg);
+      addToast('Coupons cannot be applied to orders containing bundles.', 'warning');
+      return;
+    }
+
     if (!couponCode.trim()) {
       const emptyMsg = 'Please enter a coupon or referral code.';
       setCouponError(emptyMsg);

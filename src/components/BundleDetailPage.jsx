@@ -90,7 +90,6 @@ export const BundleDetailPage = ({ bundle }) => {
                 className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </div>
-            <p className="text-xs text-center text-red-500 font-bold uppercase tracking-widest">* Coupon codes are not applicable on this bundle</p>
           </div>
 
           {/* Right Column: Info & Actions */}
