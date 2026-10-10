@@ -41,10 +41,20 @@ export const CartDrawer = () => {
   );
   
   const hasBundleProduct = cart.some(item => 
-    item && item.product && item.product.isBundle
+    item && (item.isBundle || item.noCouponAllowed || (item.product && (item.product.isBundle || item.product.category === 'bundles' || item.product.id?.includes('bundle'))))
   );
   
   const shippingFee = hasBundleProduct ? 399 : (hasAmpProduct ? 150 : 0);
+
+  // Enforce no-coupon rule if cart contains bundle
+  useEffect(() => {
+    if (hasBundleProduct && appliedVoucherCode) {
+      if (typeof removeVoucher === 'function') removeVoucher();
+      setCouponCode('');
+      setCouponError('');
+      addToast('Coupons cannot be applied to orders containing bundles.', 'warning');
+    }
+  }, [hasBundleProduct, appliedVoucherCode, removeVoucher, addToast]);
 
   const voeuxCashDiscountAmount = (isVoeuxCashApplied && voeuxCashBalance >= 150) ? Math.min(voeuxCashBalance, Math.max(0, cartTotal - discountAmount)) : 0;
   const finalTotal = Math.max(0, cartTotal - discountAmount - voeuxCashDiscountAmount + shippingFee);
@@ -119,7 +129,8 @@ export const CartDrawer = () => {
       return;
     }
 
-    const hasBundle = cart.some(item => item.isBundle || item.noCouponAllowed);
+    // 2. Prevent combining bundles with coupons
+    const hasBundle = cart.some(item => item && (item.isBundle || item.noCouponAllowed || (item.product && (item.product.isBundle || item.product.category === 'bundles' || item.product.id?.includes('bundle')))));
     if (hasBundle) {
       const msg = '* COUPON CODES ARE NOT APPLICABLE ON THIS BUNDLE';
       setCouponError(msg);
