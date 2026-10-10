@@ -5,7 +5,7 @@ export const CATEGORIES = [
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: '', image: '/images/voeux_amp_board.jpg' },
 ];
 
-export const PRODUCTS = [
+const RAW_PRODUCTS = [
   {
     id: 'voeux-x80-dual-knob',
     name: 'Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)',
@@ -437,3 +437,11 @@ export const CAR_MODELS = [
   { make: 'Honda', models: ['City', 'Elevate', 'Amaze', 'Civic'] },
   { make: 'Toyota', models: ['Fortuner', 'Innova Hycross', 'Urban Cruiser Taisor', 'Glanza', 'Hilux'] }
 ];
+
+// Automatically increase Android Player prices by ₹2000 after Oct 11, 2026, 12:00 AM IST
+export const PRODUCTS = RAW_PRODUCTS.map(p => {
+  if (p.category === 'android-players' && Date.now() >= new Date('2026-10-11T00:00:00+05:30').getTime()) {
+    return { ...p, price: p.price + 2000, originalPrice: p.originalPrice + 2000 };
+  }
+  return p;
+});

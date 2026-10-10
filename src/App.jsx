@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShopProvider, useShop } from './context/ShopContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -28,6 +28,51 @@ import { CustomerProfilePage } from './components/CustomerProfilePage';
 import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
+
+const PriceHikeCountdown = () => {
+  const targetDate = new Date('2026-10-11T00:00:00+05:30').getTime();
+  const [timeLeft, setTimeLeft] = useState(targetDate - Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(targetDate - Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  if (timeLeft <= 0) return null; // Hide after 12 AM
+
+  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+  return (
+    <div className="w-full bg-red-600 text-white py-5 px-4 flex flex-col items-center justify-center border-b-4 border-red-800 shadow-inner">
+      <h3 className="text-lg sm:text-2xl font-black uppercase tracking-widest mb-3 animate-pulse text-center">
+        ⚠️ PRICE HIKE TONIGHT AT 12 AM ⚠️
+      </h3>
+      <div className="flex justify-center items-center gap-3 sm:gap-4 text-3xl sm:text-4xl font-black font-mono">
+        <div className="flex flex-col items-center bg-black/30 rounded-xl px-4 sm:px-6 py-2 shadow-lg">
+          <span>{String(hours).padStart(2, '0')}</span>
+          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-red-100">Hours</span>
+        </div>
+        <span className="animate-pulse">:</span>
+        <div className="flex flex-col items-center bg-black/30 rounded-xl px-4 sm:px-6 py-2 shadow-lg">
+          <span>{String(minutes).padStart(2, '0')}</span>
+          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-red-100">Mins</span>
+        </div>
+        <span className="animate-pulse">:</span>
+        <div className="flex flex-col items-center bg-black/30 rounded-xl px-4 sm:px-6 py-2 shadow-lg">
+          <span>{String(seconds).padStart(2, '0')}</span>
+          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-red-100">Secs</span>
+        </div>
+      </div>
+      <p className="text-xs sm:text-sm font-bold mt-4 max-w-2xl text-center text-red-50 px-2 leading-relaxed">
+        The prices of all VOEUX® Android Car Players will officially increase tonight. Secure yours now at the current discounted rate!
+      </p>
+    </div>
+  );
+};
 
 
 const MainContent = () => {
@@ -116,6 +161,9 @@ const MainContent = () => {
           <div className="space-y-16 pb-16">
             {/* Hero Banner */}
             <Hero />
+
+            {/* Countdown Timer */}
+            <PriceHikeCountdown />
 
             {/* Clean Categories Grid */}
             <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center py-10">
