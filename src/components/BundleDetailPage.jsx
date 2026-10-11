@@ -123,10 +123,10 @@ export const BundleDetailPage = ({ bundle }) => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Bundle Overview' },
-    { id: 'player', label: playerProduct?.name || 'Android Player' },
-    { id: 'speakers', label: speakerVariant === 'all-6' ? speaker6?.name : speakerVariant === 'all-6.5' ? speaker65?.name : 'Mixed Speakers (6" & 6.5")' },
-    { id: 'frame', label: 'Custom Fitting Frame' }
+    { id: 'overview', shortLabel: 'Overview', label: 'Bundle Overview' },
+    { id: 'player', shortLabel: 'Stereo', label: 'Android Stereo' },
+    { id: 'speakers', shortLabel: 'Speakers', label: 'Car Speakers (4x)' },
+    { id: 'frame', shortLabel: 'Frame', label: 'Fitting Frame' }
   ];
 
   return (
@@ -252,14 +252,19 @@ export const BundleDetailPage = ({ bundle }) => {
 
         {/* Dynamic Tabs Section */}
         <div className="mt-16 border-t border-gray-200 pt-8">
-          <div className="flex flex-wrap border-b border-gray-200">
+          <div className="grid grid-cols-4 sm:flex sm:overflow-x-auto border-b border-gray-200">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-3 px-6 text-sm font-bold border-b-2 transition-colors cursor-pointer ${activeTab === tab.id ? 'border-[#3B429F] text-[#3B429F]' : 'border-transparent text-gray-500 hover:text-gray-900'}`}
+                className={`py-3 px-1 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-colors cursor-pointer text-center sm:text-left flex-1 sm:flex-initial whitespace-nowrap ${
+                  activeTab === tab.id 
+                    ? 'border-[#3B429F] text-[#3B429F]' 
+                    : 'border-transparent text-gray-500 hover:text-gray-900'
+                }`}
               >
-                {tab.label}
+                <span className="sm:hidden">{tab.shortLabel}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
           </div>
