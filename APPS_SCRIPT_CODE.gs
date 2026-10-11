@@ -512,11 +512,54 @@ function runFlipkartOrderAutomation() {
     sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds, titleMap);
     Logger.log('STEP 7: Invoices emailed to ' + OFFICE_EMAIL);
 
+    // If any shipments were on temporary morning HOLD by Flipkart, schedule an auto-retry
+    var hasPendingHold = PropertiesService.getScriptProperties().getProperty('FLIPKART_HAS_PENDING_HOLD');
+    if (hasPendingHold === 'true') {
+      scheduleFollowUpRun();
+    }
+
     Logger.log('=== Automation Completed Successfully ===');
   } catch (err) {
     Logger.log('CRITICAL ERROR in automation: ' + err.toString());
     notifyError('Automation failed: ' + err.toString());
   }
+}
+
+// ── Automatic Follow-Up for orders on morning Flipkart HOLD ────────────────
+function scheduleFollowUpRun() {
+  try {
+    // Delete any previous follow-up triggers first to prevent duplicates
+    var triggers = ScriptApp.getProjectTriggers();
+    for (var i = 0; i < triggers.length; i++) {
+      if (triggers[i].getHandlerFunction() === 'runFlipkartOrderAutomationFollowUp') {
+        ScriptApp.deleteTrigger(triggers[i]);
+      }
+    }
+
+    // Schedule automatic follow-up in 45 minutes to process orders once hold clears
+    ScriptApp.newTrigger('runFlipkartOrderAutomationFollowUp')
+      .timeBased()
+      .after(45 * 60 * 1000)
+      .create();
+
+    Logger.log('Scheduled automatic follow-up trigger in 45 minutes for remaining held orders.');
+  } catch(e) {
+    Logger.log('Could not schedule follow-up trigger: ' + e.toString());
+  }
+}
+
+function runFlipkartOrderAutomationFollowUp() {
+  Logger.log('=== Automatic Follow-Up Run Started (Checking Held Orders) ===');
+  try {
+    var triggers = ScriptApp.getProjectTriggers();
+    for (var i = 0; i < triggers.length; i++) {
+      if (triggers[i].getHandlerFunction() === 'runFlipkartOrderAutomationFollowUp') {
+        ScriptApp.deleteTrigger(triggers[i]);
+      }
+    }
+  } catch(e) {}
+
+  runFlipkartOrderAutomation();
 }
 
 // Order IDs to always ignore (e.g. already handed over before this feature existed)
@@ -711,46 +754,67 @@ function fetchTodaysShipments(accessToken) {
   }
 }
 
-// ── STEP 3: Filter — HOLD = false AND DAD passed ──────────────────────────
+// ── STEP 3: Filter — HOLD = false (Chunked in batches of 20 for 60+ orders) ──
 function filterEligibleShipments(accessToken, shipments) {
   if (!shipments || shipments.length === 0) return [];
 
-  var shipmentIds = shipments.map(function(s) {
-    return s.shipmentId || s.id;
-  }).join(',');
+  var allDetails = [];
+  var CHUNK_SIZE = 20; // Flipkart GET /v3/shipments/{ids} limit is 20 IDs per call
 
-  var url = FLIPKART_BASE_URL + '/v3/shipments/' + shipmentIds;
-  var options = {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-    },
-    muteHttpExceptions: true
-  };
+  for (var i = 0; i < shipments.length; i += CHUNK_SIZE) {
+    var chunk = shipments.slice(i, i + CHUNK_SIZE);
+    var shipmentIds = chunk.map(function(s) {
+      return s.shipmentId || s.id;
+    }).join(',');
 
-  try {
-    var response = UrlFetchApp.fetch(url, options);
-    var code = response.getResponseCode();
-    var body = response.getContentText();
-    Logger.log('Shipment details [' + code + ']: ' + body.substring(0, 300));
+    var url = FLIPKART_BASE_URL + '/v3/shipments/' + shipmentIds;
+    var options = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+      },
+      muteHttpExceptions: true
+    };
 
-    if (code === 200) {
-      var data = JSON.parse(body);
-      var details = data.shipments || data || [];
-      var now = new Date();
+    try {
+      var response = UrlFetchApp.fetch(url, options);
+      var code = response.getResponseCode();
+      var body = response.getContentText();
+      Logger.log('Shipment details chunk (' + (i + 1) + '-' + Math.min(i + CHUNK_SIZE, shipments.length) + ') [' + code + ']');
 
-      return details.filter(function(s) {
-        var holdStatus = s.hold === false || s.hold === 'false' || !s.hold;
-        // Removed dispatchAfterDate restriction so we can pack as early as possible
-        return holdStatus;
-      });
+      if (code === 200) {
+        var data = JSON.parse(body);
+        var details = data.shipments || data || [];
+        allDetails = allDetails.concat(details);
+      } else {
+        Logger.log('Chunk fetch non-200 [' + code + '], keeping basic data: ' + body.substring(0, 200));
+        allDetails = allDetails.concat(chunk);
+      }
+    } catch (e) {
+      Logger.log('filterEligible chunk exception: ' + e.toString());
+      allDetails = allDetails.concat(chunk);
     }
-    return shipments; // Fall back to all if detail fetch fails
-  } catch (e) {
-    Logger.log('filterEligible exception: ' + e.toString());
-    return shipments;
   }
+
+  var onHoldCount = 0;
+  var eligible = allDetails.filter(function(s) {
+    var isHold = s.hold === true || s.hold === 'true';
+    if (isHold) {
+      onHoldCount++;
+      return false;
+    }
+    return true;
+  });
+
+  if (onHoldCount > 0) {
+    Logger.log('NOTICE: ' + onHoldCount + ' shipment(s) currently on temporary HOLD by Flipkart.');
+    PropertiesService.getScriptProperties().setProperty('FLIPKART_HAS_PENDING_HOLD', 'true');
+  } else {
+    PropertiesService.getScriptProperties().deleteProperty('FLIPKART_HAS_PENDING_HOLD');
+  }
+
+  return eligible;
 }
 
 // ── STEP 4: Accept / Pack Orders ───────────────────────────────────────────
@@ -865,12 +929,17 @@ function packOrders(accessToken, shipments) {
   });
   var skuMap = fetchSKUs(accessToken, itemIds);
 
-  // One shipment per call so a single failure doesn't block the rest
-  for (var i = 0; i < shipments.length; i++) {
-    var s = shipments[i];
-    var sid = s.shipmentId || s.id;
+  // Group into batches of 10 for fast execution (completes 60 orders in ~10 seconds instead of 120s)
+  var BATCH_SIZE = 10;
+  for (var i = 0; i < shipments.length; i += BATCH_SIZE) {
+    var chunk = shipments.slice(i, i + BATCH_SIZE);
+    var packEntries = [];
+    chunk.forEach(function(s) {
+      packEntries.push(buildPackEntry(s, skuMap, accessToken));
+    });
+
     try {
-      var payload = { shipments: [buildPackEntry(s, skuMap, accessToken)] };
+      var payload = { shipments: packEntries };
       var response = UrlFetchApp.fetch(url, {
         method: 'POST',
         headers: {
@@ -883,78 +952,72 @@ function packOrders(accessToken, shipments) {
       });
       var code = response.getResponseCode();
       var body = response.getContentText();
-      var packOk = false;
+
       if (code >= 200 && code < 300) {
-        try {
-          var rs = (JSON.parse(body).shipments || [])[0];
-          packOk = !rs || rs.processingStatus !== 'FAILURE';
-          if (!packOk) Logger.log('Pack rejected ' + sid + ': ' + rs.errorCode + ' - ' + rs.errorMessage);
-        } catch (pe) { packOk = true; }
+        var respData = {};
+        try { respData = JSON.parse(body); } catch(e) {}
+        var results = respData.shipments || [];
+        if (results.length > 0) {
+          results.forEach(function(rs) {
+            if (!rs || rs.processingStatus !== 'FAILURE') {
+              okCount++;
+            } else {
+              Logger.log('Pack rejected: ' + rs.shipmentId + ' - ' + rs.errorCode + ' - ' + rs.errorMessage);
+            }
+          });
+        } else {
+          okCount += chunk.length;
+        }
       } else {
-        Logger.log('Pack FAILED ' + sid + ' [' + code + ']: ' + body.substring(0, 600));
-        Logger.log('Pack payload was: ' + JSON.stringify(payload));
+        Logger.log('Batch pack failed [' + code + '], retrying individually: ' + body.substring(0, 300));
+        // Fallback: try individual calls for this batch
+        chunk.forEach(function(s) {
+          var sid = s.shipmentId || s.id;
+          try {
+            var indPayload = { shipments: [buildPackEntry(s, skuMap, accessToken)] };
+            var indResp = UrlFetchApp.fetch(url, {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json',
+                'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+              },
+              payload: JSON.stringify(indPayload),
+              muteHttpExceptions: true
+            });
+            var indCode = indResp.getResponseCode();
+            if (indCode >= 200 && indCode < 300) okCount++;
+          } catch(err) {
+            Logger.log('Individual pack failed for ' + sid + ': ' + err.toString());
+          }
+        });
       }
-      if (packOk) okCount++;
     } catch (e) {
-      Logger.log('packOrders exception for ' + sid + ': ' + e.toString());
+      Logger.log('packOrders batch exception: ' + e.toString());
     }
   }
+
   Logger.log('Pack API accepted ' + okCount + '/' + shipments.length + ' shipments.');
-  // Give Flipkart time to generate labels before we download them
-  if (okCount > 0) Utilities.sleep(20000);
+  // Give Flipkart 25 seconds to generate labels
+  if (okCount > 0) Utilities.sleep(25000);
 }
 
-// ── STEP 5: Download Invoice PDFs ─────────────────────────────────────────
+// ── STEP 5: Download Invoice PDFs (Batched in groups of 25 for all 60+ shipments) ──
 function downloadInvoicePDFs(accessToken, shipmentIds) {
   var pdfAttachments = [];
   var validSids = [];
 
-  if (shipmentIds.length === 0) return { attachments: pdfAttachments, readySids: validSids };
+  if (!shipmentIds || shipmentIds.length === 0) return { attachments: pdfAttachments, readySids: validSids };
 
-  // Step A: Check each shipment individually to see if the label is ACTUALLY generated
-  for (var i = 0; i < shipmentIds.length; i++) {
-    var sid = shipmentIds[i];
-    var isReady = false;
-    
-    try {
-      var getUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labels';
-      var getResp = UrlFetchApp.fetch(getUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken,
-          'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-        },
-        muteHttpExceptions: true
-      });
-      if (getResp.getResponseCode() === 200 && getResp.getBlob().getBytes().length > 0) {
-        isReady = true;
-      } else {
-        var postUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labelOnly/pdf';
-        var postResp = UrlFetchApp.fetch(postUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + accessToken,
-            'Content-Type': 'application/json',
-            'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-          },
-          payload: JSON.stringify({ shipmentIds: [sid] }),
-          muteHttpExceptions: true
-        });
-        if (postResp.getResponseCode() === 200 && postResp.getBlob().getBytes().length > 0) {
-          isReady = true;
-        }
-      }
-    } catch(e) {}
-    
-    if (isReady) {
-      validSids.push(sid);
-    }
-  }
+  // Flipkart label endpoint accepts batches of up to 25 IDs
+  var BATCH_SIZE = 25;
+  var batchIndex = 1;
 
-  // Step B: Download ONE merged PDF for all valid shipments
-  if (validSids.length > 0) {
+  for (var i = 0; i < shipmentIds.length; i += BATCH_SIZE) {
+    var chunk = shipmentIds.slice(i, i + BATCH_SIZE);
+    var batchIds = chunk.join(',');
+
     try {
-      var batchIds = validSids.slice(0, 25).join(','); 
       var mergedUrl = FLIPKART_BASE_URL + '/v3/shipments/' + batchIds + '/labels';
       var mergedResp = UrlFetchApp.fetch(mergedUrl, {
         method: 'GET',
@@ -964,19 +1027,47 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
         },
         muteHttpExceptions: true
       });
-      if (mergedResp.getResponseCode() === 200) {
+
+      var code = mergedResp.getResponseCode();
+      if (code === 200) {
         var mergedBlob = mergedResp.getBlob();
         if (mergedBlob.getBytes().length > 0) {
           mergedBlob.setContentType('application/pdf');
-          mergedBlob.setName('VOEUX_Merged_Labels.pdf');
+          var fileName = shipmentIds.length <= 25 ? 'VOEUX_Merged_Labels.pdf' : ('VOEUX_Labels_Batch' + batchIndex + '.pdf');
+          mergedBlob.setName(fileName);
           pdfAttachments.push(mergedBlob);
+          validSids = validSids.concat(chunk);
+          Logger.log('Downloaded merged PDF batch ' + batchIndex + ' for ' + chunk.length + ' shipments.');
         }
+      } else {
+        Logger.log('Batch label download failed [' + code + '], checking individually for chunk...');
+        // Fallback for this chunk only
+        chunk.forEach(function(sid) {
+          try {
+            var getUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labels';
+            var getResp = UrlFetchApp.fetch(getUrl, {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+              },
+              muteHttpExceptions: true
+            });
+            if (getResp.getResponseCode() === 200 && getResp.getBlob().getBytes().length > 0) {
+              var blob = getResp.getBlob().setName('Invoice_' + sid + '.pdf');
+              pdfAttachments.push(blob);
+              validSids.push(sid);
+            }
+          } catch(e) {}
+        });
       }
     } catch(e) {
-      Logger.log('Merged labels exception: ' + e.toString());
+      Logger.log('Merged labels exception for batch ' + batchIndex + ': ' + e.toString());
     }
+    batchIndex++;
   }
 
+  Logger.log('Downloaded ' + pdfAttachments.length + ' label attachment(s) for ' + validSids.length + ' shipments.');
   return { attachments: pdfAttachments, readySids: validSids };
 }
 
@@ -1028,30 +1119,37 @@ function fetchSKUs(accessToken, orderItemIds) {
   return skuMap;
 }
 
-// ── STEP 6: Dispatch Orders ───────────────────────────────────────────────
+// ── STEP 6: Dispatch Orders (Batched in chunks of 25) ─────────────────────
 function dispatchOrders(accessToken, shipmentIds, locationId) {
+  if (!shipmentIds || shipmentIds.length === 0) return;
+
   var url = FLIPKART_BASE_URL + '/v3/shipments/dispatch';
-  var payload = { shipmentIds: shipmentIds };
-  if (locationId) {
-    payload.locationId = locationId;
-  }
+  var BATCH_SIZE = 25; // Flipkart dispatch allows max 25 per request
 
-  var options = {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'Content-Type': 'application/json',
-      'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-    },
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
+  for (var i = 0; i < shipmentIds.length; i += BATCH_SIZE) {
+    var chunk = shipmentIds.slice(i, i + BATCH_SIZE);
+    var payload = { shipmentIds: chunk };
+    if (locationId) {
+      payload.locationId = locationId;
+    }
 
-  try {
-    var response = UrlFetchApp.fetch(url, options);
-    Logger.log('Dispatch response [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 300));
-  } catch (e) {
-    Logger.log('dispatchOrders exception: ' + e.toString());
+    var options = {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
+        'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+
+    try {
+      var response = UrlFetchApp.fetch(url, options);
+      Logger.log('Dispatch batch (' + (i + 1) + '-' + Math.min(i + BATCH_SIZE, shipmentIds.length) + ') [' + response.getResponseCode() + ']: ' + response.getContentText().substring(0, 200));
+    } catch (e) {
+      Logger.log('dispatchOrders exception: ' + e.toString());
+    }
   }
 }
 
