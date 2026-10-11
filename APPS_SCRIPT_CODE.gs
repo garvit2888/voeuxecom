@@ -15,6 +15,18 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // Toggle Automation from Admin dashboard
+    if (action === 'toggle_automation') {
+      var props = PropertiesService.getScriptProperties();
+      if (e.parameter.state) {
+        props.setProperty('FLIPKART_AUTO_ENABLED', e.parameter.state); // 'true' or 'false'
+      }
+      var currentState = props.getProperty('FLIPKART_AUTO_ENABLED') !== 'false';
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'success', enabled: currentState }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // Manual trigger from Admin dashboard
     if (action === 'run_flipkart_automation') {
       runFlipkartOrderAutomation();
@@ -379,6 +391,20 @@ var FLIPKART_BASE_URL   = 'https://api.flipkart.net/sellers';
 // ── Main Entry Point — called by daily time-based trigger ──────────────────
 function runFlipkartOrderAutomation() {
   try {
+    var props = PropertiesService.getScriptProperties();
+    var autoEnabled = props.getProperty('FLIPKART_AUTO_ENABLED');
+    if (autoEnabled === 'false') {
+      Logger.log('Automation is disabled via settings (Holiday Mode).');
+      return;
+    }
+    
+    // Automatically skip on Sundays
+    var dayOfWeek = new Date().getDay(); // 0 is Sunday
+    if (dayOfWeek === 0) {
+      Logger.log('Today is Sunday. Skipping automation automatically.');
+      return;
+    }
+
     Logger.log('=== VOEUX Flipkart Automation Started: ' + new Date().toISOString() + ' ===');
 
     // STEP 1: Get access token
@@ -716,8 +742,8 @@ function filterEligibleShipments(accessToken, shipments) {
 
       return details.filter(function(s) {
         var holdStatus = s.hold === false || s.hold === 'false' || !s.hold;
-        var dadPassed = !s.dispatchAfterDate || new Date(s.dispatchAfterDate) <= now;
-        return holdStatus && dadPassed;
+        // Removed dispatchAfterDate restriction so we can pack as early as possible
+        return holdStatus;
       });
     }
     return shipments; // Fall back to all if detail fetch fails
