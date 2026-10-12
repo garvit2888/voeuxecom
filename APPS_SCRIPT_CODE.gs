@@ -451,15 +451,27 @@ function runFlipkartOrderAutomation() {
 
     var shipmentIds = eligibleShipments.map(function(s) { return s.shipmentId; });
 
-    // STEP 4: Pack each order
-    packOrders(accessToken, eligibleShipments);
-    Logger.log('STEP 4: Pack API called for ' + shipmentIds.length + ' orders.');
+    // STEP 4 + 5: Pack and download labels, retrying orders that aren't ready yet (up to 4 rounds)
+    var pdfAttachments = [];
+    var readyShipmentIds = [];
+    var pendingIds = shipmentIds.slice();
+    for (var round = 1; round <= 4 && pendingIds.length > 0; round++) {
+      var pendingSet = pendingIds;
+      var toPack = eligibleShipments.filter(function(s) { return pendingSet.indexOf(s.shipmentId || s.id) > -1; });
+      packOrders(accessToken, toPack);
+      Logger.log('STEP 4 (round ' + round + '): Pack API called for ' + toPack.length + ' orders.');
 
-    // STEP 5: Download invoice PDFs
-    var downloadResult = downloadInvoicePDFs(accessToken, shipmentIds);
-    var pdfAttachments = downloadResult.attachments;
-    var readyShipmentIds = downloadResult.readySids;
-    Logger.log('STEP 5: Downloaded merged PDF. Identified ' + readyShipmentIds.length + ' ready shipments.');
+      var downloadResult = downloadInvoicePDFs(accessToken, pendingIds);
+      pdfAttachments = pdfAttachments.concat(downloadResult.attachments);
+      readyShipmentIds = readyShipmentIds.concat(downloadResult.readySids);
+      pendingIds = pendingIds.filter(function(id) { return readyShipmentIds.indexOf(id) === -1; });
+      Logger.log('STEP 5 (round ' + round + '): ' + readyShipmentIds.length + ' ready, ' + pendingIds.length + ' still pending.');
+      if (pendingIds.length > 0 && round < 4) Utilities.sleep(20000);
+    }
+    if (pendingIds.length > 0) {
+      Logger.log('WARNING: ' + pendingIds.length + ' shipment(s) not ready after retries: ' + pendingIds.join(','));
+      PropertiesService.getScriptProperties().setProperty('FLIPKART_HAS_PENDING_HOLD', 'true');
+    }
 
     // Remember today's handed-over shipments so tomorrow they are ignored
     saveProcessedShipments(processedLog, readyShipmentIds, todayStr);
@@ -512,10 +524,15 @@ function runFlipkartOrderAutomation() {
     sendInvoicesToOffice(pdfAttachments, eligibleShipments, skuMap, readyShipmentIds, titleMap);
     Logger.log('STEP 7: Invoices emailed to ' + OFFICE_EMAIL);
 
-    // If any shipments were on temporary morning HOLD by Flipkart, schedule an auto-retry
-    var hasPendingHold = PropertiesService.getScriptProperties().getProperty('FLIPKART_HAS_PENDING_HOLD');
-    if (hasPendingHold === 'true') {
-      scheduleFollowUpRun();
+    // If any shipments were on HOLD or still not ready, schedule an auto-retry (max 4 per day)
+    var sp = PropertiesService.getScriptProperties();
+    if (sp.getProperty('FLIPKART_HAS_PENDING_HOLD') === 'true') {
+      var cnt = JSON.parse(sp.getProperty('FLIPKART_FOLLOWUP_COUNT') || '{}');
+      var n = (cnt.day === todayStr) ? cnt.n : 0;
+      if (n < 4) {
+        sp.setProperty('FLIPKART_FOLLOWUP_COUNT', JSON.stringify({ day: todayStr, n: n + 1 }));
+        scheduleFollowUpRun();
+      }
     }
 
     Logger.log('=== Automation Completed Successfully ===');
@@ -548,7 +565,10 @@ function scheduleFollowUpRun() {
   }
 }
 
+var FOLLOWUP_MODE = false;
+
 function runFlipkartOrderAutomationFollowUp() {
+  FOLLOWUP_MODE = true;
   Logger.log('=== Automatic Follow-Up Run Started (Checking Held Orders) ===');
   try {
     var triggers = ScriptApp.getProjectTriggers();
@@ -583,6 +603,7 @@ function leftoverReason(s, processedLog, todayStr) {
 
   var seen = processedLog[sid];
   if (seen && seen < todayStr) return 'already given to team on ' + seen;
+  if (seen && FOLLOWUP_MODE) return 'already sent in earlier run today';
 
   // Flipkart says it was already packed, and last changed before today => packed on an earlier day
   var st = getShipmentStatus(s);
@@ -1009,65 +1030,61 @@ function downloadInvoicePDFs(accessToken, shipmentIds) {
 
   if (!shipmentIds || shipmentIds.length === 0) return { attachments: pdfAttachments, readySids: validSids };
 
-  // Flipkart label endpoint accepts batches of up to 25 IDs
+  var hdrGet = { 'Authorization': 'Bearer ' + accessToken, 'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID };
+  var hdrPost = { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID };
+
+  // Step A: verify EACH shipment individually has a real label (generate it if missing)
+  for (var i = 0; i < shipmentIds.length; i++) {
+    var sid = shipmentIds[i];
+    var isReady = false;
+    try {
+      var getResp = UrlFetchApp.fetch(FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labels', {
+        method: 'GET', headers: hdrGet, muteHttpExceptions: true
+      });
+      if (getResp.getResponseCode() === 200 && getResp.getBlob().getBytes().length > 0) {
+        isReady = true;
+      } else {
+        var postResp = UrlFetchApp.fetch(FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labelOnly/pdf', {
+          method: 'POST', headers: hdrPost,
+          payload: JSON.stringify({ shipmentIds: [sid] }), muteHttpExceptions: true
+        });
+        if (postResp.getResponseCode() === 200 && postResp.getBlob().getBytes().length > 0) {
+          isReady = true;
+        } else {
+          Logger.log('Label not ready for ' + sid + ' [' + postResp.getResponseCode() + ']: ' + postResp.getContentText().substring(0, 200));
+        }
+      }
+    } catch (e) {
+      Logger.log('Label check exception ' + sid + ': ' + e.toString());
+    }
+    if (isReady) validSids.push(sid);
+  }
+
+  // Step B: merged PDF(s) for verified shipments only (25 per file)
   var BATCH_SIZE = 25;
   var batchIndex = 1;
-
-  for (var i = 0; i < shipmentIds.length; i += BATCH_SIZE) {
-    var chunk = shipmentIds.slice(i, i + BATCH_SIZE);
-    var batchIds = chunk.join(',');
-
+  for (var j = 0; j < validSids.length; j += BATCH_SIZE) {
+    var chunk = validSids.slice(j, j + BATCH_SIZE);
     try {
-      var mergedUrl = FLIPKART_BASE_URL + '/v3/shipments/' + batchIds + '/labels';
-      var mergedResp = UrlFetchApp.fetch(mergedUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken,
-          'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-        },
-        muteHttpExceptions: true
+      var mergedResp = UrlFetchApp.fetch(FLIPKART_BASE_URL + '/v3/shipments/' + chunk.join(',') + '/labels', {
+        method: 'GET', headers: hdrGet, muteHttpExceptions: true
       });
-
-      var code = mergedResp.getResponseCode();
-      if (code === 200) {
+      if (mergedResp.getResponseCode() === 200 && mergedResp.getBlob().getBytes().length > 0) {
         var mergedBlob = mergedResp.getBlob();
-        if (mergedBlob.getBytes().length > 0) {
-          mergedBlob.setContentType('application/pdf');
-          var fileName = shipmentIds.length <= 25 ? 'VOEUX_Merged_Labels.pdf' : ('VOEUX_Labels_Batch' + batchIndex + '.pdf');
-          mergedBlob.setName(fileName);
-          pdfAttachments.push(mergedBlob);
-          validSids = validSids.concat(chunk);
-          Logger.log('Downloaded merged PDF batch ' + batchIndex + ' for ' + chunk.length + ' shipments.');
-        }
+        mergedBlob.setContentType('application/pdf');
+        mergedBlob.setName('VOEUX_Labels_' + Utilities.formatDate(new Date(), 'Asia/Kolkata', 'HHmm') + '_Part' + batchIndex + '.pdf');
+        pdfAttachments.push(mergedBlob);
+        Logger.log('Merged PDF part ' + batchIndex + ' for ' + chunk.length + ' shipments.');
       } else {
-        Logger.log('Batch label download failed [' + code + '], checking individually for chunk...');
-        // Fallback for this chunk only
-        chunk.forEach(function(sid) {
-          try {
-            var getUrl = FLIPKART_BASE_URL + '/v3/shipments/' + sid + '/labels';
-            var getResp = UrlFetchApp.fetch(getUrl, {
-              method: 'GET',
-              headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-              },
-              muteHttpExceptions: true
-            });
-            if (getResp.getResponseCode() === 200 && getResp.getBlob().getBytes().length > 0) {
-              var blob = getResp.getBlob().setName('Invoice_' + sid + '.pdf');
-              pdfAttachments.push(blob);
-              validSids.push(sid);
-            }
-          } catch(e) {}
-        });
+        Logger.log('Merged PDF part ' + batchIndex + ' failed [' + mergedResp.getResponseCode() + ']');
       }
-    } catch(e) {
-      Logger.log('Merged labels exception for batch ' + batchIndex + ': ' + e.toString());
+    } catch (e) {
+      Logger.log('Merged labels exception part ' + batchIndex + ': ' + e.toString());
     }
     batchIndex++;
   }
 
-  Logger.log('Downloaded ' + pdfAttachments.length + ' label attachment(s) for ' + validSids.length + ' shipments.');
+  Logger.log('Verified ' + validSids.length + '/' + shipmentIds.length + ' labels; ' + pdfAttachments.length + ' PDF file(s).');
   return { attachments: pdfAttachments, readySids: validSids };
 }
 
