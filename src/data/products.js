@@ -28,7 +28,7 @@ const RAW_PRODUCTS = [
       '10.1" IPS Touchscreen Display',
       '4GB RAM + 64GB Storage',
       'Dual Knob Premium Design',
-      'AHD Rear View Camera Included',
+      'AHD Camera Not Included',
       'Built-in Bluetooth, Wi-Fi & GPS'
     ],
     fullSpecs: {
@@ -42,7 +42,7 @@ const RAW_PRODUCTS = [
       'Number of AM Channels': '12',
       'Steering Wheel Controls': 'Yes',
       'Mounting Frame': 'No',
-      'In The Box': '1 Voeux Android Car Media Player Unit, 1 Power Cable Harness, 1 GPS Antenna, 1 AHD Camera',
+      'In The Box': '1 Voeux Android Car Media Player Unit, 1 Power Cable Harness, 1 GPS Antenna (AHD Camera Not Included)',
       'Connectivity': 'Built-in Bluetooth, Wi-Fi & GPS, USB, AUX',
       'Fitment': 'Double DIN Universal Fit',
       'Warranty Summary': '1 Year Domestic Warranty on Manufacturing Defects',
@@ -51,12 +51,12 @@ const RAW_PRODUCTS = [
       'Warranty Service Type': 'Customer needs to call or email the customer support. The product will be repaired or replaced at the nearest service center or picked up for service.'
     },
     compatibility: ['Hyundai Creta', 'Maruti Swift', 'Tata Nexon', 'Kia Seltos', 'Mahindra Thar', 'Honda City', 'Universal Double DIN Fit'],
-    description: 'Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB). Upgrade your driving experience with the Voeux X80 Diamond, a premium 10.1-inch Android car multimedia system designed for performance, clarity, and seamless connectivity. Powered by a fast and stable Android platform with 4GB RAM and 64GB internal storage, this system ensures smooth multitasking, lag-free navigation, and ample space for apps, music, and videos. Featuring a high-resolution IPS touchscreen display, the X80 Diamond delivers vibrant visuals, sharp contrast, and excellent visibility in all lighting conditions. The stylish dual-knob design adds a premium feel while providing precise control for volume and media settings. Equipped with an AHD rear camera, this system offers crystal-clear reverse visuals for safer parking and maneuvering. Enjoy built-in Bluetooth for hands-free calling and music streaming, Wi-Fi support for online apps, GPS navigation for real-time directions, and USB connectivity for external media. Designed as a Double DIN unit, the X80 Diamond is compatible with most cars and offers a sleek, modern dashboard upgrade. Whether you are commuting or on a long drive, this advanced Android car stereo brings entertainment, safety, and convenience together in one powerful package.',
+    description: 'Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB). Upgrade your driving experience with the Voeux X80 Diamond, a premium 10.1-inch Android car multimedia system designed for performance, clarity, and seamless connectivity. Powered by a fast and stable Android platform with 4GB RAM and 64GB internal storage, this system ensures smooth multitasking, lag-free navigation, and ample space for apps, music, and videos. Featuring a high-resolution IPS touchscreen display, the X80 Diamond delivers vibrant visuals, sharp contrast, and excellent visibility in all lighting conditions. The stylish dual-knob design adds a premium feel while providing precise control for volume and media settings. Supports reverse parking cameras (AHD camera not included). Enjoy built-in Bluetooth for hands-free calling and music streaming, Wi-Fi support for online apps, GPS navigation for real-time directions, and USB connectivity for external media. Designed as a Double DIN unit, the X80 Diamond is compatible with most cars and offers a sleek, modern dashboard upgrade. Whether you are commuting or on a long drive, this advanced Android car stereo brings entertainment, safety, and convenience together in one powerful package.',
     features: [
       '10.1-inch IPS Touchscreen Display',
       'Android System with 4GB RAM + 64GB Storage',
       'Dual Knob Premium Design',
-      'AHD Rear View Camera Included',
+      'AHD Camera Not Included',
       'Built-in Bluetooth, Wi-Fi & GPS',
       'Double DIN Universal Fit'
     ],
