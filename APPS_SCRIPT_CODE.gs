@@ -406,6 +406,7 @@ function runFlipkartOrderAutomation() {
     }
 
     Logger.log('=== VOEUX Flipkart Automation Started: ' + new Date().toISOString() + ' ===');
+    PropertiesService.getScriptProperties().deleteProperty('FLIPKART_HAS_PENDING_HOLD');
 
     // STEP 1: Get access token
     var accessToken = getFlipkartAccessToken();
@@ -733,37 +734,75 @@ function fetchTodaysShipments(accessToken) {
       var hasMore = data.hasMore;
       var nextUrl = data.nextPageUrl;
       var page = 2;
-      
-      // Handle Pagination
-      while (hasMore && nextUrl) {
-        var fetchNextUrl = FLIPKART_BASE_URL.replace('/sellers', '') + nextUrl;
-        if (nextUrl.indexOf('/sellers') > -1) {
-          fetchNextUrl = 'https://api.flipkart.net' + nextUrl;
-        }
-        
-        var nextOptions = {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Bearer ' + accessToken,
-            'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
-          },
-          muteHttpExceptions: true
-        };
-        
-        var nextResp = UrlFetchApp.fetch(fetchNextUrl, nextOptions);
-        var nextCode = nextResp.getResponseCode();
-        
-        if (nextCode === 200) {
-          var nextData = JSON.parse(nextResp.getContentText());
-          allShipments = allShipments.concat(nextData.shipments || nextData.data || []);
-          hasMore = nextData.hasMore;
-          nextUrl = nextData.nextPageUrl;
-          Logger.log('Filter shipments (Page ' + page + ') fetched.');
-          page++;
+      Logger.log('Page 1 returned ' + allShipments.length + ' shipments. hasMore=' + hasMore + ' nextPageUrl=' + nextUrl);
+
+      var seenIds = {};
+      allShipments.forEach(function(s) { seenIds[s.shipmentId || s.id] = true; });
+
+      // Handle Pagination (Flipkart returns 20 per page)
+      while (hasMore && nextUrl && page <= 30) {
+        // Build candidate URLs — Flipkart's nextPageUrl may or may not include "/sellers"
+        var path = String(nextUrl);
+        if (path.indexOf('http') === 0) {
+          var candidates = [path];
         } else {
-          Logger.log('Pagination failed with code ' + nextCode);
-          hasMore = false;
+          if (path.charAt(0) !== '/') path = '/' + path;
+          var candidates = [];
+          if (path.indexOf('/sellers/') === 0) {
+            candidates.push('https://api.flipkart.net' + path);
+          } else {
+            candidates.push('https://api.flipkart.net/sellers' + path);
+            candidates.push('https://api.flipkart.net' + path);
+          }
         }
+
+        var nextData = null;
+        for (var c = 0; c < candidates.length && !nextData; c++) {
+          var methods = ['GET', 'POST'];
+          for (var m = 0; m < methods.length && !nextData; m++) {
+            try {
+              var opt = {
+                method: methods[m],
+                headers: {
+                  'Authorization': 'Bearer ' + accessToken,
+                  'Flipkart-Selling-Partner-Id': FLIPKART_SELLER_ID
+                },
+                muteHttpExceptions: true
+              };
+              if (methods[m] === 'POST') {
+                opt.headers['Content-Type'] = 'application/json';
+                opt.payload = JSON.stringify(payload);
+              }
+              var nextResp = UrlFetchApp.fetch(candidates[c], opt);
+              var nextCode = nextResp.getResponseCode();
+              if (nextCode === 200) {
+                nextData = JSON.parse(nextResp.getContentText());
+              } else {
+                Logger.log('Pagination ' + methods[m] + ' ' + candidates[c] + ' -> ' + nextCode);
+              }
+            } catch (pe) {
+              Logger.log('Pagination exception: ' + pe.toString());
+            }
+          }
+        }
+
+        if (!nextData) {
+          Logger.log('WARNING: Pagination failed for page ' + page + '. Some orders may be missing — will retry via follow-up run.');
+          PropertiesService.getScriptProperties().setProperty('FLIPKART_HAS_PENDING_HOLD', 'true');
+          break;
+        }
+
+        var pageShipments = nextData.shipments || nextData.data || [];
+        var added = 0;
+        pageShipments.forEach(function(s) {
+          var id = s.shipmentId || s.id;
+          if (!seenIds[id]) { seenIds[id] = true; allShipments.push(s); added++; }
+        });
+        Logger.log('Filter shipments (Page ' + page + ') fetched: ' + pageShipments.length + ' (' + added + ' new).');
+        if (added === 0) break; // safety: avoid infinite loop on repeated pages
+        hasMore = nextData.hasMore;
+        nextUrl = nextData.nextPageUrl;
+        page++;
       }
     } else {
       throw new Error('Flipkart returned HTTP ' + code + ' error: ' + body);
@@ -831,8 +870,6 @@ function filterEligibleShipments(accessToken, shipments) {
   if (onHoldCount > 0) {
     Logger.log('NOTICE: ' + onHoldCount + ' shipment(s) currently on temporary HOLD by Flipkart.');
     PropertiesService.getScriptProperties().setProperty('FLIPKART_HAS_PENDING_HOLD', 'true');
-  } else {
-    PropertiesService.getScriptProperties().deleteProperty('FLIPKART_HAS_PENDING_HOLD');
   }
 
   return eligible;
