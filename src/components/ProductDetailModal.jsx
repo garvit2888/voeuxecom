@@ -331,7 +331,28 @@ export const ProductDetailModal = () => {
           <h3 className="font-extrabold text-sm text-gray-900">Frequently Asked Questions</h3>
 
           <div className="divide-y divide-gray-200 border-y border-gray-200">
-            {(product.category === 'speakers-soundbars' ? [
+            {(product.category === 'subwoofers' ? [
+              {
+                q: 'How do I register for the 1-Year Official Warranty?',
+                a: 'You can register your warranty in under 60 seconds. Click "Register Warranty" in the main menu, enter your Certificate ID or Order ID, and select your purchase date and email. We will send your official Warranty Certificate to your email. The subwoofer has a 1-year domestic warranty on manufacturing defects only.'
+              },
+              {
+                q: 'Is this subwoofer compatible with my car model?',
+                a: 'Yes. At just 6.8 cm deep with a 25.4 cm (10-inch) driver, the SVX-UND001 is built to fit under the front seats of most hatchbacks, sedans and SUVs, including Maruti, Hyundai, Tata, Kia, Mahindra, Honda and Toyota. It can also be placed in the boot. It works with factory stereos and aftermarket Android players.'
+              },
+              {
+                q: 'What is included in the box?',
+                a: '1 x Underseat subwoofer, 1 x Bass volume remote control (with cable), 1 x Wiring harness, 4 x Screws and a small metal plate.'
+              },
+              {
+                q: 'Do I need a separate amplifier to run this subwoofer?',
+                a: 'No. It is a powered (active) subwoofer with a built-in amplifier, rated at 120W RMS and 900W peak power handling. Just connect the included wiring harness to your car battery and audio source. The wired bass remote lets you adjust the bass level from the driver\'s seat.'
+              },
+              {
+                q: 'How do shipping, delivery and replacement work?',
+                a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+              }
+            ] : product.category === 'speakers-soundbars' ? [
               {
                 q: 'How do I register for the 1-Year Warranty?',
                 a: 'Click "Register Warranty" in the menu, enter your Order ID, purchase date and email to receive your official Warranty Certificate.'
