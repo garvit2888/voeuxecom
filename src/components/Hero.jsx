@@ -19,6 +19,16 @@ export const Hero = () => {
       mobilePadding: 'p-3'
     },
     {
+      title: 'VOEUX® SVX-UND001 10" Underseat Powered Subwoofer',
+      subtitle: 'Deep Bass • Ultra-Slim Underseat Design',
+      tagline: '900W Peak Power • 120W RMS • Built-in Amplifier • Bass Remote Control',
+      image: '/images/voeux_svx_und001_2.jpg',
+      ctaText: 'Shop Underseat Subwoofer',
+      actionPage: 'subwoofers',
+      featuredProduct: PRODUCTS.find(p => p.id === 'voeux-svx-und001-underseat-subwoofer'),
+      mobilePadding: 'p-5'
+    },
+    {
       title: 'VOEUX® 160W 2-in-1 Separable Soundbar',
       subtitle: 'Convertible Dual Tower & Horizontal Soundbar',
       tagline: '160W RMS • 2.1 CH Subwoofer • Bluetooth 5.0 • 3D Sound & HDMI ARC',
