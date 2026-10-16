@@ -128,6 +128,8 @@ const MainContent = () => {
         return <CategoryPage categoryId="speakers-soundbars" />;
       case 'amplifiers':
         return <CategoryPage categoryId="amplifiers" />;
+      case 'subwoofers':
+        return <CategoryPage key="subwoofers" categoryId="subwoofers" />;
       case 'bundles':
         return <CategoryPage categoryId="bundles" />;
       case 'join-us':

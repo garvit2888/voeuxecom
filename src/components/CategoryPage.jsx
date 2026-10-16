@@ -21,11 +21,14 @@ export const CategoryPage = ({ categoryId }) => {
   const [maxPrice, setMaxPrice] = useState(30000);
   const [sortBy, setSortBy] = useState('popular');
   const [filterQuery, setFilterQuery] = useState('');
+  const [activeSub, setActiveSub] = useState('all');
+  const subcategories = category.subcategories || [];
   let filtered = categoryProducts.filter(p => {
     const matchesPrice = p.price <= maxPrice;
     const matchesQuery = p.name.toLowerCase().includes(filterQuery.toLowerCase()) ||
                          p.shortSpecs.some(s => s.toLowerCase().includes(filterQuery.toLowerCase()));
-    return matchesPrice && matchesQuery;
+    const matchesSub = activeSub === 'all' || p.subcategory === activeSub;
+    return matchesPrice && matchesQuery && matchesSub;
   });
 
   if (sortBy === 'price-low') {
@@ -48,6 +51,26 @@ export const CategoryPage = ({ categoryId }) => {
           {category.description}
         </p>
       </div>
+
+      {/* Subcategory Chips */}
+      {subcategories.length > 0 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {[{ id: 'all', name: 'All' }, ...subcategories].map(sub => (
+            <button
+              key={sub.id}
+              id={`subcategory-${sub.id}`}
+              onClick={() => setActiveSub(sub.id)}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold border transition cursor-pointer ${
+                activeSub === sub.id
+                  ? 'bg-[#3B429F] text-white border-[#3B429F]'
+                  : 'bg-white text-gray-700 border-gray-200 hover:border-[#3B429F] hover:text-[#3B429F]'
+              }`}
+            >
+              {sub.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Filter Row (Clean & Unboxed Layout) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs py-1">

@@ -29,6 +29,7 @@ export const Navbar = () => {
     { id: 'android-players', label: 'Android Players' },
     { id: 'car-speakers', label: 'Car Speakers' },
     { id: 'speakers-soundbars', label: 'Speakers & Soundbars' },
+    { id: 'subwoofers', label: 'Subwoofers' },
     { id: 'bundles', label: 'Combo Bundles' },
     { id: 'warranty', label: 'Register Warranty' }
   ];
@@ -292,6 +293,12 @@ export const Navbar = () => {
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
                     CAR AMPLIFIERS
+                  </button>
+                  <button
+                    onClick={() => { setActivePage('subwoofers'); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
+                  >
+                    SUBWOOFERS
                   </button>
                 </div>
               </div>
