@@ -3,7 +3,7 @@ export const CATEGORIES = [
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: '', image: '/images/soundbar_1.png' },
   { id: 'car-speakers', name: 'Car Speakers', icon: 'Volume2', count: 2, description: '', image: '/images/voeux_svx001_coaxial_speakers.png' },
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: '', image: '/images/voeux_amp_board.jpg' },
-  { id: 'subwoofers', name: 'Subwoofers', icon: 'Speaker', count: 1, description: 'Deep, powerful bass for every car.', image: '/images/voeux_svx_und001_1.jpg',
+  { id: 'subwoofers', name: 'Subwoofers', icon: 'Speaker', count: 1, description: 'Deep, powerful bass for every car.', image: '/images/voeux_svx_und001_1.png',
     subcategories: [
       { id: 'underseat-subwoofer', name: 'Underseat Subwoofer' }
     ]
@@ -534,23 +534,22 @@ const RAW_PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: false,
-    image: '/images/voeux_svx_und001_1.jpg',
+    image: '/images/voeux_svx_und001_1.png',
     gallery: [
-      '/images/voeux_svx_und001_1.jpg',
+      '/images/voeux_svx_und001_1.png',
       '/images/voeux_svx_und001_2.jpg',
       '/images/voeux_svx_und001_3.jpg',
       '/images/voeux_svx_und001_4.jpg',
       '/images/voeux_svx_und001_5.jpg',
-      '/images/voeux_svx_und001_6.jpg',
-      '/images/voeux_svx_und001_7.jpg'
+      '/images/voeux_svx_und001_6.jpg'
     ],
     shortSpecs: [
       '10-Inch Underseat Powered Subwoofer',
-      '120W RMS / 900W Peak Power',
+      'Peak Power Handling: 900W',
+      'RMS Power: 120W',
       '50 Hz – 150 Hz Frequency Response',
       'Dual Voice Coil (4 Ohm)',
-      'Ultra-Slim 6.8 cm Depth',
-      'Bass Remote Control Included'
+      'Ultra-Slim 6.8 cm Depth'
     ],
     fullSpecs: {
       'Brand': 'Voeux',
@@ -573,7 +572,7 @@ const RAW_PRODUCTS = [
     description: 'Voeux SVX-UND001 10-Inch Underseat Powerful Subwoofer (Powered, RMS Power: 120 W). Add deep, punchy bass to your car without giving up boot space. This powered underseat subwoofer has a built-in amplifier, 120W RMS (900W peak) output, a 50–150 Hz frequency range and a dual voice coil design. At just 6.8 cm deep, it fits neatly under most car seats. It comes with a wired bass volume remote, so you can adjust the bass from the driver\'s seat.',
     features: [
       '10-Inch (25.4 cm) Powered Underseat Subwoofer',
-      '120W RMS / 900W Peak Power Handling',
+      'Peak Power Handling: 900W (120W RMS)',
       '50 Hz – 150 Hz Frequency Response',
       'Dual Voice Coil, 4 Ohm Impedance',
       'Ultra-Slim 6.8 cm Depth – Fits Under Most Seats',
