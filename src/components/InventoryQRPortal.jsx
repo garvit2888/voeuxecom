@@ -21,7 +21,11 @@ import {
   Smartphone,
   RefreshCcw,
   Trash2,
-  Database
+  Database,
+  Camera,
+  Image as ImageIcon,
+  X,
+  Loader2
 } from 'lucide-react';
 
 export const InventoryQRPortal = () => {
@@ -55,6 +59,108 @@ export const InventoryQRPortal = () => {
   // ============================================================
   const FIREBASE_URL = 'https://voeux-warehouse-default-rtdb.firebaseio.com/warehouse.json';
   const DUMMY_IDS = ['VOEUX-INV-101', 'VOEUX-INV-102', 'VOEUX-INV-103'];
+
+  // ============================================================
+  // SHELF PHOTOS — stored separately at /shelfPhotos/{shelfId}
+  // Kept out of /warehouse so the 25s shelf sync stays lightweight
+  // ============================================================
+  const PHOTOS_BASE = 'https://voeux-warehouse-default-rtdb.firebaseio.com/shelfPhotos';
+  const [shelfPhotos, setShelfPhotos] = useState({});
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoViewer, setPhotoViewer] = useState(null);
+  const [newShelfPhoto, setNewShelfPhoto] = useState(null);
+
+  // Resize + compress image in the browser (max 1024px, JPEG) before upload
+  const compressImage = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const MAX = 1024;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const loadAllPhotos = async () => {
+    try {
+      const res = await fetch(`${PHOTOS_BASE}.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const map = {};
+      if (data) Object.keys(data).forEach(id => { if (data[id]?.data) map[id] = data[id].data; });
+      setShelfPhotos(map);
+    } catch (e) { console.log('Photo load error:', e); }
+  };
+
+  const loadPhoto = async (shelfId) => {
+    if (!shelfId) return;
+    try {
+      const res = await fetch(`${PHOTOS_BASE}/${shelfId}.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      setShelfPhotos(prev => {
+        const next = { ...prev };
+        if (data?.data) next[shelfId] = data.data; else delete next[shelfId];
+        return next;
+      });
+    } catch (e) { console.log('Photo load error:', e); }
+  };
+
+  const uploadShelfPhoto = async (shelfId, dataUrl) => {
+    if (!shelfId || !dataUrl) return false;
+    setPhotoUploading(true);
+    try {
+      const res = await fetch(`${PHOTOS_BASE}/${shelfId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: dataUrl, updatedAt: new Date().toISOString() })
+      });
+      if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+      setShelfPhotos(prev => ({ ...prev, [shelfId]: dataUrl }));
+      return true;
+    } catch (e) {
+      console.log('Photo upload error:', e);
+      alert('Could not save the shelf photo. Please check your internet connection and try again.');
+      return false;
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
+  const deleteShelfPhoto = async (shelfId, askConfirm = true) => {
+    if (!shelfId) return;
+    if (askConfirm && !window.confirm('Remove the photo of this shelf?')) return;
+    try {
+      await fetch(`${PHOTOS_BASE}/${shelfId}.json`, { method: 'DELETE' });
+      setShelfPhotos(prev => { const next = { ...prev }; delete next[shelfId]; return next; });
+    } catch (e) { console.log('Photo delete error:', e); }
+  };
+
+  const handlePhotoSelected = async (e, shelfId) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const dataUrl = await compressImage(file);
+      if (shelfId) await uploadShelfPhoto(shelfId, dataUrl);
+      else setNewShelfPhoto(dataUrl);
+    } catch (err) {
+      alert('Could not read this image. Please try another photo.');
+    }
+  };
+
+  useEffect(() => { loadAllPhotos(); }, []);
+  useEffect(() => { if (activeShelf?.id) loadPhoto(activeShelf.id); }, [activeShelf?.id]);
 
   // Clear stale localStorage on mount
   useEffect(() => {
@@ -307,6 +413,10 @@ export const InventoryQRPortal = () => {
     const updatedList = [newShelf, ...(shelves || [])];
     setShelves(updatedList);
     pushToCloud(newShelf, updatedList);
+    if (newShelfPhoto) {
+      uploadShelfPhoto(newId, newShelfPhoto);
+      setNewShelfPhoto(null);
+    }
     navigateView('qr-generated', newShelf);
   };
 
@@ -424,6 +534,7 @@ export const InventoryQRPortal = () => {
 
       // 3. Broadcast deletion to cloud database so all other devices clear it
       deleteFromCloud(shelfId);
+      deleteShelfPhoto(shelfId, false);
 
       navigateView('all-shelves');
     }
@@ -441,6 +552,23 @@ export const InventoryQRPortal = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 py-8 px-4 sm:px-8">
+
+      {/* Full-screen shelf photo viewer */}
+      {photoViewer && (
+        <div
+          onClick={() => setPhotoViewer(null)}
+          className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 print:hidden"
+        >
+          <button
+            onClick={() => setPhotoViewer(null)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+            aria-label="Close photo"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img src={photoViewer} alt="Shelf photo" className="max-w-full max-h-full object-contain rounded-xl" />
+        </div>
+      )}
       
       {/* ==================== PRINTABLE STICKER TAG (STRICT PRINT ISOLATION WRAPPER) ==================== */}
       {activeShelf && (
@@ -615,6 +743,43 @@ export const InventoryQRPortal = () => {
                     className="w-full border border-gray-300 rounded-xl p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] bg-white shadow-xs"
                   />
                 </div>
+              </div>
+
+              {/* Optional Shelf Photo */}
+              <div className="space-y-1.5">
+                <label className="text-gray-900 font-bold block">SHELF PHOTO (OPTIONAL)</label>
+                {newShelfPhoto ? (
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={newShelfPhoto}
+                      alt="New shelf preview"
+                      onClick={() => setPhotoViewer(newShelfPhoto)}
+                      className="w-28 h-28 object-cover rounded-xl border border-gray-200 cursor-zoom-in"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs text-[#3B429F] font-bold hover:underline cursor-pointer flex items-center gap-1">
+                        <Camera className="w-3.5 h-3.5" /> Change Photo
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoSelected(e, null)} />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setNewShelfPhoto(null)}
+                        className="text-xs text-red-600 font-bold hover:underline text-left cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label
+                    id="create-shelf-photo"
+                    className="w-full border-2 border-dashed border-gray-300 hover:border-[#3B429F] rounded-xl p-5 flex flex-col items-center justify-center gap-1.5 text-gray-500 hover:text-[#3B429F] cursor-pointer transition"
+                  >
+                    <Camera className="w-6 h-6" />
+                    <span className="font-bold">Take or Upload Shelf Photo</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoSelected(e, null)} />
+                  </label>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -831,8 +996,9 @@ export const InventoryQRPortal = () => {
             ) : (
               /* VIEW & QUICK EDIT QUANTITY MODE */
               <div className="space-y-6 text-xs pt-2">
-                {/* Product Information Section */}
-                <div className="space-y-4 border-b border-gray-200/80 pb-6">
+                {/* Product Information Section + Shelf Photo */}
+                <div className="flex flex-col-reverse sm:flex-row gap-6 border-b border-gray-200/80 pb-6">
+                <div className="flex-1 space-y-4">
                   <div>
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PRODUCT NAME</span>
                     <h3 className="text-lg font-bold text-gray-900 mt-0.5">{activeShelf.productName}</h3>
@@ -851,6 +1017,44 @@ export const InventoryQRPortal = () => {
                       <p className="font-semibold text-gray-900 mt-1">{activeShelf.notes || 'Standard Storage'}</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Shelf Photo Panel */}
+                <div className="w-full sm:w-64 shrink-0 space-y-2">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">SHELF PHOTO</span>
+                  {shelfPhotos[activeShelf.id] ? (
+                    <img
+                      src={shelfPhotos[activeShelf.id]}
+                      alt={`Shelf ${activeShelf.shelfNumber}`}
+                      onClick={() => setPhotoViewer(shelfPhotos[activeShelf.id])}
+                      className="w-full aspect-[4/3] object-cover rounded-xl border border-gray-200 cursor-zoom-in"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[4/3] rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 gap-1">
+                      <ImageIcon className="w-7 h-7" />
+                      <span className="font-semibold">No photo yet</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between gap-2">
+                    <label
+                      id="shelf-photo-upload"
+                      className={`flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition ${photoUploading ? 'opacity-60 pointer-events-none' : 'cursor-pointer'}`}
+                    >
+                      {photoUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5 text-[#3B429F]" />}
+                      <span>{photoUploading ? 'Saving...' : shelfPhotos[activeShelf.id] ? 'Change Photo' : 'Add Photo'}</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoSelected(e, activeShelf.id)} />
+                    </label>
+                    {shelfPhotos[activeShelf.id] && !photoUploading && (
+                      <button
+                        onClick={() => deleteShelfPhoto(activeShelf.id)}
+                        className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 cursor-pointer"
+                        title="Remove photo"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
                 </div>
 
                 {/* Stock Counter & Editable Input Section */}
@@ -924,7 +1128,7 @@ export const InventoryQRPortal = () => {
                   Saved Warehouse Shelves ({filteredShelves.length})
                 </h2>
                 <button
-                  onClick={() => syncFromCloud()}
+                  onClick={() => { syncFromCloud(); loadAllPhotos(); }}
                   className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[#3B429F] transition cursor-pointer"
                   title="Sync Latest Database"
                 >
@@ -970,7 +1174,20 @@ export const InventoryQRPortal = () => {
                     {/* Content Section */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
                       {/* Product Info */}
-                      <div className="md:col-span-2 space-y-1">
+                      <div className="md:col-span-2 flex gap-4">
+                        {shelfPhotos[shelf.id] ? (
+                          <img
+                            src={shelfPhotos[shelf.id]}
+                            alt={`Shelf ${shelf.shelfNumber}`}
+                            onClick={() => setPhotoViewer(shelfPhotos[shelf.id])}
+                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border border-gray-200 shrink-0 cursor-zoom-in"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl border-2 border-dashed border-gray-200 shrink-0 flex items-center justify-center text-gray-300" title="No shelf photo">
+                            <ImageIcon className="w-6 h-6" />
+                          </div>
+                        )}
+                      <div className="space-y-1 min-w-0">
                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PRODUCT NAME</span>
                         <h3 className="text-base font-bold text-gray-900 leading-snug">{shelf.productName}</h3>
                         
@@ -979,6 +1196,7 @@ export const InventoryQRPortal = () => {
                             <strong>Zone / Notes:</strong> {shelf.notes}
                           </p>
                         )}
+                      </div>
                       </div>
 
                       {/* Assistant & Stock Details */}
