@@ -176,101 +176,99 @@ export const Hero = () => {
       </div>
 
       {/* ========== DESKTOP LAYOUT ONLY ========== */}
-      <div className="hidden md:block bg-black">
-        <div className="container mx-auto px-4 py-10">
-          <div
-            onClick={() => handleSlideClick(slides[currentSlide])}
-            className="relative w-full min-h-[560px] lg:min-h-[640px] bg-black text-white flex items-center p-12 lg:p-20 -mx-4 -mt-10 border-b border-gray-800 shadow-2xl overflow-hidden cursor-pointer group"
-          >
-
-            {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
-            <div className="absolute right-6 top-8 bottom-8 w-[55%] flex items-center justify-end pointer-events-none z-0">
-              {slides.map((s, idx) => (
-                <img
-                  key={idx}
-                  src={s.image}
-                  alt={s.title}
-                  loading="eager"
-                  fetchPriority="high"
-                  className={`absolute right-4 max-h-full max-w-[85%] object-contain object-right transition-all duration-500 ease-in-out group-hover:scale-105 ${
-                    idx === currentSlide
-                      ? 'opacity-95'
-                      : 'opacity-0 pointer-events-none'
-                  }`}
-                />
-              ))}
-              
-              {/* Image Boundary Gradient Fades */}
-              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
-              <div className="absolute top-0 bottom-0 left-0 w-48 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none z-20" />
-              <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-black to-transparent pointer-events-none z-20" />
-            </div>
-
-            {/* Dark Gradient Overlay for text readability (extended) */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent max-w-[65%] pointer-events-none z-1" />
-
-            {/* STACKED TEXT CONTENT */}
-            <div className="relative z-10 max-w-xl text-left w-full">
-              {slides.map((s, idx) => (
-                <div
-                  key={idx}
-                  className={`transition-all duration-500 ease-in-out space-y-4 ${
-                    idx === currentSlide
-                      ? 'opacity-100 translate-y-0 relative z-10'
-                      : 'opacity-0 translate-y-4 absolute inset-0 pointer-events-none z-0'
-                  }`}
-                >
-                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                    {s.title}
-                  </h1>
-                  <p className="text-base text-gray-300 font-medium leading-relaxed">
-                    {s.tagline}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Slide Dots Desktop */}
-            <div className="absolute bottom-6 left-10 lg:left-12 z-20 flex items-center space-x-2">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentSlide(idx);
-                  }}
-                  aria-label={`Go to slide ${idx + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    currentSlide === idx ? 'w-8 bg-[#3B429F]' : 'w-2 bg-gray-600 hover:bg-gray-400'
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Prev & Next Arrows Desktop */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
-              }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
-              aria-label="Previous Slide"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentSlide(prev => (prev + 1) % slides.length);
-              }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
-              aria-label="Next Slide"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+      <div
+        onClick={() => handleSlideClick(slides[currentSlide])}
+        className="hidden md:flex relative w-full min-h-[calc(100vh-76px)] bg-black text-white items-center overflow-hidden cursor-pointer group"
+      >
+        {/* Centered Content Container */}
+        <div className="container mx-auto px-8 lg:px-16 xl:px-20 py-12 w-full flex items-center relative z-10">
+          {/* STACKED TEXT CONTENT */}
+          <div className="max-w-xl lg:max-w-2xl text-left w-full space-y-4">
+            {slides.map((s, idx) => (
+              <div
+                key={idx}
+                className={`transition-all duration-500 ease-in-out space-y-4 ${
+                  idx === currentSlide
+                    ? 'opacity-100 translate-y-0 relative z-10'
+                    : 'opacity-0 translate-y-4 absolute inset-0 pointer-events-none z-0'
+                }`}
+              >
+                <h1 className="text-3xl lg:text-5xl xl:text-6xl font-black tracking-tight text-white leading-tight">
+                  {s.title}
+                </h1>
+                <p className="text-base lg:text-lg text-gray-300 font-medium leading-relaxed max-w-xl">
+                  {s.tagline}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
+        <div className="absolute right-0 top-0 bottom-0 w-[55%] flex items-center justify-end pointer-events-none z-0 pr-8 lg:pr-16 xl:pr-24">
+          {slides.map((s, idx) => (
+            <img
+              key={idx}
+              src={s.image}
+              alt={s.title}
+              loading="eager"
+              fetchPriority="high"
+              className={`absolute right-4 max-h-[85vh] max-w-[90%] object-contain object-right transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                idx === currentSlide
+                  ? 'opacity-95'
+                  : 'opacity-0 pointer-events-none'
+              }`}
+            />
+          ))}
+          
+          {/* Image Boundary Gradient Fades */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
+          <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none z-20" />
+          <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-black to-transparent pointer-events-none z-20" />
+        </div>
+
+        {/* Dark Gradient Overlay for text readability (extended) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent max-w-[65%] pointer-events-none z-[1]" />
+
+        {/* Slide Dots Desktop */}
+        <div className="absolute bottom-8 left-8 lg:left-16 xl:left-20 z-20 flex items-center space-x-2">
+          {slides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentSlide(idx);
+              }}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                currentSlide === idx ? 'w-8 bg-[#3B429F]' : 'w-2 bg-gray-600 hover:bg-gray-400'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Prev & Next Arrows Desktop */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+          }}
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3.5 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
+          aria-label="Previous Slide"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setCurrentSlide(prev => (prev + 1) % slides.length);
+          }}
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3.5 rounded-full bg-black/80 hover:bg-gray-900 text-white border border-gray-800 transition shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
+          aria-label="Next Slide"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
       </div>
     </section>
   );
