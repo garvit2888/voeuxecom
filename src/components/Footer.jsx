@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { ShieldCheck, ArrowUp } from 'lucide-react';
 
-const MarketplaceLogo = ({ candidates, href, alt, title }) => {
+const MarketplaceLogo = ({ candidates, href, alt, title, imgClassName = '', containerClassName = '' }) => {
   const [index, setIndex] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [hasFailedAll, setHasFailedAll] = useState(false);
@@ -37,12 +37,12 @@ const MarketplaceLogo = ({ candidates, href, alt, title }) => {
       target="_blank"
       rel="noopener noreferrer"
       title={title}
-      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none"
+      className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none flex items-center justify-center ${containerClassName}`}
     >
       <img
         src={candidates[index]}
         alt={alt}
-        className="w-full h-full object-cover block rounded-full"
+        className={`w-full h-full object-cover block rounded-full transform ${imgClassName}`}
       />
     </a>
   );
@@ -98,27 +98,34 @@ export const Footer = () => {
           </div>
 
           {/* Marketplace Circular Store Logos */}
-          <div className="flex items-center gap-4 pt-1 sm:pt-4">
-            <MarketplaceLogo
-              candidates={[
-                '/images/amazon_logo.png',
-                '/images/amazon_logo.jpg',
-                '/images/amazon_logo.jpeg'
-              ]}
-              href="https://www.amazon.in/s?k=Voeux&ref=bl_dp_s_web_0"
-              alt="Amazon"
-              title="VOEUX on Amazon"
-            />
-            <MarketplaceLogo
-              candidates={[
-                '/images/flipkart_logo.png',
-                '/images/flipkart_logo.jpg',
-                '/images/flipkart_logo.jpeg'
-              ]}
-              href="https://www.flipkart.com/search?q=voeux&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off"
-              alt="Flipkart"
-              title="VOEUX on Flipkart"
-            />
+          <div className="space-y-2.5">
+            <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Find Us On</h4>
+            <div className="flex items-center gap-4 pt-1">
+              <MarketplaceLogo
+                candidates={[
+                  '/images/amazon_logo.png',
+                  '/images/amazon_logo.jpg',
+                  '/images/amazon_logo.jpeg'
+                ]}
+                href="https://www.amazon.in/s?k=Voeux&ref=bl_dp_s_web_0"
+                alt="Amazon"
+                title="VOEUX on Amazon"
+                containerClassName="bg-white"
+                imgClassName="scale-[1.10]"
+              />
+              <MarketplaceLogo
+                candidates={[
+                  '/images/flipkart_logo.png',
+                  '/images/flipkart_logo.jpg',
+                  '/images/flipkart_logo.jpeg'
+                ]}
+                href="https://www.flipkart.com/search?q=voeux&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off"
+                alt="Flipkart"
+                title="VOEUX on Flipkart"
+                containerClassName="bg-[#2874F0]"
+                imgClassName="scale-[1.38]"
+              />
+            </div>
           </div>
         </div>
 
