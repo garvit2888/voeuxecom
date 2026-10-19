@@ -10,7 +10,7 @@ export const Footer = () => {
       <div className="container mx-auto px-4 space-y-10">
         
         {/* Links Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
           
           {/* Brand Info & Logo */}
           <div className="space-y-3">
@@ -49,6 +49,39 @@ export const Footer = () => {
               <li><button onClick={() => setActivePage('contact-us')} className="hover:text-cyan-400 transition cursor-pointer">Contact Support</button></li>
               <li><button onClick={() => setActivePage('terms')} className="hover:text-cyan-400 transition cursor-pointer">Terms & Conditions</button></li>
             </ul>
+          </div>
+
+          {/* Marketplace Circular Store Logos */}
+          <div className="flex items-center gap-4 pt-1 sm:pt-4">
+            {/* Amazon Circular Logo */}
+            <a
+              href="https://www.amazon.in/s?k=Voeux&ref=bl_dp_s_web_0"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="VOEUX on Amazon"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none"
+            >
+              <img
+                src="/images/amazon_circle.svg"
+                alt="Amazon"
+                className="w-full h-full object-cover block"
+              />
+            </a>
+
+            {/* Flipkart Circular Logo */}
+            <a
+              href="https://www.flipkart.com/search?q=voeux&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="VOEUX on Flipkart"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none"
+            >
+              <img
+                src="/images/flipkart_circle.svg"
+                alt="Flipkart"
+                className="w-full h-full object-cover block"
+              />
+            </a>
           </div>
 
         </div>
