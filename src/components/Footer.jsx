@@ -1,6 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { ShieldCheck, ArrowUp } from 'lucide-react';
+
+const MarketplaceLogo = ({ candidates, href, alt, title }) => {
+  const [index, setIndex] = useState(0);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [hasFailedAll, setHasFailedAll] = useState(false);
+
+  const handleError = () => {
+    if (index + 1 < candidates.length) {
+      setIndex(prev => prev + 1);
+    } else {
+      setHasFailedAll(true);
+    }
+  };
+
+  if (hasFailedAll) {
+    return null;
+  }
+
+  if (!hasLoaded) {
+    return (
+      <img
+        src={candidates[index]}
+        alt={alt}
+        onLoad={() => setHasLoaded(true)}
+        onError={handleError}
+        className="hidden"
+      />
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={title}
+      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none"
+    >
+      <img
+        src={candidates[index]}
+        alt={alt}
+        className="w-full h-full object-cover block rounded-full"
+      />
+    </a>
+  );
+};
 
 export const Footer = () => {
   const { setActivePage } = useShop();
@@ -53,37 +99,27 @@ export const Footer = () => {
 
           {/* Marketplace Circular Store Logos */}
           <div className="flex items-center gap-4 pt-1 sm:pt-4">
-            {/* Amazon Circular Logo */}
-            <a
+            <MarketplaceLogo
+              candidates={[
+                '/images/amazon_logo.png',
+                '/images/amazon_logo.jpg',
+                '/images/amazon_logo.jpeg'
+              ]}
               href="https://www.amazon.in/s?k=Voeux&ref=bl_dp_s_web_0"
-              target="_blank"
-              rel="noopener noreferrer"
+              alt="Amazon"
               title="VOEUX on Amazon"
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none"
-            >
-              <img
-                src="/images/amazon_circle.svg"
-                alt="Amazon"
-                className="w-full h-full object-cover block"
-              />
-            </a>
-
-            {/* Flipkart Circular Logo */}
-            <a
+            />
+            <MarketplaceLogo
+              candidates={[
+                '/images/flipkart_logo.png',
+                '/images/flipkart_logo.jpg',
+                '/images/flipkart_logo.jpeg'
+              ]}
               href="https://www.flipkart.com/search?q=voeux&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off"
-              target="_blank"
-              rel="noopener noreferrer"
+              alt="Flipkart"
               title="VOEUX on Flipkart"
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0 cursor-pointer block select-none"
-            >
-              <img
-                src="/images/flipkart_circle.svg"
-                alt="Flipkart"
-                className="w-full h-full object-cover block"
-              />
-            </a>
+            />
           </div>
-
         </div>
 
         {/* Bottom Bar */}
