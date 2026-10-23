@@ -40,6 +40,7 @@ export const ProductDetailPage = () => {
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   const [includeFrame, setIncludeFrame] = useState(false);
+  const [includeCamera, setIncludeCamera] = useState(false);
   const [carMake, setCarMake] = useState('');
   const [carModel, setCarModel] = useState('');
   const [carYear, setCarYear] = useState('2024');
@@ -64,6 +65,8 @@ export const ProductDetailPage = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIncludeFrame(false);
+    setIncludeCamera(false);
   }, [product]);
 
   if (!product) {
@@ -77,8 +80,6 @@ export const ProductDetailPage = () => {
     );
   }
 
-
-
   const handleDrag360 = (e) => {
     if (!is360Mode) return;
     setRotationAngle(prev => (prev + e.movementX * 2) % 360);
@@ -88,12 +89,27 @@ export const ProductDetailPage = () => {
     ((product.originalPrice - product.price) / product.originalPrice) * 100
   );
 
+  const extraPrice = (includeFrame ? 1000 : 0) + (includeCamera ? 449 : 0);
+
+  let idSuffix = '';
+  if (includeFrame) idSuffix += '-frame';
+  if (includeCamera) idSuffix += '-camera';
+
+  let nameExtra = '';
+  if (includeFrame && includeCamera) {
+    nameExtra = ` + Frame (${carMake ? `${carMake} ${carModel} ${carYear}`.trim() : 'Custom Fit'}) + Camera`;
+  } else if (includeFrame) {
+    nameExtra = ` + Frame (${carMake ? `${carMake} ${carModel} ${carYear}`.trim() : 'Custom Fit'})`;
+  } else if (includeCamera) {
+    nameExtra = ` + Camera`;
+  }
+
   const finalProduct = {
     ...product,
-    id: includeFrame ? `${product.id}-frame` : product.id,
-    name: includeFrame ? `${product.name} + Frame (${carMake} ${carModel} ${carYear})` : product.name,
-    price: includeFrame ? product.price + 1000 : product.price,
-    originalPrice: includeFrame ? product.originalPrice + 1000 : product.originalPrice
+    id: idSuffix ? `${product.id}${idSuffix}` : product.id,
+    name: `${product.name}${nameExtra}`,
+    price: product.price + extraPrice,
+    originalPrice: product.originalPrice + extraPrice
   };
 
   return (
@@ -220,6 +236,22 @@ export const ProductDetailPage = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Camera Checkbox */}
+                <div className="pt-3 border-t border-gray-200">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeCamera}
+                      onChange={(e) => setIncludeCamera(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-[#3B429F] focus:ring-[#3B429F]"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-gray-900">Include Camera</p>
+                      <p className="text-xs text-gray-500 font-medium">+ ₹449 to total price</p>
+                    </div>
+                  </label>
+                </div>
               </div>
             )}
 

@@ -40,6 +40,7 @@ export const ProductDetailModal = () => {
   const [checkYear, setCheckYear] = useState('2024');
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [includeFrame, setIncludeFrame] = useState(false);
+  const [includeCamera, setIncludeCamera] = useState(false);
 
   const [openAccordions, setOpenAccordions] = useState({
     description: true,
@@ -67,12 +68,27 @@ export const ProductDetailModal = () => {
     ((product.originalPrice - product.price) / product.originalPrice) * 100
   );
 
+  const extraPrice = (includeFrame ? 1000 : 0) + (includeCamera ? 449 : 0);
+
+  let idSuffix = '';
+  if (includeFrame) idSuffix += '-frame';
+  if (includeCamera) idSuffix += '-camera';
+
+  let nameExtra = '';
+  if (includeFrame && includeCamera) {
+    nameExtra = ` + Frame (${checkMake ? `${checkMake} ${checkModel} ${checkYear}`.trim() : 'Custom Fit'}) + Camera`;
+  } else if (includeFrame) {
+    nameExtra = ` + Frame (${checkMake ? `${checkMake} ${checkModel} ${checkYear}`.trim() : 'Custom Fit'})`;
+  } else if (includeCamera) {
+    nameExtra = ` + Camera`;
+  }
+
   const finalProduct = {
     ...product,
-    id: includeFrame ? `${product.id}-frame` : product.id,
-    name: includeFrame ? `${product.name} + Frame (${checkMake} ${checkModel} ${checkYear})` : product.name,
-    price: includeFrame ? product.price + 1000 : product.price,
-    originalPrice: includeFrame ? product.originalPrice + 1000 : product.originalPrice
+    id: idSuffix ? `${product.id}${idSuffix}` : product.id,
+    name: `${product.name}${nameExtra}`,
+    price: product.price + extraPrice,
+    originalPrice: product.originalPrice + extraPrice
   };
 
   return (
@@ -193,6 +209,22 @@ export const ProductDetailModal = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Camera Checkbox */}
+                <div className="pt-2.5 border-t border-gray-200">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeCamera}
+                      onChange={(e) => setIncludeCamera(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-[#3B429F] focus:ring-[#3B429F]"
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-gray-900">Include Camera</p>
+                      <p className="text-[10px] text-gray-500 font-medium">+ ₹449 to total price</p>
+                    </div>
+                  </label>
+                </div>
               </div>
             )}
 
