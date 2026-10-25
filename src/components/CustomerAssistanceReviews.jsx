@@ -14,7 +14,6 @@ export const PRODUCT_OPTIONS = [
   'Voeux X80 Android Player + 4 Speakers + Frame Combo',
   'Voeux 9" TS7 Android Player + 4 Speakers + Frame Combo',
   'Voeux Single Knob Android Player + 4 Speakers + Frame Combo',
-  'VOEUX® HyperDrive Ultra 12.3" Dual-Screen Android Player',
   'Other VOEUX Product'
 ];
 
@@ -282,7 +281,7 @@ export const CustomerAssistanceReviews = () => {
             {/* Modal Header */}
             <div className="p-4 sm:px-6 bg-slate-900 text-white flex items-center justify-between text-xs font-semibold">
               <span className="font-bold uppercase tracking-wider text-white text-xs">
-                Verified Customer Review
+                Verified Customer Support Experience Review
               </span>
               <button
                 onClick={() => {
@@ -309,6 +308,10 @@ export const CustomerAssistanceReviews = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
+                  {/* Trust helper note */}
+                  <p className="text-xs text-gray-600 bg-slate-50 border border-slate-200 rounded-xl p-3 leading-relaxed font-medium">
+                    This review will help other buyers to trust our customer support experience better.
+                  </p>
                   {/* Name */}
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
