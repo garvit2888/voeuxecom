@@ -225,7 +225,7 @@ export const CustomerAssistanceReviews = () => {
       {/* Header: Pure review showcase (no public write button to prevent fake submissions) */}
       <div className="mb-8 sm:mb-10 border-b border-gray-200 pb-4">
         <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-          Customer Reviews
+          Customer Assistance Experience Reviews
         </h2>
         <p className="text-sm text-gray-500 font-medium mt-1">
           Real feedback and assistance experiences from verified drivers.
