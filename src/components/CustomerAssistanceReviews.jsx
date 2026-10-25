@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Plus, X, Send, CheckCircle2 } from 'lucide-react';
 
 const INITIAL_REVIEWS = [
@@ -6,7 +6,7 @@ const INITIAL_REVIEWS = [
     id: 'rev-voeux-amp-01',
     name: 'Verified Customer',
     rating: 5,
-    reviewText: 'Wonderful\nReview for: Maximum Power Output 500 W\nVery good product and working very nice I am full\nsatisfied o ',
+    reviewText: 'Wonderful\nReview for: Maximum Power Output 500 W\nVery good product and working very well. I am fully satisfied.',
     avatarBg: 'bg-indigo-600'
   }
 ];
@@ -46,6 +46,40 @@ export const CustomerAssistanceReviews = () => {
     return INITIAL_REVIEWS;
   });
 
+  // Sync latest reviews from the cloud backend (Firebase Realtime DB) on mount
+  useEffect(() => {
+    const fetchBackendReviews = async () => {
+      try {
+        const res = await fetch('https://voeux-warehouse-default-rtdb.firebaseio.com/customer_reviews.json');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            const list = Object.values(data).filter(r => 
+              r && r.id && !r.id.startsWith('rev-0') && !r.name?.toLowerCase().includes('test')
+            );
+            if (list.length > 0) {
+              setReviews(prev => {
+                const combined = [...list, ...prev];
+                const seen = new Set();
+                const unique = [];
+                for (const r of combined) {
+                  if (r && r.id && !seen.has(r.id)) {
+                    seen.add(r.id);
+                    unique.push(r);
+                  }
+                }
+                return unique;
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Backend sync note:', err);
+      }
+    };
+    fetchBackendReviews();
+  }, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -73,14 +107,14 @@ export const CustomerAssistanceReviews = () => {
       name: formData.name.trim(),
       rating: Number(formData.rating),
       reviewText: formData.reviewText.trim(),
-      avatarBg: randomColor
+      avatarBg: randomColor,
+      submittedAt: new Date().toLocaleString('en-IN')
     };
 
-    // 1. Immediately update website state at the top
-    const updated = [newReview, ...reviews];
-    setReviews(updated);
+    // 1. "There and then": Immediately update UI state right away
+    setReviews(prev => [newReview, ...prev.filter(r => r.id !== newReview.id)]);
 
-    // 2. Save in localStorage so it stays on refresh
+    // 2. Persist in localStorage so it stays across browser refreshes
     try {
       const stored = JSON.parse(localStorage.getItem('voeux_customer_reviews_live') || '[]');
       stored.unshift(newReview);
@@ -89,10 +123,21 @@ export const CustomerAssistanceReviews = () => {
       console.error('LocalStorage save error:', err);
     }
 
-    // 3. Post to Google Sheet in background
+    // 3. Save to Cloud Backend (Firebase Realtime Database)
+    try {
+      fetch(`https://voeux-warehouse-default-rtdb.firebaseio.com/customer_reviews/${newReview.id}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReview)
+      }).catch(err => console.error('Firebase save error:', err));
+    } catch (err) {
+      console.error('Cloud backend write failed:', err);
+    }
+
+    // 4. Also post to Google Sheet webhook
     const GOOGLE_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
     try {
-      await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+      fetch(GOOGLE_SHEET_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
@@ -101,9 +146,9 @@ export const CustomerAssistanceReviews = () => {
           customerName: newReview.name,
           rating: newReview.rating,
           reviewText: newReview.reviewText,
-          submittedAt: new Date().toLocaleString('en-IN')
+          submittedAt: newReview.submittedAt
         })
-      });
+      }).catch(() => {});
     } catch (err) {
       // background sync
     }
