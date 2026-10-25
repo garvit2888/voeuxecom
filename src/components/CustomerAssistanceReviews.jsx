@@ -3,46 +3,11 @@ import { Star, Plus, X, Send, CheckCircle2 } from 'lucide-react';
 
 const INITIAL_REVIEWS = [
   {
-    id: 'rev-01',
-    name: 'Vikramaditya Sharma',
+    id: 'rev-voeux-amp-01',
+    name: 'Verified Customer',
     rating: 5,
-    reviewText: 'Was extremely worried about voiding my new Creta factory warranty. The VOEUX technical desk video-called my installer within 5 minutes, shared the exact CANbus pinout diagram, and all steering buttons & factory reverse camera linked seamlessly on first boot. Zero wire slicing!',
+    reviewText: 'Wonderful\nReview for: Maximum Power Output 500 W\nVery good product and working very nice I am full\nsatisfied o ',
     avatarBg: 'bg-indigo-600'
-  },
-  {
-    id: 'rev-02',
-    name: 'Dr. Harmeet Singh K.',
-    rating: 5,
-    reviewText: 'Superb after-sales support! We were stuck on the reverse camera trigger wire on the Thar. VOEUX customer care sent a 20-second video clip showing the exact tap point behind the tailgate. The 9-inch QLED screen clarity under open-sunlight is phenomenal.',
-    avatarBg: 'bg-emerald-600'
-  },
-  {
-    id: 'rev-03',
-    name: 'Ananya Deshmukh',
-    rating: 5,
-    reviewText: 'Ordered for our garage detailing studio and weekend patio. Deep, punchy bass with zero distortion. Their customer assistance team contacted me via WhatsApp right after delivery to verify serial numbers and registered the 1-year replacement warranty on the spot.',
-    avatarBg: 'bg-amber-600'
-  },
-  {
-    id: 'rev-04',
-    name: 'Rahul Verma',
-    rating: 5,
-    reviewText: 'Huge improvement over stock Honda speakers. The technical team guided me on spacer thickness so the door trim clicks back flush like factory. Vocals are crystal clear and mid-bass kicks hard even on stock player power.',
-    avatarBg: 'bg-blue-600'
-  },
-  {
-    id: 'rev-05',
-    name: 'Sameer Kulkarni',
-    rating: 5,
-    reviewText: 'Called their technical hotline regarding power cable gauge and low-pass crossover tuning. They walked my installer through exact potentiometer positions for my 12-inch basstube. Runs cool even during long Mumbai to Goa drives.',
-    avatarBg: 'bg-purple-600'
-  },
-  {
-    id: 'rev-06',
-    name: 'Pooja Sharma',
-    rating: 5,
-    reviewText: 'The custom frame fitment is 100% factory finish, looks OEM installed. I had a quick question regarding wireless Apple CarPlay pairing and their executive answered my WhatsApp call within 2 minutes. Outstanding customer dedication!',
-    avatarBg: 'bg-rose-600'
   }
 ];
 
@@ -58,13 +23,21 @@ const AVATAR_COLORS = [
 export const CustomerAssistanceReviews = () => {
   const [reviews, setReviews] = useState(() => {
     try {
-      const saved = localStorage.getItem('voeux_customer_assistance_reviews');
+      // Clear previous test reviews
+      localStorage.removeItem('voeux_customer_assistance_reviews');
+      const saved = localStorage.getItem('voeux_customer_reviews_live');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingIds = new Set(parsed.map(r => r.id));
+          // Filter out legacy test reviews
+          const validSaved = parsed.filter(r => 
+            !r.id?.startsWith('rev-0') && 
+            !r.name?.toLowerCase().includes('test') &&
+            r.id !== 'rev-amp-01'
+          );
+          const existingIds = new Set(validSaved.map(r => r.id));
           const remainingInitials = INITIAL_REVIEWS.filter(r => !existingIds.has(r.id));
-          return [...parsed, ...remainingInitials];
+          return [...validSaved, ...remainingInitials];
         }
       }
     } catch (e) {
@@ -109,9 +82,9 @@ export const CustomerAssistanceReviews = () => {
 
     // 2. Save in localStorage so it stays on refresh
     try {
-      const stored = JSON.parse(localStorage.getItem('voeux_customer_assistance_reviews') || '[]');
+      const stored = JSON.parse(localStorage.getItem('voeux_customer_reviews_live') || '[]');
       stored.unshift(newReview);
-      localStorage.setItem('voeux_customer_assistance_reviews', JSON.stringify(stored));
+      localStorage.setItem('voeux_customer_reviews_live', JSON.stringify(stored));
     } catch (err) {
       console.error('LocalStorage save error:', err);
     }
@@ -199,7 +172,7 @@ export const CustomerAssistanceReviews = () => {
             </div>
 
             {/* Review Text */}
-            <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
+            <p className="text-gray-700 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
               "{review.reviewText}"
             </p>
           </div>
