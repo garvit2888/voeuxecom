@@ -239,26 +239,21 @@ export const CustomerAssistanceReviews = () => {
             key={review.id}
             className="clean-card p-6 flex flex-col space-y-3.5 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 shadow-sm transition font-body"
           >
-            {/* Top: Customer First Initial Avatar + Name + Product Name + Stars */}
+            {/* Top: Customer Name + Product Name + Stars */}
             <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-10 h-10 rounded-full ${review.avatarBg || 'bg-indigo-600'} text-white font-bold flex items-center justify-center text-sm shrink-0 shadow-sm`}>
-                  {review.name?.trim()?.charAt(0)?.toUpperCase() || 'C'}
-                </div>
-                <div className="min-w-0">
-                  <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate">
-                    {review.name}
-                  </h4>
-                  {review.productName && (
-                    <p className="text-[11px] sm:text-xs font-semibold text-indigo-700 truncate mt-0.5">
-                      {review.productName}
-                    </p>
-                  )}
-                </div>
+              <div className="min-w-0">
+                <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                  {review.name}
+                </h4>
+                {review.productName && (
+                  <p className="text-[11px] sm:text-xs font-semibold text-indigo-700 truncate mt-0.5">
+                    {review.productName}
+                  </p>
+                )}
               </div>
 
               {/* Stars */}
-              <div className="flex shrink-0 pt-1">
+              <div className="flex shrink-0 pt-0.5">
                 {[...Array(review.rating || 5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                 ))}
