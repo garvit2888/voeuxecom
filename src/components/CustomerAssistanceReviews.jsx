@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Plus, X, Send, CheckCircle2 } from 'lucide-react';
+import { Star, X, Send, CheckCircle2 } from 'lucide-react';
+
+export const PRODUCT_OPTIONS = [
+  'VOEUX® AMP Board 150W Mono Class AB Car Amplifier',
+  'Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)',
+  'VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer',
+  'Voeux Android 10.1" Dual Knob Piano Buttons (4GB/64GB) Car Player',
+  'Voeux Android 4+64GB, 6th Gen, 4 Core Car Stereo',
+  'Voeux Single Knob Piano Series Android Stereo (4GB+64GB)',
+  'Voeux 6" 2-Way Coaxial Car Speakers, 380W High Bass (SVX-001)',
+  'Voeux Premium 2 Way 6.5" 75W RMS Coaxial Speaker (380W) (SVX-005)',
+  'Voeux SVX-UND001 10-Inch Underseat Powerful Subwoofer (120W RMS)',
+  'Voeux X80 Android Player + 4 Speakers + Frame Combo',
+  'Voeux 9" TS7 Android Player + 4 Speakers + Frame Combo',
+  'Voeux Single Knob Android Player + 4 Speakers + Frame Combo',
+  'VOEUX® HyperDrive Ultra 12.3" Dual-Screen Android Player',
+  'Other VOEUX Product'
+];
 
 const INITIAL_REVIEWS = [
   {
     id: 'rev-voeux-amp-02',
     name: 'Verified Customer',
+    productName: 'VOEUX® AMP Board 150W Mono Class AB Car Amplifier',
     rating: 5,
     reviewText: 'Wonderful! Very good product and works very well. I am fully satisfied.',
-    avatarBg: 'bg-indigo-600'
+    avatarBg: 'bg-indigo-600',
+    submittedAt: 'Verified Review'
   }
 ];
 
@@ -23,7 +42,6 @@ const AVATAR_COLORS = [
 export const CustomerAssistanceReviews = () => {
   const [reviews, setReviews] = useState(() => {
     try {
-      // Clear previous test reviews
       localStorage.removeItem('voeux_customer_assistance_reviews');
       const saved = localStorage.getItem('voeux_customer_reviews_live');
       if (saved) {
@@ -90,18 +108,44 @@ export const CustomerAssistanceReviews = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Simple Form State: Name, Rating, Review Text
+  // Form State: Name, Product Name, Rating, Review Text
   const [formData, setFormData] = useState({
     name: '',
+    productName: '',
     rating: 5,
     reviewText: ''
   });
 
+  // Support personal customer review link: #write-review, #review, or ?review=true
+  useEffect(() => {
+    const handleReviewTrigger = () => {
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+      if (
+        hash === '#write-review' || 
+        hash === '#review' || 
+        hash === '#customer-review' ||
+        search.includes('review=true') ||
+        search.includes('write-review=true')
+      ) {
+        setIsModalOpen(true);
+        const section = document.getElementById('customer-reviews-section');
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    };
+
+    handleReviewTrigger();
+    window.addEventListener('hashchange', handleReviewTrigger);
+    return () => window.removeEventListener('hashchange', handleReviewTrigger);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !formData.reviewText.trim()) {
-      alert('Please enter your name and review text.');
+    if (!formData.name.trim() || !formData.productName.trim() || !formData.reviewText.trim()) {
+      alert('Please fill in your name, select the product, and write your review.');
       return;
     }
 
@@ -111,6 +155,7 @@ export const CustomerAssistanceReviews = () => {
     const newReview = {
       id: `rev-${Date.now()}`,
       name: formData.name.trim(),
+      productName: formData.productName.trim(),
       rating: Number(formData.rating),
       reviewText: formData.reviewText.trim(),
       avatarBg: randomColor,
@@ -150,6 +195,7 @@ export const CustomerAssistanceReviews = () => {
         body: JSON.stringify({
           action: 'customer_review',
           customerName: newReview.name,
+          productName: newReview.productName,
           rating: newReview.rating,
           reviewText: newReview.reviewText,
           submittedAt: newReview.submittedAt
@@ -162,60 +208,58 @@ export const CustomerAssistanceReviews = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
-      setFormData({ name: '', rating: 5, reviewText: '' });
+      setFormData({ name: '', productName: '', rating: 5, reviewText: '' });
       setTimeout(() => {
         setIsSuccess(false);
         setIsModalOpen(false);
+        // Clean URL hash if it was opened via #write-review
+        if (window.location.hash.toLowerCase().includes('review')) {
+          history.replaceState(null, '', window.location.pathname);
+        }
       }, 1200);
     }, 600);
   };
 
   return (
-    <section className="container mx-auto px-4 py-12 sm:py-16 text-gray-900 text-left border-t border-b border-gray-100 bg-white">
+    <section id="customer-reviews-section" className="container mx-auto px-4 py-12 sm:py-16 text-gray-900 text-left border-t border-b border-gray-100 bg-white">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-10 border-b border-gray-200 pb-4">
-        <div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            Customer Reviews
-          </h2>
-          <p className="text-sm text-gray-500 font-medium mt-1">
-            Real feedback and assistance experiences from verified drivers.
-          </p>
-        </div>
-
-        <button
-          onClick={() => {
-            setIsSuccess(false);
-            setIsModalOpen(true);
-          }}
-          className="self-start sm:self-auto px-5 py-3 rounded-xl bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-bold tracking-wide transition shadow-md flex items-center gap-2 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Write a Review</span>
-        </button>
+      {/* Header: Pure review showcase (no public write button to prevent fake submissions) */}
+      <div className="mb-8 sm:mb-10 border-b border-gray-200 pb-4">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+          Customer Reviews
+        </h2>
+        <p className="text-sm text-gray-500 font-medium mt-1">
+          Real feedback and assistance experiences from verified drivers.
+        </p>
       </div>
 
-      {/* Reviews Grid: Only Customer Initial + Name, Stars, and Review Text */}
+      {/* Reviews Grid: Customer Initial + Name, Product Name, Stars, and Review Text */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {reviews.map((review) => (
           <div
             key={review.id}
             className="clean-card p-6 flex flex-col space-y-3.5 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 shadow-sm transition font-body"
           >
-            {/* Top: Customer First Initial Avatar + Name + Stars */}
-            <div className="flex items-center justify-between gap-3">
+            {/* Top: Customer First Initial Avatar + Name + Product Name + Stars */}
+            <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className={`w-10 h-10 rounded-full ${review.avatarBg || 'bg-indigo-600'} text-white font-bold flex items-center justify-center text-sm shrink-0 shadow-sm`}>
                   {review.name?.trim()?.charAt(0)?.toUpperCase() || 'C'}
                 </div>
-                <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate">
-                  {review.name}
-                </h4>
+                <div className="min-w-0">
+                  <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                    {review.name}
+                  </h4>
+                  {review.productName && (
+                    <p className="text-[11px] sm:text-xs font-semibold text-indigo-700 truncate mt-0.5">
+                      {review.productName}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Stars */}
-              <div className="flex shrink-0">
+              <div className="flex shrink-0 pt-1">
                 {[...Array(review.rating || 5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                 ))}
@@ -230,7 +274,7 @@ export const CustomerAssistanceReviews = () => {
         ))}
       </div>
 
-      {/* Minimalist Review Modal */}
+      {/* Verified Customer Review Modal (Accessible via personal customer invitation link) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
           <div className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-200 text-gray-900 font-body">
@@ -238,10 +282,15 @@ export const CustomerAssistanceReviews = () => {
             {/* Modal Header */}
             <div className="p-4 sm:px-6 bg-slate-900 text-white flex items-center justify-between text-xs font-semibold">
               <span className="font-bold uppercase tracking-wider text-white text-xs">
-                Write a Customer Review
+                Verified Customer Review
               </span>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  if (window.location.hash.toLowerCase().includes('review')) {
+                    history.replaceState(null, '', window.location.pathname);
+                  }
+                }}
                 className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -256,7 +305,7 @@ export const CustomerAssistanceReviews = () => {
                     <CheckCircle2 className="w-8 h-8 text-emerald-600" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">Review Published!</h3>
-                  <p className="text-xs text-gray-600">Your review is now live on the website.</p>
+                  <p className="text-xs text-gray-600">Your review is now live on the VOEUX official store.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
@@ -273,6 +322,26 @@ export const CustomerAssistanceReviews = () => {
                       placeholder="e.g. Vikramaditya Sharma"
                       className="w-full text-xs p-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#3B429F]"
                     />
+                  </div>
+
+                  {/* Product Name (Roll-down Menu) */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                      Product Name <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      value={formData.productName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, productName: e.target.value }))}
+                      className="w-full text-xs p-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#3B429F] cursor-pointer"
+                    >
+                      <option value="">Select a product...</option>
+                      {PRODUCT_OPTIONS.map((prod) => (
+                        <option key={prod} value={prod}>
+                          {prod}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Stars Rating */}
