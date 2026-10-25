@@ -3,10 +3,10 @@ import { Star, Plus, X, Send, CheckCircle2 } from 'lucide-react';
 
 const INITIAL_REVIEWS = [
   {
-    id: 'rev-voeux-amp-01',
+    id: 'rev-voeux-amp-02',
     name: 'Verified Customer',
     rating: 5,
-    reviewText: 'Wonderful\nReview for: Maximum Power Output 500 W\nVery good product and working very well. I am fully satisfied.',
+    reviewText: 'Wonderful! Very good product and works very well. I am fully satisfied.',
     avatarBg: 'bg-indigo-600'
   }
 ];
@@ -29,11 +29,13 @@ export const CustomerAssistanceReviews = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Filter out legacy test reviews
+          // Filter out legacy test reviews and unrefined drafts
           const validSaved = parsed.filter(r => 
             !r.id?.startsWith('rev-0') && 
             !r.name?.toLowerCase().includes('test') &&
-            r.id !== 'rev-amp-01'
+            r.id !== 'rev-amp-01' &&
+            r.id !== 'rev-voeux-amp-01' &&
+            !r.reviewText?.includes('Maximum Power Output')
           );
           const existingIds = new Set(validSaved.map(r => r.id));
           const remainingInitials = INITIAL_REVIEWS.filter(r => !existingIds.has(r.id));
@@ -55,7 +57,11 @@ export const CustomerAssistanceReviews = () => {
           const data = await res.json();
           if (data && typeof data === 'object') {
             const list = Object.values(data).filter(r => 
-              r && r.id && !r.id.startsWith('rev-0') && !r.name?.toLowerCase().includes('test')
+              r && r.id && !r.id.startsWith('rev-0') && 
+              !r.name?.toLowerCase().includes('test') &&
+              r.id !== 'rev-amp-01' &&
+              r.id !== 'rev-voeux-amp-01' &&
+              !r.reviewText?.includes('Maximum Power Output')
             );
             if (list.length > 0) {
               setReviews(prev => {
@@ -218,7 +224,7 @@ export const CustomerAssistanceReviews = () => {
 
             {/* Review Text */}
             <p className="text-gray-700 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
-              "{review.reviewText}"
+              {review.reviewText}
             </p>
           </div>
         ))}
