@@ -37,6 +37,11 @@ body {
   letter-spacing: 0.02em;
 }
 
+.font-body, .font-clean {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  letter-spacing: -0.01em;
+}
+
 /* Minimalist Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

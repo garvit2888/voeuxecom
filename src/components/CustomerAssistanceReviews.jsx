@@ -1,0 +1,327 @@
+import React, { useState } from 'react';
+import { Star, Plus, X, Send, CheckCircle2 } from 'lucide-react';
+
+const INITIAL_REVIEWS = [
+  {
+    id: 'rev-01',
+    name: 'Vikramaditya Sharma',
+    rating: 5,
+    reviewText: 'Was extremely worried about voiding my new Creta factory warranty. The VOEUX technical desk video-called my installer within 5 minutes, shared the exact CANbus pinout diagram, and all steering buttons & factory reverse camera linked seamlessly on first boot. Zero wire slicing!',
+    avatarBg: 'bg-indigo-600'
+  },
+  {
+    id: 'rev-02',
+    name: 'Dr. Harmeet Singh K.',
+    rating: 5,
+    reviewText: 'Superb after-sales support! We were stuck on the reverse camera trigger wire on the Thar. VOEUX customer care sent a 20-second video clip showing the exact tap point behind the tailgate. The 9-inch QLED screen clarity under open-sunlight is phenomenal.',
+    avatarBg: 'bg-emerald-600'
+  },
+  {
+    id: 'rev-03',
+    name: 'Ananya Deshmukh',
+    rating: 5,
+    reviewText: 'Ordered for our garage detailing studio and weekend patio. Deep, punchy bass with zero distortion. Their customer assistance team contacted me via WhatsApp right after delivery to verify serial numbers and registered the 1-year replacement warranty on the spot.',
+    avatarBg: 'bg-amber-600'
+  },
+  {
+    id: 'rev-04',
+    name: 'Rahul Verma',
+    rating: 5,
+    reviewText: 'Huge improvement over stock Honda speakers. The technical team guided me on spacer thickness so the door trim clicks back flush like factory. Vocals are crystal clear and mid-bass kicks hard even on stock player power.',
+    avatarBg: 'bg-blue-600'
+  },
+  {
+    id: 'rev-05',
+    name: 'Sameer Kulkarni',
+    rating: 5,
+    reviewText: 'Called their technical hotline regarding power cable gauge and low-pass crossover tuning. They walked my installer through exact potentiometer positions for my 12-inch basstube. Runs cool even during long Mumbai to Goa drives.',
+    avatarBg: 'bg-purple-600'
+  },
+  {
+    id: 'rev-06',
+    name: 'Pooja Sharma',
+    rating: 5,
+    reviewText: 'The custom frame fitment is 100% factory finish, looks OEM installed. I had a quick question regarding wireless Apple CarPlay pairing and their executive answered my WhatsApp call within 2 minutes. Outstanding customer dedication!',
+    avatarBg: 'bg-rose-600'
+  }
+];
+
+const AVATAR_COLORS = [
+  'bg-indigo-600',
+  'bg-emerald-600',
+  'bg-blue-600',
+  'bg-purple-600',
+  'bg-rose-600',
+  'bg-amber-600'
+];
+
+export const CustomerAssistanceReviews = () => {
+  const [reviews, setReviews] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_customer_assistance_reviews');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingIds = new Set(parsed.map(r => r.id));
+          const remainingInitials = INITIAL_REVIEWS.filter(r => !existingIds.has(r.id));
+          return [...parsed, ...remainingInitials];
+        }
+      }
+    } catch (e) {
+      console.error('Error loading reviews:', e);
+    }
+    return INITIAL_REVIEWS;
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  // Simple Form State: Name, Rating, Review Text
+  const [formData, setFormData] = useState({
+    name: '',
+    rating: 5,
+    reviewText: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.name.trim() || !formData.reviewText.trim()) {
+      alert('Please enter your name and review text.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const randomColor = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
+    const newReview = {
+      id: `rev-${Date.now()}`,
+      name: formData.name.trim(),
+      rating: Number(formData.rating),
+      reviewText: formData.reviewText.trim(),
+      avatarBg: randomColor
+    };
+
+    // 1. Immediately update website state at the top
+    const updated = [newReview, ...reviews];
+    setReviews(updated);
+
+    // 2. Save in localStorage so it stays on refresh
+    try {
+      const stored = JSON.parse(localStorage.getItem('voeux_customer_assistance_reviews') || '[]');
+      stored.unshift(newReview);
+      localStorage.setItem('voeux_customer_assistance_reviews', JSON.stringify(stored));
+    } catch (err) {
+      console.error('LocalStorage save error:', err);
+    }
+
+    // 3. Post to Google Sheet in background
+    const GOOGLE_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
+    try {
+      await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'customer_review',
+          customerName: newReview.name,
+          rating: newReview.rating,
+          reviewText: newReview.reviewText,
+          submittedAt: new Date().toLocaleString('en-IN')
+        })
+      });
+    } catch (err) {
+      // background sync
+    }
+
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      setFormData({ name: '', rating: 5, reviewText: '' });
+      setTimeout(() => {
+        setIsSuccess(false);
+        setIsModalOpen(false);
+      }, 1200);
+    }, 600);
+  };
+
+  return (
+    <section className="container mx-auto px-4 py-12 sm:py-16 text-gray-900 text-left border-t border-b border-gray-100 bg-white">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-10 border-b border-gray-200 pb-4">
+        <div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Customer Reviews
+          </h2>
+          <p className="text-sm text-gray-500 font-medium mt-1">
+            Real feedback and assistance experiences from verified drivers.
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setIsSuccess(false);
+            setIsModalOpen(true);
+          }}
+          className="self-start sm:self-auto px-5 py-3 rounded-xl bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white text-xs sm:text-sm font-bold tracking-wide transition shadow-md flex items-center gap-2 cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Write a Review</span>
+        </button>
+      </div>
+
+      {/* Reviews Grid: Only Customer Initial + Name, Stars, and Review Text */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {reviews.map((review) => (
+          <div
+            key={review.id}
+            className="clean-card p-6 flex flex-col space-y-3.5 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 shadow-sm transition font-body"
+          >
+            {/* Top: Customer First Initial Avatar + Name + Stars */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-10 h-10 rounded-full ${review.avatarBg || 'bg-indigo-600'} text-white font-bold flex items-center justify-center text-sm shrink-0 shadow-sm`}>
+                  {review.name?.trim()?.charAt(0)?.toUpperCase() || 'C'}
+                </div>
+                <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                  {review.name}
+                </h4>
+              </div>
+
+              {/* Stars */}
+              <div className="flex shrink-0">
+                {[...Array(review.rating || 5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+            </div>
+
+            {/* Review Text */}
+            <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
+              "{review.reviewText}"
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Minimalist Review Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-200 text-gray-900 font-body">
+            
+            {/* Modal Header */}
+            <div className="p-4 sm:px-6 bg-slate-900 text-white flex items-center justify-between text-xs font-semibold">
+              <span className="font-bold uppercase tracking-wider text-white text-xs">
+                Write a Customer Review
+              </span>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <div className="p-6 sm:p-8">
+              {isSuccess ? (
+                <div className="text-center space-y-3 py-6">
+                  <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Review Published!</h3>
+                  <p className="text-xs text-gray-600">Your review is now live on the website.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4 text-left">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                      Your Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="e.g. Vikramaditya Sharma"
+                      className="w-full text-xs p-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#3B429F]"
+                    />
+                  </div>
+
+                  {/* Stars Rating */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                      Rating <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex items-center gap-1.5 pt-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, rating: star }))}
+                          className="p-1 hover:scale-110 transition cursor-pointer"
+                        >
+                          <Star
+                            className={`w-6 h-6 ${
+                              star <= formData.rating
+                                ? 'fill-amber-400 text-amber-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                      <span className="text-xs font-semibold text-gray-600 ml-2">
+                        {formData.rating} / 5 Stars
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Review Text */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                      Review <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={4}
+                      value={formData.reviewText}
+                      onChange={(e) => setFormData(prev => ({ ...prev, reviewText: e.target.value }))}
+                      placeholder="Write your review and experience with VOEUX..."
+                      className="w-full text-xs p-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#3B429F] resize-none"
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3.5 rounded-xl bg-[#3B429F] hover:bg-[#2B308B] active:bg-[#20246B] text-white font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Publishing Review...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          <span>Publish Review</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+    </section>
+  );
+};

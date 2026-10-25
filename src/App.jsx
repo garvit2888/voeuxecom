@@ -29,6 +29,7 @@ import { CustomerProfilePage } from './components/CustomerProfilePage';
 import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
+import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
 
 const PriceHikeCountdown = () => {
   const targetDate = new Date('2026-10-11T00:00:00+05:30').getTime();
@@ -196,6 +197,9 @@ const MainContent = () => {
                 ))}
               </div>
             </section>
+
+            {/* Customer Assistance & Verified Experience Section */}
+            <CustomerAssistanceReviews />
 
             {/* Bestsellers Grid */}
             <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center py-10">
