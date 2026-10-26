@@ -390,18 +390,18 @@ const RAW_PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: true,
-    image: '/images/voeux_svx001_coaxial_speakers.png',
+    image: '/images/voeux_cs606pt2_main.png',
     gallery: [
-      '/images/voeux_svx001_coaxial_speakers.png',
-      '/images/voeux_svx001_front.png',
-      '/images/voeux_svx001_side.png',
-      '/images/voeux_svx001_back.png',
-      '/images/voeux_svx001_box.png'
+      '/images/voeux_cs606pt2_main.png',
+      '/images/voeux_cs606pt2_front.png',
+      '/images/voeux_cs606pt2_side.png',
+      '/images/voeux_cs606pt2_back.png',
+      '/images/voeux_cs606pt2_box.png'
     ],
     aPlusContent: [
-      { image: '/images/voeux_svx001_front.png', title: 'Premium Front Face & Tweeter', description: 'Crystal-clear high frequencies delivered by the precision-engineered central tweeter, housed within an ultra-durable injection-molded polypropylene cone.' },
-      { image: '/images/voeux_svx001_side.png', title: 'Slim Profile Design', description: 'The VE-CS606PT2 features a slim and universal form factor that easily installs into most vehicle door panels without requiring extra modifications or bulky spacers.' },
-      { image: '/images/voeux_svx001_back.png', title: 'Heavy-Duty Magnet Construction', description: 'Powered by a high-density, oversized magnet structure and dual voice coils designed to push powerful, deep bass without distortion even at peak volumes.' }
+      { image: '/images/voeux_cs606pt2_front.png', title: 'Premium Front Face & Tweeter', description: 'Crystal-clear high frequencies delivered by the precision-engineered central tweeter, housed within an ultra-durable injection-molded polypropylene cone.' },
+      { image: '/images/voeux_cs606pt2_side.png', title: 'Slim Profile Design', description: 'The VE-CS606PT2 features a slim and universal form factor that easily installs into most vehicle door panels without requiring extra modifications or bulky spacers.' },
+      { image: '/images/voeux_cs606pt2_back.png', title: 'Heavy-Duty Magnet Construction', description: 'Powered by a high-density, oversized magnet structure and dual voice coils designed to push powerful, deep bass without distortion even at peak volumes.' }
     ],
     shortSpecs: [
       '1 Pair of 6.5-Inch (16.51 cm) Coaxial Speakers',
