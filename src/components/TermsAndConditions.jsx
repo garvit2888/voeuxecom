@@ -1,4 +1,5 @@
 import React from 'react';
+import { RefreshCw, AlertCircle, ShieldCheck } from 'lucide-react';
 
 export const TermsAndConditions = () => {
   return (
@@ -14,6 +15,31 @@ export const TermsAndConditions = () => {
             VOEUX® Electronics • Official Terms of Service & Store Policies
           </p>
         </div>
+
+        {/* 7-DAY REPLACEMENT POLICY & TRANSIT DAMAGE HIGHLIGHT BOX */}
+        <section id="replacement-policy" className="p-5 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-3 text-xs">
+          <div className="flex items-center gap-2 text-emerald-900 font-black text-sm uppercase tracking-wide">
+            <RefreshCw className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>7-Day Replacement Policy & Transit Damage Terms</span>
+          </div>
+          <p className="text-emerald-950 font-semibold leading-relaxed">
+            Replacement within 7 days is applicable ONLY if the product is physically damaged during transit or has a major manufacturing defect upon delivery.
+          </p>
+          <ul className="space-y-1.5 text-emerald-900 list-disc list-inside pl-1 leading-relaxed">
+            <li>
+              <strong>Unboxing Video Mandatory:</strong> Prior to dispatch, our team records a video of your product being packed. To claim a replacement for transit damage, the customer MUST record a clear, continuous unboxing video upon receiving the package.
+            </li>
+            <li>
+              <strong>Scope of Coverage:</strong> This 7-day policy covers physical damage caused during transit or major out-of-the-box hardware manufacturing defects.
+            </li>
+            <li>
+              <strong>Warranty Seal & Tampering:</strong> Warranty and replacement are strictly VOID if the warranty seal is broken, modified, or if tampering is detected.
+            </li>
+            <li>
+              <strong>Post 7-Day Window:</strong> After 7 days from delivery, requests fall under standard 1-Year Official Warranty repair or equivalent replacement guidelines.
+            </li>
+          </ul>
+        </section>
 
         {/* Overview */}
         <section className="space-y-3">

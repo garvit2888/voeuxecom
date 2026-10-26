@@ -498,6 +498,14 @@ export const CartDrawer = () => {
                     <span>Estimated Total</span>
                     <span className="text-[#3B429F]">₹{finalTotal.toLocaleString('en-IN')}</span>
                   </div>
+
+                  {/* Shipping company notice near estimated total */}
+                  <div className="p-2.5 bg-indigo-50/80 border border-indigo-200/80 rounded-xl flex items-start gap-2 text-[11px] text-indigo-950 font-medium leading-relaxed mt-2">
+                    <Truck className="w-4 h-4 text-[#3B429F] shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Note:</strong> Shipping charges will be paid directly to the courier company.
+                    </span>
+                  </div>
                 </div>
 
                 <button
@@ -514,7 +522,7 @@ export const CartDrawer = () => {
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
-                <p className="text-[11px] text-gray-400 text-center font-medium">Taxes and shipping calculated at checkout</p>
+                <p className="text-[11px] text-gray-500 text-center font-medium">Shipping charges will be paid directly to the courier company</p>
               </div>
             )}
           </>

@@ -303,9 +303,17 @@ export const ProductDetailPage = () => {
                 <ShieldCheck className="w-5 h-5 text-[#3B429F]" />
                 <span>1 Year Warranty*</span>
               </div>
-              <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
-                <RefreshCw className="w-5 h-5 text-emerald-600" />
-                <span>7 Days Replacement</span>
+              <div
+                onClick={() => {
+                  setActivePage('terms');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1 cursor-pointer hover:border-emerald-300 hover:bg-emerald-50/20 transition group"
+              >
+                <RefreshCw className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                <span className="font-semibold text-gray-900">7 Days Replacement*</span>
+                <span className="text-[10px] text-gray-500 font-normal leading-tight text-center">Transit damage / major defect</span>
+                <span className="text-[10px] text-[#3B429F] font-bold underline mt-0.5">View Terms</span>
               </div>
               <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex flex-col items-center gap-1">
                 <Truck className="w-5 h-5 text-[#3B429F]" />
@@ -426,7 +434,24 @@ export const ProductDetailPage = () => {
               },
               {
                 q: 'How do shipping, delivery and replacement work?',
-                a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+                a: (
+                  <span>
+                    We offer Free Express Delivery across India via reliable logistics partners.{' '}
+                    All products are backed by a <strong>7-Day Hassle-Free Replacement Guarantee</strong> (applies for any problem arising during transit or any major manufacturing defect —{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePage('terms');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[#3B429F] font-bold underline hover:text-[#2B308B] cursor-pointer inline"
+                    >
+                      View Terms
+                    </button>
+                    ) and 1-Year Official Warranty.
+                  </span>
+                )
               }
             ] : product.category === 'speakers-soundbars' ? [
               {
@@ -447,7 +472,24 @@ export const ProductDetailPage = () => {
               },
               {
                 q: 'How do shipping, delivery and replacement work?',
-                a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+                a: (
+                  <span>
+                    We offer Free Express Delivery across India via reliable logistics partners.{' '}
+                    All products are backed by a <strong>7-Day Hassle-Free Replacement Guarantee</strong> (applies for any problem arising during transit or any major manufacturing defect —{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePage('terms');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[#3B429F] font-bold underline hover:text-[#2B308B] cursor-pointer inline"
+                    >
+                      View Terms
+                    </button>
+                    ) and 1-Year Official Warranty.
+                  </span>
+                )
               }
             ] : (product.category === 'car-speakers' || product.id?.includes('speakers')) ? [
               {
@@ -472,7 +514,24 @@ export const ProductDetailPage = () => {
               },
               {
                 q: 'How do shipping, delivery and replacement work?',
-                a: 'A standard shipping fee of ₹199 applies for the speaker set (charges will be paid directly to the shipping company / courier partner). All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+                a: (
+                  <span>
+                    A standard shipping fee of ₹199 applies for the speaker set (charges will be paid directly to the shipping company / courier partner).{' '}
+                    All products are backed by a <strong>7-Day Hassle-Free Replacement Guarantee</strong> (applies for any problem arising during transit or any major manufacturing defect —{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePage('terms');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[#3B429F] font-bold underline hover:text-[#2B308B] cursor-pointer inline"
+                    >
+                      View Terms
+                    </button>
+                    ) and 1-Year Official Warranty.
+                  </span>
+                )
               }
             ] : [
               {
@@ -489,7 +548,24 @@ export const ProductDetailPage = () => {
               },
               {
                 q: 'How do shipping, delivery and replacement work?',
-                a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+                a: (
+                  <span>
+                    We offer Free Express Delivery across India via reliable logistics partners.{' '}
+                    All products are backed by a <strong>7-Day Hassle-Free Replacement Guarantee</strong> (applies for any problem arising during transit or any major manufacturing defect —{' '}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePage('terms');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[#3B429F] font-bold underline hover:text-[#2B308B] cursor-pointer inline"
+                    >
+                      View Terms
+                    </button>
+                    ) and 1-Year Official Warranty.
+                  </span>
+                )
               }
             ]).map((faq, idx) => (
               <div key={idx} className="py-4">
