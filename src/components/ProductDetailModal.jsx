@@ -424,7 +424,7 @@ export const ProductDetailModal = () => {
               },
               {
                 q: 'How do shipping, delivery and replacement work?',
-                a: 'Shipping charges will be paid directly to the shipping company upon delivery. Backed by a 7-Day Replacement Guarantee and 1-Year Official Warranty.'
+                a: 'A standard shipping fee of ₹199 applies for the speaker set (charges will be paid directly to the shipping company / courier partner). Backed by a 7-Day Replacement Guarantee and 1-Year Official Warranty.'
               }
             ] : [
               {

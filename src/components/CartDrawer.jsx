@@ -39,12 +39,23 @@ export const CartDrawer = () => {
       item.product.name?.toUpperCase().includes('AMP')
     )
   );
+
+  const hasSpeakerProduct = cart.some(item => 
+    item && item.product && (
+      item.product.category === 'car-speakers' || 
+      item.product.id === 'voeux-svx001-6inch-speakers' ||
+      item.product.id === 'voeux-svx005-6-5inch-speakers' ||
+      (item.product.name && item.product.name.toLowerCase().includes('speaker') && !item.product.category?.includes('soundbar'))
+    )
+  );
   
   const hasBundleProduct = cart.some(item => 
     item && (item.isBundle || item.noCouponAllowed || (item.product && (item.product.isBundle || item.product.category === 'bundles' || item.product.id?.includes('bundle'))))
   );
   
-  const shippingFee = hasBundleProduct ? 399 : (hasAmpProduct ? 150 : 0);
+  const shippingFee = hasBundleProduct 
+    ? 399 
+    : (hasSpeakerProduct ? 199 : (hasAmpProduct ? 150 : 0));
 
   // Enforce no-coupon rule if cart contains bundle
   useEffect(() => {
