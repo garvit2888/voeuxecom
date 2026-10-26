@@ -401,6 +401,31 @@ export const ProductDetailModal = () => {
                 q: 'What is included in the box?',
                 a: 'Includes VOEUX 160W Convertible Soundbar unit, Subwoofer, Remote Control, 2 Tower Bases, and cables.'
               }
+            ] : (product.category === 'car-speakers' || product.id?.includes('speakers')) ? [
+              {
+                q: 'How do I register for the 1-Year Warranty?',
+                a: 'Click "Register Warranty" in the menu, enter your Order ID, purchase date and email to receive your official Warranty Certificate.'
+              },
+              {
+                q: 'Are these speakers compatible with my car doors?',
+                a: product.name?.includes('6.5')
+                  ? 'Yes! Universal 6.5" (16.51 cm) circular door-mount fitment for front and rear doors of Maruti, Hyundai, Tata, Mahindra, Kia, Honda, Toyota, etc.'
+                  : 'Yes! Universal 6" (15.24 cm) circular door-mount fitment for front and rear doors of Maruti, Hyundai, Tata, Mahindra, Kia, Honda, Toyota, etc.'
+              },
+              {
+                q: 'What is included in the box package?',
+                a: product.name?.includes('6.5')
+                  ? '1 Pair (2 Units) of 6.5" Coaxial Speakers (VE-CS606PT2, 460W Peak / 75W RMS), protective metal mesh grilles, and mounting hardware.'
+                  : '1 Pair (2 Units) of 6" Coaxial Speakers (VE-CS606, 380W Peak / 75W RMS), protective metal mesh grilles, and mounting hardware.'
+              },
+              {
+                q: 'Do I need an external amplifier to run these speakers?',
+                a: 'No. They run directly from your car stereo or Android player thanks to high sensitivity and 75W RMS handling, though an amplifier provides extra punch.'
+              },
+              {
+                q: 'How do shipping, delivery and replacement work?',
+                a: 'Shipping charges will be paid directly to the shipping company upon delivery. Backed by a 7-Day Replacement Guarantee and 1-Year Official Warranty.'
+              }
             ] : [
               {
                 q: 'How do I register for the 1-Year Warranty?',

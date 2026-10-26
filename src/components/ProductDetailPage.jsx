@@ -449,6 +449,31 @@ export const ProductDetailPage = () => {
                 q: 'How do shipping, delivery and replacement work?',
                 a: 'We offer Free Express Delivery across India via reliable logistics partners. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
               }
+            ] : (product.category === 'car-speakers' || product.id?.includes('speakers')) ? [
+              {
+                q: 'How do I register for the 1-Year Official Warranty?',
+                a: 'You can register your warranty in under 60 seconds! Click on "Register Warranty" in the main menu, enter your Certificate ID or Order ID, select your purchase date and email. We will generate your official Warranty Certificate and send it directly to your email.'
+              },
+              {
+                q: 'Are these speakers compatible with my car doors?',
+                a: product.name?.includes('6.5')
+                  ? 'Yes! The VOEUX 6.5-Inch (VE-CS606PT2, 460W) speakers feature a standard 16.51 cm circular door-mount form factor designed to fit factory door speaker slots in front and rear doors of Maruti, Hyundai, Tata, Mahindra, Kia, Honda, Toyota, and most Indian passenger cars.'
+                  : 'Yes! The VOEUX 6-Inch (VE-CS606, 380W) speakers feature a standard 15.24 cm circular door-mount form factor designed to fit factory door slots in Maruti, Hyundai, Tata, Mahindra, Kia, Honda, Toyota, and most Indian passenger cars.'
+              },
+              {
+                q: 'What is included in the box package?',
+                a: product.name?.includes('6.5')
+                  ? 'The package includes 1 Pair (2 Units) of VOEUX Premium 6.5-Inch Coaxial Speakers (VE-CS606PT2, 460W Peak / 75W RMS), 2 protective metal mesh grilles, and mounting screw accessories.'
+                  : 'The package includes 1 Pair (2 Units) of VOEUX Premium 6-Inch Coaxial Speakers (VE-CS606, 380W Peak / 75W RMS), 2 protective metal mesh grilles, and mounting screw accessories.'
+              },
+              {
+                q: 'Do I need a separate amplifier to run these speakers?',
+                a: 'No, an external amplifier is not required! With high sensitivity (91-93 dB) and rated 75W RMS handling, these 2-way coaxial speakers can run directly off your factory stereo or aftermarket Android player. Connecting them to an external amplifier delivers even punchier bass.'
+              },
+              {
+                q: 'How do shipping, delivery and replacement work?',
+                a: 'Shipping charges will be paid directly to the shipping company upon delivery. All products are backed by a 7-Day Hassle-Free Replacement Guarantee and 1-Year Official Warranty.'
+              }
             ] : [
               {
                 q: 'How do I register for the 1-Year Official Warranty?',

@@ -786,6 +786,14 @@ export const CartDrawer = () => {
                   <span>Total Amount Payable</span>
                   <span className="text-[#3B429F]">₹{finalTotal.toLocaleString('en-IN')}</span>
                 </div>
+
+                {/* Shipping notice */}
+                <div className="p-2.5 bg-indigo-50/80 border border-indigo-200/80 rounded-xl flex items-start gap-2 text-[11px] text-indigo-950 font-medium leading-relaxed mt-2">
+                  <Truck className="w-4 h-4 text-[#3B429F] shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Note:</strong> Shipping charges will be paid directly to the shipping company.
+                  </span>
+                </div>
               </div>
 
               {/* Payment Info */}
@@ -814,6 +822,10 @@ export const CartDrawer = () => {
                 <span>Total Amount Due</span>
                 <span className="text-lg text-[#3B429F]">₹{finalTotal.toLocaleString('en-IN')}</span>
               </div>
+              <p className="text-[11px] text-gray-500 flex items-center justify-center gap-1.5 font-medium">
+                <Truck className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <span>Shipping charges will be paid directly to the shipping company</span>
+              </p>
 
               <div className="flex gap-3">
                 <button
@@ -876,6 +888,10 @@ export const CartDrawer = () => {
               <div className="flex justify-between border-b border-gray-200/60 pb-2">
                 <span className="text-gray-500 font-medium">Delivery Address:</span>
                 <span className="font-semibold text-gray-900 text-right">{lastPlacedOrder.shippingAddress?.city} - {lastPlacedOrder.shippingAddress?.pincode}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200/60 pb-2">
+                <span className="text-gray-500 font-medium">Shipping Payment:</span>
+                <span className="font-semibold text-gray-900 text-right">Paid directly to the shipping company</span>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-gray-500 font-medium">Payment Mode:</span>
