@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useShop } from '../context/ShopContext';
 import {
   FileText,
   Building2,
@@ -11,10 +12,12 @@ import {
   Printer,
   ChevronRight,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from 'lucide-react';
 
 export const DistributorApplicationForm = () => {
+  const { setActivePage } = useShop();
   const GOOGLE_SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJ8McdwGLCM2q9-lcSoDA22F7U0leONZ8ryBYKZ8kCPGYxbb-KqL7jVzYhC2IHiF-nmw/exec';
 
   const [formData, setFormData] = useState({
@@ -39,7 +42,6 @@ export const DistributorApplicationForm = () => {
 
     // Section 3: Sales Potential & Investment
     projectedMonthlyVolume: '100–149 units',
-    salesStrategy: '',
     initialInvestment: '₹2–5 lakh',
 
     // Section 4: Commitment & Advantage
@@ -70,13 +72,8 @@ export const DistributorApplicationForm = () => {
       return;
     }
 
-    if (!formData.salesStrategy.trim()) {
-      alert('Please provide your strategy for achieving 100+ units per month (Question 11).');
-      return;
-    }
-
     if (!formData.competitiveAdvantage.trim()) {
-      alert('Please describe your competitive advantage and why VOEUX should select your firm (Question 14).');
+      alert('Please describe your competitive advantage and why VOEUX should select your firm (Question 13).');
       return;
     }
 
@@ -118,8 +115,7 @@ export const DistributorApplicationForm = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmittedApplication(payload);
-      const formEl = document.getElementById('distributor-application-form');
-      if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 1200);
   };
 
@@ -132,8 +128,23 @@ export const DistributorApplicationForm = () => {
   };
 
   return (
-    <div id="distributor-application-form" className="bg-white py-12 sm:py-16 border-t border-gray-200">
+    <div id="distributor-application-form" className="min-h-screen bg-white py-12 sm:py-16">
       <div className="container mx-auto px-4 max-w-3xl space-y-8 text-gray-900 text-left">
+
+        {/* Back to Distributor Program Overview */}
+        <div>
+          <button
+            type="button"
+            onClick={() => {
+              setActivePage('join-us');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-[#3B429F] transition cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Distributor Program Overview</span>
+          </button>
+        </div>
 
         {/* Document Header (Identical to Warranty Registration Portal style) */}
         <div className="border-b border-gray-200 pb-6 space-y-2">
@@ -507,31 +518,10 @@ export const DistributorApplicationForm = () => {
                 </div>
               </div>
 
-              {/* Q11: Strategy for 100+ units */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-gray-900 font-bold block uppercase tracking-wide">
-                    11. What is your strategy for achieving 100+ VOEUX units per month in your city? *
-                  </label>
-                  <span className="text-[10px] text-red-600 font-bold uppercase">Required</span>
-                </div>
-                <textarea
-                  required
-                  rows={4}
-                  placeholder="Describe your dealer network, sales team, local market reach, and approach to acquiring new car accessory dealers..."
-                  value={formData.salesStrategy}
-                  onChange={e => setFormData({ ...formData, salesStrategy: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-xs text-gray-900 focus:outline-none focus:border-[#3B429F] leading-relaxed"
-                />
-                <span className="text-[11px] text-gray-500 block">
-                  Guidance: Detail your existing dealer connections, sales personnel allocation, territory coverage plan, and local promotional approach.
-                </span>
-              </div>
-
-              {/* Q12: Initial Investment Allocation */}
+              {/* Q11: Initial Investment Allocation */}
               <div className="space-y-2">
                 <label className="text-gray-900 font-bold block uppercase tracking-wide">
-                  12. What initial working capital / inventory investment are you prepared to allocate to VOEUX? *
+                  11. What initial working capital / inventory investment are you prepared to allocate to VOEUX? *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2">
                   {[
@@ -571,10 +561,10 @@ export const DistributorApplicationForm = () => {
                 <span className="text-[11px] text-[#3B429F] font-semibold lowercase">step 4 of 4</span>
               </h3>
 
-              {/* Q13: Dedicated Sales Team */}
+              {/* Q12: Dedicated Sales Team */}
               <div className="space-y-2">
                 <label className="text-gray-900 font-bold block uppercase tracking-wide">
-                  13. Do you have a dedicated sales team or field representatives to promote VOEUX to local dealers? *
+                  12. Do you have a dedicated sales team or field representatives to promote VOEUX to local dealers? *
                 </label>
                 <div className="space-y-2">
                   {[
@@ -605,11 +595,11 @@ export const DistributorApplicationForm = () => {
                 </div>
               </div>
 
-              {/* Q14: Competitive Advantage */}
+              {/* Q13: Competitive Advantage */}
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <label className="text-gray-900 font-bold block uppercase tracking-wide">
-                    14. Why should VOEUX select your business as its authorised distributor, and what competitive advantage can you bring to your city? *
+                    13. Why should VOEUX select your business as its authorised distributor, and what competitive advantage can you bring to your city? *
                   </label>
                   <span className="text-[10px] text-red-600 font-bold uppercase">Required</span>
                 </div>
@@ -734,6 +724,18 @@ export const DistributorApplicationForm = () => {
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Application Summary</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActivePage('join-us');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Distributor Overview</span>
               </button>
 
               <button

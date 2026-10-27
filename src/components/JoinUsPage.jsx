@@ -8,7 +8,6 @@ import {
   MapPin,
   FileText
 } from 'lucide-react';
-import { DistributorApplicationForm } from './DistributorApplicationForm';
 
 export const JoinUsPage = () => {
   const { setActivePage } = useShop();
@@ -16,11 +15,9 @@ export const JoinUsPage = () => {
   const whatsappMessage = encodeURIComponent("hi i am interested to know more about voeux official distributor program");
   const whatsappUrl = `https://api.whatsapp.com/send?phone=919999484530&text=${whatsappMessage}`;
 
-  const handleScrollToForm = () => {
-    const el = document.getElementById('distributor-application-form');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const handleApplyClick = () => {
+    setActivePage('distributor-application');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -46,7 +43,7 @@ export const JoinUsPage = () => {
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               type="button"
-              onClick={handleScrollToForm}
+              onClick={handleApplyClick}
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#3B429F] hover:bg-[#2B308B] text-white font-extrabold text-sm tracking-wide transition flex items-center justify-center gap-2.5 shadow-xl shadow-indigo-950/40 cursor-pointer"
             >
               <FileText className="w-5 h-5" />
@@ -166,9 +163,6 @@ export const JoinUsPage = () => {
 
       </section>
 
-      {/* ==================== CITY DISTRIBUTOR APPLICATION & EVALUATION FORM ==================== */}
-      <DistributorApplicationForm />
-
       {/* ==================== FINAL CALL TO ACTION ==================== */}
       <section className="relative w-full bg-slate-900 text-white py-20 px-6 sm:px-12 text-center overflow-hidden group transition-all duration-700">
         
@@ -183,14 +177,14 @@ export const JoinUsPage = () => {
               Ready To Grow With VOEUX®?
             </h3>
             <p className="text-slate-300 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-              Complete the distributor application above or message our corporate onboarding manager directly via WhatsApp.
+              Complete the online distributor application or message our corporate onboarding manager directly via WhatsApp.
             </p>
           </div>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
             <button
               type="button"
-              onClick={handleScrollToForm}
+              onClick={handleApplyClick}
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#3B429F] hover:bg-[#2B308B] text-white font-extrabold text-sm tracking-wide transition flex items-center justify-center gap-2.5 shadow-xl shadow-indigo-950/40 cursor-pointer"
             >
               <FileText className="w-5 h-5" />

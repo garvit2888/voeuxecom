@@ -5,6 +5,7 @@ import { Hero } from './components/Hero';
 import { ProductCard } from './components/ProductCard';
 import { CategoryPage } from './components/CategoryPage';
 import { JoinUsPage } from './components/JoinUsPage';
+import { DistributorApplicationForm } from './components/DistributorApplicationForm';
 import { WarrantyPortal } from './components/WarrantyPortal';
 import { InstallationPortal } from './components/InstallationPortal';
 import { DealerLocator } from './components/DealerLocator';
@@ -136,6 +137,10 @@ const MainContent = () => {
       case 'join-us':
       case 'distributor-program':
         return <JoinUsPage />;
+      case 'distributor-application':
+      case 'distributor-form':
+      case 'apply-distributor':
+        return <DistributorApplicationForm />;
       case 'about-us':
         return <AboutUs />;
       case 'contact-us':
