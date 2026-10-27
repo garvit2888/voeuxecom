@@ -302,6 +302,125 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // ==================== 1C. VOEUX DISTRIBUTOR PROGRAM APPLICATIONS ====================
+    if (data.type === 'DISTRIBUTOR_APPLICATION' || data.action === 'distributor_application') {
+      var SPREADSHEET_ID = "1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E";
+      var ss = null;
+      try {
+        ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      } catch(eOpen) {
+        ss = SpreadsheetApp.getActiveSpreadsheet();
+      }
+
+      if (ss) {
+        var distSheet = ss.getSheetByName("Distributor Applications");
+        if (!distSheet) {
+          distSheet = ss.insertSheet("Distributor Applications");
+        }
+        if (distSheet.getLastRow() === 0) {
+          distSheet.appendRow([
+            "Application ID",
+            "Submission Timestamp",
+            "Applicant Name",
+            "Firm / Business Name",
+            "Phone / WhatsApp",
+            "Email Address",
+            "Target City & State",
+            "Primary Business Activity",
+            "Other Activity Details",
+            "Years in Business",
+            "Active Dealers Supplied",
+            "Product Categories Handled",
+            "Brands & Monthly Volume",
+            "Realistic 90-Day Dealer Onboarding",
+            "Projected Monthly Volume (3-6 Months)",
+            "Initial Working Capital Allocation",
+            "Sales Team Setup",
+            "Competitive Advantage / Strategy",
+            "Status"
+          ]);
+
+          // Format Header Row
+          var headerRange = distSheet.getRange(1, 1, 1, 19);
+          headerRange.setFontWeight("bold");
+          headerRange.setBackground("#3B429F");
+          headerRange.setFontColor("#FFFFFF");
+          distSheet.setFrozenRows(1);
+        }
+
+        var categoriesStr = Array.isArray(data.productCategories) 
+          ? data.productCategories.join(", ") 
+          : (data.productCategories || "");
+
+        distSheet.appendRow([
+          data.applicationId || '',
+          data.submittedAt || new Date().toLocaleString('en-IN'),
+          data.applicantName || '',
+          data.firmName || '',
+          data.phone || '',
+          data.email || '',
+          data.targetLocation || '',
+          data.primaryActivity || '',
+          data.otherActivity || '',
+          data.yearsInBusiness || '',
+          data.activeDealersCount || '',
+          categoriesStr,
+          data.brandsHandledAndVolume || '',
+          data.onboardDealers90Days || '',
+          data.projectedMonthlyVolume || '',
+          data.initialInvestment || '',
+          data.salesTeamSetup || '',
+          data.competitiveAdvantage || '',
+          data.status || 'UNDER_REVIEW'
+        ]);
+      }
+
+      // Email Notification to VOEUX Business Development Team
+      try {
+        var subjectDist = "💼 NEW DISTRIBUTOR APPLICATION: " + (data.firmName || data.applicantName || 'Applicant') + " (" + (data.targetLocation || 'India') + ") [" + (data.applicationId || '') + "]";
+        var bodyDist = "VOEUX® AUTHORISED CITY DISTRIBUTOR APPLICATION\n" +
+          "====================================================\n" +
+          "Reference ID: " + (data.applicationId || '') + "\n" +
+          "Submission Time: " + (data.submittedAt || new Date().toLocaleString('en-IN')) + "\n" +
+          "Status: UNDER REVIEW\n\n" +
+          "APPLICANT & FIRM PROFILE:\n" +
+          "----------------------------------------------------\n" +
+          "Applicant Name: " + (data.applicantName || '') + "\n" +
+          "Firm / Business: " + (data.firmName || '') + "\n" +
+          "Target Territory: " + (data.targetLocation || '') + "\n" +
+          "Phone / WhatsApp: " + (data.phone || '') + "\n" +
+          "Official Email: " + (data.email || '') + "\n" +
+          "Primary Activity: " + (data.primaryActivity || '') + (data.otherActivity ? " (" + data.otherActivity + ")" : "") + "\n" +
+          "Years in Business: " + (data.yearsInBusiness || '') + "\n\n" +
+          "DISTRIBUTION CAPABILITY & PROJECTIONS:\n" +
+          "----------------------------------------------------\n" +
+          "Active Dealers Supplied: " + (data.activeDealersCount || '') + "\n" +
+          "Product Categories: " + (Array.isArray(data.productCategories) ? data.productCategories.join(', ') : data.productCategories) + "\n" +
+          "Brands Handled & Volume: " + (data.brandsHandledAndVolume || '') + "\n" +
+          "Expected 90-Day Dealer Onboarding: " + (data.onboardDealers90Days || '') + "\n" +
+          "Projected Monthly Volume (3-6 mo): " + (data.projectedMonthlyVolume || '') + "\n" +
+          "Initial Working Capital Allocation: " + (data.initialInvestment || '') + "\n" +
+          "Dedicated Sales Team: " + (data.salesTeamSetup || '') + "\n\n" +
+          "COMPETITIVE ADVANTAGE & WHY VOEUX SHOULD SELECT:\n" +
+          "----------------------------------------------------\n" +
+          (data.competitiveAdvantage || 'N/A') + "\n\n" +
+          "====================================================\n" +
+          "WhatsApp Direct Link: https://api.whatsapp.com/send?phone=91" + String(data.phone).replace(/[^0-9]/g, '') + "\n" +
+          "Google Sheet: https://docs.google.com/spreadsheets/d/1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E/edit";
+
+        MailApp.sendEmail({
+          to: "voeuxoffice@gmail.com,voeuxexperience@gmail.com",
+          subject: subjectDist,
+          body: bodyDist,
+          name: "VOEUX® Distributor Bot"
+        });
+      } catch(eMail) {}
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "success", applicationId: data.applicationId }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // ==================== 2. WARRANTY REGISTRATION & EMAIL ====================
     var SPREADSHEET_ID = "1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E";
     var sheet = null;

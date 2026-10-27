@@ -3,7 +3,8 @@ import {
   ShieldCheck, Play, Clock, Package, Mail, Zap, CheckCircle, CheckCircle2,
   AlertCircle, RefreshCw, Eye, EyeOff, Boxes, Truck, FileText,
   Bell, Activity, Settings, TrendingUp, X, Server, Globe, Database,
-  Lock, ExternalLink, Layers, Cpu, Terminal, Check, Sliders
+  Lock, ExternalLink, Layers, Cpu, Terminal, Check, Sliders,
+  Building2, Download, Search, MessageSquare
 } from 'lucide-react';
 
 const CONFIG = {
@@ -84,6 +85,20 @@ export const FlipkartOpsAdmin = () => {
     { time: '17:05:05', type: 'SYNC', msg: 'Real-time Catalog Price Scraper synced 4 FSN listings with zero price variance' },
     { time: '17:05:10', type: 'SYSTEM', msg: 'Scheduled Daily Trigger ready for 11:00 AM IST execution' }
   ]);
+
+  // Distributor Applications Review State
+  const [distributorApps, setDistributorApps] = useState([]);
+  const [distSearch, setDistSearch] = useState('');
+  const [selectedAppModal, setSelectedAppModal] = useState(null);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('voeux_distributor_applications') || '[]');
+      setDistributorApps(stored);
+    } catch (e) {
+      setDistributorApps([]);
+    }
+  }, [activeTab]);
 
   const showToast = (msg, type = 'info') => {
     setToast({ msg, type });
@@ -272,6 +287,7 @@ export const FlipkartOpsAdmin = () => {
         <div className="flex border-b border-slate-800 gap-2 overflow-x-auto pb-1 scrollbar-none">
           {[
             { id: 'overview', label: 'System Overview & Health', icon: Activity },
+            { id: 'distributors', label: 'Distributor Applications', icon: Building2 },
             { id: 'inventory', label: 'Realtime Price & Stock Sync Matrix', icon: Database },
             { id: 'orders', label: 'Automated Order & Invoice Pipeline', icon: Package },
             { id: 'webhooks', label: 'API Webhooks & Endpoints', icon: Server },
@@ -672,6 +688,304 @@ export const FlipkartOpsAdmin = () => {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* TAB 6: DISTRIBUTOR APPLICATIONS REVIEW */}
+        {activeTab === 'distributors' && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Header / Actions Card */}
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block">
+                  VOEUX® B2B EXPANSION PORTAL
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-white">
+                  Authorised City Distributor Applications
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Real-time applications submitted from the website and automatically logged into Google Sheets.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="https://docs.google.com/spreadsheets/d/1e0YB-NMRJd3PsWVL130zAGty_blg8XrQwNKvq4IA24E/edit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/40"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Open in Google Sheets</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const csvRows = [
+                      ['Reference ID', 'Date', 'Applicant Name', 'Firm Name', 'Phone', 'Email', 'City & State', 'Primary Activity', 'Projected Monthly Sales', 'Initial Capital', 'Sales Team', 'Competitive Pitch'].join(',')
+                    ];
+                    distributorApps.forEach(app => {
+                      csvRows.push([
+                        `"${app.applicationId || ''}"`,
+                        `"${app.submittedAt || ''}"`,
+                        `"${(app.applicantName || '').replace(/"/g, '""')}"`,
+                        `"${(app.firmName || '').replace(/"/g, '""')}"`,
+                        `"${app.phone || ''}"`,
+                        `"${app.email || ''}"`,
+                        `"${(app.targetLocation || '').replace(/"/g, '""')}"`,
+                        `"${(app.primaryActivity || '').replace(/"/g, '""')}"`,
+                        `"${(app.projectedMonthlyVolume || '').replace(/"/g, '""')}"`,
+                        `"${(app.initialInvestment || '').replace(/"/g, '""')}"`,
+                        `"${(app.salesTeamSetup || '').replace(/"/g, '""')}"`,
+                        `"${(app.competitiveAdvantage || '').replace(/"/g, '""')}"`
+                      ].join(','));
+                    });
+                    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', `voeux_distributor_applications_${new Date().toISOString().slice(0, 10)}.csv`);
+                    a.click();
+                  }}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-slate-700"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export CSV</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Google Sheets Tab Guide Notice */}
+            <div className="bg-indigo-950/40 border border-indigo-500/30 rounded-2xl p-4 flex items-start gap-3 text-xs text-indigo-200">
+              <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold text-white block">Automatic Google Sheet Tab: "Distributor Applications"</span>
+                <p className="text-slate-300 leading-relaxed text-[11px]">
+                  All submitted applications are posted via Google Apps Script directly to your VOEUX Google Sheet under the <strong className="text-white">"Distributor Applications"</strong> tab. Instant alerts with applicant dossiers are also emailed to <span className="text-white font-mono">voeuxoffice@gmail.com</span> & <span className="text-white font-mono">voeuxexperience@gmail.com</span>.
+                </p>
+              </div>
+            </div>
+
+            {/* Filter Search */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by applicant name, firm, or city..."
+                  value={distSearch}
+                  onChange={e => setDistSearch(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <span className="text-xs text-slate-400">
+                Total: <strong className="text-white">{distributorApps.length}</strong> applications
+              </span>
+            </div>
+
+            {/* Applications Table */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                    <tr>
+                      <th className="py-3 px-4">Ref ID</th>
+                      <th className="py-3 px-4">Applicant & Firm</th>
+                      <th className="py-3 px-4">City / State</th>
+                      <th className="py-3 px-4">Contact</th>
+                      <th className="py-3 px-4">Target Volume</th>
+                      <th className="py-3 px-4">Capital</th>
+                      <th className="py-3 px-4">Date</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 text-slate-200">
+                    {distributorApps
+                      .filter(app => {
+                        const q = distSearch.toLowerCase();
+                        return (
+                          (app.applicantName || '').toLowerCase().includes(q) ||
+                          (app.firmName || '').toLowerCase().includes(q) ||
+                          (app.targetLocation || '').toLowerCase().includes(q) ||
+                          (app.applicationId || '').toLowerCase().includes(q)
+                        );
+                      })
+                      .map((app, idx) => (
+                        <tr key={app.applicationId || idx} className="hover:bg-slate-800/40 transition">
+                          <td className="py-3.5 px-4 font-mono font-bold text-indigo-400">
+                            {app.applicationId || 'N/A'}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-bold text-white block">{app.applicantName}</span>
+                            <span className="text-slate-400 text-[11px]">{app.firmName}</span>
+                          </td>
+                          <td className="py-3.5 px-4 font-medium text-slate-300">
+                            {app.targetLocation}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-[11px] text-slate-300">
+                            <div>{app.phone}</div>
+                            <div className="text-slate-500 text-[10px] truncate max-w-[140px]">{app.email}</div>
+                          </td>
+                          <td className="py-3.5 px-4 font-bold text-emerald-400">
+                            {app.projectedMonthlyVolume}
+                          </td>
+                          <td className="py-3.5 px-4 font-semibold text-slate-300">
+                            {app.initialInvestment}
+                          </td>
+                          <td className="py-3.5 px-4 text-slate-400 text-[11px]">
+                            {app.submittedAt}
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <a
+                                href={`https://api.whatsapp.com/send?phone=91${String(app.phone).replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${app.applicantName}, regarding your VOEUX City Distributorship application (${app.applicationId}) for ${app.firmName} in ${app.targetLocation}...`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg transition"
+                                title="Chat on WhatsApp"
+                              >
+                                <MessageSquare className="w-3.5 h-3.5" />
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedAppModal(app)}
+                                className="px-2.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-lg transition text-[11px] font-semibold"
+                              >
+                                View Dossier
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+
+                    {distributorApps.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="py-12 text-center text-slate-500">
+                          <Building2 className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                          <span>No distributor applications logged yet. Test by submitting an application on the portal!</span>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Dossier Detail Modal */}
+            {selectedAppModal && (
+              <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto text-left">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block">
+                        APPLICATION DOSSIER
+                      </span>
+                      <h3 className="text-lg font-black text-white">
+                        {selectedAppModal.firmName} ({selectedAppModal.applicationId})
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAppModal(null)}
+                      className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Applicant Name</span>
+                      <span className="text-white font-semibold">{selectedAppModal.applicantName}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">City & State</span>
+                      <span className="text-white font-semibold">{selectedAppModal.targetLocation}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Phone / WhatsApp</span>
+                      <span className="text-white font-mono">{selectedAppModal.phone}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Email</span>
+                      <span className="text-white font-mono">{selectedAppModal.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Primary Activity</span>
+                      <span className="text-white font-semibold">{selectedAppModal.primaryActivity}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Years in Business</span>
+                      <span className="text-white font-semibold">{selectedAppModal.yearsInBusiness}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Active Dealers Supplied</span>
+                      <span className="text-white font-semibold">{selectedAppModal.activeDealersCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Expected 90-Day Onboarding</span>
+                      <span className="text-white font-semibold">{selectedAppModal.onboardDealers90Days}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Projected Monthly Sales</span>
+                      <span className="text-emerald-400 font-bold">{selectedAppModal.projectedMonthlyVolume}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Initial Capital Allocation</span>
+                      <span className="text-white font-semibold">{selectedAppModal.initialInvestment}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-xs border-t border-slate-800 pt-3">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Product Categories</span>
+                    <span className="text-slate-200">
+                      {Array.isArray(selectedAppModal.productCategories) ? selectedAppModal.productCategories.join(', ') : selectedAppModal.productCategories}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1 text-xs border-t border-slate-800 pt-3">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Brands Handled & Monthly Volume</span>
+                    <p className="text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed">
+                      {selectedAppModal.brandsHandledAndVolume || 'N/A'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1 text-xs border-t border-slate-800 pt-3">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Dedicated Sales Team</span>
+                    <span className="text-slate-200">{selectedAppModal.salesTeamSetup}</span>
+                  </div>
+
+                  <div className="space-y-1 text-xs border-t border-slate-800 pt-3">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Competitive Advantage / Strategy</span>
+                    <p className="text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line">
+                      {selectedAppModal.competitiveAdvantage || 'N/A'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+                    <a
+                      href={`https://api.whatsapp.com/send?phone=91${String(selectedAppModal.phone).replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${selectedAppModal.applicantName}, regarding your VOEUX City Distributorship application (${selectedAppModal.applicationId}) for ${selectedAppModal.firmName} in ${selectedAppModal.targetLocation}...`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-2"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Chat on WhatsApp</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAppModal(null)}
+                      className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition"
+                    >
+                      Close Dossier
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
