@@ -533,9 +533,8 @@ export const DistributorApplicationForm = () => {
                 <label className="text-gray-900 font-bold block uppercase tracking-wide">
                   12. What initial working capital / inventory investment are you prepared to allocate to VOEUX? *
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2">
                   {[
-                    'Below ₹1 lakh',
                     '₹1–2 lakh',
                     '₹2–5 lakh',
                     '₹5–10 lakh',
