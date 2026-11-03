@@ -165,6 +165,9 @@ const MainContent = () => {
               </div>
             </section>
 
+            {/* VOEUX – Built for Your Drive (About Us Homepage Section) */}
+            <AboutUs />
+
             {/* Customer Assistance & Verified Experience Section */}
             <CustomerAssistanceReviews />
 

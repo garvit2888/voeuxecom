@@ -310,7 +310,13 @@ export const Navbar = () => {
                 </h3>
                 <div className="space-y-3 font-condensed text-xl sm:text-2xl font-normal uppercase text-white tracking-wide">
                   <button
-                    onClick={() => { setActivePage('about-us'); setIsMobileMenuOpen(false); }}
+                    onClick={() => {
+                      setActivePage('home');
+                      setIsMobileMenuOpen(false);
+                      setTimeout(() => {
+                        document.getElementById('about-us-section')?.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                    }}
                     className="block w-full text-left transition hover:text-indigo-300 cursor-pointer"
                   >
                     ABOUT US

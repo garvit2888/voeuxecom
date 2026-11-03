@@ -88,7 +88,19 @@ export const Footer = () => {
           <div className="space-y-2.5">
             <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Services & Information</h4>
             <ul className="space-y-2 text-slate-300">
-              <li><button onClick={() => setActivePage('about-us')} className="hover:text-cyan-400 transition cursor-pointer">About Us</button></li>
+              <li>
+                <button
+                  onClick={() => {
+                    setActivePage('home');
+                    setTimeout(() => {
+                      document.getElementById('about-us-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="hover:text-cyan-400 transition cursor-pointer"
+                >
+                  About Us
+                </button>
+              </li>
               <li><button onClick={() => setActivePage('join-us')} className="hover:text-cyan-400 transition cursor-pointer">Official Distributor Program</button></li>
               <li><button onClick={() => setActivePage('warranty-policy')} className="hover:text-cyan-400 transition cursor-pointer">Repairs & Warranty Policy</button></li>
               <li><button onClick={() => setActivePage('warranty')} className="hover:text-cyan-400 transition cursor-pointer">Warranty Register Portal</button></li>
