@@ -95,7 +95,7 @@ export const Hero = () => {
   }, [slides.length]);
 
   return (
-    <section className="bg-black border-b border-gray-800">
+    <section id="hero-section" className="bg-black border-b border-gray-800">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
       <div className="md:hidden relative min-h-screen bg-black text-white flex flex-col items-center justify-center pt-2 pb-24 px-4 overflow-x-hidden">

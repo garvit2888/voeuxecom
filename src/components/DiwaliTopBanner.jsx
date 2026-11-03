@@ -1,162 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { useShop } from '../context/ShopContext';
+import React from 'react';
 import { DiyaIcon } from './DiyaIcon';
-import { Sparkles, Tag, ArrowRight, Eye } from 'lucide-react';
-import { isDiwaliSaleActive, DIWALI_CONFIG } from '../utils/diwaliOffers';
+import { DiwaliCountdownTimer } from './DiwaliCountdownTimer';
+import { ChevronDown } from 'lucide-react';
 
 /**
  * Top Diwali Announcement Section
- * Positioned below the Navigation bar and on top of the Hero carousel.
- * Featuring traditional glowing diyas, festival branding, and discount highlights.
+ * Covers the whole screen across desktop, laptop, tablet, and mobile.
+ * Pure black background with giant glowing Diyas, grand "VOEUX DIWALI DHAMAKA SALE",
+ * and the countdown timer placed directly below the title and above "Explore Offers".
  */
 export const DiwaliTopBanner = () => {
-  const { setActivePage } = useShop();
-  const [saleActive, setSaleActive] = useState(() => isDiwaliSaleActive());
-  const [mode, setMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('voeux_diwali_mode') || 'auto';
-    }
-    return 'auto';
-  });
-
-  useEffect(() => {
-    const check = () => setSaleActive(isDiwaliSaleActive());
-    check();
-    const interval = setInterval(check, 1000);
-    return () => clearInterval(interval);
-  }, [mode]);
-
-  const toggleTestMode = () => {
-    const next = mode === 'active' ? 'countdown' : (mode === 'countdown' ? 'auto' : 'active');
-    setMode(next);
-    if (next === 'auto') {
-      localStorage.removeItem('voeux_diwali_mode');
+  const scrollToContent = () => {
+    const heroEl = document.getElementById('hero-section');
+    if (heroEl) {
+      heroEl.scrollIntoView({ behavior: 'smooth' });
     } else {
-      localStorage.setItem('voeux_diwali_mode', next);
+      window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
     }
-    window.location.reload();
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-[#0b0c1e] via-[#1a1843] to-[#0b0c1e] text-white border-b border-amber-500/40 shadow-xl">
-      {/* Background Decorative Festive Sparks */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute -left-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute -right-10 -top-10 w-40 h-40 bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
+    <section className="relative w-full min-h-[100dvh] bg-black text-white flex flex-col justify-between items-center px-4 py-8 sm:py-12 overflow-hidden select-none">
+      
+      {/* Radiant Festive Warm Radial Lighting Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/20 via-orange-600/5 to-transparent pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[50vh] bg-amber-400/10 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="container mx-auto px-4 py-4 sm:py-5 relative z-10">
+      {/* Top Spacer for balanced vertical centering */}
+      <div className="w-full h-4 sm:h-8" />
+
+      {/* Main Full-Screen Centerpiece */}
+      <div className="container mx-auto px-4 relative z-10 flex flex-col items-center justify-center my-auto">
         
-        {/* Main Banner Header with Diyas */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-center">
+        {/* Diyas & Grand Title */}
+        <div className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-10 md:gap-12 lg:gap-16 text-center">
           
-          {/* Left Diya */}
-          <div className="hidden sm:flex items-center gap-2">
-            <DiyaIcon className="w-8 h-8 sm:w-10 sm:h-10 transform -scale-x-100" />
+          {/* Left Diya (Large & Glowing with Flame Animation) */}
+          <div className="shrink-0 flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(245,158,11,0.6)]">
+            <DiyaIcon className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-44 lg:h-44 transform -scale-x-100" />
           </div>
 
-          {/* Central Title & Dates */}
-          <div className="space-y-1.5 flex flex-col items-center">
-            
-            {/* Small Festive Tag */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/25 to-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-black tracking-widest uppercase shadow-sm">
-              <span className="sm:hidden"><DiyaIcon className="w-4 h-4" /></span>
-              <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-spin" />
-              <span>VOEUX® FESTIVE CELEBRATION</span>
-              <span className="sm:hidden"><DiyaIcon className="w-4 h-4 transform -scale-x-100" /></span>
-            </div>
-
-            {/* Main Headline */}
-            <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 drop-shadow-sm leading-tight uppercase">
+          {/* Grand Headline */}
+          <div className="flex-1 max-w-4xl px-2">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight uppercase bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 drop-shadow-[0_4px_30px_rgba(245,158,11,0.55)] leading-[1.08]">
               VOEUX DIWALI DHAMAKA SALE
-            </h2>
-            <div className="text-xs sm:text-base font-extrabold text-amber-300 tracking-wider uppercase">
-              VOEUX DIWALI SALE FROM 4TH NOVEMBER TO 8TH NOVEMBER
-            </div>
-
-            {/* Sub-tagline */}
-            <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-2xl leading-relaxed">
-              {saleActive ? (
-                <span className="text-emerald-300 font-bold flex items-center justify-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                  DHAMAKA OFFERS ARE NOW LIVE! Extra Festive Discounts Applied Storewide.
-                </span>
-              ) : (
-                <span>
-                  India's Biggest In-Car Audio & Stereo Dhamaka Drops at <strong className="text-amber-300">12:00 AM Midnight, 4th November</strong>!
-                </span>
-              )}
-            </p>
+            </h1>
           </div>
 
-          {/* Right Diya */}
-          <div className="hidden sm:flex items-center gap-2">
-            <DiyaIcon className="w-8 h-8 sm:w-10 sm:h-10" />
+          {/* Right Diya (Large & Glowing with Flame Animation) */}
+          <div className="shrink-0 flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(245,158,11,0.6)]">
+            <DiyaIcon className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-44 lg:h-44" />
           </div>
+
         </div>
 
-        {/* Quick Offer Highlights Pills */}
-        <div className="mt-3 sm:mt-4 pt-3 border-t border-amber-500/20 flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-[11px] sm:text-xs font-bold text-slate-200">
-          <button
-            type="button"
-            onClick={() => setActivePage('android-players')}
-            className="px-3 py-1.5 rounded-lg bg-black/40 hover:bg-amber-500/20 border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer text-amber-200"
-          >
-            <Tag className="w-3 h-3 text-amber-400" />
-            <span>₹500 OFF Android Players</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePage('car-speakers')}
-            className="px-3 py-1.5 rounded-lg bg-black/40 hover:bg-amber-500/20 border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer text-amber-200"
-          >
-            <Tag className="w-3 h-3 text-amber-400" />
-            <span>₹500 OFF Car Speakers</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePage('speakers-soundbars')}
-            className="px-3 py-1.5 rounded-lg bg-black/40 hover:bg-amber-500/20 border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer text-amber-200"
-          >
-            <Tag className="w-3 h-3 text-amber-400" />
-            <span>₹250 OFF 160W Soundbar</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePage('subwoofers')}
-            className="px-3 py-1.5 rounded-lg bg-black/40 hover:bg-amber-500/20 border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer text-amber-200"
-          >
-            <Tag className="w-3 h-3 text-amber-400" />
-            <span>₹1,000 OFF Underseat Sub</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePage('bundles')}
-            className="px-3 py-1.5 rounded-lg bg-black/40 hover:bg-amber-500/20 border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer text-amber-200"
-          >
-            <Tag className="w-3 h-3 text-amber-400" />
-            <span>₹500 OFF All Combos</span>
-          </button>
-        </div>
-
-        {/* Developer / Testing Switch for Branch Testing */}
-        <div className="mt-2.5 flex items-center justify-center gap-3 text-[10px] text-slate-400">
-          <span className="font-mono">Testing Branch Mode: <strong className="text-amber-300 font-bold uppercase">{mode}</strong></span>
-          <button
-            type="button"
-            onClick={toggleTestMode}
-            className="px-2.5 py-0.5 rounded-md bg-white/10 hover:bg-white/20 text-white font-semibold transition border border-white/20 cursor-pointer flex items-center gap-1"
-            title="Switch between Realtime Clock, Forced Live Sale, and Forced Countdown mode"
-          >
-            <Eye className="w-3 h-3 text-amber-300" />
-            <span>Toggle Test Mode ({mode === 'active' ? 'Sale Live' : (mode === 'countdown' ? 'Countdown' : 'Auto')})</span>
-          </button>
-        </div>
+        {/* DIWALI COUNTDOWN BELOW VOEUX DIWALI DHAMAKA SALE & ABOVE EXPLORE OFFERS */}
+        <DiwaliCountdownTimer />
 
       </div>
+
+      {/* Downward Scroll Indicator (EXPLORE OFFERS) */}
+      <button
+        type="button"
+        onClick={scrollToContent}
+        className="relative z-10 flex flex-col items-center gap-2 text-amber-300/80 hover:text-amber-200 transition-colors cursor-pointer group pb-4 animate-bounce"
+        aria-label="Scroll down to explore products"
+      >
+        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 group-hover:text-amber-300 transition-colors">
+          Explore Offers
+        </span>
+        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+      </button>
+
     </section>
   );
 };

@@ -127,17 +127,15 @@ const MainContent = () => {
       case 'home':
       default:
         return (
-          <div className="space-y-16 pb-16">
-            {/* Top Diwali Sale Section between Navbar and Hero */}
+          <div className="pb-16">
+            {/* Full-screen Diwali Dhamaka Sale Section (covers 100dvh with countdown timer) */}
             <DiwaliTopBanner />
 
-            {/* Hero Banner */}
+            {/* Hero Carousel (160W Soundbar, X80, etc.) flush directly below with 0 gap */}
             <Hero />
 
-            {/* Diwali Countdown Timer (till 4th Nov 12:00 AM IST) in the exact same location as before */}
-            <DiwaliCountdownTimer />
-
-            {/* Clean Categories Grid */}
+            <div className="space-y-16 mt-16">
+              {/* Clean Categories Grid */}
             <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center py-10">
               <div className="flex items-center justify-between mb-8 sm:mb-12 border-b border-gray-200 pb-4">
                 <div>
@@ -213,7 +211,7 @@ const MainContent = () => {
                 </div>
               </div>
             </section>
-
+            </div>
           </div>
         );
     }

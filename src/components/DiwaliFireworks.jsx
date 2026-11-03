@@ -1,31 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { isDiwaliSaleActive } from '../utils/diwaliOffers';
-import { Sparkles, X } from 'lucide-react';
 
 /**
  * Celebratory Diwali Firecracker Rockets Canvas Animation
- * Launches rockets that shoot across the screen, leave trails, and burst into festive sparks.
+ * Runs for exactly 15 seconds after the splash screen finishes, then automatically disappears.
  */
 export const DiwaliFireworks = () => {
   const canvasRef = useRef(null);
   const [isActive, setIsActive] = useState(false);
-  const [showControls, setShowControls] = useState(false);
   const animationFrameId = useRef(null);
+  const isSpawningRef = useRef(true);
 
   useEffect(() => {
-    // Only run if Diwali Sale is active or preview is enabled
+    // Only run if Diwali Sale is active (e.g. from 4th Nov or ?diwali=active)
     if (!isDiwaliSaleActive()) {
       setIsActive(false);
       return;
     }
 
-    // Delay start until after splash screen completes (~900ms)
+    // Delay start until after splash screen completes (~950ms)
     const startTimer = setTimeout(() => {
       setIsActive(true);
-      setShowControls(true);
+      isSpawningRef.current = true;
     }, 950);
 
-    return () => clearTimeout(startTimer);
+    // Hard stop spawning rockets after 15 seconds
+    const stopSpawningTimer = setTimeout(() => {
+      isSpawningRef.current = false;
+    }, 950 + 15000);
+
+    // Completely unmount canvas 2.5s after spawning stops (to let active sparks fade)
+    const endTimer = setTimeout(() => {
+      setIsActive(false);
+    }, 950 + 17500);
+
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(stopSpawningTimer);
+      clearTimeout(endTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -65,7 +78,6 @@ export const DiwaliFireworks = () => {
       constructor() {
         this.x = width * (0.15 + Math.random() * 0.7);
         this.y = height + 10;
-        // Target explosion area (upper 15% to 55% of screen)
         this.targetY = height * (0.15 + Math.random() * 0.4);
         const targetX = this.x + (Math.random() - 0.5) * (width * 0.3);
         const dx = targetX - this.x;
@@ -87,7 +99,7 @@ export const DiwaliFireworks = () => {
 
         this.x += this.vx;
         this.y += this.vy;
-        this.vy += 0.05; // slight gravity
+        this.vy += 0.05;
 
         if (this.y <= this.targetY || this.vy >= 0) {
           this.explode();
@@ -95,7 +107,6 @@ export const DiwaliFireworks = () => {
       }
 
       draw() {
-        // Draw trailing spark line
         for (let i = 0; i < this.trail.length; i++) {
           const pt = this.trail[i];
           const radius = (i / this.trail.length) * 2.5;
@@ -106,7 +117,6 @@ export const DiwaliFireworks = () => {
           ctx.fill();
         }
 
-        // Draw rocket head
         ctx.beginPath();
         ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
         ctx.fillStyle = '#FFFFFF';
@@ -151,7 +161,7 @@ export const DiwaliFireworks = () => {
       update() {
         this.vx *= 0.96;
         this.vy *= 0.96;
-        this.vy += 0.08; // gravity
+        this.vy += 0.08;
         this.x += this.vx;
         this.y += this.vy;
         this.alpha -= this.decay;
@@ -171,32 +181,28 @@ export const DiwaliFireworks = () => {
       }
     }
 
-    // Launch schedule: frequent bursts at start (celebratory grand opening), then gentle cadence
     let frameCount = 0;
     const launchRocket = () => {
-      rockets.push(new Rocket());
+      if (isSpawningRef.current) {
+        rockets.push(new Rocket());
+      }
     };
 
-    // Initial volley of 4 rockets staggered
+    // Initial volley of rockets
     setTimeout(() => launchRocket(), 100);
-    setTimeout(() => launchRocket(), 450);
-    setTimeout(() => launchRocket(), 800);
-    setTimeout(() => launchRocket(), 1200);
+    setTimeout(() => launchRocket(), 400);
+    setTimeout(() => launchRocket(), 750);
+    setTimeout(() => launchRocket(), 1100);
 
     const animate = () => {
       frameCount++;
-
-      // Semi-transparent clear for smooth fading motion trail
       ctx.clearRect(0, 0, width, height);
 
-      // Launch new rockets periodically:
-      // First 600 frames (~10s): launch every 45-60 frames
-      // After 600 frames: launch occasionally every 120 frames
-      const interval = frameCount < 600 ? 50 : 130;
-      if (frameCount % interval === 0) {
+      // Launch rockets periodically while within 15 seconds
+      if (isSpawningRef.current && frameCount % 45 === 0) {
         launchRocket();
-        if (Math.random() > 0.5) {
-          setTimeout(() => launchRocket(), 200 + Math.random() * 300);
+        if (Math.random() > 0.4) {
+          setTimeout(() => launchRocket(), 200 + Math.random() * 250);
         }
       }
 
@@ -236,42 +242,10 @@ export const DiwaliFireworks = () => {
   if (!isActive) return null;
 
   return (
-    <>
-      {/* Non-blocking Fullscreen Canvas for Fireworks */}
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 pointer-events-none z-40 select-none"
-        style={{ mixBlendMode: 'screen' }}
-      />
-
-      {/* Floating Diwali Festive Controls (Bottom Right) */}
-      {showControls && (
-        <div className="fixed bottom-24 right-4 sm:right-6 z-50 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <button
-            type="button"
-            onClick={() => {
-              // Trigger extra grand burst
-              setIsActive(false);
-              setTimeout(() => setIsActive(true), 100);
-            }}
-            className="px-3.5 py-2 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white rounded-full text-xs font-bold shadow-xl border border-amber-300/40 flex items-center gap-1.5 transition cursor-pointer backdrop-blur-md"
-            title="Burst more Diwali firecrackers"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-yellow-200 animate-spin" />
-            <span className="hidden sm:inline">Diwali Dhamaka Sparks</span>
-            <span className="sm:hidden">🎆 Burst</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowControls(false)}
-            className="w-7 h-7 bg-black/60 hover:bg-black text-gray-300 hover:text-white rounded-full flex items-center justify-center transition border border-gray-700 cursor-pointer"
-            title="Hide button"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-    </>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-40 select-none transition-opacity duration-1000"
+      style={{ mixBlendMode: 'screen' }}
+    />
   );
 };
