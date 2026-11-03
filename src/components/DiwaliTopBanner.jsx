@@ -54,22 +54,12 @@ export const DiwaliTopBanner = () => {
             <DiyaIcon className="w-14 h-14 sm:w-20 sm:h-20 md:w-28 md:h-28 lg:w-36 lg:h-36 transform -scale-x-100" />
           </div>
 
-          {/* Center Area: Countdown Timer OR Live Sale Badge */}
-          <div className="flex-1 max-w-md sm:max-w-lg flex flex-col items-center justify-center">
-            {!saleActive ? (
+          {/* Center Area: Countdown Timer (before Nov 4) */}
+          {!saleActive && (
+            <div className="flex-1 max-w-md sm:max-w-lg flex flex-col items-center justify-center">
               <DiwaliCountdownTimer />
-            ) : (
-              <div className="flex flex-col items-center text-center space-y-2 py-4 animate-in fade-in zoom-in duration-500">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/25 via-red-500/30 to-amber-500/25 border border-amber-400/50 text-amber-300 text-xs sm:text-sm font-black tracking-widest uppercase shadow-lg">
-                  <Sparkles className="w-4 h-4 text-yellow-300 animate-spin" />
-                  <span>DHAMAKA OFFERS LIVE</span>
-                </div>
-                <p className="text-sm sm:text-lg font-bold text-amber-200 tracking-wide">
-                  Extra Festive Discounts Applied Storewide
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Right Diya (Large & Radiant) */}
           <div className="shrink-0 flex items-center justify-center filter drop-shadow-[0_0_25px_rgba(245,158,11,0.7)]">

@@ -89,6 +89,11 @@ export const getDiwaliDiscount = (product) => {
     return 500;
   }
 
+  // 6) Car Amplifiers: 149 off
+  if (cat === 'amplifiers' || id.includes('amp') || name.includes('amplifier')) {
+    return 149;
+  }
+
   return 0;
 };
 
