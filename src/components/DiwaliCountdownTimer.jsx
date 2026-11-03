@@ -45,28 +45,28 @@ export const DiwaliCountdownTimer = () => {
       </div>
 
       {/* Countdown Timer Clocks */}
-      <div className="flex justify-center items-center gap-2.5 sm:gap-4 text-2xl sm:text-4xl font-black font-mono">
+      <div className="flex justify-center items-center gap-1.5 sm:gap-3 md:gap-4 text-xl sm:text-3xl md:text-4xl font-black font-mono">
         
         {/* Hours */}
-        <div className="flex flex-col items-center bg-slate-900/90 rounded-2xl px-4 sm:px-6 py-2.5 shadow-2xl border border-amber-500/40 min-w-[70px] sm:min-w-[92px]">
+        <div className="flex flex-col items-center bg-slate-900/90 rounded-xl sm:rounded-2xl px-3 sm:px-5 md:px-6 py-2 sm:py-2.5 shadow-2xl border border-amber-500/40 min-w-[62px] sm:min-w-[84px] md:min-w-[96px]">
           <span className="text-amber-200">{String(hours).padStart(2, '0')}</span>
-          <span className="text-[9px] sm:text-[11px] uppercase font-bold tracking-widest mt-1 text-slate-400">Hours</span>
+          <span className="text-[8px] sm:text-[10px] md:text-[11px] uppercase font-bold tracking-widest mt-0.5 sm:mt-1 text-slate-400">Hours</span>
         </div>
 
-        <span className="text-amber-400 font-bold animate-pulse text-xl sm:text-2xl">:</span>
+        <span className="text-amber-400 font-bold animate-pulse text-lg sm:text-2xl">:</span>
 
         {/* Minutes */}
-        <div className="flex flex-col items-center bg-slate-900/90 rounded-2xl px-4 sm:px-6 py-2.5 shadow-2xl border border-amber-500/40 min-w-[70px] sm:min-w-[92px]">
+        <div className="flex flex-col items-center bg-slate-900/90 rounded-xl sm:rounded-2xl px-3 sm:px-5 md:px-6 py-2 sm:py-2.5 shadow-2xl border border-amber-500/40 min-w-[62px] sm:min-w-[84px] md:min-w-[96px]">
           <span className="text-amber-200">{String(minutes).padStart(2, '0')}</span>
-          <span className="text-[9px] sm:text-[11px] uppercase font-bold tracking-widest mt-1 text-slate-400">Mins</span>
+          <span className="text-[8px] sm:text-[10px] md:text-[11px] uppercase font-bold tracking-widest mt-0.5 sm:mt-1 text-slate-400">Mins</span>
         </div>
 
-        <span className="text-amber-400 font-bold animate-pulse text-xl sm:text-2xl">:</span>
+        <span className="text-amber-400 font-bold animate-pulse text-lg sm:text-2xl">:</span>
 
         {/* Seconds */}
-        <div className="flex flex-col items-center bg-slate-900/90 rounded-2xl px-4 sm:px-6 py-2.5 shadow-2xl border border-amber-500/40 min-w-[70px] sm:min-w-[92px]">
+        <div className="flex flex-col items-center bg-slate-900/90 rounded-xl sm:rounded-2xl px-3 sm:px-5 md:px-6 py-2 sm:py-2.5 shadow-2xl border border-amber-500/40 min-w-[62px] sm:min-w-[84px] md:min-w-[96px]">
           <span className="text-amber-200">{String(seconds).padStart(2, '0')}</span>
-          <span className="text-[9px] sm:text-[11px] uppercase font-bold tracking-widest mt-1 text-slate-400">Secs</span>
+          <span className="text-[8px] sm:text-[10px] md:text-[11px] uppercase font-bold tracking-widest mt-0.5 sm:mt-1 text-slate-400">Secs</span>
         </div>
 
       </div>
