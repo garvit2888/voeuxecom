@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { DiwaliPriceDisplay } from './DiwaliPriceDisplay';
 
 export const Hero = () => {
   const { setActivePage, setSelectedProductModal } = useShop();
@@ -137,6 +138,13 @@ export const Hero = () => {
                 {s.title}
               </h1>
 
+              {/* Special Diwali Pricing with Animated Cut Line */}
+              {s.featuredProduct && (
+                <div className="py-0.5">
+                  <DiwaliPriceDisplay product={s.featuredProduct} size="md" />
+                </div>
+              )}
+
               <p className="text-sm text-gray-300 font-medium leading-relaxed">
                 {s.tagline}
               </p>
@@ -184,6 +192,14 @@ export const Hero = () => {
                 <h1 className="text-3xl lg:text-5xl xl:text-6xl font-black tracking-tight text-white leading-tight">
                   {s.title}
                 </h1>
+
+                {/* Special Diwali Pricing with Animated Cut Line */}
+                {s.featuredProduct && (
+                  <div className="py-1">
+                    <DiwaliPriceDisplay product={s.featuredProduct} size="lg" />
+                  </div>
+                )}
+
                 <p className="text-base lg:text-lg text-gray-300 font-medium leading-relaxed max-w-xl">
                   {s.tagline}
                 </p>

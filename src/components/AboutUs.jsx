@@ -12,7 +12,11 @@ export const AboutUs = () => {
       <div className="bg-[#3B429F] text-white p-8 sm:p-10 rounded-3xl space-y-4 shadow-xl border border-indigo-400/20 text-left">
         <div className="flex items-center justify-between border-b border-white/20 pb-3 flex-wrap gap-2">
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">VOEUX – Built for Your Drive</h2>
-          <span className="font-mono italic font-extrabold text-lg sm:text-xl text-yellow-300">voeux®</span>
+          <img
+            src="/images/voeux_logo.png"
+            alt="VOEUX®"
+            className="h-8 sm:h-10 w-auto object-contain rounded-xl shadow-md border border-white/20 bg-black/30 p-1"
+          />
         </div>
         
         <p className="text-sm sm:text-base leading-relaxed text-indigo-100 font-medium">

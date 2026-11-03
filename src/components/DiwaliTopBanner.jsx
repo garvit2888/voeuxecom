@@ -59,6 +59,13 @@ export const DiwaliTopBanner = () => {
 
         </div>
 
+        {/* Festive Subheading */}
+        <div className="text-center px-3 sm:px-4 max-w-2xl -mt-2 sm:-mt-4">
+          <p className="text-xs sm:text-sm md:text-base font-bold tracking-wide text-amber-200/90 leading-relaxed drop-shadow-sm">
+            View exclusive festival offers throughout the site &bull; Offer ends on 8th November, 12:00 AM IST
+          </p>
+        </div>
+
         {/* Countdown Timer (only when timer is active before sale starts) */}
         {!saleActive && (
           <div className="w-full max-w-md sm:max-w-lg flex flex-col items-center justify-center">

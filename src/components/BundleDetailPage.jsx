@@ -245,7 +245,9 @@ export const BundleDetailPage = ({ bundle }) => {
 
               <button
                 onClick={() => {
-                  const waText = encodeURIComponent(`hi i have a query regarding the voeux bundle offer`);
+                  const carDetails = carMake ? ` for my ${carMake} ${carModel} (${carYear})` : '';
+                  const variantLabel = speakerVariant === 'all-6' ? '4x 6-inch speakers' : (speakerVariant === 'all-6.5' ? '4x 6.5-inch speakers' : '2x 6-inch + 2x 6.5-inch speakers');
+                  const waText = encodeURIComponent(`Hello VOEUX Team, I am interested in ordering the "${bundle.name}" Combo Package (₹${finalPrice.toLocaleString('en-IN')}) with ${variantLabel}${carDetails}. Could you please guide me with order and delivery?`);
                   window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
                 }}
                 className="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"

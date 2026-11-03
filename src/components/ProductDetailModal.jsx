@@ -271,7 +271,8 @@ export const ProductDetailModal = () => {
 
               <button
                 onClick={() => {
-                  const waText = encodeURIComponent(`Hi VOEUX, I am interested in buying ${product.name}`);
+                  const carDetails = checkMake ? ` for my ${checkMake} ${checkModel} (${checkYear})` : '';
+                  const waText = encodeURIComponent(`Hello VOEUX Team, I am interested in ordering the "${finalProduct.name}" (₹${finalProduct.price?.toLocaleString('en-IN')})${carDetails}. Could you please assist me with order, payment, and delivery?`);
                   window.open(`https://wa.me/919999484530?text=${waText}`, '_blank');
                 }}
                 className="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
