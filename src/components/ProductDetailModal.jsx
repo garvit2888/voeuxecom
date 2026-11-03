@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { CAR_MODELS } from '../data/products';
+import { DiwaliPriceDisplay } from './DiwaliPriceDisplay';
+import { getDiwaliDiscount, isDiwaliSaleActive } from '../utils/diwaliOffers';
 import {
   X,
   ShieldCheck,
@@ -84,12 +86,15 @@ export const ProductDetailModal = () => {
     nameExtra = ` + Camera`;
   }
 
+  const diwaliDiscount = isDiwaliSaleActive() ? getDiwaliDiscount(product) : 0;
+
   const finalProduct = {
     ...product,
     id: idSuffix ? `${product.id}${idSuffix}` : product.id,
     name: `${product.name}${nameExtra}`,
-    price: product.price + extraPrice,
-    originalPrice: product.originalPrice + extraPrice
+    price: Math.max(0, product.price + extraPrice - diwaliDiscount),
+    originalPrice: product.originalPrice + extraPrice,
+    regularPriceBeforeDiwali: product.price + extraPrice
   };
 
   return (
@@ -163,16 +168,16 @@ export const ProductDetailModal = () => {
               </p>
             </div>
 
-            {/* Price Row */}
+            {/* Price Row with Diwali Price Display */}
             <div className="space-y-1.5 py-3 border-y border-gray-200">
-              <div className="flex items-baseline gap-3">
-                <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-                  ₹{finalProduct.price.toLocaleString('en-IN')}
-                </span>
-                <span className="text-sm text-gray-400 line-through">
-                  ₹{finalProduct.originalPrice.toLocaleString('en-IN')}
-                </span>
-              </div>
+              <DiwaliPriceDisplay
+                product={product}
+                overridePrice={product.price + extraPrice}
+                overrideMrp={product.originalPrice + extraPrice}
+                overrideDiscount={diwaliDiscount}
+                size="md"
+                showBadge={true}
+              />
               <p className="text-[10px] text-gray-500 font-medium">(MRP Inclusive of all taxes)</p>
             </div>
 

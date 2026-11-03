@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { ArrowLeft, ShoppingCart, MessageSquare, ShieldCheck, RefreshCw, Truck, ChevronDown, Package } from 'lucide-react';
+import { DiwaliPriceDisplay } from './DiwaliPriceDisplay';
+import { isDiwaliSaleActive } from '../utils/diwaliOffers';
 
 export const BundleDetailPage = ({ bundle }) => {
   const { setActivePage, addToCart, setIsCartOpen, productsList, user, setIsAuthModalOpen, buyNowCheckout, addToast } = useShop();
@@ -26,44 +28,47 @@ export const BundleDetailPage = ({ bundle }) => {
   const speaker6Mrp = speaker6.originalPrice || 6999;
   const speaker65Mrp = speaker65.originalPrice || 8500;
 
-  let finalPrice = bundle.price;
+  let basePrice = bundle.price;
   let finalMrp = bundle.originalPrice;
 
   if (bundle.id === 'bundle-ts7-4-speakers-frame') {
     if (speakerVariant === 'all-6') {
-      finalPrice = 10999;
+      basePrice = 10999;
       finalMrp = playerMrp + (speaker6Mrp * 2);
     } else if (speakerVariant === 'all-6.5') {
-      finalPrice = 12199;
+      basePrice = 12199;
       finalMrp = playerMrp + (speaker65Mrp * 2);
     } else if (speakerVariant === 'mix') {
-      finalPrice = 11599;
+      basePrice = 11599;
       finalMrp = playerMrp + speaker6Mrp + speaker65Mrp;
     }
   } else if (bundle.id === 'bundle-single-knob-4-speakers-frame') {
     if (speakerVariant === 'all-6') {
-      finalPrice = 13999;
+      basePrice = 13999;
       finalMrp = playerMrp + (speaker6Mrp * 2);
     } else if (speakerVariant === 'all-6.5') {
-      finalPrice = 16399;
+      basePrice = 16399;
       finalMrp = playerMrp + (speaker65Mrp * 2);
     } else if (speakerVariant === 'mix') {
-      finalPrice = 15199;
+      basePrice = 15199;
       finalMrp = playerMrp + speaker6Mrp + speaker65Mrp;
     }
   } else {
     // X80 bundle (keeping user's exact requested MRPs)
     if (speakerVariant === 'all-6') {
-      finalPrice = 13999;
+      basePrice = 13999;
       finalMrp = 54997;
     } else if (speakerVariant === 'all-6.5') {
-      finalPrice = 16399;
+      basePrice = 16399;
       finalMrp = 57999;
     } else if (speakerVariant === 'mix') {
-      finalPrice = 15199;
+      basePrice = 15199;
       finalMrp = 56498;
     }
   }
+
+  const diwaliDiscount = isDiwaliSaleActive() ? 500 : 0;
+  const finalPrice = Math.max(0, basePrice - diwaliDiscount);
 
   const handleAddToCart = () => {
     if (!carMake.trim() || !carModel.trim()) {
@@ -106,7 +111,7 @@ export const BundleDetailPage = ({ bundle }) => {
     buyNowCheckout(cartItem);
   };
 
-  const getPriceForVariant = (variant) => {
+  const getBasePriceForVariant = (variant) => {
     if (bundle.id === 'bundle-ts7-4-speakers-frame') {
       if (variant === 'all-6') return 10999;
       if (variant === 'all-6.5') return 12199;
@@ -120,6 +125,10 @@ export const BundleDetailPage = ({ bundle }) => {
       if (variant === 'all-6.5') return 16399;
       return 15199;
     }
+  };
+
+  const getPriceForVariant = (variant) => {
+    return Math.max(0, getBasePriceForVariant(variant) - diwaliDiscount);
   };
 
   const tabs = [
@@ -165,16 +174,14 @@ export const BundleDetailPage = ({ bundle }) => {
               {bundle.name}
             </h1>
             
-            <div className="space-y-2 py-4 border-y border-gray-200">
-              <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-extrabold text-[#3B429F]">
-                  ₹{finalPrice.toLocaleString('en-IN')}
-                </span>
-                <span className="text-base text-gray-400 line-through">
-                  ₹{finalMrp.toLocaleString('en-IN')}
-                </span>
-              </div>
-              <p className="text-[11px] text-gray-500 font-medium">(MRP Inclusive of all taxes)</p>
+            <div className="py-4 border-y border-gray-200">
+              <DiwaliPriceDisplay
+                product={bundle}
+                overridePrice={basePrice}
+                overrideMrp={finalMrp}
+                overrideDiscount={500}
+                size="lg"
+              />
             </div>
 
             {/* Speaker Variant Selector */}

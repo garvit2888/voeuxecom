@@ -31,48 +31,9 @@ import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
-
-const PriceHikeCountdown = () => {
-  const targetDate = new Date('2026-10-11T00:00:00+05:30').getTime();
-  const [timeLeft, setTimeLeft] = useState(targetDate - Date.now());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft(targetDate - Date.now());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [targetDate]);
-
-  if (timeLeft <= 0) return null; // Hide after 12 AM
-
-  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-  return (
-    <div className="w-full bg-black text-white py-6 px-4 flex flex-col items-center justify-center border-b border-gray-800 shadow-inner">
-      <div className="flex justify-center items-center gap-3 sm:gap-4 text-3xl sm:text-4xl font-black font-mono">
-        <div className="flex flex-col items-center bg-gray-900 rounded-xl px-4 sm:px-6 py-2 shadow-lg border border-gray-800">
-          <span>{String(hours).padStart(2, '0')}</span>
-          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-gray-400">Hours</span>
-        </div>
-        <span className="animate-pulse text-gray-500">:</span>
-        <div className="flex flex-col items-center bg-gray-900 rounded-xl px-4 sm:px-6 py-2 shadow-lg border border-gray-800">
-          <span>{String(minutes).padStart(2, '0')}</span>
-          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-gray-400">Mins</span>
-        </div>
-        <span className="animate-pulse text-gray-500">:</span>
-        <div className="flex flex-col items-center bg-gray-900 rounded-xl px-4 sm:px-6 py-2 shadow-lg border border-gray-800">
-          <span>{String(seconds).padStart(2, '0')}</span>
-          <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest mt-1 text-gray-400">Secs</span>
-        </div>
-      </div>
-      <p className="text-xs sm:text-sm font-bold mt-5 max-w-2xl text-center text-gray-300 px-2 leading-relaxed">
-        The prices of all VOEUX® Android Car Players will officially revise tonight. Secure yours now at the current discounted rate!
-      </p>
-    </div>
-  );
-};
+import { DiwaliCountdownTimer } from './components/DiwaliCountdownTimer';
+import { DiwaliTopBanner } from './components/DiwaliTopBanner';
+import { DiwaliFireworks } from './components/DiwaliFireworks';
 
 
 const MainContent = () => {
@@ -167,11 +128,14 @@ const MainContent = () => {
       default:
         return (
           <div className="space-y-16 pb-16">
+            {/* Top Diwali Sale Section between Navbar and Hero */}
+            <DiwaliTopBanner />
+
             {/* Hero Banner */}
             <Hero />
 
-            {/* Countdown Timer */}
-            <PriceHikeCountdown />
+            {/* Diwali Countdown Timer (till 4th Nov 12:00 AM IST) in the exact same location as before */}
+            <DiwaliCountdownTimer />
 
             {/* Clean Categories Grid */}
             <section className="container mx-auto px-4 min-h-[100dvh] flex flex-col justify-center py-10">
@@ -256,9 +220,12 @@ const MainContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col justify-between">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col justify-between relative">
       {/* Brand Splash Screen on Initial Load */}
       <SplashScreen />
+
+      {/* Diwali Fireworks Animation (bursts rockets & crackers after splash screen) */}
+      <DiwaliFireworks />
 
       {/* Added to Cart Celebration Pop-Up Card */}
       {lastAddedProduct && (
