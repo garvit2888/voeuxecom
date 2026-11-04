@@ -430,6 +430,32 @@ function doPost(e) {
     } catch(eW) {
       sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     }
+
+    var hasExtended = data.hasExtendedWarranty === 'YES' || data.hasExtendedWarranty === true || data.extendedWarranty === 'YES' || (data.extendedWarrantyAmount && data.extendedWarrantyAmount > 0);
+    var extPlanText = hasExtended 
+      ? (data.extendedWarrantyPlan || '1 Year Standard + 1 Year Extended Warranty by VOEUX (Total 2 Years)')
+      : '1 Year Standard Warranty';
+    var extAmountText = hasExtended ? '₹1,249' : '₹0';
+
+    // If sheet is fresh/empty, append header row with Extended Warranty columns
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Certificate ID",
+        "Customer Name",
+        "Customer Email",
+        "Phone Number",
+        "Date of Purchase",
+        "Warranty End Date",
+        "Product Purchased",
+        "Store / Outlet",
+        "Order ID",
+        "Registration Date & Time",
+        "Warranty Status",
+        "Extended Warranty Plan",
+        "Extended Warranty Amount"
+      ]);
+    }
+
     sheet.appendRow([
       data.certificateId || '',
       data.name || '',
@@ -441,14 +467,32 @@ function doPost(e) {
       data.storeOutlet || '',
       data.orderId || '',
       data.submittedAt || '',
-      data.warrantyStatus || 'ACTIVE'
+      (hasExtended ? 'ACTIVE (2-Year Protection)' : (data.warrantyStatus || 'ACTIVE')),
+      extPlanText,
+      extAmountText
     ]);
 
     // Send Warranty Certificate Email to Customer
     if (data.email && data.email.indexOf('@') > -1) {
-      var subject = "VOEUX Warranty Certificate - " + (data.certificateId || '');
+      var subject = hasExtended
+        ? "VOEUX Official Warranty Certificate (1 Year Standard + 1 Year Extended Plan) - " + (data.certificateId || '')
+        : "VOEUX Warranty Certificate - " + (data.certificateId || '');
+
+      var introMessage = hasExtended
+        ? "Your VOEUX® 1-Year Warranty + 1-Year Extended Warranty Plan (Total 2 Years Protection at ₹1,249/-) has been registered successfully!\n\n"
+        : "Your VOEUX® 1-Year Warranty has been registered successfully!\n\n";
+
+      var planSection = hasExtended
+        ? "Warranty Plan: 1 Year Warranty Plan + 1 Year Extended Warranty by VOEUX (Total 2 Years Complete Protection)\n" +
+          "Extended Warranty Fee: ₹1,249/- (Included & Activated)\n"
+        : "Warranty Plan: 1 Year Official Domestic Warranty\n";
+
+      var statusSection = hasExtended
+        ? "Status: ACTIVE (2-Year Extended Complete Protection)\n"
+        : "Status: ACTIVE (1-Year Official Warranty)\n";
+
       var message = "Dear " + (data.name || 'Valued Customer') + ",\n\n" +
-        "Your VOEUX® 1-Year Warranty has been registered successfully!\n\n" +
+        introMessage +
         "==========================================\n" +
         "VOEUX® OFFICIAL WARRANTY CERTIFICATE\n" +
         "==========================================\n" +
@@ -456,9 +500,11 @@ function doPost(e) {
         "Customer Name: " + (data.name || '') + "\n" +
         "Product Purchased: " + (data.productPurchased || '') + "\n" +
         "Date of Purchase: " + (data.purchaseDate || '') + "\n" +
+        planSection +
         "Warranty End Date: " + (data.warrantyExpires || '') + "\n" +
         "Store / Outlet: " + (data.storeOutlet || '') + "\n" +
-        "Status: ACTIVE (1-Year Official Warranty)\n" +
+        (data.orderId ? ("Order ID / Invoice: " + data.orderId + "\n") : "") +
+        statusSection +
         "==========================================\n\n" +
         "WhatsApp Customer Support: +91 9999484530 (Mon-Sat 11 AM - 6 PM)\n" +
         "Official Email: voeuxexperience@gmail.com\n" +
@@ -469,7 +515,8 @@ function doPost(e) {
         GmailApp.sendEmail(data.email, subject, message, {
           name: "VOEUX® Official Warranty Care",
           from: "voeuxexperience@gmail.com",
-          replyTo: "voeuxexperience@gmail.com"
+          replyTo: "voeuxexperience@gmail.com",
+          bcc: "voeuxoffice@gmail.com"
         });
       } catch (mailErr) {
         MailApp.sendEmail({
@@ -477,7 +524,8 @@ function doPost(e) {
           subject: subject,
           body: message,
           name: "VOEUX® Official Warranty Care",
-          replyTo: "voeuxexperience@gmail.com"
+          replyTo: "voeuxexperience@gmail.com",
+          bcc: "voeuxoffice@gmail.com"
         });
       }
     }

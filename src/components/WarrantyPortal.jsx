@@ -20,12 +20,13 @@ export const WarrantyPortal = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registeredCertificate, setRegisteredCertificate] = useState(null);
+  const [includeExtendedWarranty, setIncludeExtendedWarranty] = useState(false);
 
-  // Helper to compute exact 1-Year Warranty End Date
-  const getWarrantyEndDate = (purchaseDateStr) => {
+  // Helper to compute exact Warranty End Date (1-Year Standard or 2-Year with Extended Plan)
+  const getWarrantyEndDate = (purchaseDateStr, isExtended = false) => {
     if (!purchaseDateStr) return '';
     const date = new Date(purchaseDateStr);
-    date.setFullYear(date.getFullYear() + 1);
+    date.setFullYear(date.getFullYear() + (isExtended ? 2 : 1));
     return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
@@ -48,7 +49,7 @@ export const WarrantyPortal = () => {
     setIsSubmitting(true);
 
     const certificateId = 'VX-WRTY-' + Math.floor(100000 + Math.random() * 900000);
-    const expiryDate = getWarrantyEndDate(formData.purchaseDate);
+    const expiryDate = getWarrantyEndDate(formData.purchaseDate, includeExtendedWarranty);
 
     const submissionData = {
       ...formData,
@@ -57,7 +58,14 @@ export const WarrantyPortal = () => {
       certificateId,
       submittedAt: new Date().toLocaleString('en-IN'),
       warrantyExpires: expiryDate,
-      warrantyStatus: 'ACTIVE',
+      warrantyStatus: includeExtendedWarranty ? 'ACTIVE (2-Year Protection)' : 'ACTIVE',
+      hasExtendedWarranty: includeExtendedWarranty ? 'YES' : 'NO',
+      extendedWarranty: includeExtendedWarranty ? 'YES (₹1,249)' : 'NO',
+      extendedWarrantyPlan: includeExtendedWarranty 
+        ? '1 Year Standard Warranty + 1 Year Extended Warranty by VOEUX (Total 2 Years)' 
+        : '1 Year Standard Warranty',
+      extendedWarrantyAmount: includeExtendedWarranty ? 1249 : 0,
+      warrantyDuration: includeExtendedWarranty ? '2 Years' : '1 Year',
       sheetId: '1HrCZRT2DyDmBkj1Z2RT3s7hgiwN47xWhNxiyHpGg8wA'
     };
 
@@ -102,6 +110,40 @@ export const WarrantyPortal = () => {
             VOEUX® Electronics • Official 1-Year Domestic Warranty Activation
           </p>
         </div>
+
+        {/* Minimalist 1-Year Extended Warranty Plan Option */}
+        {!registeredCertificate && (
+          <div className="border-b border-gray-200 pb-5">
+            <label className="flex items-start gap-3.5 cursor-pointer group select-none">
+              <input
+                type="checkbox"
+                id="extended-warranty-checkbox"
+                checked={includeExtendedWarranty}
+                onChange={(e) => setIncludeExtendedWarranty(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded text-[#3B429F] border-gray-300 focus:ring-[#3B429F] accent-[#3B429F] cursor-pointer shrink-0"
+              />
+              <div className="flex-1 space-y-1">
+                <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                  <span className="font-bold text-gray-900 text-xs sm:text-sm tracking-tight group-hover:text-[#3B429F] transition-colors">
+                    Include 1 Year Extended Warranty Plan
+                  </span>
+                  <span className="font-extrabold text-[#3B429F] text-xs sm:text-sm">
+                    ₹1,249/-
+                  </span>
+                </div>
+                <p className="text-gray-600 text-xs leading-relaxed">
+                  1 year warranty plan + 1 year extended warranty by voeux (Total 2 Years Complete Protection)
+                </p>
+                {includeExtendedWarranty && (
+                  <p className="text-[11px] text-[#3B429F] font-semibold flex items-center gap-1 pt-0.5 animate-in fade-in duration-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#3B429F]" />
+                    Extended coverage active: Warranty valid until {getWarrantyEndDate(formData.purchaseDate, true)}
+                  </p>
+                )}
+              </div>
+            </label>
+          </div>
+        )}
 
         {/* WhatsApp Support Text Line */}
         <div className="text-xs text-gray-700 space-y-1">
@@ -257,7 +299,11 @@ export const WarrantyPortal = () => {
                   <span>ACTIVATING WARRANTY & SENDING EMAIL...</span>
                 </>
               ) : (
-                <span>ACTIVATE WARRANTY & SEND EMAIL CERTIFICATE</span>
+                <span>
+                  {includeExtendedWarranty
+                    ? 'ACTIVATE 2-YEAR EXTENDED WARRANTY & SEND EMAIL CERTIFICATE'
+                    : 'ACTIVATE WARRANTY & SEND EMAIL CERTIFICATE'}
+                </span>
               )}
             </button>
 
@@ -286,9 +332,17 @@ export const WarrantyPortal = () => {
               <p><strong>Store Outlet:</strong> {registeredCertificate.storeOutlet}</p>
               <p><strong>Phone:</strong> {registeredCertificate.phone || 'N/A'}</p>
               <p><strong>Order ID:</strong> {registeredCertificate.orderId || 'N/A'}</p>
+              {registeredCertificate.hasExtendedWarranty === 'YES' ? (
+                <div className="py-2 px-3 my-2 bg-indigo-50 border border-indigo-200 rounded text-[#3B429F] font-sans">
+                  <p className="font-bold text-xs">🛡️ Plan: 1 Year Standard Warranty + 1 Year Extended Warranty by VOEUX</p>
+                  <p className="text-[11px] text-gray-700 mt-0.5">Extended Warranty Plan (₹1,249/-) Included • 2 Years Total Protection</p>
+                </div>
+              ) : (
+                <p><strong>Warranty Plan:</strong> 1 Year Official Domestic Warranty</p>
+              )}
               <p><strong>Status:</strong> <span className="text-emerald-700 font-bold">{registeredCertificate.warrantyStatus}</span></p>
               <p className="text-indigo-900 font-bold text-sm pt-2 border-t border-gray-200">
-                <strong>Warranty End Date:</strong> {registeredCertificate.warrantyExpires}
+                <strong>Warranty End Date:</strong> {registeredCertificate.warrantyExpires} {registeredCertificate.hasExtendedWarranty === 'YES' ? '(2 Years Total Protection)' : '(1 Year Standard)'}
               </p>
             </div>
 
@@ -301,7 +355,10 @@ export const WarrantyPortal = () => {
               </button>
 
               <button
-                onClick={() => setRegisteredCertificate(null)}
+                onClick={() => {
+                  setRegisteredCertificate(null);
+                  setIncludeExtendedWarranty(false);
+                }}
                 className="border border-gray-300 text-gray-800 font-bold px-6 py-3 rounded-lg text-xs hover:bg-gray-100"
               >
                 Register Another Product
