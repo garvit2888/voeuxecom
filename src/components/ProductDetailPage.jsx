@@ -43,6 +43,10 @@ export const ProductDetailPage = () => {
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   const isX80 = product?.id?.includes('x80') || product?.name?.toLowerCase().includes('x80');
+  const is6InchSpeaker = product?.id === 'voeux-svx001-6inch-speakers' || product?.name?.toLowerCase().includes('6-inch') || product?.name?.toLowerCase().includes('6 inch');
+  const featuresImage = product?.featuresBannerImage || 
+    (isX80 ? '/images/x80_product_features.png' : 
+    (is6InchSpeaker ? '/images/speaker_6inch_features.jpg' : null));
 
   const [includeFrame, setIncludeFrame] = useState(false);
   const [includeCamera, setIncludeCamera] = useState(false);
@@ -153,30 +157,27 @@ export const ProductDetailPage = () => {
         {/* Top Product Section: Left Gallery & Right Info */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-start">
           
-          {/* Left Column: Image Showcase & 360 Spin Viewer (Enlarged covering whole left portion) */}
+          {/* Left Column: Image Showcase (No box behind, enlarged covering whole left space, no hover movement) */}
           <div className="lg:col-span-7 xl:col-span-7 space-y-6">
             
-            {/* Main Image Viewport - Enlarge covering whole left portion */}
+            {/* Main Image Viewport - Pure image, no box, no hover scale */}
             <div
               onClick={() => {
                 setZoomImage(selectedImg);
                 setIsZoomOpen(true);
               }}
-              className="relative w-full min-h-[380px] sm:min-h-[460px] lg:min-h-[520px] xl:min-h-[580px] aspect-square sm:aspect-[4/3] rounded-3xl overflow-hidden flex items-center justify-center bg-gradient-to-b from-gray-50/70 via-white to-gray-50/70 border border-gray-100/90 group cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-8"
+              className="w-full flex items-center justify-center cursor-pointer select-none"
             >
               <img
                 src={selectedImg}
                 alt={product.name}
-                className="w-full h-full max-h-[540px] xl:max-h-[600px] object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-md"
+                className="w-full h-auto max-h-[640px] xl:max-h-[680px] object-contain"
               />
-              <span className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 text-xs px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <ZoomIn className="w-3.5 h-3.5 text-[#3B429F]" /> Click to Zoom
-              </span>
             </div>
 
             {/* Thumbnail Carousel */}
             {product.gallery && product.gallery.length > 1 && (
-              <div className="flex items-center gap-3 overflow-x-auto pb-1">
+              <div className="flex items-center gap-3 overflow-x-auto pb-1 pt-1">
                 {product.gallery.map((img, idx) => (
                   <button
                     key={idx}
@@ -184,8 +185,8 @@ export const ProductDetailPage = () => {
                       setSelectedImg(img);
                       setZoomImage(img);
                     }}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden border-2 transition shrink-0 p-1 bg-white cursor-pointer ${
-                      selectedImg === img ? 'border-[#3B429F] shadow-sm' : 'border-gray-200 opacity-60 hover:opacity-100'
+                    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden transition shrink-0 p-1 bg-white cursor-pointer border-2 ${
+                      selectedImg === img ? 'border-[#3B429F]' : 'border-gray-200 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt="thumbnail" className="w-full h-full object-contain rounded-xl" />
@@ -194,30 +195,20 @@ export const ProductDetailPage = () => {
               </div>
             )}
 
-            {/* X80 Specific Product Features Picture - Enlarged below product images, filling the left space opposite Description & Key Features */}
-            {(isX80 || product.featuresBannerImage) && (
-              <div className="pt-4 space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-[11px] font-bold text-gray-500 tracking-wider uppercase">
-                    X80 KEY FEATURE HIGHLIGHTS
-                  </span>
-                  <span className="text-[10px] text-[#3B429F] font-semibold flex items-center gap-1">
-                    <ZoomIn className="w-3 h-3" /> Click image to enlarge
-                  </span>
-                </div>
-                <div
-                  onClick={() => {
-                    setZoomImage(product.featuresBannerImage || '/images/x80_product_features.png');
-                    setIsZoomOpen(true);
-                  }}
-                  className="w-full rounded-3xl overflow-hidden border border-gray-200/90 shadow-md bg-slate-950 p-1 group cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-[#3B429F]/60"
-                >
-                  <img
-                    src={product.featuresBannerImage || '/images/x80_product_features.png'}
-                    alt="VOEUX X80 Key Features - QLED Display, Dual Knob Design, Wireless Apple CarPlay, Wireless Android Auto, AHD Camera Support, 4GB RAM 64GB Storage"
-                    className="w-full h-auto object-cover rounded-2xl transition-transform duration-500 group-hover:scale-[1.01]"
-                  />
-                </div>
+            {/* Product Features Picture (X80 & 6-Inch Speakers) - No box, no hover scale, covers whole left space opposite Description */}
+            {featuresImage && (
+              <div
+                onClick={() => {
+                  setZoomImage(featuresImage);
+                  setIsZoomOpen(true);
+                }}
+                className="w-full pt-4 cursor-pointer select-none"
+              >
+                <img
+                  src={featuresImage}
+                  alt={`${product.name} Key Features`}
+                  className="w-full h-auto rounded-2xl block"
+                />
               </div>
             )}
 

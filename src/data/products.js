@@ -329,6 +329,7 @@ const RAW_PRODUCTS = [
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_svx001_coaxial_speakers.png',
+    featuresBannerImage: '/images/speaker_6inch_features.jpg',
     gallery: [
       '/images/voeux_svx001_coaxial_speakers.png',
       '/images/voeux_svx001_front.png',
