@@ -45,12 +45,14 @@ export const ProductDetailPage = () => {
   const is65InchSpeaker = product?.id === 'voeux-svx005-6-5inch-speakers' || product?.name?.toLowerCase().includes('6.5') || product?.name?.toLowerCase().includes('cs606');
   const is6InchSpeaker = product?.id === 'voeux-svx001-6inch-speakers' || (product?.name?.toLowerCase().includes('6-inch') && !product?.name?.toLowerCase().includes('6.5'));
   const isSubwoofer = product?.id?.includes('und001') || product?.category === 'subwoofers' || product?.name?.toLowerCase().includes('subwoofer');
+  const isTS7 = product?.id?.includes('ts7') || product?.name?.toLowerCase().includes('ts7') || product?.name?.toLowerCase().includes('carbon black');
   const isX80 = product?.id?.includes('x80') || product?.name?.toLowerCase().includes('x80');
   const featuresImage = product?.featuresBannerImage || 
     (is65InchSpeaker ? '/images/speaker_6_5inch_features.jpg' :
     (is6InchSpeaker ? '/images/speaker_6inch_features.jpg' :
     (isSubwoofer ? '/images/subwoofer_und001_features.jpg' :
-    (isX80 ? '/images/x80_product_features.jpg' : null))));
+    (isTS7 ? '/images/ts7_product_features.jpg' :
+    (isX80 ? '/images/x80_product_features.jpg' : null)))));
 
   const [includeFrame, setIncludeFrame] = useState(false);
   const [includeCamera, setIncludeCamera] = useState(false);

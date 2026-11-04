@@ -215,6 +215,7 @@ const RAW_PRODUCTS = [
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_carbon_black_ts7.jpg',
+    featuresBannerImage: '/images/ts7_product_features.jpg',
     gallery: ['/images/voeux_carbon_black_ts7.jpg'],
     shortSpecs: [
       '9 Inch QLED Touchscreen Display',
