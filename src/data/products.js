@@ -157,6 +157,7 @@ const RAW_PRODUCTS = [
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_dual_knob_piano_stereo.jpg',
+    featuresBannerImage: '/images/dual_knob_piano_features.jpg',
     gallery: ['/images/voeux_dual_knob_piano_stereo.jpg'],
     shortSpecs: [
       '10.1 Inch QLED Touchscreen Display',
