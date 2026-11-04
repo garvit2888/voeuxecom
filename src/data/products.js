@@ -538,6 +538,7 @@ const RAW_PRODUCTS = [
     isTrending: true,
     isBestseller: false,
     image: '/images/voeux_svx_und001_1.png',
+    featuresBannerImage: '/images/subwoofer_und001_features.jpg',
     gallery: [
       '/images/voeux_svx_und001_1.png',
       '/images/voeux_svx_und001_2.jpg',
