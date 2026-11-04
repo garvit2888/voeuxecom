@@ -29,6 +29,8 @@ export const ProductCard = ({ product }) => {
           src={product.image}
           alt={product.name}
           className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+          loading="lazy"
+          decoding="async"
         />
       </div>
 

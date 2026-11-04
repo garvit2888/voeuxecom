@@ -45,7 +45,7 @@ export const ProductDetailPage = () => {
   const isX80 = product?.id?.includes('x80') || product?.name?.toLowerCase().includes('x80');
   const is6InchSpeaker = product?.id === 'voeux-svx001-6inch-speakers' || product?.name?.toLowerCase().includes('6-inch') || product?.name?.toLowerCase().includes('6 inch');
   const featuresImage = product?.featuresBannerImage || 
-    (isX80 ? '/images/x80_product_features.png' : 
+    (isX80 ? '/images/x80_product_features.jpg' : 
     (is6InchSpeaker ? '/images/speaker_6inch_features.jpg' : null));
 
   const [includeFrame, setIncludeFrame] = useState(false);
@@ -172,6 +172,8 @@ export const ProductDetailPage = () => {
                 src={selectedImg}
                 alt={product.name}
                 className="w-full h-auto max-h-[640px] xl:max-h-[680px] object-contain"
+                loading="eager"
+                decoding="async"
               />
             </div>
 
@@ -189,25 +191,27 @@ export const ProductDetailPage = () => {
                       selectedImg === img ? 'border-[#3B429F]' : 'border-gray-200 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="thumbnail" className="w-full h-full object-contain rounded-xl" />
+                    <img src={img} alt="thumbnail" className="w-full h-full object-contain rounded-xl" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Product Features Picture (X80 & 6-Inch Speakers) - No box, no hover scale, covers whole left space opposite Description */}
+            {/* Desktop Only: Product Features Picture (X80 & 6-Inch Speakers) - On the left side of Description */}
             {featuresImage && (
               <div
                 onClick={() => {
                   setZoomImage(featuresImage);
                   setIsZoomOpen(true);
                 }}
-                className="w-full pt-4 cursor-pointer select-none"
+                className="hidden lg:block w-full pt-4 cursor-pointer select-none"
               >
                 <img
                   src={featuresImage}
                   alt={`${product.name} Key Features`}
                   className="w-full h-auto rounded-2xl block"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             )}
@@ -423,6 +427,25 @@ export const ProductDetailPage = () => {
               </div>
 
             </div>
+
+            {/* Mobile Only: Product Features Image (way below Description, Key Features & Specifications) */}
+            {featuresImage && (
+              <div
+                onClick={() => {
+                  setZoomImage(featuresImage);
+                  setIsZoomOpen(true);
+                }}
+                className="block lg:hidden w-full pt-6 cursor-pointer select-none"
+              >
+                <img
+                  src={featuresImage}
+                  alt={`${product.name} Key Features`}
+                  className="w-full h-auto rounded-2xl block"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            )}
 
           </div>
 
