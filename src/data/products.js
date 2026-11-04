@@ -3,7 +3,7 @@ export const CATEGORIES = [
   { id: 'speakers-soundbars', name: 'Speakers & Soundbars', icon: 'Speaker', count: 1, description: '', image: '/images/soundbar_1.png' },
   { id: 'car-speakers', name: 'Car Speakers', icon: 'Volume2', count: 2, description: '', image: '/images/voeux_svx001_coaxial_speakers.png' },
   { id: 'amplifiers', name: 'Car Amplifiers', icon: 'Zap', count: 1, description: '', image: '/images/voeux_amp_board.jpg' },
-  { id: 'subwoofers', name: 'Subwoofers', icon: 'Speaker', count: 1, description: 'Deep, powerful bass for every car.', image: '/images/voeux_svx_und001_1.png',
+  { id: 'subwoofers', name: 'Subwoofers', icon: 'Speaker', count: 1, description: 'Deep, powerful bass for every car.', image: '/images/voeux_subwoofer_und001_hero.jpg',
     subcategories: [
       { id: 'underseat-subwoofer', name: 'Underseat Subwoofer' }
     ]
@@ -538,15 +538,13 @@ const RAW_PRODUCTS = [
     isNew: true,
     isTrending: true,
     isBestseller: false,
-    image: '/images/voeux_svx_und001_1.png',
+    image: '/images/voeux_subwoofer_und001_hero.jpg',
     featuresBannerImage: '/images/subwoofer_und001_features.jpg',
     gallery: [
-      '/images/voeux_svx_und001_1.png',
-      '/images/voeux_svx_und001_2.jpg',
-      '/images/voeux_svx_und001_3.jpg',
-      '/images/voeux_svx_und001_4.jpg',
-      '/images/voeux_svx_und001_5.jpg',
-      '/images/voeux_svx_und001_6.jpg'
+      '/images/voeux_subwoofer_und001_hero.jpg',
+      '/images/voeux_subwoofer_und001_box_accessories.jpg',
+      '/images/voeux_subwoofer_und001_panel.jpg',
+      '/images/voeux_subwoofer_und001_remote.jpg'
     ],
     shortSpecs: [
       '10-Inch Underseat Powered Subwoofer',
