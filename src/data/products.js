@@ -23,6 +23,7 @@ const RAW_PRODUCTS = [
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_x80_stereo.jpg',
+    featuresBannerImage: '/images/x80_product_features.png',
     gallery: [
       '/images/voeux_x80_stereo.jpg',
       '/images/voeux_x80_gallery_1.jpg',

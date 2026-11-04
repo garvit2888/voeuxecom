@@ -140,7 +140,7 @@ export const BundleDetailPage = ({ bundle }) => {
 
   return (
     <div className="bg-white min-h-screen pb-20">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
         
         {/* Back Button */}
         <button 
@@ -151,11 +151,11 @@ export const BundleDetailPage = ({ bundle }) => {
           Back to Bundles
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14">
           
-          {/* Left Column: Image */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="aspect-square w-full bg-gray-50 rounded-3xl overflow-hidden border border-gray-100 flex items-center justify-center p-4 relative group">
+          {/* Left Column: Image (Enlarged covering whole left portion) */}
+          <div className="lg:col-span-7 xl:col-span-7 space-y-6">
+            <div className="w-full min-h-[380px] sm:min-h-[460px] lg:min-h-[520px] xl:min-h-[580px] aspect-square sm:aspect-[4/3] bg-gradient-to-b from-gray-50/70 via-white to-gray-50/70 rounded-3xl overflow-hidden border border-gray-100/90 flex items-center justify-center p-6 sm:p-10 relative group shadow-sm hover:shadow-md transition-all duration-300">
               <span className="absolute top-4 left-4 bg-[#3B429F] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full z-10 shadow-lg flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5" />
                 Bundle Offer
@@ -163,13 +163,13 @@ export const BundleDetailPage = ({ bundle }) => {
               <img 
                 src={bundle.image} 
                 alt={bundle.name}
-                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full max-h-[540px] xl:max-h-[600px] object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-md"
               />
             </div>
           </div>
 
           {/* Right Column: Info & Actions */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-5 xl:col-span-5 space-y-6">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
               {bundle.name}
             </h1>

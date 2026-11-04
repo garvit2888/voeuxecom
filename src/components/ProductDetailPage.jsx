@@ -37,9 +37,12 @@ export const ProductDetailPage = () => {
   const product = selectedProductModal;
 
   const [selectedImg, setSelectedImg] = useState(product?.image || '');
+  const [zoomImage, setZoomImage] = useState('');
   const [is360Mode, setIs360Mode] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  const isX80 = product?.id?.includes('x80') || product?.name?.toLowerCase().includes('x80');
 
   const [includeFrame, setIncludeFrame] = useState(false);
   const [includeCamera, setIncludeCamera] = useState(false);
@@ -67,6 +70,8 @@ export const ProductDetailPage = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedImg(product?.image || '');
+    setZoomImage('');
     setIncludeFrame(false);
     setIncludeCamera(false);
   }, [product]);
@@ -143,45 +148,83 @@ export const ProductDetailPage = () => {
       </div>
 
       {/* Main Full-Page Product Container */}
-      <div className="container mx-auto px-4 py-8 sm:py-14 max-w-6xl space-y-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 max-w-7xl space-y-16">
         
         {/* Top Product Section: Left Gallery & Right Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-start">
           
-          {/* Left Column: Image Showcase & 360 Spin Viewer */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Left Column: Image Showcase & 360 Spin Viewer (Enlarged covering whole left portion) */}
+          <div className="lg:col-span-7 xl:col-span-7 space-y-6">
             
-            {/* Main Image Viewport - Borderless Pure Fitted Design */}
+            {/* Main Image Viewport - Enlarge covering whole left portion */}
             <div
-              onClick={() => setIsZoomOpen(true)}
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden flex items-center justify-center group cursor-pointer"
+              onClick={() => {
+                setZoomImage(selectedImg);
+                setIsZoomOpen(true);
+              }}
+              className="relative w-full min-h-[380px] sm:min-h-[460px] lg:min-h-[520px] xl:min-h-[580px] aspect-square sm:aspect-[4/3] rounded-3xl overflow-hidden flex items-center justify-center bg-gradient-to-b from-gray-50/70 via-white to-gray-50/70 border border-gray-100/90 group cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-8"
             >
               <img
                 src={selectedImg}
                 alt={product.name}
-                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full max-h-[540px] xl:max-h-[600px] object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-md"
               />
+              <span className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 text-xs px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <ZoomIn className="w-3.5 h-3.5 text-[#3B429F]" /> Click to Zoom
+              </span>
             </div>
 
             {/* Thumbnail Carousel */}
-            <div className="flex items-center gap-3 overflow-x-auto pb-1">
-              {product.gallery.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImg(img)}
-                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition shrink-0 ${
-                    selectedImg === img ? 'border-[#3B429F] shadow-sm' : 'border-gray-200 opacity-60 hover:opacity-100'
-                  }`}
+            {product.gallery && product.gallery.length > 1 && (
+              <div className="flex items-center gap-3 overflow-x-auto pb-1">
+                {product.gallery.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setSelectedImg(img);
+                      setZoomImage(img);
+                    }}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden border-2 transition shrink-0 p-1 bg-white cursor-pointer ${
+                      selectedImg === img ? 'border-[#3B429F] shadow-sm' : 'border-gray-200 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt="thumbnail" className="w-full h-full object-contain rounded-xl" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* X80 Specific Product Features Picture - Enlarged below product images, filling the left space opposite Description & Key Features */}
+            {(isX80 || product.featuresBannerImage) && (
+              <div className="pt-4 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[11px] font-bold text-gray-500 tracking-wider uppercase">
+                    X80 KEY FEATURE HIGHLIGHTS
+                  </span>
+                  <span className="text-[10px] text-[#3B429F] font-semibold flex items-center gap-1">
+                    <ZoomIn className="w-3 h-3" /> Click image to enlarge
+                  </span>
+                </div>
+                <div
+                  onClick={() => {
+                    setZoomImage(product.featuresBannerImage || '/images/x80_product_features.png');
+                    setIsZoomOpen(true);
+                  }}
+                  className="w-full rounded-3xl overflow-hidden border border-gray-200/90 shadow-md bg-slate-950 p-1 group cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-[#3B429F]/60"
                 >
-                  <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+                  <img
+                    src={product.featuresBannerImage || '/images/x80_product_features.png'}
+                    alt="VOEUX X80 Key Features - QLED Display, Dual Knob Design, Wireless Apple CarPlay, Wireless Android Auto, AHD Camera Support, 4GB RAM 64GB Storage"
+                    className="w-full h-auto object-cover rounded-2xl transition-transform duration-500 group-hover:scale-[1.01]"
+                  />
+                </div>
+              </div>
+            )}
 
           </div>
 
           {/* Right Column: Clean Product Info & Pricing */}
-          <div className="lg:col-span-6 space-y-6 text-left">
+          <div className="lg:col-span-5 xl:col-span-5 space-y-6 text-left">
             
             {/* Title & Short Specs */}
             <div className="space-y-1.5">
@@ -638,16 +681,16 @@ export const ProductDetailPage = () => {
           {/* Center Main Zoomed Image Container */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex-1 w-full max-w-5xl flex items-center justify-center py-4"
+            className="relative flex-1 w-full max-w-6xl flex items-center justify-center py-4"
           >
             <img
-              src={selectedImg}
+              src={zoomImage || selectedImg}
               alt={product.name}
-              className="max-h-[75vh] max-w-full object-contain rounded-2xl shadow-2xl transition-all duration-300"
+              className="max-h-[82vh] max-w-full object-contain rounded-2xl shadow-2xl transition-all duration-300"
             />
 
-            {/* Prev & Next Controls if Gallery has multiple items */}
-            {product.gallery.length > 1 && (
+            {/* Prev & Next Controls if Gallery has multiple items and not viewing custom banner */}
+            {!zoomImage && product.gallery.length > 1 && (
               <>
                 <button
                   onClick={(e) => {
@@ -656,7 +699,7 @@ export const ProductDetailPage = () => {
                     const prevIdx = (currentIdx - 1 + product.gallery.length) % product.gallery.length;
                     setSelectedImg(product.gallery[prevIdx]);
                   }}
-                  className="absolute left-2 sm:left-6 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800 text-white border border-gray-700 transition flex items-center justify-center shadow-xl"
+                  className="absolute left-2 sm:left-6 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800 text-white border border-gray-700 transition flex items-center justify-center shadow-xl cursor-pointer"
                   aria-label="Previous Image"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -669,7 +712,7 @@ export const ProductDetailPage = () => {
                     const nextIdx = (currentIdx + 1) % product.gallery.length;
                     setSelectedImg(product.gallery[nextIdx]);
                   }}
-                  className="absolute right-2 sm:right-6 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800 text-white border border-gray-700 transition flex items-center justify-center shadow-xl"
+                  className="absolute right-2 sm:right-6 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800 text-white border border-gray-700 transition flex items-center justify-center shadow-xl cursor-pointer"
                   aria-label="Next Image"
                 >
                   <ChevronRight className="w-6 h-6" />
