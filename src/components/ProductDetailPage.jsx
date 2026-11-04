@@ -44,9 +44,11 @@ export const ProductDetailPage = () => {
 
   const isX80 = product?.id?.includes('x80') || product?.name?.toLowerCase().includes('x80');
   const is6InchSpeaker = product?.id === 'voeux-svx001-6inch-speakers' || product?.name?.toLowerCase().includes('6-inch') || product?.name?.toLowerCase().includes('6 inch');
+  const is65InchSpeaker = product?.id === 'voeux-svx005-6-5inch-speakers' || product?.name?.toLowerCase().includes('6.5') || product?.name?.toLowerCase().includes('cs606');
   const featuresImage = product?.featuresBannerImage || 
     (isX80 ? '/images/x80_product_features.jpg' : 
-    (is6InchSpeaker ? '/images/speaker_6inch_features.jpg' : null));
+    (is65InchSpeaker ? '/images/speaker_6_5inch_features.jpg' :
+    (is6InchSpeaker ? '/images/speaker_6inch_features.jpg' : null)));
 
   const [includeFrame, setIncludeFrame] = useState(false);
   const [includeCamera, setIncludeCamera] = useState(false);

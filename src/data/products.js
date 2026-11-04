@@ -393,6 +393,7 @@ const RAW_PRODUCTS = [
     isTrending: true,
     isBestseller: true,
     image: '/images/voeux_cs606pt2_main.png',
+    featuresBannerImage: '/images/speaker_6_5inch_features.jpg',
     gallery: [
       '/images/voeux_cs606pt2_main.png',
       '/images/voeux_cs606pt2_front.png',
