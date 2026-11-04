@@ -140,36 +140,40 @@ export const BundleDetailPage = ({ bundle }) => {
 
   return (
     <div className="bg-white min-h-screen pb-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
-        
-        {/* Back Button */}
-        <button 
-          onClick={() => setActivePage('bundles')}
-          className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#3B429F] transition mb-6 cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Bundles
-        </button>
+      {/* Top Header / Back Button */}
+      <div className="w-full border-b border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <button 
+            onClick={() => setActivePage('bundles')}
+            className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#3B429F] transition cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Bundles
+          </button>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14">
+      {/* Top Product Section: Left Image (Starts from Screen Left Edge) & Right Details */}
+      <div className="w-full pb-10 border-b border-gray-100">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-start">
           
-          {/* Left Column: Image (No box behind, enlarged covering whole left space, no hover movement) */}
-          <div className="lg:col-span-7 xl:col-span-7 space-y-6">
-            <div className="w-full flex items-center justify-center relative select-none">
-              <span className="absolute top-2 left-2 bg-[#3B429F] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full z-10 shadow-md flex items-center gap-1.5">
+          {/* Left Column: Image - flush from left edge of screen all the way to right details column */}
+          <div className="lg:col-span-7 xl:col-span-7 2xl:col-span-7 w-full flex flex-col justify-start pl-0 pr-0">
+            <div className="w-full flex items-center justify-center relative select-none bg-white p-2 sm:p-4">
+              <span className="absolute top-4 left-4 bg-[#3B429F] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full z-10 shadow-md flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5" />
                 Bundle Offer
               </span>
               <img 
                 src={bundle.image} 
                 alt={bundle.name}
-                className="w-full h-auto max-h-[640px] xl:max-h-[680px] object-contain"
+                className="w-full max-w-full h-auto max-h-[70vh] lg:max-h-[75vh] object-contain mx-auto block"
               />
             </div>
           </div>
 
           {/* Right Column: Info & Actions */}
-          <div className="lg:col-span-5 xl:col-span-5 space-y-6">
+          <div className="lg:col-span-5 xl:col-span-5 2xl:col-span-5 w-full px-4 sm:px-6 lg:px-8 xl:pr-14 2xl:pr-20 space-y-6 text-left pt-2 lg:pt-4">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
               {bundle.name}
             </h1>
@@ -258,9 +262,11 @@ export const BundleDetailPage = ({ bundle }) => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Dynamic Tabs Section */}
-        <div className="mt-16 border-t border-gray-200 pt-8">
+      {/* Dynamic Tabs Section */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        <div className="mt-6 border-t border-gray-200 pt-8">
           <div className="grid grid-cols-4 sm:flex sm:overflow-x-auto border-b border-gray-200">
             {tabs.map(tab => (
               <button

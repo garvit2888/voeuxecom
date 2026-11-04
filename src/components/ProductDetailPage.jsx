@@ -151,27 +151,25 @@ export const ProductDetailPage = () => {
         </div>
       </div>
 
-      {/* Main Full-Page Product Container */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 max-w-7xl space-y-16">
-        
-        {/* Top Product Section: Left Gallery & Right Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-start">
+      {/* Top Product Section: Left Image Flush from Screen Left Edge till Product Details */}
+      <div className="w-full pb-10 border-b border-gray-100">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-start">
           
-          {/* Left Column: Image Showcase (No box behind, enlarged covering whole left space, no hover movement) */}
-          <div className="lg:col-span-7 xl:col-span-7 space-y-6">
+          {/* Left Column: Image Showcase (Starts from 0px screen left edge all the way to right details column) */}
+          <div className="lg:col-span-7 xl:col-span-7 2xl:col-span-7 w-full flex flex-col justify-start pl-0 pr-0">
             
-            {/* Main Image Viewport - Pure image, no box, no hover scale */}
+            {/* Main Image Viewport - Fits screen exactly without exceeding screen limits or cropping */}
             <div
               onClick={() => {
                 setZoomImage(selectedImg);
                 setIsZoomOpen(true);
               }}
-              className="w-full flex items-center justify-center cursor-pointer select-none"
+              className="w-full flex items-center justify-center cursor-pointer select-none bg-white p-2 sm:p-4"
             >
               <img
                 src={selectedImg}
                 alt={product.name}
-                className="w-full h-auto max-h-[640px] xl:max-h-[680px] object-contain"
+                className="w-full max-w-full h-auto max-h-[70vh] lg:max-h-[75vh] object-contain mx-auto block"
                 loading="eager"
                 decoding="async"
               />
@@ -179,7 +177,7 @@ export const ProductDetailPage = () => {
 
             {/* Thumbnail Carousel */}
             {product.gallery && product.gallery.length > 1 && (
-              <div className="flex items-center gap-3 overflow-x-auto pb-1 pt-1">
+              <div className="flex items-center gap-3 overflow-x-auto pb-1 pt-4 px-4 sm:px-6 lg:px-8">
                 {product.gallery.map((img, idx) => (
                   <button
                     key={idx}
@@ -197,29 +195,10 @@ export const ProductDetailPage = () => {
               </div>
             )}
 
-            {/* Desktop Only: Product Features Picture (X80 & 6-Inch Speakers) - On the left side of Description */}
-            {featuresImage && (
-              <div
-                onClick={() => {
-                  setZoomImage(featuresImage);
-                  setIsZoomOpen(true);
-                }}
-                className="hidden lg:block w-full pt-4 cursor-pointer select-none"
-              >
-                <img
-                  src={featuresImage}
-                  alt={`${product.name} Key Features`}
-                  className="w-full h-auto rounded-2xl block"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            )}
-
           </div>
 
           {/* Right Column: Clean Product Info & Pricing */}
-          <div className="lg:col-span-5 xl:col-span-5 space-y-6 text-left">
+          <div className="lg:col-span-5 xl:col-span-5 2xl:col-span-5 w-full px-4 sm:px-6 lg:px-8 xl:pr-14 2xl:pr-20 space-y-6 text-left pt-2 lg:pt-4">
             
             {/* Title & Short Specs */}
             <div className="space-y-1.5">
@@ -428,28 +407,34 @@ export const ProductDetailPage = () => {
 
             </div>
 
-            {/* Mobile Only: Product Features Image (way below Description, Key Features & Specifications) */}
-            {featuresImage && (
-              <div
-                onClick={() => {
-                  setZoomImage(featuresImage);
-                  setIsZoomOpen(true);
-                }}
-                className="block lg:hidden w-full pt-6 cursor-pointer select-none"
-              >
-                <img
-                  src={featuresImage}
-                  alt={`${product.name} Key Features`}
-                  className="w-full h-auto rounded-2xl block"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            )}
-
           </div>
 
         </div>
+      </div>
+
+      {/* Full-Width Features Banner (Strictly Below Description, Key Features & Specifications) - Fits exactly within screen with zero cropping */}
+      {featuresImage && (
+        <div className="w-full my-6 sm:my-10 overflow-hidden flex items-center justify-center">
+          <div
+            onClick={() => {
+              setZoomImage(featuresImage);
+              setIsZoomOpen(true);
+            }}
+            className="w-full max-w-full flex items-center justify-center cursor-pointer select-none"
+          >
+            <img
+              src={featuresImage}
+              alt={`${product.name} Key Features & Highlights`}
+              className="w-full max-w-full h-auto max-h-[85vh] object-contain mx-auto block"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Main Container for A+ Rich Content, FAQs, Reviews, and Recently Viewed */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 max-w-7xl space-y-16">
 
         {/* A+ Rich Content Section */}
         {product.aPlusContent && product.aPlusContent.length > 0 && (
