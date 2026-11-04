@@ -452,7 +452,8 @@ function doPost(e) {
         "Registration Date & Time",
         "Warranty Status",
         "Extended Warranty Plan",
-        "Extended Warranty Amount"
+        "Extended Warranty Amount",
+        "Razorpay Payment ID"
       ]);
     }
 
@@ -469,7 +470,8 @@ function doPost(e) {
       data.submittedAt || '',
       (hasExtended ? 'ACTIVE (2-Year Protection)' : (data.warrantyStatus || 'ACTIVE')),
       extPlanText,
-      extAmountText
+      extAmountText,
+      data.paymentId || 'N/A'
     ]);
 
     // Send Warranty Certificate Email to Customer
@@ -484,7 +486,8 @@ function doPost(e) {
 
       var planSection = hasExtended
         ? "Warranty Plan: 1 Year Warranty Plan + 1 Year Extended Warranty by VOEUX (Total 2 Years Complete Protection)\n" +
-          "Extended Warranty Fee: ₹1,249/- (Included & Activated)\n"
+          "Extended Warranty Fee: ₹1,249/- (Paid & Activated)\n" +
+          (data.paymentId && data.paymentId !== 'N/A' ? ("Razorpay Payment ID: " + data.paymentId + "\n") : "")
         : "Warranty Plan: 1 Year Official Domestic Warranty\n";
 
       var statusSection = hasExtended

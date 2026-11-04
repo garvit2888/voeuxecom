@@ -22,6 +22,21 @@ export const WarrantyPortal = () => {
   const [registeredCertificate, setRegisteredCertificate] = useState(null);
   const [includeExtendedWarranty, setIncludeExtendedWarranty] = useState(false);
 
+  // Dynamic Razorpay Script Loader
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   // Helper to compute exact Warranty End Date (1-Year Standard or 2-Year with Extended Plan)
   const getWarrantyEndDate = (purchaseDateStr, isExtended = false) => {
     if (!purchaseDateStr) return '';
@@ -30,44 +45,9 @@ export const WarrantyPortal = () => {
     return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const selectedProduct = formData.productPurchased === 'Other' 
-      ? (formData.customProductName.trim() || 'Other VOEUX Product')
-      : formData.productPurchased;
-
-    const selectedStore = formData.storeOutlet === 'Other'
-      ? (formData.customStoreName.trim() || 'Other Retail Outlet')
-      : formData.storeOutlet;
-
-    if (!formData.name || !formData.email || !formData.purchaseDate || !selectedProduct || !selectedStore) {
-      alert('Please fill in required fields: Customer Name, Customer Email Address, Date of Purchase, Product Purchased, and Store Outlet.');
-      return;
-    }
-
+  // Common completion handler: Saves to localStorage, triggers Google Sheet Webhook & Customer Email
+  const completeRegistration = async (submissionData) => {
     setIsSubmitting(true);
-
-    const certificateId = 'VX-WRTY-' + Math.floor(100000 + Math.random() * 900000);
-    const expiryDate = getWarrantyEndDate(formData.purchaseDate, includeExtendedWarranty);
-
-    const submissionData = {
-      ...formData,
-      productPurchased: selectedProduct,
-      storeOutlet: selectedStore,
-      certificateId,
-      submittedAt: new Date().toLocaleString('en-IN'),
-      warrantyExpires: expiryDate,
-      warrantyStatus: includeExtendedWarranty ? 'ACTIVE (2-Year Protection)' : 'ACTIVE',
-      hasExtendedWarranty: includeExtendedWarranty ? 'YES' : 'NO',
-      extendedWarranty: includeExtendedWarranty ? 'YES (₹1,249)' : 'NO',
-      extendedWarrantyPlan: includeExtendedWarranty 
-        ? '1 Year Standard Warranty + 1 Year Extended Warranty by VOEUX (Total 2 Years)' 
-        : '1 Year Standard Warranty',
-      extendedWarrantyAmount: includeExtendedWarranty ? 1249 : 0,
-      warrantyDuration: includeExtendedWarranty ? '2 Years' : '1 Year',
-      sheetId: '1HrCZRT2DyDmBkj1Z2RT3s7hgiwN47xWhNxiyHpGg8wA'
-    };
 
     // 1. Save submission data in local browser storage
     try {
@@ -90,11 +70,121 @@ export const WarrantyPortal = () => {
       console.log('Sheet payload background sync complete.');
     }
 
-    // 3. Smooth 1.2s delay so user sees loading animation clearly
+    // 3. Smooth delay so user sees loading animation clearly
     setTimeout(() => {
       setIsSubmitting(false);
       setRegisteredCertificate(submissionData);
     }, 1200);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const selectedProduct = formData.productPurchased === 'Other' 
+      ? (formData.customProductName.trim() || 'Other VOEUX Product')
+      : formData.productPurchased;
+
+    const selectedStore = formData.storeOutlet === 'Other'
+      ? (formData.customStoreName.trim() || 'Other Retail Outlet')
+      : formData.storeOutlet;
+
+    if (!formData.name || !formData.email || !formData.purchaseDate || !selectedProduct || !selectedStore) {
+      alert('Please fill in required fields: Customer Name, Customer Email Address, Date of Purchase, Product Purchased, and Store Outlet.');
+      return;
+    }
+
+    const certificateId = 'VX-WRTY-' + Math.floor(100000 + Math.random() * 900000);
+
+    // FLOW A: Customer opted for Extended Warranty (+₹1,249/-) -> Redirect to Razorpay Payment Portal
+    if (includeExtendedWarranty) {
+      setIsSubmitting(true);
+      const isLoaded = await loadRazorpayScript();
+
+      if (!isLoaded || !window.Razorpay) {
+        setIsSubmitting(false);
+        alert('Unable to load Razorpay payment portal. Please check your internet connection and try again.');
+        return;
+      }
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TXq1ludSll63Cn',
+        amount: 1249 * 100, // ₹1,249 in paise
+        currency: 'INR',
+        name: 'VOEUX® Electronics',
+        description: '1 Year Extended Warranty Plan (Total 2 Years Protection)',
+        image: window.location.origin + '/images/voeux_logo.png',
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone || ''
+        },
+        theme: { color: '#3B429F' },
+        handler: async function (response) {
+          const paymentId = response.razorpay_payment_id || 'PAY_' + Date.now();
+          const expiryDate = getWarrantyEndDate(formData.purchaseDate, true);
+
+          const submissionData = {
+            ...formData,
+            productPurchased: selectedProduct,
+            storeOutlet: selectedStore,
+            certificateId,
+            submittedAt: new Date().toLocaleString('en-IN'),
+            warrantyExpires: expiryDate,
+            warrantyStatus: 'ACTIVE (2-Year Protection)',
+            hasExtendedWarranty: 'YES',
+            extendedWarranty: 'YES (₹1,249)',
+            extendedWarrantyPlan: '1 Year Standard Warranty + 1 Year Extended Warranty by VOEUX (Total 2 Years)',
+            extendedWarrantyAmount: 1249,
+            warrantyDuration: '2 Years',
+            paymentId: paymentId,
+            paymentMethod: 'RAZORPAY_ONLINE',
+            paymentStatus: 'PAID',
+            sheetId: '1HrCZRT2DyDmBkj1Z2RT3s7hgiwN47xWhNxiyHpGg8wA'
+          };
+
+          await completeRegistration(submissionData);
+        },
+        modal: {
+          ondismiss: function () {
+            setIsSubmitting(false);
+            alert('Payment was not completed. You can try paying again to activate the 1 Year Extended Warranty, or uncheck the option to proceed with standard free registration.');
+          }
+        }
+      };
+
+      try {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } catch (err) {
+        setIsSubmitting(false);
+        alert('Razorpay Payment Portal error: ' + (err.message || 'Unknown error'));
+      }
+      return;
+    }
+
+    // FLOW B: Normal Flow (Checkbox NOT selected) -> Directly activate and dispatch certificate email
+    setIsSubmitting(true);
+    const expiryDate = getWarrantyEndDate(formData.purchaseDate, false);
+    const submissionData = {
+      ...formData,
+      productPurchased: selectedProduct,
+      storeOutlet: selectedStore,
+      certificateId,
+      submittedAt: new Date().toLocaleString('en-IN'),
+      warrantyExpires: expiryDate,
+      warrantyStatus: 'ACTIVE (1-Year Standard)',
+      hasExtendedWarranty: 'NO',
+      extendedWarranty: 'NO',
+      extendedWarrantyPlan: '1 Year Standard Warranty',
+      extendedWarrantyAmount: 0,
+      warrantyDuration: '1 Year',
+      paymentId: 'N/A',
+      paymentMethod: 'FREE_REGISTRATION',
+      paymentStatus: 'N/A',
+      sheetId: '1HrCZRT2DyDmBkj1Z2RT3s7hgiwN47xWhNxiyHpGg8wA'
+    };
+
+    await completeRegistration(submissionData);
   };
 
   return (
@@ -296,12 +386,16 @@ export const WarrantyPortal = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>ACTIVATING WARRANTY & SENDING EMAIL...</span>
+                  <span>
+                    {includeExtendedWarranty
+                      ? 'PROCESSING PAYMENT / ACTIVATING WARRANTY...'
+                      : 'ACTIVATING WARRANTY & SENDING EMAIL...'}
+                  </span>
                 </>
               ) : (
                 <span>
                   {includeExtendedWarranty
-                    ? 'ACTIVATE 2-YEAR EXTENDED WARRANTY & SEND EMAIL CERTIFICATE'
+                    ? 'PAY ₹1,249 VIA RAZORPAY & ACTIVATE 2-YEAR EXTENDED WARRANTY'
                     : 'ACTIVATE WARRANTY & SEND EMAIL CERTIFICATE'}
                 </span>
               )}
@@ -332,6 +426,9 @@ export const WarrantyPortal = () => {
               <p><strong>Store Outlet:</strong> {registeredCertificate.storeOutlet}</p>
               <p><strong>Phone:</strong> {registeredCertificate.phone || 'N/A'}</p>
               <p><strong>Order ID:</strong> {registeredCertificate.orderId || 'N/A'}</p>
+              {registeredCertificate.paymentId && registeredCertificate.paymentId !== 'N/A' && (
+                <p><strong>Payment ID:</strong> <span className="text-[#3B429F] font-bold">{registeredCertificate.paymentId}</span> (₹1,249 Paid via Razorpay)</p>
+              )}
               {registeredCertificate.hasExtendedWarranty === 'YES' ? (
                 <div className="py-2 px-3 my-2 bg-indigo-50 border border-indigo-200 rounded text-[#3B429F] font-sans">
                   <p className="font-bold text-xs">🛡️ Plan: 1 Year Standard Warranty + 1 Year Extended Warranty by VOEUX</p>
