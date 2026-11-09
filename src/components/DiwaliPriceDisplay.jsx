@@ -13,7 +13,8 @@ export const DiwaliPriceDisplay = ({
   overrideMrp = null,
   overrideDiscount = null,
   size = 'md', // 'sm' | 'md' | 'lg'
-  showBadge = true
+  showBadge = true,
+  theme = 'light' // 'light' | 'dark'
 }) => {
   const [isCutAnimated, setIsCutAnimated] = useState(false);
   const [saleActive, setSaleActive] = useState(() => isDiwaliSaleActive());
@@ -36,6 +37,7 @@ export const DiwaliPriceDisplay = ({
   const discount = overrideDiscount !== null ? overrideDiscount : defaultPricing.discount;
   const hasDiwaliDiscount = saleActive && discount > 0;
   const diwaliPrice = hasDiwaliDiscount ? Math.max(0, regularPrice - discount) : regularPrice;
+  const isDark = theme === 'dark';
 
   // Text sizes based on prop
   const sizeClasses = {
@@ -63,12 +65,20 @@ export const DiwaliPriceDisplay = ({
   if (!hasDiwaliDiscount) {
     return (
       <div className="flex flex-col space-y-0.5">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className={sizeClasses.diwali.replace('text-red-600', 'text-gray-900')}>
-            ₹{regularPrice.toLocaleString('en-IN')}
-          </span>
+        <div className="flex items-baseline gap-2.5 flex-wrap">
+          {isDark ? (
+            <div className="price-shine-container">
+              <span className={`${sizeClasses.diwali.replace('text-red-600', '')} glowing-price-white font-black tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]`}>
+                ₹{regularPrice.toLocaleString('en-IN')}
+              </span>
+            </div>
+          ) : (
+            <span className={sizeClasses.diwali.replace('text-red-600', 'text-gray-900')}>
+              ₹{regularPrice.toLocaleString('en-IN')}
+            </span>
+          )}
           {mrp > regularPrice && (
-            <span className={`${sizeClasses.mrp} line-through`}>
+            <span className={`${sizeClasses.mrp} ${isDark ? 'text-gray-400 font-semibold' : ''} line-through`}>
               MRP ₹{mrp.toLocaleString('en-IN')}
             </span>
           )}
@@ -85,8 +95,8 @@ export const DiwaliPriceDisplay = ({
         
         {/* Animated Strikethrough Regular Price */}
         <div className="relative inline-block font-semibold">
-          <span className="text-gray-500 text-[11px] uppercase mr-1 font-bold">Orig. Price:</span>
-          <span className={`${sizeClasses.regular} relative inline-block transition-colors duration-500 ${isCutAnimated ? 'text-gray-400' : 'text-gray-700'}`}>
+          <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'} text-[11px] uppercase mr-1 font-bold`}>Orig. Price:</span>
+          <span className={`${sizeClasses.regular} relative inline-block transition-colors duration-500 ${isCutAnimated ? (isDark ? 'text-gray-500' : 'text-gray-400') : (isDark ? 'text-gray-300' : 'text-gray-700')}`}>
             ₹{regularPrice.toLocaleString('en-IN')}
             
             {/* Animated Red Strike Cut Line */}
@@ -102,25 +112,33 @@ export const DiwaliPriceDisplay = ({
 
         {/* MRP as was before */}
         {mrp > regularPrice && (
-          <span className={`${sizeClasses.mrp} line-through font-medium`}>
+          <span className={`${sizeClasses.mrp} ${isDark ? 'text-gray-400 font-semibold' : 'text-gray-400 font-medium'} line-through`}>
             MRP: ₹{mrp.toLocaleString('en-IN')}
           </span>
         )}
       </div>
 
-      {/* 2. Below: Diwali Special Price in bold festive red with pop animation */}
+      {/* 2. Below: Diwali Special Price in bold festive red or glowing white with pop animation */}
       <div className="flex items-baseline gap-2.5 flex-wrap">
         <div
           className={`flex items-baseline gap-1.5 transition-all duration-500 ease-out ${
             isCutAnimated ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-80 translate-y-0.5'
           }`}
         >
-          <span className="text-[11px] sm:text-xs font-bold text-red-600 uppercase tracking-wide">
+          <span className={`text-[11px] sm:text-xs font-bold uppercase tracking-wide ${isDark ? 'text-yellow-400' : 'text-red-600'}`}>
             Diwali Special:
           </span>
-          <span className={`${sizeClasses.diwali} tracking-tight drop-shadow-sm`}>
-            ₹{diwaliPrice.toLocaleString('en-IN')}
-          </span>
+          {isDark ? (
+            <div className="price-shine-container">
+              <span className={`${sizeClasses.diwali.replace('text-red-600', '')} glowing-price-white font-black tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]`}>
+                ₹{diwaliPrice.toLocaleString('en-IN')}
+              </span>
+            </div>
+          ) : (
+            <span className={`${sizeClasses.diwali} tracking-tight drop-shadow-sm`}>
+              ₹{diwaliPrice.toLocaleString('en-IN')}
+            </span>
+          )}
         </div>
 
         {/* Festive Badge */}

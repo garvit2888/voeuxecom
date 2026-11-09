@@ -121,7 +121,7 @@ export const Hero = () => {
               {/* Special Diwali Pricing with Animated Cut Line */}
               {s.featuredProduct && (
                 <div className="py-0.5">
-                  <DiwaliPriceDisplay product={s.featuredProduct} size="md" />
+                  <DiwaliPriceDisplay product={s.featuredProduct} size="md" theme="dark" />
                 </div>
               )}
 
@@ -176,7 +176,7 @@ export const Hero = () => {
                 {/* Special Diwali Pricing with Animated Cut Line */}
                 {s.featuredProduct && (
                   <div className="py-1">
-                    <DiwaliPriceDisplay product={s.featuredProduct} size="lg" />
+                    <DiwaliPriceDisplay product={s.featuredProduct} size="lg" theme="dark" />
                   </div>
                 )}
 
