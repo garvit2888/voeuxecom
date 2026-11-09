@@ -31,9 +31,6 @@ import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
-import { DiwaliCountdownTimer } from './components/DiwaliCountdownTimer';
-import { DiwaliTopBanner } from './components/DiwaliTopBanner';
-import { DiwaliFireworks } from './components/DiwaliFireworks';
 
 
 const MainContent = () => {
@@ -128,10 +125,7 @@ const MainContent = () => {
       default:
         return (
           <div className="pb-16">
-            {/* Full-screen Diwali Dhamaka Sale Section (covers 100dvh with countdown timer) */}
-            <DiwaliTopBanner />
-
-            {/* Hero Carousel (160W Soundbar, X80, etc.) flush directly below with 0 gap */}
+            {/* Hero Carousel (160W Soundbar, X80, etc.) */}
             <Hero />
 
             <div className="space-y-16 mt-16">
@@ -224,9 +218,6 @@ const MainContent = () => {
     <div className="min-h-screen bg-white text-gray-900 flex flex-col justify-between relative">
       {/* Brand Splash Screen on Initial Load */}
       <SplashScreen />
-
-      {/* Diwali Fireworks Animation (bursts rockets & crackers after splash screen) */}
-      <DiwaliFireworks />
 
       {/* Added to Cart Celebration Pop-Up Card */}
       {lastAddedProduct && (
