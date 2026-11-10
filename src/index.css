@@ -206,79 +206,39 @@ body {
 .animate-cart-toast-in  { animation: cart-toast-in  0.45s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 .animate-cart-toast-out { animation: cart-toast-out 0.35s ease-in forwards; }
 
-/* Glowing White Price with Radiant Shine Animation for Dark Backgrounds */
-@keyframes price-glow-pulse {
+/* Shiny White Price Text (Strictly text-clipped, no glow/halo around letters) */
+@keyframes text-shine-sweep {
   0% {
-    text-shadow:
-      0 0 8px rgba(255, 255, 255, 0.95),
-      0 0 18px rgba(255, 255, 255, 0.8),
-      0 0 30px rgba(255, 255, 255, 0.5),
-      0 0 45px rgba(255, 255, 255, 0.3);
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) brightness(1);
-  }
-  50% {
-    text-shadow:
-      0 0 14px rgba(255, 255, 255, 1),
-      0 0 26px rgba(255, 255, 255, 0.95),
-      0 0 42px rgba(255, 255, 255, 0.75),
-      0 0 65px rgba(255, 255, 255, 0.5);
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.95)) brightness(1.2);
+    background-position: -200% center;
   }
   100% {
-    text-shadow:
-      0 0 8px rgba(255, 255, 255, 0.95),
-      0 0 18px rgba(255, 255, 255, 0.8),
-      0 0 30px rgba(255, 255, 255, 0.5),
-      0 0 45px rgba(255, 255, 255, 0.3);
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) brightness(1);
+    background-position: 200% center;
   }
 }
 
-@keyframes price-shine-sweep {
-  0% {
-    transform: translateX(-150%) skewX(-25deg);
-  }
-  30%, 100% {
-    transform: translateX(250%) skewX(-25deg);
-  }
-}
-
+.shiny-price-white,
 .glowing-price-white {
+  display: inline-block;
   color: #FFFFFF !important;
-  animation: price-glow-pulse 2.4s ease-in-out infinite;
-  display: inline-flex;
-  align-items: baseline;
-  position: relative;
-  letter-spacing: -0.01em;
-}
-
-.price-shine-container {
-  position: relative;
-  display: inline-flex;
-  align-items: baseline;
-  overflow: hidden;
-  padding: 2px 8px;
-  margin: -2px -8px;
-  border-radius: 4px;
-}
-
-.price-shine-container::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
   background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.25) 20%,
-    rgba(255, 255, 255, 0.95) 50%,
-    rgba(255, 255, 255, 0.25) 80%,
-    transparent 100%
-  );
-  animation: price-shine-sweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  pointer-events: none;
+    115deg,
+    #FFFFFF 0%,
+    #FFFFFF 28%,
+    #cbd5e1 38%,
+    #FFFFFF 48%,
+    #FFFFFF 52%,
+    #94a3b8 62%,
+    #FFFFFF 72%,
+    #FFFFFF 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: text-shine-sweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  text-shadow: none !important;
+  filter: none !important;
+  letter-spacing: -0.01em;
 }
 
 

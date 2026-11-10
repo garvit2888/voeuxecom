@@ -67,11 +67,9 @@ export const DiwaliPriceDisplay = ({
       <div className="flex flex-col space-y-0.5">
         <div className="flex items-baseline gap-2.5 flex-wrap">
           {isDark ? (
-            <div className="price-shine-container">
-              <span className={`${sizeClasses.diwali.replace('text-red-600', '')} glowing-price-white font-black tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]`}>
-                ₹{regularPrice.toLocaleString('en-IN')}
-              </span>
-            </div>
+            <span className={`${sizeClasses.diwali.replace('text-red-600', '')} shiny-price-white font-black tracking-tight`}>
+              ₹{regularPrice.toLocaleString('en-IN')}
+            </span>
           ) : (
             <span className={sizeClasses.diwali.replace('text-red-600', 'text-gray-900')}>
               ₹{regularPrice.toLocaleString('en-IN')}
@@ -129,11 +127,9 @@ export const DiwaliPriceDisplay = ({
             Diwali Special:
           </span>
           {isDark ? (
-            <div className="price-shine-container">
-              <span className={`${sizeClasses.diwali.replace('text-red-600', '')} glowing-price-white font-black tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]`}>
-                ₹{diwaliPrice.toLocaleString('en-IN')}
-              </span>
-            </div>
+            <span className={`${sizeClasses.diwali.replace('text-red-600', '')} shiny-price-white font-black tracking-tight`}>
+              ₹{diwaliPrice.toLocaleString('en-IN')}
+            </span>
           ) : (
             <span className={`${sizeClasses.diwali} tracking-tight drop-shadow-sm`}>
               ₹{diwaliPrice.toLocaleString('en-IN')}
