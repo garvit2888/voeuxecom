@@ -52,7 +52,8 @@ export const Hero = () => {
       ctaText: 'Explore Carbon Black TS7',
       actionPage: 'android-players',
       featuredProduct: PRODUCTS.find(p => p.id === 'voeux-carbon-black-ts7-4-64') || PRODUCTS[0],
-      mobilePadding: 'p-5'
+      mobilePadding: 'p-5',
+      isTs7: true
     }
   ];
 
@@ -150,14 +151,18 @@ export const Hero = () => {
               <div
                 key={idx}
                 onClick={() => handleSlideClick(s)}
-                className="w-full h-full shrink-0 relative"
+                className="w-full h-full shrink-0 relative bg-black"
               >
                 <img
                   src={s.image}
                   alt={s.title}
                   loading="eager"
                   fetchPriority="high"
-                  className="w-full h-full object-cover object-center pointer-events-none"
+                  className={`w-full h-full pointer-events-none ${
+                    s.isTs7
+                      ? 'object-contain object-top'
+                      : 'object-cover object-center'
+                  }`}
                 />
               </div>
             ))}
@@ -264,7 +269,7 @@ export const Hero = () => {
         </div>
 
         {/* INSTANT PRELOADED EAGER IMAGES (GPU RAM CACHED) */}
-        <div className="absolute right-0 top-0 bottom-0 w-[55%] flex items-center justify-end pointer-events-none z-0 pr-8 lg:pr-16 xl:pr-24">
+        <div className="absolute right-0 top-0 bottom-0 w-[55%] lg:w-[60%] flex items-center justify-end pointer-events-none z-0 pr-8 lg:pr-16 xl:pr-24">
           {slides.map((s, idx) => (
             <img
               key={idx}
@@ -272,7 +277,11 @@ export const Hero = () => {
               alt={s.title}
               loading="eager"
               fetchPriority="high"
-              className={`absolute right-4 max-h-[85vh] max-w-[90%] object-contain object-right transition-all duration-500 ease-in-out group-hover:scale-105 ${
+              className={`absolute right-4 object-contain object-right transition-all duration-500 ease-in-out ${
+                s.isTs7
+                  ? 'max-h-[96vh] max-w-full scale-110 lg:scale-120 xl:scale-125 group-hover:scale-130 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] [mask-image:radial-gradient(ellipse_at_center,black_65%,transparent_98%)]'
+                  : 'max-h-[85vh] max-w-[90%] group-hover:scale-105'
+              } ${
                 idx === currentSlide
                   ? 'opacity-95'
                   : 'opacity-0 pointer-events-none'
@@ -280,11 +289,11 @@ export const Hero = () => {
             />
           ))}
           
-          {/* Image Boundary Gradient Fades */}
-          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
-          <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none z-20" />
-          <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-black to-transparent pointer-events-none z-20" />
+          {/* Image Boundary Gradient Fades / Shade Effect */}
+          <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-black via-black/70 to-transparent pointer-events-none z-20" />
+          <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-b from-transparent via-black/70 to-black pointer-events-none z-20" />
+          <div className="absolute top-0 bottom-0 left-0 w-72 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-20" />
+          <div className="absolute top-0 bottom-0 right-0 w-28 bg-gradient-to-l from-black via-black/60 to-transparent pointer-events-none z-20" />
         </div>
 
         {/* Dark Gradient Overlay for text readability (extended) */}
