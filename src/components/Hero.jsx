@@ -102,7 +102,7 @@ export const Hero = () => {
     <section id="hero-section" className="bg-black border-b border-gray-800">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative w-full bg-black text-white flex flex-col pt-0 pb-12 overflow-x-hidden">
+      <div className="md:hidden relative w-full min-h-screen min-h-[100dvh] bg-black text-white flex flex-col justify-between pt-0 pb-20 overflow-x-hidden">
 
         {/* IMAGE STACK: Full bleed edge-to-edge from extreme left to extreme right */}
         <div
@@ -110,7 +110,7 @@ export const Hero = () => {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="relative w-full aspect-square overflow-hidden cursor-pointer select-none bg-black"
+          className="relative w-full aspect-square overflow-hidden cursor-pointer select-none bg-black shrink-0"
         >
           {slides.map((s, idx) => (
             <img
@@ -128,37 +128,39 @@ export const Hero = () => {
           ))}
         </div>
 
-        {/* TEXT STACK: Directly below edge-to-edge image */}
-        <div className="w-full mt-4 space-y-3.5 text-left min-h-[170px] relative px-4">
-          {slides.map((s, idx) => (
-            <div
-              key={idx}
-              onClick={() => setSelectedProductModal(s.featuredProduct)}
-              className={`transition-all duration-500 ease-in-out space-y-3 cursor-pointer ${
-                idx === currentSlide
-                  ? 'opacity-100 translate-y-0 relative z-10'
-                  : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
-              }`}
-            >
-              <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
-                {s.title}
-              </h1>
+        {/* TEXT STACK & DOTS: Fills remaining viewport space gracefully */}
+        <div className="w-full flex-1 flex flex-col justify-between mt-3 px-4">
+          <div className="space-y-3 text-left min-h-[155px] relative">
+            {slides.map((s, idx) => (
+              <div
+                key={idx}
+                onClick={() => setSelectedProductModal(s.featuredProduct)}
+                className={`transition-all duration-500 ease-in-out space-y-3 cursor-pointer ${
+                  idx === currentSlide
+                    ? 'opacity-100 translate-y-0 relative z-10'
+                    : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
+                }`}
+              >
+                <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
+                  {s.title}
+                </h1>
 
-              {/* Special Pricing with Animated Cut Line */}
-              {s.featuredProduct && (
-                <div className="py-0.5">
-                  <DiwaliPriceDisplay product={s.featuredProduct} size="md" theme="dark" />
-                </div>
-              )}
+                {/* Special Pricing with Animated Cut Line */}
+                {s.featuredProduct && (
+                  <div className="py-0.5">
+                    <DiwaliPriceDisplay product={s.featuredProduct} size="md" theme="dark" />
+                  </div>
+                )}
 
-              <p className="text-sm text-gray-300 font-medium leading-relaxed">
-                {s.tagline}
-              </p>
-            </div>
-          ))}
+                <p className="text-sm text-gray-300 font-medium leading-relaxed">
+                  {s.tagline}
+                </p>
+              </div>
+            ))}
+          </div>
 
           {/* Slide Dots Mobile */}
-          <div className="flex items-center justify-center space-x-2 pt-4 pb-1 relative z-20">
+          <div className="flex items-center justify-center space-x-2 pt-4 pb-2 relative z-20">
             {slides.map((_, idx) => (
               <button
                 key={idx}
