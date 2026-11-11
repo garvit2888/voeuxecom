@@ -7,6 +7,8 @@ import { DiwaliPriceDisplay } from './DiwaliPriceDisplay';
 export const Hero = () => {
   const { setActivePage, setSelectedProductModal } = useShop();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
 
   const slides = [
     {
@@ -68,6 +70,27 @@ export const Hero = () => {
     }
   };
 
+  const handleTouchStart = (e) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    const isLeftSwipe = distance > 45;
+    const isRightSwipe = distance < -45;
+    if (isLeftSwipe) {
+      setCurrentSlide(prev => (prev + 1) % slides.length);
+    } else if (isRightSwipe) {
+      setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+    }
+  };
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
@@ -79,12 +102,15 @@ export const Hero = () => {
     <section id="hero-section" className="bg-black border-b border-gray-800">
 
       {/* ========== MOBILE LAYOUT ONLY ========== */}
-      <div className="md:hidden relative min-h-screen bg-black text-white flex flex-col items-center justify-center pt-2 pb-24 px-4 overflow-x-hidden">
+      <div className="md:hidden relative w-full bg-black text-white flex flex-col pt-0 pb-12 overflow-x-hidden">
 
-        {/* IMAGE STACK: Clean container without cutting shadow gradients */}
+        {/* IMAGE STACK: Full bleed edge-to-edge from extreme left to extreme right */}
         <div
           onClick={() => handleSlideClick(slides[currentSlide])}
-          className="relative w-full h-72 sm:h-96 overflow-hidden flex items-center justify-center cursor-pointer"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="relative w-full aspect-square overflow-hidden cursor-pointer select-none bg-black"
         >
           {slides.map((s, idx) => (
             <img
@@ -93,7 +119,7 @@ export const Hero = () => {
               alt={s.title}
               loading="eager"
               fetchPriority="high"
-              className={`absolute inset-0 w-full h-full object-contain object-center p-2 transition-all duration-500 ease-in-out ${
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 ease-in-out ${
                 idx === currentSlide
                   ? 'opacity-100 scale-100 z-1'
                   : 'opacity-0 scale-105 pointer-events-none z-0'
@@ -103,22 +129,22 @@ export const Hero = () => {
         </div>
 
         {/* TEXT STACK: Directly below edge-to-edge image */}
-        <div className="w-full mt-3 space-y-4 text-left min-h-[160px] relative px-1">
+        <div className="w-full mt-4 space-y-3.5 text-left min-h-[170px] relative px-4">
           {slides.map((s, idx) => (
             <div
               key={idx}
               onClick={() => setSelectedProductModal(s.featuredProduct)}
-              className={`transition-all duration-500 ease-in-out space-y-3.5 cursor-pointer ${
+              className={`transition-all duration-500 ease-in-out space-y-3 cursor-pointer ${
                 idx === currentSlide
                   ? 'opacity-100 translate-y-0 relative z-10'
                   : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
               }`}
             >
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">
+              <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
                 {s.title}
               </h1>
 
-              {/* Special Diwali Pricing with Animated Cut Line */}
+              {/* Special Pricing with Animated Cut Line */}
               {s.featuredProduct && (
                 <div className="py-0.5">
                   <DiwaliPriceDisplay product={s.featuredProduct} size="md" theme="dark" />
@@ -132,7 +158,7 @@ export const Hero = () => {
           ))}
 
           {/* Slide Dots Mobile */}
-          <div className="flex items-center justify-center space-x-2 pt-5 pb-1 relative z-20">
+          <div className="flex items-center justify-center space-x-2 pt-4 pb-1 relative z-20">
             {slides.map((_, idx) => (
               <button
                 key={idx}
