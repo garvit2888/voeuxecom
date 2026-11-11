@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,8 +7,11 @@ import { DiwaliPriceDisplay } from './DiwaliPriceDisplay';
 export const Hero = () => {
   const { setActivePage, setSelectedProductModal } = useShop();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [touchStartX, setTouchStartX] = useState(null);
-  const [touchEndX, setTouchEndX] = useState(null);
+  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const isSwipingRef = useRef(false);
 
   const slides = [
     {
@@ -62,6 +65,7 @@ export const Hero = () => {
   }, []);
 
   const handleSlideClick = (slide) => {
+    if (isSwipingRef.current || Math.abs(dragOffset) > 10) return;
     if (slide.actionPage === 'bundles') {
       setActivePage('bundles');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -71,32 +75,54 @@ export const Hero = () => {
   };
 
   const handleTouchStart = (e) => {
-    setTouchEndX(null);
     setTouchStartX(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
+    setDragOffset(0);
+    setIsDragging(true);
+    isSwipingRef.current = false;
   };
 
   const handleTouchMove = (e) => {
-    setTouchEndX(e.targetTouches[0].clientX);
+    if (!isDragging) return;
+    const diffX = e.targetTouches[0].clientX - touchStartX;
+    const diffY = e.targetTouches[0].clientY - touchStartY;
+
+    // Allow natural vertical page scroll if vertical delta is greater
+    if (Math.abs(diffY) > Math.abs(diffX) && !isSwipingRef.current) {
+      return;
+    }
+
+    if (Math.abs(diffX) > 8) {
+      isSwipingRef.current = true;
+    }
+    setDragOffset(diffX);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartX || !touchEndX) return;
-    const distance = touchStartX - touchEndX;
-    const isLeftSwipe = distance > 45;
-    const isRightSwipe = distance < -45;
-    if (isLeftSwipe) {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    if (dragOffset < -45) {
+      // Swiped Left -> Product slides to next in that direction
       setCurrentSlide(prev => (prev + 1) % slides.length);
-    } else if (isRightSwipe) {
+    } else if (dragOffset > 45) {
+      // Swiped Right -> Product slides to previous in that direction
       setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
     }
+    setDragOffset(0);
+    setTimeout(() => {
+      isSwipingRef.current = false;
+    }, 50);
   };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % slides.length);
+      if (!isDragging) {
+        setCurrentSlide(prev => (prev + 1) % slides.length);
+      }
     }, 6000);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, [slides.length, isDragging]);
 
   return (
     <section id="hero-section" className="bg-black border-b border-gray-800">
@@ -104,59 +130,80 @@ export const Hero = () => {
       {/* ========== MOBILE LAYOUT ONLY ========== */}
       <div className="md:hidden relative w-full min-h-screen min-h-[100dvh] bg-black text-white flex flex-col justify-between pt-0 pb-20 overflow-x-hidden">
 
-        {/* IMAGE STACK: Full bleed edge-to-edge from extreme left to extreme right */}
+        {/* IMAGE SLIDER TRACK: Full bleed edge-to-edge with true horizontal sliding animation */}
         <div
-          onClick={() => handleSlideClick(slides[currentSlide])}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           className="relative w-full aspect-square overflow-hidden cursor-pointer select-none bg-black shrink-0"
         >
-          {slides.map((s, idx) => (
-            <img
-              key={idx}
-              src={s.image}
-              alt={s.title}
-              loading="eager"
-              fetchPriority="high"
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 ease-in-out ${
-                idx === currentSlide
-                  ? 'opacity-100 scale-100 z-1'
-                  : 'opacity-0 scale-105 pointer-events-none z-0'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* TEXT STACK & DOTS: Fills remaining viewport space gracefully */}
-        <div className="w-full flex-1 flex flex-col justify-between mt-3 px-4">
-          <div className="space-y-3 text-left min-h-[155px] relative">
+          <div
+            className="flex w-full h-full will-change-transform"
+            style={{
+              transform: isDragging
+                ? `translateX(calc(-${currentSlide * 100}% + ${dragOffset}px))`
+                : `translateX(-${currentSlide * 100}%)`,
+              transition: isDragging ? 'none' : 'transform 450ms cubic-bezier(0.25, 1, 0.5, 1)'
+            }}
+          >
             {slides.map((s, idx) => (
               <div
                 key={idx}
-                onClick={() => setSelectedProductModal(s.featuredProduct)}
-                className={`transition-all duration-500 ease-in-out space-y-3 cursor-pointer ${
-                  idx === currentSlide
-                    ? 'opacity-100 translate-y-0 relative z-10'
-                    : 'opacity-0 translate-y-3 absolute inset-0 pointer-events-none z-0'
-                }`}
+                onClick={() => handleSlideClick(s)}
+                className="w-full h-full shrink-0 relative"
               >
-                <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
-                  {s.title}
-                </h1>
-
-                {/* Special Pricing with Animated Cut Line */}
-                {s.featuredProduct && (
-                  <div className="py-0.5">
-                    <DiwaliPriceDisplay product={s.featuredProduct} size="md" theme="dark" />
-                  </div>
-                )}
-
-                <p className="text-sm text-gray-300 font-medium leading-relaxed">
-                  {s.tagline}
-                </p>
+                <img
+                  src={s.image}
+                  alt={s.title}
+                  loading="eager"
+                  fetchPriority="high"
+                  className="w-full h-full object-cover object-center pointer-events-none"
+                />
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* TEXT STACK & DOTS: Slides smoothly in sync with images */}
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="w-full flex-1 flex flex-col justify-between mt-3 px-4 overflow-hidden"
+        >
+          <div className="relative min-h-[155px] overflow-hidden">
+            <div
+              className="flex w-full will-change-transform"
+              style={{
+                transform: isDragging
+                  ? `translateX(calc(-${currentSlide * 100}% + ${dragOffset}px))`
+                  : `translateX(-${currentSlide * 100}%)`,
+                transition: isDragging ? 'none' : 'transform 450ms cubic-bezier(0.25, 1, 0.5, 1)'
+              }}
+            >
+              {slides.map((s, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => handleSlideClick(s)}
+                  className="w-full shrink-0 space-y-3 text-left cursor-pointer select-none"
+                >
+                  <h1 className="text-2xl font-black tracking-tight leading-tight text-white">
+                    {s.title}
+                  </h1>
+
+                  {/* Special Pricing with Animated Cut Line */}
+                  {s.featuredProduct && (
+                    <div className="py-0.5">
+                      <DiwaliPriceDisplay product={s.featuredProduct} size="md" theme="dark" />
+                    </div>
+                  )}
+
+                  <p className="text-sm text-gray-300 font-medium leading-relaxed">
+                    {s.tagline}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Slide Dots Mobile */}
