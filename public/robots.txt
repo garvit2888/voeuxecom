@@ -1,4 +1,14 @@
 User-agent: *
 Allow: /
+Disallow: /?*admin*
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /images/
+
+User-agent: Bingbot
+Allow: /
 
 Sitemap: https://voeuxtechnologies.in/sitemap.xml

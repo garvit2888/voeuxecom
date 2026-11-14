@@ -1,9 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
   <url>
     <loc>https://voeuxtechnologies.in/</loc>
-    <lastmod>2026-08-06</lastmod>
+    <lastmod>2026-11-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+
+    <!-- VOEUX X80 Diamond 10.1" Dual Knob Android Car Stereo -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_x80_stereo.jpg</image:loc>
+      <image:title>VOEUX® X80 Diamond Premium 10.1" Dual Knob Android Car Stereo (4GB+64GB)</image:title>
+      <image:caption>VOEUX X80 Diamond 10.1-inch IPS Touchscreen Android Car Stereo with 4GB RAM, 64GB Storage, Dual Rotary Knobs, Wireless Apple CarPlay &amp; Android Auto</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_x80_hero_bg.jpg</image:loc>
+      <image:title>VOEUX® Premium X80 Series Dual Knob 10.1" Car Stereo</image:title>
+      <image:caption>Official VOEUX X80 Series Dual Knob 10.1-inch Android Car Multimedia System</image:caption>
+    </image:image>
+
+    <!-- VOEUX 160W 2-in-1 Separable Soundbar with Subwoofer -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_main.jpg</image:loc>
+      <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
+      <image:caption>VOEUX 160W 2.1 Channel Convertible Dual Tower &amp; Horizontal Bluetooth 5.0 Soundbar with Dedicated Subwoofer and HDMI ARC</image:caption>
+    </image:image>
+
+    <!-- VOEUX Carbon Black Series 9" QLED Android TS7 Car Stereo -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_carbon_black_ts7.jpg</image:loc>
+      <image:title>VOEUX® Carbon Black Series 9" QLED Android TS7 4+64GB Car Stereo</image:title>
+      <image:caption>VOEUX 9-inch QLED Touchscreen Android TS7 6th Gen 4-Core Car Stereo (4GB+64GB) with Wireless CarPlay, Android Auto &amp; AHD Camera</image:caption>
+    </image:image>
+
+    <!-- VOEUX 10.1" Dual Knob Piano Buttons Android Car Stereo -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_dual_knob_piano_stereo.jpg</image:loc>
+      <image:title>VOEUX® Android 10.1" Dual Knob &amp; Piano Buttons Car Multimedia Player (4GB+64GB)</image:title>
+      <image:caption>VOEUX 10.1-inch QLED Touchscreen Android Car Stereo with Dual Knobs, Piano Buttons, 4GB RAM, 64GB ROM &amp; AHD Rear Camera</image:caption>
+    </image:image>
+
+    <!-- VOEUX Single Knob Piano Series Android Car Stereo -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_single_knob_piano_stereo.png</image:loc>
+      <image:title>VOEUX® Single Knob Piano Series Android Car Stereo (4GB+64GB)</image:title>
+      <image:caption>VOEUX Single Rotary Knob &amp; Physical Piano Buttons Android Car Stereo with 4GB RAM, 64GB Storage &amp; Wireless Apple CarPlay</image:caption>
+    </image:image>
+
+    <!-- VOEUX SVX-UND001 10-Inch Underseat Active Subwoofer -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_hero.jpg</image:loc>
+      <image:title>VOEUX® SVX-UND001 10-Inch Powered Underseat Car Subwoofer (120W RMS / 900W Peak)</image:title>
+      <image:caption>VOEUX SVX-UND001 Ultra-Slim 10-inch Active Underseat Car Subwoofer with Built-in Amplifier and Wired Bass Remote</image:caption>
+    </image:image>
+
+    <!-- VOEUX 6.5" 2-Way Coaxial Car Speakers (VE-CS606PT2) -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_main.png</image:loc>
+      <image:title>VOEUX® VE-CS606PT2 6.5" 2-Way Coaxial Car Speakers (460W Peak / 75W RMS)</image:title>
+      <image:caption>VOEUX 6.5-inch 2-Way Coaxial Car Door Speakers with Dual Voice Coil Technology and 93 dB High Sensitivity</image:caption>
+    </image:image>
+
+    <!-- VOEUX 6" 2-Way Coaxial Car Speakers (VE-CS606) -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_coaxial_speakers.png</image:loc>
+      <image:title>VOEUX® VE-CS606 6" 2-Way Coaxial Car Speakers (380W High Bass)</image:title>
+      <image:caption>VOEUX 6-inch 2-Way Coaxial High-Bass Car Speakers with Dual Voice Coil and Polypropylene Cone</image:caption>
+    </image:image>
+
+    <!-- VOEUX 150W Mono Class AB Car Amplifier Board -->
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_board.jpg</image:loc>
+      <image:title>VOEUX® 150W Mono Class AB Car Amplifier Board for Basstubes &amp; Subwoofers</image:title>
+      <image:caption>VOEUX 150W RMS Mono Class AB Car Amplifier Board with Variable Bass Crossover and 25A Fuse Protection</image:caption>
+    </image:image>
   </url>
 </urlset>

@@ -65,6 +65,115 @@ const MainContent = () => {
     return () => window.removeEventListener('hashchange', checkSecretRoute);
   }, [setActivePage]);
 
+  // Dynamic On-Page SEO & Structured Data Updater (Zero UI changes)
+  useEffect(() => {
+    const defaultTitle = 'VOEUX® Official Store | Premium Car Android Players, Subwoofers, Speakers & Soundbars';
+    const defaultDesc = 'Shop official VOEUX® car electronics & home audio in India. Explore 9" & 10.1" QLED Car Android Players with Wireless Apple CarPlay & Android Auto, 160W 2-in-1 Bluetooth Soundbars, 10" Underseat Subwoofers, 460W Coaxial Car Speakers & Class AB Amplifiers.';
+
+    const pageSeoMap = {
+      'home': {
+        title: defaultTitle,
+        desc: defaultDesc
+      },
+      'android-players': {
+        title: 'Car Android Players (9" & 10.1" QLED, 4GB+64GB, Wireless CarPlay) | VOEUX® Official Store',
+        desc: 'Buy VOEUX® 9-inch & 10.1-inch QLED Android Car Stereos with 4GB RAM, 64GB ROM, Dual Rotary Knobs, Wireless Apple CarPlay, Android Auto & AHD Reverse Camera. Universal Double-DIN Fit.'
+      },
+      'car-speakers': {
+        title: '6" & 6.5" Coaxial Car Door Speakers (High Bass, Dual Voice Coil) | VOEUX® Official Store',
+        desc: 'Upgrade your car audio with VOEUX® VE-CS606 (380W 6-inch) and VE-CS606PT2 (460W 6.5-inch) 2-Way Coaxial Car Speakers featuring Dual Voice Coil technology and high sensitivity.'
+      },
+      'speakers-soundbars': {
+        title: 'VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer | Official Store',
+        desc: 'Shop the VOEUX® 160W RMS 2.1 Channel Convertible Soundbar. Use as a sleek horizontal TV soundbar or twin vertical tower speakers with dedicated external subwoofer, Bluetooth 5.0 & HDMI ARC.'
+      },
+      'subwoofers': {
+        title: '10-Inch Active Underseat Car Subwoofer (120W RMS / 900W Peak) | VOEUX® Official Store',
+        desc: 'Experience deep punchy bass without losing boot space with the VOEUX® SVX-UND001 10-Inch Powered Underseat Car Subwoofer. Ultra-slim 6.8 cm profile with built-in amplifier & wired bass remote.'
+      },
+      'amplifiers': {
+        title: '150W Mono Class AB Car Amplifier Board for Basstubes & Subwoofers | VOEUX® Official Store',
+        desc: 'Shop the VOEUX® 150W RMS Mono Class AB Car Amplifier Board featuring variable bass crossover control (40Hz–200Hz), RCA & high-level inputs, and 25A fuse protection.'
+      },
+      'bundles': {
+        title: 'Car Android Stereo + 4 Speakers + Frame Combo Bundles | VOEUX® Official Store',
+        desc: 'Save big with complete VOEUX® Car Audio Upgrade Combos including a 9" or 10.1" Android Car Player, 4 High-Bass Coaxial Speakers, and a custom Double-DIN dashboard frame.'
+      },
+      'warranty': {
+        title: 'Online Warranty Registration & Support | VOEUX® Electronics India',
+        desc: 'Register your 1-Year Domestic Warranty for official VOEUX® Car Android Players, Soundbars, Subwoofers, Car Speakers, and Amplifiers.'
+      },
+      'dealers': {
+        title: 'Authorized Dealer & Installer Locator | VOEUX® Electronics India',
+        desc: 'Find authorized VOEUX® car audio dealers and fitment studios across New Delhi, Mumbai, Bengaluru, and pan-India.'
+      },
+      'join-us': {
+        title: 'Become an Authorized VOEUX® Distributor or Dealer | Partner Program',
+        desc: 'Partner with VOEUX® Electronics India. Apply for our official car electronics and audio distributor network.'
+      }
+    };
+
+    let nextTitle = defaultTitle;
+    let nextDesc = defaultDesc;
+
+    if (selectedProductModal && selectedProductModal.name) {
+      nextTitle = `${selectedProductModal.name} – ₹${Number(selectedProductModal.price).toLocaleString('en-IN')} | VOEUX® Official Store`;
+      nextDesc = selectedProductModal.description || `${selectedProductModal.name} available at ₹${Number(selectedProductModal.price).toLocaleString('en-IN')} with 1-Year VOEUX® Warranty and Free Delivery across India.`;
+    } else if (pageSeoMap[activePage]) {
+      nextTitle = pageSeoMap[activePage].title;
+      nextDesc = pageSeoMap[activePage].desc;
+    }
+
+    document.title = nextTitle;
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', nextDesc);
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', nextTitle);
+
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', nextDesc);
+
+    // Inject dynamic Product JSON-LD when viewing a product
+    let scriptEl = document.getElementById('voeux-dynamic-product-ld');
+    if (selectedProductModal && selectedProductModal.name) {
+      if (!scriptEl) {
+        scriptEl = document.createElement('script');
+        scriptEl.id = 'voeux-dynamic-product-ld';
+        scriptEl.type = 'application/ld+json';
+        document.head.appendChild(scriptEl);
+      }
+      const productImage = selectedProductModal.image?.startsWith('http')
+        ? selectedProductModal.image
+        : `https://voeuxtechnologies.in${selectedProductModal.image || '/images/voeux_logo.png'}`;
+
+      scriptEl.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: selectedProductModal.name,
+        sku: selectedProductModal.id,
+        image: [productImage],
+        description: selectedProductModal.description || nextDesc,
+        brand: {
+          '@type': 'Brand',
+          name: 'VOEUX'
+        },
+        offers: {
+          '@type': 'Offer',
+          url: 'https://voeuxtechnologies.in/',
+          priceCurrency: 'INR',
+          price: String(selectedProductModal.price),
+          priceValidUntil: '2027-12-31',
+          itemCondition: 'https://schema.org/NewCondition',
+          availability: 'https://schema.org/InStock'
+        }
+      });
+    } else if (scriptEl) {
+      scriptEl.remove();
+    }
+  }, [activePage, selectedProductModal]);
+
 
   const renderPage = () => {
     switch (activePage) {
