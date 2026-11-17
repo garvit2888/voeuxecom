@@ -439,7 +439,7 @@ export const ProductDetailModal = () => {
                 q: 'How do shipping, delivery and replacement work?',
                 a: (
                   <span>
-                    We offer Free Express Delivery across India via reliable logistics partners.{' '}
+                    A standard shipping fee of ₹399 applies for the soundbar (charges will be paid directly to the shipping company / courier partner).{' '}
                     All products are backed by a <strong>7-Day Hassle-Free Replacement Guarantee</strong> (applies for any problem arising during transit or any major manufacturing defect —{' '}
                     <button
                       type="button"

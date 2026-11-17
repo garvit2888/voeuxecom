@@ -52,8 +52,17 @@ export const CartDrawer = () => {
   const hasBundleProduct = cart.some(item => 
     item && (item.isBundle || item.noCouponAllowed || (item.product && (item.product.isBundle || item.product.category === 'bundles' || item.product.id?.includes('bundle'))))
   );
+
+  const hasSoundbarProduct = cart.some(item =>
+    item && item.product && (
+      item.product.category === 'speakers-soundbars' ||
+      item.product.id === 'voeux-160w-separable-soundbar' ||
+      item.product.id?.toLowerCase().includes('soundbar') ||
+      item.product.name?.toLowerCase().includes('soundbar')
+    )
+  );
   
-  const shippingFee = hasBundleProduct 
+  const shippingFee = (hasBundleProduct || hasSoundbarProduct)
     ? 399 
     : (hasSpeakerProduct ? 199 : (hasAmpProduct ? 150 : 0));
 
