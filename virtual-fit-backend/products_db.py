@@ -8,9 +8,13 @@ transparent reference photographs and physical dimensions.
 import os
 from typing import Dict, Any, Optional
 
-PRODUCTS_IMG_DIR = os.path.abspath(
+LOCAL_PRODUCTS_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "products")
+)
+PUBLIC_PRODUCTS_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "public", "images", "virtual-fit", "products")
 )
+PRODUCTS_IMG_DIR = LOCAL_PRODUCTS_DIR if os.path.isdir(LOCAL_PRODUCTS_DIR) else PUBLIC_PRODUCTS_DIR
 
 VIRTUAL_FIT_PRODUCTS: Dict[str, Dict[str, Any]] = {
     "voeux-x80-dual-knob": {
