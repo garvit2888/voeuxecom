@@ -219,3 +219,4 @@ async def refit_manual_corners(
         "corners": parsed_corners,
         "processing_ms": elapsed_ms,
     }
+

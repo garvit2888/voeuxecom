@@ -55,3 +55,4 @@ def get_product_ref(product_id: str) -> Optional[Dict[str, Any]]:
 
 def list_supported_products():
     return list(VIRTUAL_FIT_PRODUCTS.values())
+

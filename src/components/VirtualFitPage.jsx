@@ -234,6 +234,8 @@ export const VirtualFitPage = () => {
       : (productsList || PRODUCTS).find((p) => p.id === 'voeux-x80-dual-knob') || PRODUCTS[0];
 
   const [stage, setStage] = useState('upload'); // 'upload' | 'preview' | 'processing' | 'result'
+  const [showTutorial, setShowTutorial] = useState(true); // Always shown on open to guide customers
+  const [loadingSample, setLoadingSample] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -290,6 +292,23 @@ export const VirtualFitPage = () => {
     setIsDragOver(false);
     const file = e.dataTransfer?.files?.[0];
     if (file) handleFileSelected(file);
+  };
+
+  const handleUseSampleDashboard = async () => {
+    setLoadingSample(true);
+    setErrorMessage('');
+    try {
+      const resp = await fetch('/images/virtual-fit/sample_dashboard.jpg');
+      if (!resp.ok) throw new Error('Could not load sample dashboard.');
+      const blob = await resp.blob();
+      const sampleFile = new File([blob], 'sample_dashboard.jpg', { type: 'image/jpeg' });
+      setShowTutorial(false);
+      handleFileSelected(sampleFile);
+    } catch (err) {
+      setErrorMessage('Could not load sample dashboard. Please upload your own photo.');
+    } finally {
+      setLoadingSample(false);
+    }
   };
 
   const runVirtualFitPipeline = async () => {
@@ -484,15 +503,125 @@ export const VirtualFitPage = () => {
           </span>
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/50">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#3B429F]" />
-          <span className="truncate max-w-[200px]">
-            {activeProduct.id === 'voeux-x80-dual-knob'
-              ? 'X80 Dual Knob 10.1"'
-              : 'Carbon Black TS7 9"'}
-          </span>
+        <div className="flex items-center gap-5">
+          <button
+            type="button"
+            onClick={() => setShowTutorial(true)}
+            className="text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-white/55 hover:text-white transition-colors cursor-pointer"
+          >
+            How It Works
+          </button>
+          <div className="hidden sm:flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/50">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3B429F]" />
+            <span className="truncate max-w-[200px]">
+              {activeProduct.id === 'voeux-x80-dual-knob'
+                ? 'X80 Dual Knob 10.1"'
+                : 'Carbon Black TS7 9"'}
+            </span>
+          </div>
         </div>
       </header>
+
+      {/* Editorial Tutorial Overlay (Shown Every Time Virtual Fit Opens) */}
+      {showTutorial && (
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center px-5 py-8">
+          <div className="w-full max-w-xl border border-white/20 bg-black px-7 sm:px-10 py-9 sm:py-11 text-left">
+            <div className="flex items-center justify-between pb-5 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/images/voeux_logo.png"
+                  alt="VOEUX®"
+                  className="h-4 w-auto object-contain opacity-90"
+                />
+                <span className="h-3 w-[1px] bg-white/25" />
+                <span className="text-[10px] uppercase tracking-[0.28em] text-[#7c85ff]">
+                  QUICK GUIDE
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTutorial(false)}
+                className="text-[10px] uppercase tracking-[0.22em] text-white/50 hover:text-white cursor-pointer"
+              >
+                Skip
+              </button>
+            </div>
+
+            <h2 className="mt-6 text-2xl sm:text-3xl font-light uppercase tracking-[0.14em] text-white">
+              HOW VIRTUAL FIT WORKS
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm font-clean text-white/55 leading-relaxed">
+              Visualize the exact{' '}
+              <span className="text-white/90">
+                {activeProduct.id === 'voeux-x80-dual-knob'
+                  ? 'VOEUX® X80 10.1" Dual Knob'
+                  : 'VOEUX® TS7 9" QLED'}
+              </span>{' '}
+              installed inside your vehicle in three simple steps.
+            </p>
+
+            <div className="mt-7 space-y-5">
+              <div className="flex items-start gap-4">
+                <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">01</span>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-white">
+                    Upload a Clear Dashboard Photo
+                  </p>
+                  <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
+                    Take a straight-on, well-lit photograph of your car&apos;s center dashboard — or try our sample dashboard if you don&apos;t have a photo handy right now.
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-[1px] bg-white/10" />
+
+              <div className="flex items-start gap-4">
+                <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">02</span>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-white">
+                    Automatic Stereo Detection &amp; True-Scale Fit
+                  </p>
+                  <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
+                    Our vision engine automatically locates your stereo opening and fits the real VOEUX unit to scale (10.1&quot; vs 9&quot;) with realistic perspective and lighting.
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-[1px] bg-white/10" />
+
+              <div className="flex items-start gap-4">
+                <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">03</span>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-white">
+                    Compare, Adjust Corners &amp; Download
+                  </p>
+                  <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
+                    Slide Before &amp; After to compare, tap <strong className="text-white/90 font-medium">ADJUST FIT</strong> anytime to drag the 4 corners for exact placement, then download your preview or add directly to cart.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-9 flex flex-col sm:flex-row items-center gap-3.5">
+              <button
+                type="button"
+                onClick={() => setShowTutorial(false)}
+                className="w-full sm:flex-1 py-3.5 px-6 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-[11px] uppercase tracking-[0.26em] font-medium transition-all cursor-pointer"
+              >
+                GOT IT, LET&apos;S BEGIN
+              </button>
+              <button
+                type="button"
+                onClick={handleUseSampleDashboard}
+                disabled={loadingSample}
+                className="w-full sm:w-auto py-3.5 px-6 border border-white/35 hover:border-[#3B429F] text-white/85 hover:text-white text-[11px] uppercase tracking-[0.2em] font-light transition-all cursor-pointer disabled:opacity-50"
+              >
+                {loadingSample ? 'LOADING...' : 'TRY SAMPLE DASHBOARD'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Immersive Stage */}
       <main className="flex-1 w-full max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14 flex flex-col items-center justify-center">
@@ -531,7 +660,7 @@ export const VirtualFitPage = () => {
               <span className="w-6 h-[1px] bg-[#3B429F]" />
             </div>
 
-            {/* Minimalist Upload Button */}
+            {/* Minimalist Upload & Sample Dashboard Buttons */}
             <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
               <button
                 type="button"
@@ -540,6 +669,15 @@ export const VirtualFitPage = () => {
               >
                 <Upload className="w-4 h-4 text-white/80 group-hover:text-[#7c85ff] transition-colors" />
                 <span>UPLOAD YOUR DASHBOARD</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleUseSampleDashboard}
+                disabled={loadingSample}
+                className="px-8 py-4 border border-white/25 hover:border-white/75 text-white/75 hover:text-white text-xs uppercase tracking-[0.22em] font-light transition-all duration-300 cursor-pointer disabled:opacity-50"
+              >
+                {loadingSample ? 'LOADING SAMPLE...' : 'TRY SAMPLE DASHBOARD'}
               </button>
 
               <button
@@ -901,3 +1039,4 @@ export const VirtualFitPage = () => {
     </div>
   );
 };
+
