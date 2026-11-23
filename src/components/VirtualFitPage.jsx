@@ -17,7 +17,29 @@ import {
 export const VIRTUAL_FIT_SUPPORTED_IDS = [
   'voeux-x80-dual-knob',
   'voeux-carbon-black-ts7-4-64',
+  'voeux-single-knob-piano-4-64',
 ];
+
+const VIRTUAL_FIT_PRODUCT_META = {
+  'voeux-x80-dual-knob': {
+    shortLabel: 'X80 Dual Knob 10.1"',
+    fullLabel: 'VOEUX® X80 Dual Knob 10.1"',
+    aspect: 1.78,
+    minWidthRatio: 0.21,
+  },
+  'voeux-carbon-black-ts7-4-64': {
+    shortLabel: 'TS7 9" QLED',
+    fullLabel: 'VOEUX® Carbon Black TS7 9" QLED',
+    aspect: 1.786,
+    minWidthRatio: 0.19,
+  },
+  'voeux-single-knob-piano-4-64': {
+    shortLabel: 'Single Knob Piano',
+    fullLabel: 'VOEUX® Single Knob Piano Series',
+    aspect: 1.285,
+    minWidthRatio: 0.20,
+  },
+};
 
 const API_BASE =
   import.meta.env.VITE_VIRTUAL_FIT_API_URL || 'http://localhost:8000';
@@ -458,11 +480,12 @@ export const VirtualFitPage = () => {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const rect = adjustContainerRef.current.getBoundingClientRect();
-        const productAspect =
-          activeProduct.id === 'voeux-x80-dual-knob' ? 1.78 : 1.786;
-        // Never allow shrinking unrealistically small below real 9" / 10.1" proportions
-        const minWidthPx =
-          rect.width * (activeProduct.id === 'voeux-x80-dual-knob' ? 0.21 : 0.19);
+        const prodMeta =
+          VIRTUAL_FIT_PRODUCT_META[activeProduct.id] ||
+          VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob'];
+        const productAspect = prodMeta.aspect;
+        // Never allow shrinking unrealistically small below real physical proportions
+        const minWidthPx = rect.width * prodMeta.minWidthRatio;
         const maxWidthPx = rect.width * 0.85;
 
         if (activeCornerIdx === 'move' && dragStartRef.current) {
@@ -654,9 +677,7 @@ export const VirtualFitPage = () => {
           <div className="hidden sm:flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/50">
             <span className="w-1.5 h-1.5 rounded-full bg-[#3B429F]" />
             <span className="truncate max-w-[200px]">
-              {activeProduct.id === 'voeux-x80-dual-knob'
-                ? 'X80 Dual Knob 10.1"'
-                : 'Carbon Black TS7 9"'}
+              {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).shortLabel}
             </span>
           </div>
         </div>
@@ -693,9 +714,7 @@ export const VirtualFitPage = () => {
             <p className="mt-2 text-xs sm:text-sm font-clean text-white/55 leading-relaxed">
               Visualize the exact{' '}
               <span className="text-white/90">
-                {activeProduct.id === 'voeux-x80-dual-knob'
-                  ? 'VOEUX® X80 10.1" Dual Knob'
-                  : 'VOEUX® TS7 9" QLED'}
+                {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
               </span>{' '}
               installed inside your vehicle in three simple steps.
             </p>
@@ -792,9 +811,7 @@ export const VirtualFitPage = () => {
               <span>
                 Selected:{' '}
                 <strong className="text-white/90 font-normal">
-                  {activeProduct.id === 'voeux-x80-dual-knob'
-                    ? 'VOEUX® X80 Dual Knob 10.1"'
-                    : 'VOEUX® TS7 9" QLED Android'}
+                  {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
                 </strong>
               </span>
               <span className="w-6 h-[1px] bg-[#3B429F]" />
@@ -1014,9 +1031,7 @@ export const VirtualFitPage = () => {
                   VOEUX VIRTUAL FIT PREVIEW
                 </p>
                 <h2 className="text-xl sm:text-2xl font-light uppercase tracking-[0.12em] text-white">
-                  {activeProduct.id === 'voeux-x80-dual-knob'
-                    ? 'VOEUX® X80 DUAL KNOB 10.1"'
-                    : 'VOEUX® CARBON BLACK TS7 9" QLED'}
+                  {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
                 </h2>
               </div>
 
@@ -1233,6 +1248,7 @@ export const VirtualFitPage = () => {
                       setVirtualFitProduct(prod);
                       if (selectedFile) {
                         setStage('preview');
+                        detectCornersForPreview(selectedFile, prod.id);
                       }
                     }}
                     className={`pb-0.5 border-b transition-colors cursor-pointer ${
@@ -1241,7 +1257,7 @@ export const VirtualFitPage = () => {
                         : 'border-transparent text-white/45 hover:text-white/80'
                     }`}
                   >
-                    {pid === 'voeux-x80-dual-knob' ? 'X80 10.1" Dual Knob' : 'TS7 9" QLED'}
+                    {(VIRTUAL_FIT_PRODUCT_META[pid] || {}).shortLabel || prod.name}
                   </button>
                 );
               })}

@@ -113,12 +113,14 @@ def extract_transparent_product(input_path: str, output_path: str) -> None:
 
 if __name__ == "__main__":
     targets = [
-        ("x80_dual_knob_front.PNG", "x80_dual_knob_clean.png"),
-        ("ts7_9inch_front.PNG", "ts7_9inch_clean.png"),
+        (os.path.join(PRODUCTS_DIR, "x80_dual_knob_front.PNG"), os.path.join(PRODUCTS_DIR, "x80_dual_knob_clean.png")),
+        (os.path.join(PRODUCTS_DIR, "ts7_9inch_front.PNG"), os.path.join(PRODUCTS_DIR, "ts7_9inch_clean.png")),
+        (
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public", "images", "voeux_single_knob_piano_stereo.png")),
+            os.path.join(PRODUCTS_DIR, "single_knob_piano_clean.png"),
+        ),
     ]
-    for src_name, dst_name in targets:
-        src_path = os.path.join(PRODUCTS_DIR, src_name)
-        dst_path = os.path.join(PRODUCTS_DIR, dst_name)
+    for src_path, dst_path in targets:
         if os.path.exists(src_path):
             extract_transparent_product(src_path, dst_path)
         else:

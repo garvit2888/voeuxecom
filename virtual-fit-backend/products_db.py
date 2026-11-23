@@ -41,6 +41,20 @@ VIRTUAL_FIT_PRODUCTS: Dict[str, Dict[str, Any]] = {
         "has_protruding_knobs": False,
         "knob_overhang_ratio": 0.0,
     },
+    "voeux-single-knob-piano-4-64": {
+        "product_id": "voeux-single-knob-piano-4-64",
+        "name": "VOEUX® Single Knob Piano Series Android Stereo (4GB+64GB)",
+        "short_name": "VOEUX® Single Knob Piano",
+        "screen_size_inches": 9.5,
+        "physical_width_mm": 236.0,
+        "physical_height_mm": 184.0,
+        "aspect_ratio": 1.285,
+        "fascia_info": "Universal Double DIN with central rotary knob and physical piano keys",
+        "reference_image_file": "single_knob_piano_clean.png",
+        "reference_image_url": "/images/virtual-fit/products/single_knob_piano_clean.png",
+        "has_protruding_knobs": True,
+        "knob_overhang_ratio": 0.06,
+    },
 }
 
 
