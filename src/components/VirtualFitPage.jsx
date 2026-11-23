@@ -531,6 +531,32 @@ export const VirtualFitPage = () => {
     setSliderPos(Math.max(0, Math.min(100, pct)));
   };
 
+  // Move the constant-size player boundary so its circular center dot sits at (clientX, clientY)
+  const moveFixedBoxToClientPos = useCallback((clientX, clientY) => {
+    if (!adjustContainerRef.current) return;
+    const rect = adjustContainerRef.current.getBoundingClientRect();
+    const cxNorm = (clientX - rect.left) / rect.width;
+    const cyNorm = (clientY - rect.top) / rect.height;
+
+    setCorners((prev) => {
+      if (!prev || prev.length !== 4) return prev;
+      const boxW = Math.max(...prev.map((c) => c.x)) - Math.min(...prev.map((c) => c.x));
+      const boxH = Math.max(...prev.map((c) => c.y)) - Math.min(...prev.map((c) => c.y));
+      const halfW = boxW / 2;
+      const halfH = boxH / 2;
+
+      const clampedCx = Math.max(halfW + 0.005, Math.min(1 - halfW - 0.005, cxNorm));
+      const clampedCy = Math.max(halfH + 0.005, Math.min(1 - halfH - 0.005, cyNorm));
+
+      return [
+        { x: clampedCx - halfW, y: clampedCy - halfH },
+        { x: clampedCx + halfW, y: clampedCy - halfH },
+        { x: clampedCx + halfW, y: clampedCy + halfH },
+        { x: clampedCx - halfW, y: clampedCy + halfH },
+      ];
+    });
+  }, []);
+
   useEffect(() => {
     const onMove = (e) => {
       if (isSlidingRef.current) {
@@ -541,94 +567,7 @@ export const VirtualFitPage = () => {
         if (e.cancelable) e.preventDefault();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        const rect = adjustContainerRef.current.getBoundingClientRect();
-        const prodMeta =
-          VIRTUAL_FIT_PRODUCT_META[activeProduct.id] ||
-          VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob'];
-        const productAspect = prodMeta.aspect;
-        // Never allow shrinking unrealistically small below real physical proportions
-        const minWidthPx = rect.width * prodMeta.minWidthRatio;
-        const maxWidthPx = rect.width * 0.85;
-
-        if (activeCornerIdx === 'move' && dragStartRef.current) {
-          const dxNorm = (clientX - dragStartRef.current.clientX) / rect.width;
-          const dyNorm = (clientY - dragStartRef.current.clientY) / rect.height;
-          const startCorners = dragStartRef.current.corners;
-          const minX = Math.min(...startCorners.map((c) => c.x));
-          const maxX = Math.max(...startCorners.map((c) => c.x));
-          const minY = Math.min(...startCorners.map((c) => c.y));
-          const maxY = Math.max(...startCorners.map((c) => c.y));
-
-          const clampedDx = Math.max(0.01 - minX, Math.min(0.99 - maxX, dxNorm));
-          const clampedDy = Math.max(0.01 - minY, Math.min(0.99 - maxY, dyNorm));
-
-          setCorners(
-            startCorners.map((pt) => ({
-              x: pt.x + clampedDx,
-              y: pt.y + clampedDy,
-            }))
-          );
-          return;
-        }
-
-        // Symmetrical aspect-ratio-locked corner resize (dragging up/down or left/right
-        // always keeps the exact real VOEUX product proportions, never stretched or squished)
-        setCorners((prev) => {
-          if (!prev || prev.length !== 4) return prev;
-          const oppIdx = (activeCornerIdx + 2) % 4;
-          const anchorPxX = prev[oppIdx].x * rect.width;
-          const anchorPxY = prev[oppIdx].y * rect.height;
-
-          const curPxX = Math.max(0, Math.min(rect.width, clientX - rect.left));
-          const curPxY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-          const dxPx = curPxX - anchorPxX;
-          const dyPx = curPxY - anchorPxY;
-
-          // Use whichever axis moved further so vertical OR horizontal dragging scales smoothly
-          let targetW = Math.max(Math.abs(dxPx), Math.abs(dyPx) * productAspect);
-          targetW = Math.max(minWidthPx, Math.min(maxWidthPx, targetW));
-          let targetH = targetW / productAspect;
-
-          if (targetH > rect.height * 0.85) {
-            targetH = rect.height * 0.85;
-            targetW = targetH * productAspect;
-          }
-
-          // Determine box bounds anchored at the opposite corner
-          const isLeft = activeCornerIdx === 0 || activeCornerIdx === 3;
-          const isTop = activeCornerIdx === 0 || activeCornerIdx === 1;
-
-          let x1 = isLeft ? anchorPxX - targetW : anchorPxX;
-          let x2 = isLeft ? anchorPxX : anchorPxX + targetW;
-          let y1 = isTop ? anchorPxY - targetH : anchorPxY;
-          let y2 = isTop ? anchorPxY : anchorPxY + targetH;
-
-          // Keep strictly inside dashboard bounds without breaking symmetry
-          if (x1 < 4) {
-            x2 += 4 - x1;
-            x1 = 4;
-          }
-          if (x2 > rect.width - 4) {
-            x1 -= x2 - (rect.width - 4);
-            x2 = rect.width - 4;
-          }
-          if (y1 < 4) {
-            y2 += 4 - y1;
-            y1 = 4;
-          }
-          if (y2 > rect.height - 4) {
-            y1 -= y2 - (rect.height - 4);
-            y2 = rect.height - 4;
-          }
-
-          return [
-            { x: x1 / rect.width, y: y1 / rect.height },
-            { x: x2 / rect.width, y: y1 / rect.height },
-            { x: x2 / rect.width, y: y2 / rect.height },
-            { x: x1 / rect.width, y: y2 / rect.height },
-          ];
-        });
+        moveFixedBoxToClientPos(clientX, clientY);
       }
     };
     const onUp = () => {
@@ -647,7 +586,7 @@ export const VirtualFitPage = () => {
       window.removeEventListener('touchmove', onMove);
       window.removeEventListener('touchend', onUp);
     };
-  }, [activeCornerIdx, activeProduct.id]);
+  }, [activeCornerIdx, moveFixedBoxToClientPos]);
 
   const handleDownloadPreview = () => {
     if (!resultImage) return;
@@ -814,10 +753,10 @@ export const VirtualFitPage = () => {
                 <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">03</span>
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-white">
-                    Compare, Adjust Corners &amp; Download
+                    Place Center Dot, Compare &amp; Download
                   </p>
                   <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
-                    Slide Before &amp; After to compare, tap <strong className="text-white/90 font-medium">ADJUST FIT</strong> anytime to drag the 4 corners for exact placement, then download your preview or add directly to cart.
+                    Tap or drag the circular dot to the center of your console — the boundary stays locked to true fixed 9&quot; / 10.1&quot; physical size for your dashboard photo. Then slide Before &amp; After, download, or add directly to cart.
                   </p>
                 </div>
               </div>
@@ -927,23 +866,33 @@ export const VirtualFitPage = () => {
           </div>
         )}
 
-        {/* ================= STAGE 2: PHOTO PREVIEW + ADJUST FIT + CONTINUE ================= */}
+        {/* ================= STAGE 2: PHOTO PREVIEW + PLACE CENTER DOT + CONTINUE ================= */}
         {stage === 'preview' && previewUrl && (
           <div className="w-full max-w-4xl flex flex-col items-center text-center">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#7c85ff] mb-2">
               {isDetectingPreview
-                ? 'DETECTING STEREO BAY...'
-                : 'ADJUST FIT AREA & CONTINUE'}
+                ? 'ANALYZING DASHBOARD SCALE & CONSOLE...'
+                : 'PLACE CIRCULAR DOT ON CONSOLE CENTER'}
             </p>
             <p className="text-xs sm:text-sm font-clean text-white/60 mb-5 max-w-xl">
               {isDetectingPreview
-                ? 'Our automotive vision model is locating your stereo opening automatically...'
-                : 'Drag the 4 corner points (TL, TR, BR, BL) if you want to refine where your VOEUX player sits, or click CONTINUE to visualize immediately.'}
+                ? 'Analyzing dashboard distance & zoom to lock the exact physical player size...'
+                : 'Tap or drag the circular dot to the center of your car\'s stereo console. The boundary reflects the fixed real-world size of this VOEUX player.'}
             </p>
 
             <div
               ref={adjustContainerRef}
-              className="relative w-full border border-white/20 bg-black overflow-hidden select-none touch-none"
+              onMouseDown={(e) => {
+                if (isDetectingPreview || !corners) return;
+                setActiveCornerIdx('move');
+                moveFixedBoxToClientPos(e.clientX, e.clientY);
+              }}
+              onTouchStart={(e) => {
+                if (isDetectingPreview || !corners || !e.touches[0]) return;
+                setActiveCornerIdx('move');
+                moveFixedBoxToClientPos(e.touches[0].clientX, e.touches[0].clientY);
+              }}
+              className="relative w-full border border-white/20 bg-black overflow-hidden select-none touch-none cursor-crosshair"
             >
               <img
                 src={originalImage || previewUrl}
@@ -951,7 +900,7 @@ export const VirtualFitPage = () => {
                 className="w-full h-auto block pointer-events-none"
               />
 
-              {/* Scanning line while OWL-ViT detects corners */}
+              {/* Scanning line while detecting dashboard scale & stereo center */}
               {isDetectingPreview && (
                 <div
                   className="absolute inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#7c85ff] to-transparent pointer-events-none"
@@ -959,66 +908,51 @@ export const VirtualFitPage = () => {
                 />
               )}
 
-              {/* Interactive Symmetrical 4-Corner Placement Frame */}
-              {!isDetectingPreview && corners && corners.length === 4 && (
-                <>
-                  <svg
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="none"
-                    className="absolute inset-0 w-full h-full"
-                  >
-                    <polygon
-                      points={corners.map((c) => `${c.x * 100},${c.y * 100}`).join(' ')}
-                      fill="rgba(59, 66, 159, 0.24)"
-                      stroke="#FFFFFF"
-                      strokeWidth="0.35"
-                      className="cursor-move"
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        dragStartRef.current = {
-                          clientX: e.clientX,
-                          clientY: e.clientY,
-                          corners: corners.map((c) => ({ ...c })),
-                        };
-                        setActiveCornerIdx('move');
-                      }}
-                      onTouchStart={(e) => {
-                        e.stopPropagation();
-                        if (!e.touches[0]) return;
-                        dragStartRef.current = {
-                          clientX: e.touches[0].clientX,
-                          clientY: e.touches[0].clientY,
-                          corners: corners.map((c) => ({ ...c })),
-                        };
-                        setActiveCornerIdx('move');
-                      }}
-                    />
-                  </svg>
+              {/* Constant-Size Fixed Boundary + Circular Center Dot */}
+              {!isDetectingPreview && corners && corners.length === 4 && (() => {
+                const minX = Math.min(...corners.map((c) => c.x));
+                const maxX = Math.max(...corners.map((c) => c.x));
+                const minY = Math.min(...corners.map((c) => c.y));
+                const maxY = Math.max(...corners.map((c) => c.y));
+                const cx = (minX + maxX) / 2;
+                const cy = (minY + maxY) / 2;
+                const prodMeta =
+                  VIRTUAL_FIT_PRODUCT_META[activeProduct.id] ||
+                  VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob'];
 
-                  {corners.map((pt, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        setActiveCornerIdx(idx);
-                      }}
-                      onTouchStart={(e) => {
-                        e.stopPropagation();
-                        setActiveCornerIdx(idx);
-                      }}
+                return (
+                  <>
+                    {/* Fixed Constant-Size Boundary */}
+                    <div
                       style={{
-                        left: `${pt.x * 100}%`,
-                        top: `${pt.y * 100}%`,
+                        left: `${minX * 100}%`,
+                        top: `${minY * 100}%`,
+                        width: `${(maxX - minX) * 100}%`,
+                        height: `${(maxY - minY) * 100}%`,
                       }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[10px] sm:text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
-                      aria-label={`Adjust corner ${CORNER_LABELS[idx]}`}
+                      className="absolute border border-white/90 bg-[#3B429F]/20 pointer-events-none shadow-[0_0_25px_rgba(0,0,0,0.65)]"
                     >
-                      {CORNER_LABELS[idx]}
-                    </button>
-                  ))}
-                </>
-              )}
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90">
+                        {prodMeta.shortLabel} · FIXED SIZE
+                      </span>
+                    </div>
+
+                    {/* Central Circular Target Dot */}
+                    <div
+                      style={{
+                        left: `${cx * 100}%`,
+                        top: `${cy * 100}%`,
+                      }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center"
+                    >
+                      <span className="absolute w-11 h-11 rounded-full border border-white/45 animate-ping opacity-40" />
+                      <span className="w-7 h-7 sm:w-6 sm:h-6 rounded-full border-2 border-white bg-[#3B429F] shadow-[0_0_16px_rgba(124,133,255,0.95)] flex items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                      </span>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {errorMessage && (
@@ -1196,61 +1130,73 @@ export const VirtualFitPage = () => {
                 </span>
               </div>
             ) : (
-              /* === MANUAL 4-CORNER PERSPECTIVE ADJUSTMENT === */
+              /* === FIXED-SIZE CENTER DOT REPOSITIONING === */
               <div className="w-full flex flex-col items-center">
                 <p className="w-full text-left text-xs font-clean text-white/60 mb-3">
-                  Drag the 4 corner points (TL, TR, BR, BL) to align exactly with your dashboard&apos;s stereo frame, then click <strong className="text-white">APPLY ADJUSTMENT</strong>.
+                  Tap or drag the circular dot to the center of your stereo console, then click <strong className="text-white">APPLY ADJUSTMENT</strong>. The player size remains fixed to true physical scale.
                 </p>
                 <div
                   ref={adjustContainerRef}
-                  className="relative w-full border border-white/25 overflow-hidden select-none bg-black touch-none"
+                  onMouseDown={(e) => {
+                    if (!corners) return;
+                    setActiveCornerIdx('move');
+                    moveFixedBoxToClientPos(e.clientX, e.clientY);
+                  }}
+                  onTouchStart={(e) => {
+                    if (!corners || !e.touches[0]) return;
+                    setActiveCornerIdx('move');
+                    moveFixedBoxToClientPos(e.touches[0].clientX, e.touches[0].clientY);
+                  }}
+                  className="relative w-full border border-white/25 overflow-hidden select-none bg-black touch-none cursor-crosshair"
                 >
                   <img
                     src={originalImage}
-                    alt="Adjust 4 corners on your dashboard"
+                    alt="Place circular dot on your dashboard console center"
                     className="w-full h-auto block pointer-events-none"
                   />
 
-                  {/* SVG Quad Outline Overlay */}
-                  {corners && corners.length === 4 && (
-                    <svg
-                      viewBox="0 0 100 100"
-                      preserveAspectRatio="none"
-                      className="absolute inset-0 w-full h-full pointer-events-none"
-                    >
-                      <polygon
-                        points={corners.map((c) => `${c.x * 100},${c.y * 100}`).join(' ')}
-                        fill="rgba(59, 66, 159, 0.22)"
-                        stroke="#FFFFFF"
-                        strokeWidth="0.35"
-                      />
-                    </svg>
-                  )}
+                  {corners && corners.length === 4 && (() => {
+                    const minX = Math.min(...corners.map((c) => c.x));
+                    const maxX = Math.max(...corners.map((c) => c.x));
+                    const minY = Math.min(...corners.map((c) => c.y));
+                    const maxY = Math.max(...corners.map((c) => c.y));
+                    const cx = (minX + maxX) / 2;
+                    const cy = (minY + maxY) / 2;
+                    const prodMeta =
+                      VIRTUAL_FIT_PRODUCT_META[activeProduct.id] ||
+                      VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob'];
 
-                  {/* 4 Draggable Corner Handles */}
-                  {corners &&
-                    corners.map((pt, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          setActiveCornerIdx(idx);
-                        }}
-                        onTouchStart={(e) => {
-                          e.stopPropagation();
-                          setActiveCornerIdx(idx);
-                        }}
-                        style={{
-                          left: `${pt.x * 100}%`,
-                          top: `${pt.y * 100}%`,
-                        }}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[10px] sm:text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
-                        aria-label={`Drag corner ${CORNER_LABELS[idx]}`}
-                      >
-                        {CORNER_LABELS[idx]}
-                      </button>
-                    ))}
+                    return (
+                      <>
+                        <div
+                          style={{
+                            left: `${minX * 100}%`,
+                            top: `${minY * 100}%`,
+                            width: `${(maxX - minX) * 100}%`,
+                            height: `${(maxY - minY) * 100}%`,
+                          }}
+                          className="absolute border border-white/90 bg-[#3B429F]/20 pointer-events-none shadow-[0_0_25px_rgba(0,0,0,0.65)]"
+                        >
+                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90">
+                            {prodMeta.shortLabel} · FIXED SIZE
+                          </span>
+                        </div>
+
+                        <div
+                          style={{
+                            left: `${cx * 100}%`,
+                            top: `${cy * 100}%`,
+                          }}
+                          className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center"
+                        >
+                          <span className="absolute w-11 h-11 rounded-full border border-white/45 animate-ping opacity-40" />
+                          <span className="w-7 h-7 sm:w-6 sm:h-6 rounded-full border-2 border-white bg-[#3B429F] shadow-[0_0_16px_rgba(124,133,255,0.95)] flex items-center justify-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             )}

@@ -206,23 +206,38 @@ class VirtualFitPipeline:
         self, img_bgr: np.ndarray, wheel_diameter_px: Optional[float]
     ) -> Tuple[float, str]:
         """
-        Estimate real-world pixels-per-millimeter at the center dashboard plane.
-        Uses detected steering wheel (370mm standard diameter) as primary reference,
-        falling back to full-cabin dashboard width (~1380mm).
+        Estimate real-world pixels-per-millimeter at the center dashboard plane
+        based on camera distance & zoom level:
+        1) Primary: Detected steering wheel (370mm real diameter).
+        2) Secondary: Top-windshield visibility & cabin framing analysis (distinguishes
+           close-up console photos from wide full-dashboard cabin photos).
         """
         h, w = img_bgr.shape[:2]
         if wheel_diameter_px is not None and wheel_diameter_px > h * 0.25:
             raw_px_per_mm = wheel_diameter_px / REAL_STEERING_WHEEL_DIAMETER_MM
             console_px_per_mm = raw_px_per_mm * STEERING_TO_CONSOLE_DEPTH_FACTOR
-            # Sanity clamp relative to image width (prevents extreme outliers)
             min_px_mm = (w * 0.16) / 229.0
-            max_px_mm = (w * 0.55) / 252.0
+            max_px_mm = (w * 0.62) / 252.0
             console_px_per_mm = float(np.clip(console_px_per_mm, min_px_mm, max_px_mm))
             return console_px_per_mm, "steering_wheel_calibrated"
 
-        # Fallback: full dashboard width ~1350mm
-        fallback_px_mm = float(w) / 1280.0
-        return fallback_px_mm, "dashboard_width_estimated"
+        # Secondary zoom/distance cue: check bright windshield band at top 16% of photo
+        gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        top_strip = gray[: max(8, int(h * 0.16)), :]
+        windshield_ratio = float(np.mean(top_strip > 170))
+
+        if windshield_ratio >= 0.22:
+            visible_width_mm = 1160.0  # Full wide cabin photo
+        elif windshield_ratio >= 0.08:
+            t = min(1.0, (windshield_ratio - 0.08) / 0.14)
+            visible_width_mm = 820.0 + t * 320.0  # Medium distance dashboard shot
+        else:
+            visible_width_mm = 580.0  # Close-up zoomed console photo
+
+        if (w / max(1.0, float(h))) < 1.1:
+            visible_width_mm *= 0.76  # Portrait framing
+
+        return float(w) / visible_width_mm, "zoom_distance_estimated"
 
     def enforce_symmetric_physical_quad(
         self,
@@ -384,15 +399,12 @@ class VirtualFitPipeline:
 
         # 1. Primary: OWL-ViT Open-Vocabulary Stereo + Steering Wheel Detector
         ml_res, wheel_diameter_px = self._detect_with_owlvit(img_bgr)
-        px_per_mm, scale_method = self._estimate_px_per_mm(img_bgr, wheel_diameter_px)
-        # When steering wheel physical calibration is available, use exact true-to-life
-        # 9" (229mm) vs 10.1" (252mm) physical sizing directly!
-        use_exact_physical = scale_method == "steering_wheel_calibrated"
+        px_per_mm, _scale_method = self._estimate_px_per_mm(img_bgr, wheel_diameter_px)
 
         if ml_res is not None:
             quad, conf = ml_res
             sym_quad = self.enforce_symmetric_physical_quad(
-                quad, img_bgr, product_id, px_per_mm, allow_larger=not use_exact_physical
+                quad, img_bgr, product_id, px_per_mm, allow_larger=False
             )
             return sym_quad, conf, "owlvit_automotive"
 
@@ -401,7 +413,7 @@ class VirtualFitPipeline:
         if cv_res is not None:
             quad, conf = cv_res
             sym_quad = self.enforce_symmetric_physical_quad(
-                quad, img_bgr, product_id, px_per_mm, allow_larger=not use_exact_physical
+                quad, img_bgr, product_id, px_per_mm, allow_larger=False
             )
             return sym_quad, conf, "opencv_contour"
 
