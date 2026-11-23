@@ -236,6 +236,7 @@ export const VirtualFitPage = () => {
   const [stage, setStage] = useState('upload'); // 'upload' | 'preview' | 'processing' | 'result'
   const [showTutorial, setShowTutorial] = useState(true); // Always shown on open to guide customers
   const [loadingSample, setLoadingSample] = useState(false);
+  const [isDetectingPreview, setIsDetectingPreview] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -269,6 +270,33 @@ export const VirtualFitPage = () => {
     };
   }, [previewUrl]);
 
+  const detectCornersForPreview = useCallback(async (file, productId) => {
+    setIsDetectingPreview(true);
+    setErrorMessage('');
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('product_id', productId);
+
+      const resp = await fetch(`${API_BASE}/api/virtual-fit/detect-corners`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await resp.json();
+      if (resp.ok && data.success) {
+        setOriginalImage(data.original_image);
+        setCorners(data.corners);
+        setConfidence(data.confidence);
+        setNeedsManualCheck(Boolean(data.needs_manual_check));
+      }
+    } catch (err) {
+      // Fallback: let user still click Continue or show helpful error then
+      console.warn('Preview corner pre-detection skipped:', err);
+    } finally {
+      setIsDetectingPreview(false);
+    }
+  }, []);
+
   const handleFileSelected = useCallback((file) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -284,8 +312,11 @@ export const VirtualFitPage = () => {
     const url = URL.createObjectURL(file);
     setSelectedFile(file);
     setPreviewUrl(url);
+    setOriginalImage(null);
+    setCorners(null);
     setStage('preview');
-  }, [previewUrl]);
+    detectCornersForPreview(file, activeProduct.id);
+  }, [previewUrl, activeProduct.id, detectCornersForPreview]);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -318,6 +349,31 @@ export const VirtualFitPage = () => {
     setIsAdjusting(false);
 
     try {
+      // If corners were already detected & optionally adjusted by the user on the preview stage,
+      // composite directly with those exact 4 corners for instant razor-accurate placement!
+      if (corners && corners.length === 4 && originalImage) {
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+        formData.append('product_id', activeProduct.id);
+        formData.append('corners', JSON.stringify(corners));
+
+        const resp = await fetch(`${API_BASE}/api/virtual-fit/refit`, {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.success) {
+          throw new Error(data.detail || 'Could not composite dashboard photograph.');
+        }
+
+        setResultImage(data.result_image);
+        setNeedsManualCheck(false);
+        setSliderPos(50);
+        setStage('result');
+        return;
+      }
+
+      // Otherwise run full auto-detect + composite
       const formData = new FormData();
       formData.append('image', selectedFile);
       formData.append('product_id', activeProduct.id);
@@ -708,19 +764,78 @@ export const VirtualFitPage = () => {
           </div>
         )}
 
-        {/* ================= STAGE 2: PHOTO PREVIEW + CONTINUE ================= */}
+        {/* ================= STAGE 2: PHOTO PREVIEW + ADJUST FIT + CONTINUE ================= */}
         {stage === 'preview' && previewUrl && (
-          <div className="w-full max-w-3xl flex flex-col items-center text-center">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-white/50 mb-5">
-              DASHBOARD PHOTOGRAPH READY
+          <div className="w-full max-w-4xl flex flex-col items-center text-center">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-[#7c85ff] mb-2">
+              {isDetectingPreview
+                ? 'DETECTING STEREO BAY...'
+                : 'ADJUST FIT AREA & CONTINUE'}
+            </p>
+            <p className="text-xs sm:text-sm font-clean text-white/60 mb-5 max-w-xl">
+              {isDetectingPreview
+                ? 'Our automotive vision model is locating your stereo opening automatically...'
+                : 'Drag the 4 corner points (TL, TR, BR, BL) if you want to refine where your VOEUX player sits, or click CONTINUE to visualize immediately.'}
             </p>
 
-            <div className="w-full border border-white/15 bg-black overflow-hidden">
+            <div
+              ref={adjustContainerRef}
+              className="relative w-full border border-white/20 bg-black overflow-hidden select-none touch-none"
+            >
               <img
-                src={previewUrl}
+                src={originalImage || previewUrl}
                 alt="Uploaded car dashboard preview"
-                className="w-full max-h-[56vh] object-contain mx-auto"
+                className="w-full h-auto block pointer-events-none"
               />
+
+              {/* Scanning line while OWL-ViT detects corners */}
+              {isDetectingPreview && (
+                <div
+                  className="absolute inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#7c85ff] to-transparent pointer-events-none"
+                  style={{ animation: 'vfScanLine 1.8s ease-in-out infinite' }}
+                />
+              )}
+
+              {/* Interactive 4-Corner Placement Frame */}
+              {!isDetectingPreview && corners && corners.length === 4 && (
+                <>
+                  <svg
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    className="absolute inset-0 w-full h-full pointer-events-none"
+                  >
+                    <polygon
+                      points={corners.map((c) => `${c.x * 100},${c.y * 100}`).join(' ')}
+                      fill="rgba(59, 66, 159, 0.24)"
+                      stroke="#FFFFFF"
+                      strokeWidth="0.35"
+                    />
+                  </svg>
+
+                  {corners.map((pt, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        setActiveCornerIdx(idx);
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        setActiveCornerIdx(idx);
+                      }}
+                      style={{
+                        left: `${pt.x * 100}%`,
+                        top: `${pt.y * 100}%`,
+                      }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
+                      aria-label={`Adjust corner ${CORNER_LABELS[idx]}`}
+                    >
+                      {CORNER_LABELS[idx]}
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
 
             {errorMessage && (
@@ -733,9 +848,10 @@ export const VirtualFitPage = () => {
               <button
                 type="button"
                 onClick={runVirtualFitPipeline}
-                className="px-12 py-4 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-xs sm:text-[13px] uppercase tracking-[0.28em] font-medium transition-all duration-300 cursor-pointer"
+                disabled={isDetectingPreview}
+                className="px-12 py-4 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-xs sm:text-[13px] uppercase tracking-[0.28em] font-medium transition-all duration-300 cursor-pointer disabled:opacity-50"
               >
-                CONTINUE
+                {isDetectingPreview ? 'DETECTING...' : 'CONTINUE'}
               </button>
 
               <button

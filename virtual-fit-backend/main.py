@@ -141,6 +141,37 @@ async def get_products():
     return {"products": list_supported_products()}
 
 
+@app.post("/api/virtual-fit/detect-corners")
+async def detect_corners_only(
+    image: UploadFile = File(...),
+    product_id: str = Form(...),
+):
+    """
+    Run OWL-ViT + OpenCV stereo detection and return the 4 normalized corners
+    immediately after upload so the user can review or adjust fit before compositing.
+    """
+    prod = get_product_ref(product_id)
+    if not prod:
+        raise HTTPException(status_code=404, detail=f"Product '{product_id}' is not configured for Virtual Fit.")
+
+    t0 = time.perf_counter()
+    dashboard_bgr = await decode_and_validate_image(image)
+    result = await run_in_threadpool(pipeline.run_detect_only, dashboard_bgr, product_id)
+    original_data_url = await run_in_threadpool(encode_bgr_to_data_url, dashboard_bgr, 90)
+    elapsed_ms = int((time.perf_counter() - t0) * 1000)
+
+    return {
+        "success": True,
+        "product_id": product_id,
+        "original_image": original_data_url,
+        "corners": result["corners"],
+        "confidence": result["confidence"],
+        "detection_method": result["detection_method"],
+        "needs_manual_check": result["needs_manual_check"],
+        "processing_ms": elapsed_ms,
+    }
+
+
 @app.post("/api/virtual-fit/detect-and-fit")
 async def detect_and_fit(
     image: UploadFile = File(...),

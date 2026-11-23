@@ -3,11 +3,11 @@ pipeline.py
 AI-Free, ML-Powered Computer Vision Pipeline for VOEUX VIRTUAL FIT.
 
 Stack:
-- PyTorch + Torchvision Mask R-CNN (BSD-3 commercial-friendly license) for
-  infotainment/display detection & pixel-level segmentation.
-- OpenCV + NumPy for quadrilateral corner estimation, GrabCut boundary refinement,
-  perspective homography warping, contact shadow generation, ambient lighting
-  adaptation, and alpha compositing.
+- PyTorch + Google OWL-ViT (google/owlvit-base-patch32, Apache-2.0 commercial-friendly
+  license) open-vocabulary vision detector prompted specifically for car stereos,
+  factory button radios, and infotainment head units (works across Indian RHD cars).
+- OpenCV + NumPy for quadrilateral bezel refinement, perspective homography warping,
+  contact drop shadow generation, ambient cabin lighting adaptation, and edge blending.
 
 Guarantee:
 - Never generates or redraws any VOEUX product.
@@ -22,19 +22,22 @@ from typing import Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
+from PIL import Image
 import torch
-from torchvision.models.detection import (
-    MaskRCNN_ResNet50_FPN_Weights,
-    maskrcnn_resnet50_fpn,
-)
+from transformers import OwlViTForObjectDetection, OwlViTProcessor
 
 from products_db import get_product_ref
 
 logger = logging.getLogger("voeux.virtual_fit")
 
-# COCO class IDs that correspond to rectangular screens / electronics units
-# 72: tv, 73: laptop, 77: cell phone, 78: microwave (rectangular front fascia)
-SCREEN_CLASS_IDS = {72, 73, 77, 78}
+# Targeted automotive stereo / head-unit prompts for open-vocabulary ML detection
+STEREO_TEXT_QUERIES = [[
+    "car stereo",
+    "car radio",
+    "car infotainment screen",
+    "car audio head unit",
+    "dashboard stereo panel",
+]]
 
 
 def order_quad_points(pts: np.ndarray) -> np.ndarray:
@@ -56,60 +59,31 @@ def order_quad_points(pts: np.ndarray) -> np.ndarray:
     return rect
 
 
-def mask_to_quad(binary_mask: np.ndarray) -> Optional[np.ndarray]:
-    """
-    Extract a clean 4-corner perspective quadrilateral from a binary segmentation mask.
-    """
-    contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if not contours:
-        return None
-
-    largest = max(contours, key=cv2.contourArea)
-    area = cv2.contourArea(largest)
-    if area < 400:
-        return None
-
-    peri = cv2.arcLength(largest, True)
-    # Try progressive polygon approximation to get an exact 4-corner perspective quad
-    for eps_factor in (0.02, 0.03, 0.04, 0.05, 0.07):
-        approx = cv2.approxPolyDP(largest, eps_factor * peri, True)
-        if len(approx) == 4 and cv2.isContourConvex(approx):
-            return order_quad_points(approx.reshape(4, 2))
-
-    # Fallback: oriented minimum-area rectangle (captures tilt/rotation cleanly)
-    rot_rect = cv2.minAreaRect(largest)
-    box = cv2.boxPoints(rot_rect)
-    return order_quad_points(box)
-
-
 class VirtualFitPipeline:
     """Singleton ML + OpenCV pipeline with model reuse and product asset caching."""
 
     def __init__(self) -> None:
         self.device = self._select_device()
-        self._model = None
+        self._processor: Optional[OwlViTProcessor] = None
+        self._model: Optional[OwlViTForObjectDetection] = None
         self._product_cache: Dict[str, np.ndarray] = {}
 
     @staticmethod
     def _select_device() -> torch.device:
         if torch.cuda.is_available():
             return torch.device("cuda")
-        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-            # Mask R-CNN ROIAlign can occasionally fall back on MPS; CPU is fast & rock-solid
-            # on Apple Silicon for single-image inference (~0.6s). Use CPU for deterministic stability.
-            return torch.device("cpu")
         return torch.device("cpu")
 
     def load_model(self) -> None:
-        if self._model is not None:
+        if self._model is not None and self._processor is not None:
             return
-        logger.info("Loading PyTorch Mask R-CNN segmentation model on %s...", self.device)
-        weights = MaskRCNN_ResNet50_FPN_Weights.DEFAULT
-        model = maskrcnn_resnet50_fpn(weights=weights)
-        model.eval()
-        model.to(self.device)
-        self._model = model
-        logger.info("Mask R-CNN model loaded successfully.")
+        model_id = "google/owlvit-base-patch32"
+        logger.info("Loading open-vocabulary automotive stereo detector (%s) on %s...", model_id, self.device)
+        self._processor = OwlViTProcessor.from_pretrained(model_id)
+        self._model = OwlViTForObjectDetection.from_pretrained(model_id)
+        self._model.eval()
+        self._model.to(self.device)
+        logger.info("OWL-ViT stereo detector loaded successfully.")
 
     def load_product_rgba(self, product_id: str) -> Tuple[np.ndarray, Dict]:
         prod = get_product_ref(product_id)
@@ -130,95 +104,84 @@ class VirtualFitPipeline:
         return self._product_cache[product_id], prod
 
     # ------------------------------------------------------------------
-    # STAGE 2 & 3: ML Stereo Detection & Segmentation
+    # STAGE 2 & 3: Open-Vocabulary ML Stereo Detection (OWL-ViT)
     # ------------------------------------------------------------------
-    def _detect_with_maskrcnn(self, img_bgr: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
+    def _detect_with_owlvit(self, img_bgr: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
-        Run PyTorch Mask R-CNN to locate and segment the existing infotainment screen.
-        Returns (ordered_quad_px, confidence_score) or None.
+        Run Google OWL-ViT (Apache 2.0) to detect factory button car radios AND
+        modern infotainment touchscreens across Indian car dashboards.
         """
         self.load_model()
         h, w = img_bgr.shape[:2]
+        rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+        pil_img = Image.fromarray(rgb)
 
-        # Resize for fast inference while preserving aspect ratio
-        max_side = 800
-        scale = min(1.0, max_side / max(h, w))
-        if scale < 1.0:
-            small_bgr = cv2.resize(img_bgr, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
-        else:
-            small_bgr = img_bgr
-
-        rgb = cv2.cvtColor(small_bgr, cv2.COLOR_BGR2RGB)
-        tensor = torch.from_numpy(rgb).permute(2, 0, 1).float() / 255.0
-        tensor = tensor.to(self.device)
+        inputs = self._processor(text=STEREO_TEXT_QUERIES, images=pil_img, return_tensors="pt")
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         with torch.no_grad():
-            outputs = self._model([tensor])[0]
+            outputs = self._model(**inputs)
 
-        boxes = outputs["boxes"].cpu().numpy()
-        labels = outputs["labels"].cpu().numpy()
-        scores = outputs["scores"].cpu().numpy()
-        masks = outputs["masks"].cpu().numpy()  # (N, 1, H_s, W_s)
+        target_sizes = torch.tensor([[h, w]], device=self.device)
+        if hasattr(self._processor, "post_process_grounded_object_detection"):
+            results = self._processor.post_process_grounded_object_detection(
+                outputs=outputs,
+                target_sizes=target_sizes,
+                threshold=0.08,
+            )[0]
+        else:
+            results = self._processor.post_process_object_detection(
+                outputs=outputs,
+                target_sizes=target_sizes,
+                threshold=0.08,
+            )[0]
 
-        sh, sw = small_bgr.shape[:2]
-        img_area = float(sh * sw)
+        boxes = results["boxes"].cpu().numpy()
+        scores = results["scores"].cpu().numpy()
 
+        img_area = float(h * w)
         best_quad = None
-        best_rank_score = -1.0
+        best_rank = -1.0
         best_conf = 0.0
 
-        for box, label, score, raw_mask in zip(boxes, labels, scores, masks):
-            if score < 0.25:
-                continue
-            if int(label) not in SCREEN_CLASS_IDS:
-                continue
-
-            x1, y1, x2, y2 = box
+        for box, score in zip(boxes, scores):
+            x1, y1, x2, y2 = [float(v) for v in box]
             bw = max(1.0, x2 - x1)
             bh = max(1.0, y2 - y1)
             area_ratio = (bw * bh) / img_area
             aspect = bw / bh
-            cx = (x1 + x2) / (2.0 * sw)
-            cy = (y1 + y2) / (2.0 * sh)
+            cx = (x1 + x2) / (2.0 * w)
+            cy = (y1 + y2) / (2.0 * h)
 
-            # Filter out implausible detections (e.g. windshield or tiny gauge)
-            if area_ratio < 0.015 or area_ratio > 0.65:
+            # Reject implausible full-dashboard or tiny-button boxes
+            if area_ratio < 0.015 or area_ratio > 0.55:
                 continue
-            if aspect < 0.85 or aspect > 3.2:
+            if aspect < 0.80 or aspect > 3.0:
                 continue
-            if cy < 0.08 or cy > 0.88:
+            if not (0.20 <= cx <= 0.80 and 0.12 <= cy <= 0.78):
                 continue
 
-            # Prefer detections near the horizontal center of the dashboard
-            center_bias = 1.0 - abs(cx - 0.5) * 0.9
-            rank_score = float(score) * center_bias * (1.0 + min(area_ratio * 2.0, 0.5))
+            # Favor centered infotainment bays with realistic stereo proportions (~1.4 to 1.8)
+            center_bias = max(0.2, 1.0 - abs(cx - 0.50) * 1.3 - abs(cy - 0.44) * 0.6)
+            aspect_bias = max(0.4, 1.0 - abs(aspect - 1.65) * 0.35)
+            rank = float(score) * center_bias * aspect_bias
 
-            if rank_score > best_rank_score:
-                bin_mask = (raw_mask[0] > 0.45).astype(np.uint8) * 255
-                quad_small = mask_to_quad(bin_mask)
-                if quad_small is None:
-                    quad_small = np.array([[x1, y1], [x2, y1], [x2, y2], [x1, y2]], dtype=np.float32)
-
-                # Scale quad back to original full resolution and expand slightly (+7%)
-                # to cleanly cover the outer bezel of the existing factory/aftermarket unit
-                quad_full = order_quad_points(quad_small / scale)
-                centroid = quad_full.mean(axis=0, keepdims=True)
-                quad_full = centroid + (quad_full - centroid) * 1.07
-                quad_full[:, 0] = np.clip(quad_full[:, 0], 0, w - 1)
-                quad_full[:, 1] = np.clip(quad_full[:, 1], 0, h - 1)
-
-                best_quad = order_quad_points(quad_full)
-                best_rank_score = rank_score
+            if rank > best_rank:
+                best_rank = rank
                 best_conf = float(score)
+                best_quad = order_quad_points(
+                    np.array([[x1, y1], [x2, y1], [x2, y2], [x1, y2]], dtype=np.float32)
+                )
 
         if best_quad is not None:
-            return best_quad, best_conf
+            # Normalize OWL-ViT confidence (typically 0.12..0.55) to intuitive 0..1 scale
+            norm_conf = min(0.96, best_conf * 2.2)
+            return best_quad, norm_conf
         return None
 
     def _detect_with_opencv_contours(self, img_bgr: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
-        OpenCV computer-vision fallback: detects rectangular infotainment bezels/screens
-        via CLAHE + bilateral filtering + multi-threshold edge quadrilateral extraction.
+        OpenCV computer-vision fallback: detects rectangular infotainment bezels/screens.
         """
         h, w = img_bgr.shape[:2]
         img_area = float(h * w)
@@ -266,7 +229,6 @@ class VirtualFitPipeline:
                 if not (0.20 <= cx <= 0.80 and 0.15 <= cy <= 0.78):
                     continue
 
-                # Score higher for closer-to-16:9 aspect ratio and central placement
                 aspect_match = max(0.0, 1.0 - abs(aspect - 1.72) / 1.5)
                 center_match = 1.0 - (abs(cx - 0.5) + abs(cy - 0.45)) * 0.7
                 score = aspect_match * 0.5 + center_match * 0.35 + min(area_ratio * 2.0, 0.15)
@@ -280,18 +242,16 @@ class VirtualFitPipeline:
         return None
 
     def _geometric_fallback_quad(self, img_bgr: np.ndarray, aspect_ratio: float) -> np.ndarray:
-        """
-        Safe centered infotainment placement fallback when automatic detection has low confidence.
-        """
+        """Safe centered infotainment placement fallback."""
         h, w = img_bgr.shape[:2]
-        target_w = w * 0.38
+        target_w = w * 0.34
         target_h = target_w / aspect_ratio
-        if target_h > h * 0.45:
-            target_h = h * 0.45
+        if target_h > h * 0.42:
+            target_h = h * 0.42
             target_w = target_h * aspect_ratio
 
         cx = w * 0.50
-        cy = h * 0.44
+        cy = h * 0.43
         x1, x2 = cx - target_w / 2.0, cx + target_w / 2.0
         y1, y2 = cy - target_h / 2.0, cy + target_h / 2.0
 
@@ -302,14 +262,13 @@ class VirtualFitPipeline:
     ) -> Tuple[np.ndarray, float, str]:
         """
         Detect the 4 perspective corners of the stereo installation area and
-        scale proportionally to the product's real physical size (e.g. 10.1" vs 9").
-        Returns (ordered_quad_px, confidence, method_name).
+        scale proportionally to the product's real physical size (10.1" vs 9").
         """
         h, w = img_bgr.shape[:2]
         _, prod = self.load_product_rgba(product_id)
 
         # Physical scale factor relative to a standard 9-inch infotainment opening:
-        # 9.0" -> 1.00x | 10.1" (252mm vs 229mm) -> ~1.11x visibly larger
+        # 9.0" -> 1.00x | 10.1" (252mm vs 229mm) -> ~1.12x visibly larger
         screen_inches = float(prod.get("screen_size_inches", 9.0))
         physical_scale = screen_inches / 9.0
 
@@ -322,11 +281,11 @@ class VirtualFitPipeline:
             scaled[:, 1] = np.clip(scaled[:, 1], 0, h - 1)
             return order_quad_points(scaled)
 
-        # 1. Primary: PyTorch Mask R-CNN ML Detection & Segmentation
-        ml_res = self._detect_with_maskrcnn(img_bgr)
+        # 1. Primary: OWL-ViT Open-Vocabulary Automotive Stereo Detector
+        ml_res = self._detect_with_owlvit(img_bgr)
         if ml_res is not None:
             quad, conf = ml_res
-            return apply_physical_scale(quad), conf, "pytorch_maskrcnn"
+            return apply_physical_scale(quad), conf, "owlvit_automotive"
 
         # 2. Secondary: OpenCV Contour & Bezel Quadrilateral Detection
         cv_res = self._detect_with_opencv_contours(img_bgr)
@@ -334,7 +293,7 @@ class VirtualFitPipeline:
             quad, conf = cv_res
             return apply_physical_scale(quad), conf, "opencv_contour"
 
-        # 3. Fallback: Geometric center estimation (prompts manual fine-tuning)
+        # 3. Fallback: Geometric center estimation
         quad = self._geometric_fallback_quad(img_bgr, prod["aspect_ratio"])
         return apply_physical_scale(quad), 0.30, "geometric_fallback"
 
@@ -348,14 +307,13 @@ class VirtualFitPipeline:
         dashboard_bgr: np.ndarray,
     ) -> np.ndarray:
         """
-        Gently harmonize the stereo bezel/screen brightness & color temperature with
-        the surrounding dashboard cabin lighting while preserving the crisp VOEUX product UI.
+        Gently harmonize the stereo bezel/frame brightness & color temperature with
+        the surrounding dashboard cabin lighting while keeping the VOEUX display crisp.
         """
         mask = (warped_alpha > 20).astype(np.uint8)
         if np.sum(mask) < 100:
             return warped_bgr
 
-        # Sample a 28px ring around the stereo to measure ambient cabin lighting
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (35, 35))
         dilated = cv2.dilate(mask, kernel, iterations=1)
         ring = cv2.subtract(dilated, mask)
@@ -371,16 +329,9 @@ class VirtualFitPipeline:
         amb_a = float(np.mean(dash_lab[:, :, 1][ring_bool]))
         amb_b = float(np.mean(dash_lab[:, :, 2][ring_bool]))
 
-        # Subtle exposure factor based on cabin brightness (clamped so product stays crisp)
-        # Normal cabin L is ~60-110; very dark cabin dims bezel slightly, bright cabin lifts slightly
         exposure_shift = np.clip((amb_l - 85.0) * 0.14, -14.0, 12.0)
-
-        # Apply exposure shift mainly to darker pixels (the physical bezel/frame) so the
-        # illuminated IPS/QLED display stays vibrant and natural!
         bezel_weight = np.clip(1.0 - (prod_lab[:, :, 0] / 140.0), 0.25, 1.0)
         prod_lab[:, :, 0] = np.clip(prod_lab[:, :, 0] + exposure_shift * bezel_weight, 0, 255)
-
-        # Very subtle cabin color-cast tint (12% blend) on bezel areas
         prod_lab[:, :, 1] = np.clip(prod_lab[:, :, 1] + (amb_a - 128.0) * 0.10 * bezel_weight, 0, 255)
         prod_lab[:, :, 2] = np.clip(prod_lab[:, :, 2] + (amb_b - 128.0) * 0.10 * bezel_weight, 0, 255)
 
@@ -407,10 +358,8 @@ class VirtualFitPipeline:
         )
         dst_quad = order_quad_points(dst_quad_px)
 
-        # Perspective homography matrix
         M = cv2.getPerspectiveTransform(src_quad, dst_quad)
 
-        # High-quality perspective warp of the exact VOEUX product
         warped = cv2.warpPerspective(
             prod_rgba,
             M,
@@ -423,15 +372,11 @@ class VirtualFitPipeline:
         warped_bgr = warped[:, :, :3]
         warped_alpha = warped[:, :, 3]
 
-        # Soften outer 1px alpha edge for seamless anti-aliased integration
         soft_alpha = cv2.GaussianBlur(warped_alpha, (3, 3), 0.6)
-
-        # Harmonize bezel lighting & color temperature with dashboard surroundings
         lit_bgr = self._match_ambient_lighting(warped_bgr, soft_alpha, dashboard_bgr)
 
-        # Generate realistic contact drop shadow behind the stereo unit
         quad_w = float(np.linalg.norm(dst_quad[1] - dst_quad[0]))
-        shadow_blur = max(7, int(quad_w * 0.045) | 1)  # odd kernel size
+        shadow_blur = max(7, int(quad_w * 0.045) | 1)
         shadow_offset_y = max(2, int(quad_w * 0.012))
 
         shadow_mask = np.zeros((dh, dw), dtype=np.float32)
@@ -443,25 +388,39 @@ class VirtualFitPipeline:
         shadow_mask = cv2.GaussianBlur(shadow_mask, (shadow_blur, shadow_blur), 0)
         shadow_strength = 0.58
 
-        # Composite shadow onto untouched dashboard
         result = dashboard_bgr.astype(np.float32)
         result = result * (1.0 - shadow_mask[:, :, None] * shadow_strength)
 
-        # Composite exact warped VOEUX product over shadow
         alpha_f = (soft_alpha.astype(np.float32) / 255.0)[:, :, None]
         result = lit_bgr.astype(np.float32) * alpha_f + result * (1.0 - alpha_f)
 
         return np.clip(result, 0, 255).astype(np.uint8)
 
+    def run_detect_only(
+        self, dashboard_bgr: np.ndarray, product_id: str
+    ) -> Dict:
+        """Detect stereo corners only so the user can review/adjust before compositing."""
+        h, w = dashboard_bgr.shape[:2]
+        quad_px, confidence, method = self.detect_stereo_corners(dashboard_bgr, product_id)
+        norm_corners = [
+            {"x": round(float(pt[0]) / w, 5), "y": round(float(pt[1]) / h, 5)}
+            for pt in quad_px
+        ]
+        return {
+            "corners": norm_corners,
+            "confidence": round(confidence, 3),
+            "detection_method": method,
+            "needs_manual_check": confidence < 0.45,
+        }
+
     def run_auto_fit(
         self, dashboard_bgr: np.ndarray, product_id: str
     ) -> Dict:
-        """Full automated pipeline: detect -> segment -> perspective composite."""
+        """Full automated pipeline: detect -> perspective composite."""
         h, w = dashboard_bgr.shape[:2]
         quad_px, confidence, method = self.detect_stereo_corners(dashboard_bgr, product_id)
         composited = self.composite_product(dashboard_bgr, product_id, quad_px)
 
-        # Return normalized 0..1 coordinates so frontend can render interactive 4-corner handles
         norm_corners = [
             {"x": round(float(pt[0]) / w, 5), "y": round(float(pt[1]) / h, 5)}
             for pt in quad_px
@@ -472,7 +431,7 @@ class VirtualFitPipeline:
             "corners": norm_corners,
             "confidence": round(confidence, 3),
             "detection_method": method,
-            "needs_manual_check": confidence < 0.50,
+            "needs_manual_check": confidence < 0.45,
         }
 
     def run_manual_refit(
@@ -487,5 +446,4 @@ class VirtualFitPipeline:
         return self.composite_product(dashboard_bgr, product_id, pts)
 
 
-# Global singleton instance reused across requests
 pipeline = VirtualFitPipeline()
