@@ -30,14 +30,19 @@ from products_db import get_product_ref
 
 logger = logging.getLogger("voeux.virtual_fit")
 
-# Targeted automotive stereo / head-unit prompts for open-vocabulary ML detection
+# Targeted automotive stereo + steering wheel (real-world 370mm scale anchor) prompts
 STEREO_TEXT_QUERIES = [[
     "car stereo",
     "car radio",
     "car infotainment screen",
     "car audio head unit",
     "dashboard stereo panel",
+    "car steering wheel",
 ]]
+STEERING_WHEEL_QUERY_IDX = 5
+REAL_STEERING_WHEEL_DIAMETER_MM = 370.0
+# Steering wheel sits closer to camera than center console (~22% foreshortening)
+STEERING_TO_CONSOLE_DEPTH_FACTOR = 0.78
 
 
 def order_quad_points(pts: np.ndarray) -> np.ndarray:
@@ -104,12 +109,16 @@ class VirtualFitPipeline:
         return self._product_cache[product_id], prod
 
     # ------------------------------------------------------------------
-    # STAGE 2 & 3: Open-Vocabulary ML Stereo Detection (OWL-ViT)
+    # STAGE 2 & 3: Open-Vocabulary ML Stereo + Steering Wheel Detection
     # ------------------------------------------------------------------
-    def _detect_with_owlvit(self, img_bgr: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
+    def _detect_with_owlvit(
+        self, img_bgr: np.ndarray
+    ) -> Tuple[Optional[Tuple[np.ndarray, float]], Optional[float]]:
         """
-        Run Google OWL-ViT (Apache 2.0) to detect factory button car radios AND
-        modern infotainment touchscreens across Indian car dashboards.
+        Run Google OWL-ViT (Apache 2.0) in a single pass to detect:
+        1) The car stereo / factory button radio / infotainment head unit
+        2) The car steering wheel (370mm real-world diameter scale anchor)
+        Returns (stereo_result_or_none, steering_wheel_diameter_px_or_none).
         """
         self.load_model()
         h, w = img_bgr.shape[:2]
@@ -138,32 +147,45 @@ class VirtualFitPipeline:
 
         boxes = results["boxes"].cpu().numpy()
         scores = results["scores"].cpu().numpy()
+        labels = results["labels"].cpu().numpy()
 
         img_area = float(h * w)
         best_quad = None
         best_rank = -1.0
         best_conf = 0.0
 
-        for box, score in zip(boxes, scores):
+        best_wheel_score = -1.0
+        wheel_diameter_px: Optional[float] = None
+
+        for box, score, label in zip(boxes, scores, labels):
             x1, y1, x2, y2 = [float(v) for v in box]
             bw = max(1.0, x2 - x1)
             bh = max(1.0, y2 - y1)
             area_ratio = (bw * bh) / img_area
+
+            # Capture steering wheel as real-world 370mm physical scale anchor
+            if int(label) == STEERING_WHEEL_QUERY_IDX:
+                if area_ratio >= 0.04 and float(score) > best_wheel_score:
+                    best_wheel_score = float(score)
+                    # Use max(bw, bh) because steering wheels near frame edge may be clipped horizontally
+                    wheel_diameter_px = max(bw, bh)
+                continue
+
             aspect = bw / bh
             cx = (x1 + x2) / (2.0 * w)
             cy = (y1 + y2) / (2.0 * h)
 
-            # Reject implausible full-dashboard or tiny-button boxes
-            if area_ratio < 0.015 or area_ratio > 0.55:
+            # Reject implausible full-dashboard or tiny-slot boxes
+            if area_ratio < 0.012 or area_ratio > 0.55:
                 continue
-            if aspect < 0.80 or aspect > 3.0:
+            if aspect < 0.75 or aspect > 3.5:
                 continue
             if not (0.20 <= cx <= 0.80 and 0.12 <= cy <= 0.78):
                 continue
 
-            # Favor centered infotainment bays with realistic stereo proportions (~1.4 to 1.8)
+            # Favor centered infotainment bays with realistic stereo proportions
             center_bias = max(0.2, 1.0 - abs(cx - 0.50) * 1.3 - abs(cy - 0.44) * 0.6)
-            aspect_bias = max(0.4, 1.0 - abs(aspect - 1.65) * 0.35)
+            aspect_bias = max(0.35, 1.0 - abs(aspect - 1.65) * 0.30)
             rank = float(score) * center_bias * aspect_bias
 
             if rank > best_rank:
@@ -173,11 +195,104 @@ class VirtualFitPipeline:
                     np.array([[x1, y1], [x2, y1], [x2, y2], [x1, y2]], dtype=np.float32)
                 )
 
+        stereo_res = None
         if best_quad is not None:
-            # Normalize OWL-ViT confidence (typically 0.12..0.55) to intuitive 0..1 scale
             norm_conf = min(0.96, best_conf * 2.2)
-            return best_quad, norm_conf
-        return None
+            stereo_res = (best_quad, norm_conf)
+
+        return stereo_res, wheel_diameter_px
+
+    def _estimate_px_per_mm(
+        self, img_bgr: np.ndarray, wheel_diameter_px: Optional[float]
+    ) -> Tuple[float, str]:
+        """
+        Estimate real-world pixels-per-millimeter at the center dashboard plane.
+        Uses detected steering wheel (370mm standard diameter) as primary reference,
+        falling back to full-cabin dashboard width (~1380mm).
+        """
+        h, w = img_bgr.shape[:2]
+        if wheel_diameter_px is not None and wheel_diameter_px > h * 0.25:
+            raw_px_per_mm = wheel_diameter_px / REAL_STEERING_WHEEL_DIAMETER_MM
+            console_px_per_mm = raw_px_per_mm * STEERING_TO_CONSOLE_DEPTH_FACTOR
+            # Sanity clamp relative to image width (prevents extreme outliers)
+            min_px_mm = (w * 0.16) / 229.0
+            max_px_mm = (w * 0.55) / 252.0
+            console_px_per_mm = float(np.clip(console_px_per_mm, min_px_mm, max_px_mm))
+            return console_px_per_mm, "steering_wheel_calibrated"
+
+        # Fallback: full dashboard width ~1350mm
+        fallback_px_mm = float(w) / 1280.0
+        return fallback_px_mm, "dashboard_width_estimated"
+
+    def enforce_symmetric_physical_quad(
+        self,
+        quad_px: np.ndarray,
+        img_bgr: np.ndarray,
+        product_id: str,
+        px_per_mm: float,
+        allow_larger: bool = True,
+    ) -> np.ndarray:
+        """
+        Guarantee TWO critical physical accuracy rules:
+        1) STRICT SYMMETRY: Output quad always matches the exact aspect ratio of the
+           actual VOEUX product PNG (never stretched vertically or squished horizontally;
+           dual knobs stay 100% circular).
+        2) NO UNREALISTIC SHRINKING: The player width is NEVER shrunk below its true
+           real-world physical size (229mm for 9" TS7, 252mm for 10.1" X80) on the dashboard.
+        """
+        h, w = img_bgr.shape[:2]
+        prod_rgba, prod_meta = self.load_product_rgba(product_id)
+        ph, pw = prod_rgba.shape[:2]
+        exact_aspect = float(pw) / float(ph)
+
+        quad = order_quad_points(quad_px)
+        cx = float(quad[:, 0].mean())
+        cy = float(quad[:, 1].mean())
+
+        top_w = float(np.linalg.norm(quad[1] - quad[0]))
+        bot_w = float(np.linalg.norm(quad[2] - quad[3]))
+        left_h = float(np.linalg.norm(quad[3] - quad[0]))
+        right_h = float(np.linalg.norm(quad[2] - quad[1]))
+
+        cur_w = (top_w + bot_w) / 2.0
+        cur_h = (left_h + right_h) / 2.0
+        # Equivalent width from current area/dimensions so dragging up/down OR left/right scales symmetrically
+        cur_equiv_w = max(cur_w, cur_h * exact_aspect)
+
+        # True physical minimum width on this dashboard photo
+        min_physical_w = float(prod_meta["physical_width_mm"]) * px_per_mm
+        max_reasonable_w = float(w) * 0.82
+
+        if allow_larger:
+            final_w = max(cur_equiv_w, min_physical_w)
+        else:
+            final_w = min_physical_w
+
+        final_w = float(np.clip(final_w, min_physical_w, max_reasonable_w))
+        final_h = final_w / exact_aspect
+
+        # Ensure height fits inside frame cleanly while keeping strict aspect ratio
+        if final_h > h * 0.85:
+            final_h = h * 0.85
+            final_w = final_h * exact_aspect
+
+        # Clamp center so the symmetrical player stays cleanly within the dashboard image
+        half_w = final_w / 2.0
+        half_h = final_h / 2.0
+        cx = float(np.clip(cx, half_w + 4, w - half_w - 4))
+        cy = float(np.clip(cy, half_h + 4, h - half_h - 4))
+
+        return order_quad_points(
+            np.array(
+                [
+                    [cx - half_w, cy - half_h],
+                    [cx + half_w, cy - half_h],
+                    [cx + half_w, cy + half_h],
+                    [cx - half_w, cy + half_h],
+                ],
+                dtype=np.float32,
+            )
+        )
 
     def _detect_with_opencv_contours(self, img_bgr: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
@@ -261,41 +376,41 @@ class VirtualFitPipeline:
         self, img_bgr: np.ndarray, product_id: str
     ) -> Tuple[np.ndarray, float, str]:
         """
-        Detect the 4 perspective corners of the stereo installation area and
-        scale proportionally to the product's real physical size (10.1" vs 9").
+        Detect the 4 corners of the stereo installation area, calibrate real-world
+        cabin scale via the steering wheel / full dashboard width, and enforce
+        strict product symmetry + true physical 9" / 10.1" minimum size.
         """
-        h, w = img_bgr.shape[:2]
         _, prod = self.load_product_rgba(product_id)
 
-        # Physical scale factor relative to a standard 9-inch infotainment opening:
-        # 9.0" -> 1.00x | 10.1" (252mm vs 229mm) -> ~1.12x visibly larger
-        screen_inches = float(prod.get("screen_size_inches", 9.0))
-        physical_scale = screen_inches / 9.0
+        # 1. Primary: OWL-ViT Open-Vocabulary Stereo + Steering Wheel Detector
+        ml_res, wheel_diameter_px = self._detect_with_owlvit(img_bgr)
+        px_per_mm, scale_method = self._estimate_px_per_mm(img_bgr, wheel_diameter_px)
+        # When steering wheel physical calibration is available, use exact true-to-life
+        # 9" (229mm) vs 10.1" (252mm) physical sizing directly!
+        use_exact_physical = scale_method == "steering_wheel_calibrated"
 
-        def apply_physical_scale(quad: np.ndarray) -> np.ndarray:
-            if abs(physical_scale - 1.0) < 0.01:
-                return quad
-            centroid = quad.mean(axis=0, keepdims=True)
-            scaled = centroid + (quad - centroid) * physical_scale
-            scaled[:, 0] = np.clip(scaled[:, 0], 0, w - 1)
-            scaled[:, 1] = np.clip(scaled[:, 1], 0, h - 1)
-            return order_quad_points(scaled)
-
-        # 1. Primary: OWL-ViT Open-Vocabulary Automotive Stereo Detector
-        ml_res = self._detect_with_owlvit(img_bgr)
         if ml_res is not None:
             quad, conf = ml_res
-            return apply_physical_scale(quad), conf, "owlvit_automotive"
+            sym_quad = self.enforce_symmetric_physical_quad(
+                quad, img_bgr, product_id, px_per_mm, allow_larger=not use_exact_physical
+            )
+            return sym_quad, conf, "owlvit_automotive"
 
         # 2. Secondary: OpenCV Contour & Bezel Quadrilateral Detection
         cv_res = self._detect_with_opencv_contours(img_bgr)
         if cv_res is not None:
             quad, conf = cv_res
-            return apply_physical_scale(quad), conf, "opencv_contour"
+            sym_quad = self.enforce_symmetric_physical_quad(
+                quad, img_bgr, product_id, px_per_mm, allow_larger=not use_exact_physical
+            )
+            return sym_quad, conf, "opencv_contour"
 
-        # 3. Fallback: Geometric center estimation
+        # 3. Fallback: Geometric center estimation calibrated to true physical scale
         quad = self._geometric_fallback_quad(img_bgr, prod["aspect_ratio"])
-        return apply_physical_scale(quad), 0.30, "geometric_fallback"
+        sym_quad = self.enforce_symmetric_physical_quad(
+            quad, img_bgr, product_id, px_per_mm, allow_larger=False
+        )
+        return sym_quad, 0.30, "geometric_fallback"
 
     # ------------------------------------------------------------------
     # STAGE 6: OpenCV Perspective Transformation & Realistic Compositing
@@ -437,13 +552,21 @@ class VirtualFitPipeline:
     def run_manual_refit(
         self, dashboard_bgr: np.ndarray, product_id: str, norm_corners: List[Dict[str, float]]
     ) -> np.ndarray:
-        """Re-composite exact VOEUX product using customer-adjusted 4 corners."""
+        """
+        Re-composite exact VOEUX product using customer-adjusted region while strictly
+        enforcing symmetrical product aspect ratio (no stretching/elongation) and
+        minimum real-world physical size (never shrinks below true 9" or 10.1" scale).
+        """
         h, w = dashboard_bgr.shape[:2]
         pts = np.array(
             [[c["x"] * w, c["y"] * h] for c in norm_corners],
             dtype=np.float32,
         )
-        return self.composite_product(dashboard_bgr, product_id, pts)
+        px_per_mm, _ = self._estimate_px_per_mm(dashboard_bgr, None)
+        sym_pts = self.enforce_symmetric_physical_quad(
+            pts, dashboard_bgr, product_id, px_per_mm, allow_larger=True
+        )
+        return self.composite_product(dashboard_bgr, product_id, sym_pts)
 
 
 pipeline = VirtualFitPipeline()

@@ -254,10 +254,11 @@ export const VirtualFitPage = () => {
   const isSlidingRef = useRef(false);
   const compareContainerRef = useRef(null);
 
-  // Interactive Manual 4-Corner Correction
+  // Interactive Manual Symmetrical Placement & 4-Corner Correction
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [isRefitting, setIsRefitting] = useState(false);
-  const [activeCornerIdx, setActiveCornerIdx] = useState(null);
+  const [activeCornerIdx, setActiveCornerIdx] = useState(null); // 0..3 or 'move'
+  const dragStartRef = useRef(null);
   const adjustContainerRef = useRef(null);
 
   const fileInputRef = useRef(null);
@@ -453,19 +454,102 @@ export const VirtualFitPage = () => {
         updateSliderFromClientX(clientX);
       }
       if (activeCornerIdx !== null && adjustContainerRef.current) {
+        if (e.cancelable) e.preventDefault();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const rect = adjustContainerRef.current.getBoundingClientRect();
-        const nx = Math.max(0.01, Math.min(0.99, (clientX - rect.left) / rect.width));
-        const ny = Math.max(0.01, Math.min(0.99, (clientY - rect.top) / rect.height));
-        setCorners((prev) =>
-          prev ? prev.map((pt, idx) => (idx === activeCornerIdx ? { x: nx, y: ny } : pt)) : prev
-        );
+        const productAspect =
+          activeProduct.id === 'voeux-x80-dual-knob' ? 1.78 : 1.786;
+        // Never allow shrinking unrealistically small below real 9" / 10.1" proportions
+        const minWidthPx =
+          rect.width * (activeProduct.id === 'voeux-x80-dual-knob' ? 0.21 : 0.19);
+        const maxWidthPx = rect.width * 0.85;
+
+        if (activeCornerIdx === 'move' && dragStartRef.current) {
+          const dxNorm = (clientX - dragStartRef.current.clientX) / rect.width;
+          const dyNorm = (clientY - dragStartRef.current.clientY) / rect.height;
+          const startCorners = dragStartRef.current.corners;
+          const minX = Math.min(...startCorners.map((c) => c.x));
+          const maxX = Math.max(...startCorners.map((c) => c.x));
+          const minY = Math.min(...startCorners.map((c) => c.y));
+          const maxY = Math.max(...startCorners.map((c) => c.y));
+
+          const clampedDx = Math.max(0.01 - minX, Math.min(0.99 - maxX, dxNorm));
+          const clampedDy = Math.max(0.01 - minY, Math.min(0.99 - maxY, dyNorm));
+
+          setCorners(
+            startCorners.map((pt) => ({
+              x: pt.x + clampedDx,
+              y: pt.y + clampedDy,
+            }))
+          );
+          return;
+        }
+
+        // Symmetrical aspect-ratio-locked corner resize (dragging up/down or left/right
+        // always keeps the exact real VOEUX product proportions, never stretched or squished)
+        setCorners((prev) => {
+          if (!prev || prev.length !== 4) return prev;
+          const oppIdx = (activeCornerIdx + 2) % 4;
+          const anchorPxX = prev[oppIdx].x * rect.width;
+          const anchorPxY = prev[oppIdx].y * rect.height;
+
+          const curPxX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+          const curPxY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+          const dxPx = curPxX - anchorPxX;
+          const dyPx = curPxY - anchorPxY;
+
+          // Use whichever axis moved further so vertical OR horizontal dragging scales smoothly
+          let targetW = Math.max(Math.abs(dxPx), Math.abs(dyPx) * productAspect);
+          targetW = Math.max(minWidthPx, Math.min(maxWidthPx, targetW));
+          let targetH = targetW / productAspect;
+
+          if (targetH > rect.height * 0.85) {
+            targetH = rect.height * 0.85;
+            targetW = targetH * productAspect;
+          }
+
+          // Determine box bounds anchored at the opposite corner
+          const isLeft = activeCornerIdx === 0 || activeCornerIdx === 3;
+          const isTop = activeCornerIdx === 0 || activeCornerIdx === 1;
+
+          let x1 = isLeft ? anchorPxX - targetW : anchorPxX;
+          let x2 = isLeft ? anchorPxX : anchorPxX + targetW;
+          let y1 = isTop ? anchorPxY - targetH : anchorPxY;
+          let y2 = isTop ? anchorPxY : anchorPxY + targetH;
+
+          // Keep strictly inside dashboard bounds without breaking symmetry
+          if (x1 < 4) {
+            x2 += 4 - x1;
+            x1 = 4;
+          }
+          if (x2 > rect.width - 4) {
+            x1 -= x2 - (rect.width - 4);
+            x2 = rect.width - 4;
+          }
+          if (y1 < 4) {
+            y2 += 4 - y1;
+            y1 = 4;
+          }
+          if (y2 > rect.height - 4) {
+            y1 -= y2 - (rect.height - 4);
+            y2 = rect.height - 4;
+          }
+
+          return [
+            { x: x1 / rect.width, y: y1 / rect.height },
+            { x: x2 / rect.width, y: y1 / rect.height },
+            { x: x2 / rect.width, y: y2 / rect.height },
+            { x: x1 / rect.width, y: y2 / rect.height },
+          ];
+        });
       }
     };
     const onUp = () => {
       isSlidingRef.current = false;
       setActiveCornerIdx(null);
+      dragStartRef.current = null;
     };
 
     window.addEventListener('mousemove', onMove);
@@ -478,7 +562,7 @@ export const VirtualFitPage = () => {
       window.removeEventListener('touchmove', onMove);
       window.removeEventListener('touchend', onUp);
     };
-  }, [activeCornerIdx]);
+  }, [activeCornerIdx, activeProduct.id]);
 
   const handleDownloadPreview = () => {
     if (!resultImage) return;
@@ -796,19 +880,39 @@ export const VirtualFitPage = () => {
                 />
               )}
 
-              {/* Interactive 4-Corner Placement Frame */}
+              {/* Interactive Symmetrical 4-Corner Placement Frame */}
               {!isDetectingPreview && corners && corners.length === 4 && (
                 <>
                   <svg
                     viewBox="0 0 100 100"
                     preserveAspectRatio="none"
-                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    className="absolute inset-0 w-full h-full"
                   >
                     <polygon
                       points={corners.map((c) => `${c.x * 100},${c.y * 100}`).join(' ')}
                       fill="rgba(59, 66, 159, 0.24)"
                       stroke="#FFFFFF"
                       strokeWidth="0.35"
+                      className="cursor-move"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        dragStartRef.current = {
+                          clientX: e.clientX,
+                          clientY: e.clientY,
+                          corners: corners.map((c) => ({ ...c })),
+                        };
+                        setActiveCornerIdx('move');
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        if (!e.touches[0]) return;
+                        dragStartRef.current = {
+                          clientX: e.touches[0].clientX,
+                          clientY: e.touches[0].clientY,
+                          corners: corners.map((c) => ({ ...c })),
+                        };
+                        setActiveCornerIdx('move');
+                      }}
                     />
                   </svg>
 
