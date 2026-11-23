@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
 import {
+  detectCornersInBrowser,
+  compositeInBrowser,
+} from '../utils/virtualFitClientEngine';
+import {
   ArrowLeft,
   Upload,
   Download,
@@ -41,11 +45,27 @@ const VIRTUAL_FIT_PRODUCT_META = {
   },
 };
 
-const API_BASE =
-  import.meta.env.VITE_VIRTUAL_FIT_API_URL ||
-  (typeof window !== 'undefined'
-    ? `${window.location.protocol}//${window.location.hostname}:8000`
-    : 'http://localhost:8000');
+const getConfiguredApiBase = () => {
+  if (import.meta.env.VITE_VIRTUAL_FIT_API_URL) {
+    return import.meta.env.VITE_VIRTUAL_FIT_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const isLocalNetwork =
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host.startsWith('192.168.') ||
+      host.startsWith('10.') ||
+      host.endsWith('.local');
+    if (isLocalNetwork) {
+      return `${window.location.protocol}//${host}:8000`;
+    }
+  }
+  // On public production without a paid ML server, use built-in zero-cost browser CV engine
+  return null;
+};
+
+const API_BASE = getConfiguredApiBase();
 
 const CORNER_LABELS = ['TL', 'TR', 'BR', 'BL'];
 
@@ -300,24 +320,37 @@ export const VirtualFitPage = () => {
     setIsDetectingPreview(true);
     setErrorMessage('');
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('product_id', productId);
+      if (API_BASE) {
+        try {
+          const formData = new FormData();
+          formData.append('image', file);
+          formData.append('product_id', productId);
 
-      const resp = await fetch(`${API_BASE}/api/virtual-fit/detect-corners`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await resp.json();
-      if (resp.ok && data.success) {
-        setOriginalImage(data.original_image);
-        setCorners(data.corners);
-        setConfidence(data.confidence);
-        setNeedsManualCheck(Boolean(data.needs_manual_check));
+          const resp = await fetch(`${API_BASE}/api/virtual-fit/detect-corners`, {
+            method: 'POST',
+            body: formData,
+          });
+          const data = await resp.json();
+          if (resp.ok && data.success) {
+            setOriginalImage(data.original_image);
+            setCorners(data.corners);
+            setConfidence(data.confidence);
+            setNeedsManualCheck(Boolean(data.needs_manual_check));
+            return;
+          }
+        } catch (backendErr) {
+          console.info('Python backend unavailable, using built-in browser CV engine.');
+        }
       }
+
+      // Built-in zero-cost browser computer-vision detector (live on public production)
+      const localData = await detectCornersInBrowser(file, productId);
+      setOriginalImage(localData.original_image);
+      setCorners(localData.corners);
+      setConfidence(localData.confidence);
+      setNeedsManualCheck(Boolean(localData.needs_manual_check));
     } catch (err) {
-      // Fallback: let user still click Continue or show helpful error then
-      console.warn('Preview corner pre-detection skipped:', err);
+      setErrorMessage(err.message || 'Unable to read this photograph. Please try a clearer image.');
     } finally {
       setIsDetectingPreview(false);
     }
@@ -375,58 +408,73 @@ export const VirtualFitPage = () => {
     setIsAdjusting(false);
 
     try {
-      // If corners were already detected & optionally adjusted by the user on the preview stage,
-      // composite directly with those exact 4 corners for instant razor-accurate placement!
-      if (corners && corners.length === 4 && originalImage) {
-        const formData = new FormData();
-        formData.append('image', selectedFile);
-        formData.append('product_id', activeProduct.id);
-        formData.append('corners', JSON.stringify(corners));
+      // 1. Try Python ML backend if configured (local Mac/LAN or cloud ML host)
+      if (API_BASE) {
+        try {
+          if (corners && corners.length === 4 && originalImage) {
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            formData.append('product_id', activeProduct.id);
+            formData.append('corners', JSON.stringify(corners));
 
-        const resp = await fetch(`${API_BASE}/api/virtual-fit/refit`, {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await resp.json();
-        if (!resp.ok || !data.success) {
-          throw new Error(data.detail || 'Could not composite dashboard photograph.');
+            const resp = await fetch(`${API_BASE}/api/virtual-fit/refit`, {
+              method: 'POST',
+              body: formData,
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+              setResultImage(data.result_image);
+              setNeedsManualCheck(false);
+              setSliderPos(50);
+              setStage('result');
+              return;
+            }
+          } else {
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            formData.append('product_id', activeProduct.id);
+
+            const resp = await fetch(`${API_BASE}/api/virtual-fit/detect-and-fit`, {
+              method: 'POST',
+              body: formData,
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+              setOriginalImage(data.original_image);
+              setResultImage(data.result_image);
+              setCorners(data.corners);
+              setConfidence(data.confidence);
+              setNeedsManualCheck(Boolean(data.needs_manual_check));
+              setSliderPos(50);
+              setStage('result');
+              return;
+            }
+          }
+        } catch (backendErr) {
+          console.info('Python backend unavailable, using built-in browser CV engine.');
         }
-
-        setResultImage(data.result_image);
-        setNeedsManualCheck(false);
-        setSliderPos(50);
-        setStage('result');
-        return;
       }
 
-      // Otherwise run full auto-detect + composite
-      const formData = new FormData();
-      formData.append('image', selectedFile);
-      formData.append('product_id', activeProduct.id);
-
-      const resp = await fetch(`${API_BASE}/api/virtual-fit/detect-and-fit`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await resp.json();
-      if (!resp.ok || !data.success) {
-        throw new Error(data.detail || 'Could not process dashboard photograph.');
+      // 2. Built-in zero-cost browser computer-vision & Canvas compositing engine
+      let activeCorners = corners;
+      if (!activeCorners || activeCorners.length !== 4) {
+        const detected = await detectCornersInBrowser(selectedFile, activeProduct.id);
+        activeCorners = detected.corners;
+        setOriginalImage(detected.original_image);
+        setCorners(detected.corners);
       }
 
-      setOriginalImage(data.original_image);
-      setResultImage(data.result_image);
-      setCorners(data.corners);
-      setConfidence(data.confidence);
-      setNeedsManualCheck(Boolean(data.needs_manual_check));
+      const comp = await compositeInBrowser(selectedFile, activeProduct.id, activeCorners);
+      setOriginalImage(comp.original_image);
+      setResultImage(comp.result_image);
+      setCorners(comp.corners);
+      setNeedsManualCheck(false);
       setSliderPos(50);
       setStage('result');
     } catch (err) {
       console.error('Virtual Fit pipeline error:', err);
       setErrorMessage(
-        err.message === 'Failed to fetch'
-          ? 'The VOEUX Virtual Fit ML server is not running. Please start the local Python backend on port 8000 and try again.'
-          : err.message || 'Unable to process this photograph. Please try a clearer front-facing dashboard photo.'
+        err.message || 'Unable to process this photograph. Please try a clearer front-facing dashboard photo.'
       );
       setStage('preview');
     }
@@ -438,22 +486,33 @@ export const VirtualFitPage = () => {
     setErrorMessage('');
 
     try {
-      const formData = new FormData();
-      formData.append('image', selectedFile);
-      formData.append('product_id', activeProduct.id);
-      formData.append('corners', JSON.stringify(corners));
+      if (API_BASE) {
+        try {
+          const formData = new FormData();
+          formData.append('image', selectedFile);
+          formData.append('product_id', activeProduct.id);
+          formData.append('corners', JSON.stringify(corners));
 
-      const resp = await fetch(`${API_BASE}/api/virtual-fit/refit`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await resp.json();
-      if (!resp.ok || !data.success) {
-        throw new Error(data.detail || 'Could not update placement.');
+          const resp = await fetch(`${API_BASE}/api/virtual-fit/refit`, {
+            method: 'POST',
+            body: formData,
+          });
+          const data = await resp.json();
+          if (resp.ok && data.success) {
+            setResultImage(data.result_image);
+            setNeedsManualCheck(false);
+            setIsAdjusting(false);
+            setSliderPos(50);
+            return;
+          }
+        } catch (backendErr) {
+          console.info('Python backend unavailable for refit, using built-in browser engine.');
+        }
       }
 
-      setResultImage(data.result_image);
+      const comp = await compositeInBrowser(selectedFile, activeProduct.id, corners);
+      setResultImage(comp.result_image);
+      setCorners(comp.corners);
       setNeedsManualCheck(false);
       setIsAdjusting(false);
       setSliderPos(50);
