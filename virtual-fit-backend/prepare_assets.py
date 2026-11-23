@@ -116,7 +116,7 @@ if __name__ == "__main__":
         (os.path.join(PRODUCTS_DIR, "x80_dual_knob_front.PNG"), os.path.join(PRODUCTS_DIR, "x80_dual_knob_clean.png")),
         (os.path.join(PRODUCTS_DIR, "ts7_9inch_front.PNG"), os.path.join(PRODUCTS_DIR, "ts7_9inch_clean.png")),
         (
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public", "images", "voeux_single_knob_piano_stereo.png")),
+            os.path.join(PRODUCTS_DIR, "single_knob_piano_front.PNG"),
             os.path.join(PRODUCTS_DIR, "single_knob_piano_clean.png"),
         ),
     ]

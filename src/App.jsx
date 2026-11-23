@@ -35,7 +35,30 @@ import { VirtualFitPage } from './components/VirtualFitPage';
 
 
 const MainContent = () => {
-  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating, setSelectedProductModal, selectedProductModal } = useShop();
+  const { activePage, setActivePage, productsList, toasts, lastAddedProduct, setIsCartOpen, cartAnimating, setSelectedProductModal, selectedProductModal, openVirtualFit } = useShop();
+  const [showVirtualFitPopup, setShowVirtualFitPopup] = useState(false);
+
+  // Show VOEUX Virtual Fit promo pop-up on homepage once per session
+  useEffect(() => {
+    if (activePage !== 'home') {
+      setShowVirtualFitPopup(false);
+      return;
+    }
+    try {
+      if (sessionStorage.getItem('voeux_vf_popup_dismissed') === '1') return;
+    } catch (e) {}
+    const timer = setTimeout(() => {
+      setShowVirtualFitPopup(true);
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, [activePage]);
+
+  const dismissVirtualFitPopup = () => {
+    setShowVirtualFitPopup(false);
+    try {
+      sessionStorage.setItem('voeux_vf_popup_dismissed', '1');
+    } catch (e) {}
+  };
 
   // Capture incoming referral parameters (?ref=9999999999 or #ref=...)
   useEffect(() => {
@@ -371,6 +394,70 @@ const MainContent = () => {
       {!isImmersiveVirtualFit && <Navbar />}
       <main className="flex-1">{renderPage()}</main>
       {!isImmersiveVirtualFit && <Footer />}
+
+      {/* Homepage VOEUX Virtual Fit Promo Pop-Up */}
+      {showVirtualFitPopup && activePage === 'home' && (
+        <div
+          onClick={dismissVirtualFitPopup}
+          className="fixed inset-0 z-[130] bg-black/75 backdrop-blur-sm flex items-center justify-center px-4 py-6 animate-in fade-in duration-300"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md bg-black text-white border border-white/25 px-6 sm:px-8 py-8 text-center shadow-2xl"
+          >
+            <button
+              type="button"
+              onClick={dismissVirtualFitPopup}
+              aria-label="Close popup"
+              className="absolute top-3.5 right-4 text-white/50 hover:text-white text-xl leading-none cursor-pointer"
+            >
+              ×
+            </button>
+
+            <div className="flex items-center justify-center gap-2.5 mb-5">
+              <img
+                src="/images/voeux_logo.png"
+                alt="VOEUX®"
+                className="h-4 w-auto object-contain opacity-95"
+              />
+              <span className="h-3 w-[1px] bg-white/25" />
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#7c85ff]">
+                NEW FEATURE
+              </span>
+            </div>
+
+            <h3 className="text-2xl sm:text-[26px] font-light uppercase tracking-[0.14em] text-white leading-snug">
+              SEE YOUR ANDROID PLAYER ON YOUR DASHBOARD
+            </h3>
+
+            <p className="mt-3 text-xs sm:text-sm font-clean text-white/65 leading-relaxed">
+              Try <strong className="text-white font-medium">VOEUX® Virtual Fit</strong> — upload a photo of your car&apos;s dashboard (or use our sample) to see how our 9&quot; &amp; 10.1&quot; Android Players look inside your car.
+            </p>
+
+            <div className="mt-7 flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  dismissVirtualFitPopup();
+                  const defaultPlayer = (productsList || PRODUCTS).find((p) => p.id === 'voeux-x80-dual-knob') || PRODUCTS[0];
+                  openVirtualFit(defaultPlayer);
+                }}
+                className="w-full py-3.5 px-6 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-xs uppercase tracking-[0.24em] font-medium transition-all cursor-pointer"
+              >
+                TRY VIRTUAL FIT
+              </button>
+
+              <button
+                type="button"
+                onClick={dismissVirtualFitPopup}
+                className="text-[11px] uppercase tracking-[0.2em] text-white/45 hover:text-white/80 py-1 cursor-pointer"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfettiOverlay />
       <CartDrawer />

@@ -36,23 +36,26 @@ const VIRTUAL_FIT_PRODUCT_META = {
   'voeux-single-knob-piano-4-64': {
     shortLabel: 'Single Knob Piano',
     fullLabel: 'VOEUX® Single Knob Piano Series',
-    aspect: 1.285,
+    aspect: 1.31,
     minWidthRatio: 0.20,
   },
 };
 
 const API_BASE =
-  import.meta.env.VITE_VIRTUAL_FIT_API_URL || 'http://localhost:8000';
+  import.meta.env.VITE_VIRTUAL_FIT_API_URL ||
+  (typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:8000`
+    : 'http://localhost:8000');
 
 const CORNER_LABELS = ['TL', 'TR', 'BR', 'BL'];
 
 /**
  * Precision Automotive Technical Outline Dashboard SVG
- * Extremely thin white strokes, outline-only, with slow travelling luminous pulse
- * and subtle prominence on the central infotainment bay.
+ * Large, screen-filling outline-only technical drawing with thin white strokes,
+ * slow travelling luminous pulse, and subtle prominence on the central infotainment bay.
  */
 const AutomotiveDashboardOutline = () => (
-  <div className="relative w-full max-w-[780px] mx-auto select-none pointer-events-none">
+  <div className="relative w-[108%] -mx-[4%] sm:w-full sm:mx-auto max-w-[1160px] select-none pointer-events-none">
     <style>{`
       @keyframes voeuxDashTrace {
         0% { stroke-dashoffset: 1600; opacity: 0.15; }
@@ -685,8 +688,8 @@ export const VirtualFitPage = () => {
 
       {/* Editorial Tutorial Overlay (Shown Every Time Virtual Fit Opens) */}
       {showTutorial && (
-        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center px-5 py-8">
-          <div className="w-full max-w-xl border border-white/20 bg-black px-7 sm:px-10 py-9 sm:py-11 text-left">
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center px-4 py-6 overflow-y-auto">
+          <div className="w-full max-w-xl max-h-[90dvh] overflow-y-auto border border-white/20 bg-black px-6 sm:px-10 py-7 sm:py-11 text-left">
             <div className="flex items-center justify-between pb-5 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <img
@@ -783,7 +786,7 @@ export const VirtualFitPage = () => {
       )}
 
       {/* Main Immersive Stage */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14 flex flex-col items-center justify-center">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-10 py-6 sm:py-10 flex flex-col items-center justify-center overflow-x-hidden">
         {/* ================= STAGE 1: IMMERSIVE UPLOAD ================= */}
         {stage === 'upload' && (
           <div
@@ -791,38 +794,38 @@ export const VirtualFitPage = () => {
               isDragOver ? 'opacity-80' : 'opacity-100'
             }`}
           >
-            {/* Central Precision Dashboard Line Illustration */}
-            <div className="w-full mb-8 sm:mb-10">
+            {/* Central Precision Dashboard Line Illustration — Large & Screen-Filling */}
+            <div className="w-full mb-5 sm:mb-7">
               <AutomotiveDashboardOutline />
             </div>
 
             {/* Editorial Typography */}
-            <h1 className="text-3xl sm:text-5xl md:text-[54px] font-light tracking-[0.16em] text-white uppercase leading-tight">
+            <h1 className="text-2xl sm:text-5xl md:text-[54px] font-light tracking-[0.14em] sm:tracking-[0.16em] text-white uppercase leading-tight px-2">
               YOUR DASHBOARD. YOUR VOEUX.
             </h1>
 
-            <p className="mt-4 text-sm sm:text-base font-clean font-light text-white/65 tracking-wide max-w-xl leading-relaxed">
+            <p className="mt-3 sm:mt-4 text-xs sm:text-base font-clean font-light text-white/65 tracking-wide max-w-xl leading-relaxed px-2">
               See how your favourite VOEUX Android Player could look inside your car.
             </p>
 
             {/* Carried-Forward Selected Product Indicator */}
-            <div className="mt-5 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-white/50">
-              <span className="w-6 h-[1px] bg-[#3B429F]" />
+            <div className="mt-4 sm:mt-5 inline-flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.22em] text-white/50">
+              <span className="w-4 sm:w-6 h-[1px] bg-[#3B429F]" />
               <span>
                 Selected:{' '}
                 <strong className="text-white/90 font-normal">
                   {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
                 </strong>
               </span>
-              <span className="w-6 h-[1px] bg-[#3B429F]" />
+              <span className="w-4 sm:w-6 h-[1px] bg-[#3B429F]" />
             </div>
 
-            {/* Minimalist Upload & Sample Dashboard Buttons */}
-            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+            {/* Minimalist Upload & Sample Dashboard Buttons (Full-width stacked on mobile) */}
+            <div className="mt-7 sm:mt-9 w-full sm:w-auto flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 px-2 sm:px-0">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="group relative px-10 py-4 border border-white/80 hover:border-[#3B429F] text-white text-xs sm:text-[13px] uppercase tracking-[0.26em] font-light transition-all duration-300 hover:bg-[#3B429F]/15 cursor-pointer inline-flex items-center gap-3"
+                className="w-full sm:w-auto group relative px-8 sm:px-10 py-4 border border-white/80 hover:border-[#3B429F] text-white text-xs sm:text-[13px] uppercase tracking-[0.24em] sm:tracking-[0.26em] font-light transition-all duration-300 hover:bg-[#3B429F]/15 cursor-pointer inline-flex items-center justify-center gap-3"
               >
                 <Upload className="w-4 h-4 text-white/80 group-hover:text-[#7c85ff] transition-colors" />
                 <span>UPLOAD YOUR DASHBOARD</span>
@@ -832,7 +835,7 @@ export const VirtualFitPage = () => {
                 type="button"
                 onClick={handleUseSampleDashboard}
                 disabled={loadingSample}
-                className="px-8 py-4 border border-white/25 hover:border-white/75 text-white/75 hover:text-white text-xs uppercase tracking-[0.22em] font-light transition-all duration-300 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-8 py-4 border border-white/25 hover:border-white/75 text-white/75 hover:text-white text-xs uppercase tracking-[0.22em] font-light transition-all duration-300 cursor-pointer disabled:opacity-50"
               >
                 {loadingSample ? 'LOADING SAMPLE...' : 'TRY SAMPLE DASHBOARD'}
               </button>
@@ -840,7 +843,7 @@ export const VirtualFitPage = () => {
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="sm:hidden px-8 py-3.5 border border-white/30 text-white/80 text-[11px] uppercase tracking-[0.22em] font-light inline-flex items-center gap-2.5 cursor-pointer"
+                className="w-full sm:hidden px-8 py-3.5 border border-white/30 text-white/80 text-[11px] uppercase tracking-[0.22em] font-light inline-flex items-center justify-center gap-2.5 cursor-pointer"
               >
                 <Camera className="w-3.5 h-3.5" />
                 <span>USE CAMERA</span>
@@ -949,7 +952,7 @@ export const VirtualFitPage = () => {
                         left: `${pt.x * 100}%`,
                         top: `${pt.y * 100}%`,
                       }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
+                      className="absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[10px] sm:text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
                       aria-label={`Adjust corner ${CORNER_LABELS[idx]}`}
                     >
                       {CORNER_LABELS[idx]}
@@ -1183,7 +1186,7 @@ export const VirtualFitPage = () => {
                           left: `${pt.x * 100}%`,
                           top: `${pt.y * 100}%`,
                         }}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
+                        className="absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-8 sm:h-8 rounded-full border-2 border-white bg-[#3B429F]/90 text-white text-[10px] sm:text-[9px] font-bold tracking-wider flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
                         aria-label={`Drag corner ${CORNER_LABELS[idx]}`}
                       >
                         {CORNER_LABELS[idx]}
