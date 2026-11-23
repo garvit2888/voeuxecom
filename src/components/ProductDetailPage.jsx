@@ -4,6 +4,7 @@ import { CAR_MODELS } from '../data/products';
 import { ProductCard } from './ProductCard';
 import { DiwaliPriceDisplay } from './DiwaliPriceDisplay';
 import { getDiwaliDiscount, isDiwaliSaleActive } from '../utils/diwaliOffers';
+import { VIRTUAL_FIT_SUPPORTED_IDS } from './VirtualFitPage';
 import {
   ShieldCheck,
   RotateCw,
@@ -18,7 +19,8 @@ import {
   X,
   HelpCircle,
   Zap,
-  ShoppingCart
+  ShoppingCart,
+  Monitor
 } from 'lucide-react';
 
 export const ProductDetailPage = () => {
@@ -31,7 +33,8 @@ export const ProductDetailPage = () => {
     setIsCartOpen,
     user,
     setIsAuthModalOpen,
-    buyNowCheckout
+    buyNowCheckout,
+    openVirtualFit
   } = useShop();
 
   const product = selectedProductModal;
@@ -290,6 +293,17 @@ export const ProductDetailPage = () => {
 
             {/* Primary Action Buttons */}
             <div className="space-y-2.5 pt-1">
+              {VIRTUAL_FIT_SUPPORTED_IDS.includes(product.id) && (
+                <button
+                  type="button"
+                  onClick={() => openVirtualFit(product)}
+                  className="w-full bg-black hover:bg-[#111328] text-white border border-gray-900 hover:border-[#3B429F] py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-bold tracking-[0.14em] uppercase cursor-pointer shadow-md"
+                >
+                  <Monitor className="w-4 h-4 text-[#7c85ff]" />
+                  <span>SEE IT ON YOUR DASHBOARD</span>
+                </button>
+              )}
+
               <div className="flex gap-2">
                 <button
                   onClick={() => {

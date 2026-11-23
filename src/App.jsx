@@ -31,6 +31,7 @@ import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
+import { VirtualFitPage } from './components/VirtualFitPage';
 
 
 const MainContent = () => {
@@ -227,6 +228,8 @@ const MainContent = () => {
         return <TermsAndConditions />;
       case 'product-detail':
         return selectedProductModal?.isBundle ? <BundleDetailPage bundle={selectedProductModal} /> : <ProductDetailPage />;
+      case 'virtual-fit':
+        return <VirtualFitPage />;
       case 'profile':
       case 'my-orders':
         return <CustomerProfilePage />;
@@ -323,8 +326,10 @@ const MainContent = () => {
     }
   };
 
+  const isImmersiveVirtualFit = activePage === 'virtual-fit';
+
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col justify-between relative">
+    <div className={`min-h-screen flex flex-col justify-between relative ${isImmersiveVirtualFit ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
       {/* Brand Splash Screen on Initial Load */}
       <SplashScreen />
 
@@ -363,15 +368,15 @@ const MainContent = () => {
         ))}
       </div>
 
-      <Navbar />
+      {!isImmersiveVirtualFit && <Navbar />}
       <main className="flex-1">{renderPage()}</main>
-      <Footer />
+      {!isImmersiveVirtualFit && <Footer />}
 
       <ConfettiOverlay />
       <CartDrawer />
       <CustomerAuthModal />
       <CarSelectorModal />
-      <LiveChatWidget />
+      {!isImmersiveVirtualFit && <LiveChatWidget />}
     </div>
   );
 };

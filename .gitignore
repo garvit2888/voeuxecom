@@ -24,3 +24,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python ML Backend Virtual Env & Caches
+virtual-fit-backend/.venv/
+virtual-fit-backend/__pycache__/
+virtual-fit-backend/test_outputs/
+**/__pycache__/
+*.pyc

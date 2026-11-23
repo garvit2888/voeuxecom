@@ -43,11 +43,27 @@ export const ShopProvider = ({ children }) => {
     }
     if (!hash) return 'home';
     if (hash.startsWith('product-detail')) return 'product-detail';
+    if (hash.startsWith('virtual-fit')) return 'virtual-fit';
     if (hash.startsWith('inventory-qr') || hash.startsWith('warehouse-qr') || hash.startsWith('qr-inventory')) {
       return 'inventory-qr';
     }
     return hash;
   };
+
+  const [virtualFitProduct, setVirtualFitProduct] = useState(() => {
+    try {
+      const hash = (window.location.hash || '').replace('#', '').trim();
+      if (hash.startsWith('virtual-fit')) {
+        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
+        const pid = urlParams.get('id');
+        if (pid) {
+          const found = PRODUCTS.find(p => p.id === pid);
+          if (found) return found;
+        }
+      }
+    } catch (e) {}
+    return PRODUCTS.find(p => p.id === 'voeux-x80-dual-knob') || PRODUCTS[0];
+  });
 
   const [selectedProductModal, _setSelectedProductModal] = useState(() => {
     // Restore product page on reload from URL hash
@@ -96,6 +112,18 @@ export const ShopProvider = ({ children }) => {
         window.history.pushState({ page }, '', `#${page}`);
       }
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openVirtualFit = (product) => {
+    if (product) {
+      setVirtualFitProduct(product);
+    }
+    _setSelectedProductModal(null);
+    _setActivePageState('virtual-fit');
+    setPageTransitionKey(prev => prev + 1);
+    const pid = product?.id || virtualFitProduct?.id || 'voeux-x80-dual-knob';
+    window.history.pushState({ page: 'virtual-fit', productId: pid }, '', `#virtual-fit?id=${pid}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -1244,7 +1272,10 @@ export const ShopProvider = ({ children }) => {
         buyNowCheckout,
         cartAnimating,
         lastAddedProduct,
-        pageTransitionKey
+        pageTransitionKey,
+        virtualFitProduct,
+        setVirtualFitProduct,
+        openVirtualFit
       }}
     >
       {children}
