@@ -54,7 +54,7 @@ const CORNER_LABELS = ['TL', 'TR', 'BR', 'BL'];
  * Large, screen-filling outline-only technical drawing with thin white strokes,
  * slow travelling luminous pulse, and subtle prominence on the central infotainment bay.
  */
-const AutomotiveDashboardOutline = () => (
+export const AutomotiveDashboardOutline = () => (
   <div className="relative w-[108%] -mx-[4%] sm:w-full sm:mx-auto max-w-[1160px] select-none pointer-events-none">
     <style>{`
       @keyframes voeuxDashTrace {

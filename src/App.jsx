@@ -31,7 +31,7 @@ import { InventoryQRPortal } from './components/InventoryQRPortal';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
-import { VirtualFitPage } from './components/VirtualFitPage';
+import { VirtualFitPage, AutomotiveDashboardOutline } from './components/VirtualFitPage';
 
 
 const MainContent = () => {
@@ -291,6 +291,64 @@ const MainContent = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </section>
+
+            {/* ========== VOEUX® VIRTUAL FIT HOMEPAGE SHOWCASE SECTION ========== */}
+            <section className="w-full bg-black text-white py-16 sm:py-24 px-4 sm:px-10 border-y border-white/10 overflow-hidden">
+              <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
+                <div className="inline-flex items-center gap-3 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-[#7c85ff] mb-6">
+                  <span className="w-6 h-[1px] bg-[#3B429F]" />
+                  <span>VOEUX® VIRTUAL FIT</span>
+                  <span className="w-6 h-[1px] bg-[#3B429F]" />
+                </div>
+
+                {/* Animated Automotive Dashboard Technical Outline */}
+                <div className="w-full mb-6 sm:mb-8">
+                  <AutomotiveDashboardOutline />
+                </div>
+
+                <h2 className="text-3xl sm:text-5xl md:text-[54px] font-light uppercase tracking-[0.14em] sm:tracking-[0.16em] text-white leading-tight">
+                  YOUR DASHBOARD. YOUR VOEUX.
+                </h2>
+
+                <p className="mt-4 text-xs sm:text-base font-clean font-light text-white/65 max-w-2xl leading-relaxed tracking-wide">
+                  Upload a photograph of your car&apos;s dashboard — or test with our sample — to preview how our exact 9&quot; QLED, 10.1&quot; Dual Knob X80, or Single Knob Piano Android Players look inside your vehicle before you buy.
+                </p>
+
+                {/* Direct Model Launchers */}
+                <div className="mt-8 w-full sm:w-auto flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const x80 = (productsList || PRODUCTS).find((p) => p.id === 'voeux-x80-dual-knob') || PRODUCTS[0];
+                      openVirtualFit(x80);
+                    }}
+                    className="w-full sm:w-auto px-10 py-4 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-xs sm:text-[13px] uppercase tracking-[0.26em] font-medium transition-all duration-300 cursor-pointer"
+                  >
+                    TRY VIRTUAL FIT NOW
+                  </button>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.2em] text-white/45">
+                  {[
+                    { id: 'voeux-x80-dual-knob', label: 'X80 10.1" Dual Knob' },
+                    { id: 'voeux-carbon-black-ts7-4-64', label: 'TS7 9" QLED' },
+                    { id: 'voeux-single-knob-piano-4-64', label: 'Single Knob Piano' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        const prod = (productsList || PRODUCTS).find((p) => p.id === item.id);
+                        if (prod) openVirtualFit(prod);
+                      }}
+                      className="pb-0.5 border-b border-transparent hover:border-[#3B429F] hover:text-white transition-colors cursor-pointer"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </section>
 
