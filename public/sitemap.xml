@@ -345,6 +345,77 @@
     </image:image>
   </url>
 
+  <!-- ==================== CAR-SPECIFIC ANDROID PLAYER FITMENT GUIDES ==================== -->
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-creta-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-swift-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-nexon-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-thar-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/kia-seltos-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-brezza-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-baleno-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/honda-city-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-scorpio-n-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://voeuxtechnologies.in/car/toyota-fortuner-android-player</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
   <!-- ==================== SUPPORT, WARRANTY, DEALERS & BRAND PAGES ==================== -->
   <url>
     <loc>https://voeuxtechnologies.in/dealers</loc>

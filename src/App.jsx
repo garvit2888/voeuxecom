@@ -32,6 +32,8 @@ import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
 import { VirtualFitPage, AutomotiveDashboardOutline } from './components/VirtualFitPage';
+import { CarFitmentGuidePage } from './components/CarFitmentGuidePage';
+import { getCarGuideBySlug } from './data/carGuides';
 
 
 const MainContent = () => {
@@ -173,6 +175,13 @@ const MainContent = () => {
       nextTitle = `${selectedProductModal.name} – ₹${Number(selectedProductModal.price).toLocaleString('en-IN')} | VOEUX® Official Store`;
       nextDesc = selectedProductModal.description || `${selectedProductModal.name} available at ₹${Number(selectedProductModal.price).toLocaleString('en-IN')} with 1-Year VOEUX® Warranty and Free Delivery across India.`;
       canonicalPath = `/product/${selectedProductModal.id}`;
+    } else if (typeof activePage === 'string' && activePage.startsWith('car/')) {
+      const carGuide = getCarGuideBySlug(activePage.slice(4));
+      if (carGuide) {
+        nextTitle = carGuide.seoTitle;
+        nextDesc = carGuide.seoDescription;
+        canonicalPath = `/car/${carGuide.slug}`;
+      }
     } else if (pageSeoMap[activePage]) {
       nextTitle = pageSeoMap[activePage].title;
       nextDesc = pageSeoMap[activePage].desc;
@@ -238,6 +247,9 @@ const MainContent = () => {
 
 
   const renderPage = () => {
+    if (typeof activePage === 'string' && activePage.startsWith('car/')) {
+      return <CarFitmentGuidePage slug={activePage.slice(4)} />;
+    }
     switch (activePage) {
       case 'admin-test-payment':
         return <AdminTestPaymentPage />;
