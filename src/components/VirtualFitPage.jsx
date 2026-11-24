@@ -293,6 +293,8 @@ export const VirtualFitPage = () => {
   const [corners, setCorners] = useState(null); // [{x, y}, ...] normalized 0..1
   const [confidence, setConfidence] = useState(null);
   const [aiCarHint, setAiCarHint] = useState(null);
+  const [detectionEngine, setDetectionEngine] = useState(null); // e.g. 'gemini-flash-latest' | 'owlvit' | 'browser-cv'
+  const [detectedYawDeg, setDetectedYawDeg] = useState(0);
   const [needsManualCheck, setNeedsManualCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -322,6 +324,8 @@ export const VirtualFitPage = () => {
     setIsDetectingPreview(true);
     setErrorMessage('');
     setAiCarHint(null);
+    setDetectionEngine(null);
+    setDetectedYawDeg(0);
     try {
       // 1. Primary: Gemini Flash Vision AI via free Vercel Serverless Function (/api/virtual-fit-ai)
       const aiData = await detectCornersWithGeminiAI(file, productId);
@@ -330,6 +334,8 @@ export const VirtualFitPage = () => {
         setCorners(aiData.corners);
         setConfidence(aiData.confidence);
         setNeedsManualCheck(Boolean(aiData.needs_manual_check));
+        setDetectionEngine(aiData.engine || 'gemini-ai');
+        setDetectedYawDeg(Number(aiData.camera_yaw_deg) || 0);
         if (aiData.car_hint) setAiCarHint(aiData.car_hint);
         return;
       }
@@ -351,6 +357,7 @@ export const VirtualFitPage = () => {
             setCorners(data.corners);
             setConfidence(data.confidence);
             setNeedsManualCheck(Boolean(data.needs_manual_check));
+            setDetectionEngine('local-owlvit');
             return;
           }
         } catch (backendErr) {
@@ -364,6 +371,7 @@ export const VirtualFitPage = () => {
       setCorners(localData.corners);
       setConfidence(localData.confidence);
       setNeedsManualCheck(Boolean(localData.needs_manual_check));
+      setDetectionEngine('browser-cv');
     } catch (err) {
       setErrorMessage(err.message || 'Unable to read this photograph. Please try a clearer image.');
     } finally {
@@ -990,6 +998,26 @@ export const VirtualFitPage = () => {
                 );
               })()}
             </div>
+
+            {/* Live AI Engine Verification Badge */}
+            {!isDetectingPreview && detectionEngine && (
+              <div className="mt-4 inline-flex items-center gap-2.5 px-3.5 py-1.5 border border-white/15 bg-white/[0.04] text-[10px] uppercase tracking-[0.2em]">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    detectionEngine.includes('gemini')
+                      ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]'
+                      : 'bg-amber-400'
+                  }`}
+                />
+                <span className={detectionEngine.includes('gemini') ? 'text-emerald-300' : 'text-white/60'}>
+                  {detectionEngine.includes('gemini')
+                    ? `AI VISION ACTIVE (${detectionEngine})${aiCarHint ? ` · ${aiCarHint}` : ''}${
+                        Math.abs(detectedYawDeg) >= 4 ? ` · ANGLE ${detectedYawDeg > 0 ? '+' : ''}${detectedYawDeg}°` : ''
+                      }`
+                    : 'LOCAL CV FALLBACK (AI OFFLINE)'}
+                </span>
+              </div>
+            )}
 
             {errorMessage && (
               <p className="mt-5 text-xs sm:text-sm font-clean text-red-400 max-w-xl leading-relaxed">

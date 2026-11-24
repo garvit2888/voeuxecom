@@ -2,29 +2,30 @@
  * api/virtual-fit-ai.js
  * Free-tier Vercel Serverless Function powered by Google Gemini Flash Vision.
  *
- * Analyzes an uploaded car dashboard photo and returns:
+ * Dynamically discovers the latest available Gemini Flash model if needed,
+ * analyzes the uploaded car dashboard photo, and returns:
  *  - Exact 4-corner 3D perspective trapezoid [TL, TR, BR, BL] calibrated to the
  *    real-world physical dimensions of the chosen VOEUX Android Player
  *    (9" = 229mm, 9.5" = 236mm, 10.1" = 252mm),
  *  - Automatic camera zoom/distance calibration (handles tight close-ups & wide cabin shots),
  *  - Automatic side-angle 3D perspective yaw & slope estimation,
- *  - Optional vehicle dashboard hint.
- *
- * Never generates or modifies the VOEUX product hardware — only computes exact
- * spatial geometry so the browser composites the real transparent VOEUX PNG.
+ *  - Vehicle dashboard hint + engine status metadata.
  */
 
 const PRODUCT_SPECS = {
   'voeux-x80-dual-knob': {
     physicalWidthMm: 252,
+    screenLabel: '10.1-inch (252mm wide)',
     aspect: 1.78,
   },
   'voeux-carbon-black-ts7-4-64': {
     physicalWidthMm: 229,
+    screenLabel: '9-inch (229mm wide)',
     aspect: 1.786,
   },
   'voeux-single-knob-piano-4-64': {
     physicalWidthMm: 236,
+    screenLabel: '9.5-inch (236mm wide)',
     aspect: 1.31,
   },
 };
@@ -44,15 +45,15 @@ function buildCalibratedTrapezoid(aiData, productId, imgW, imgH) {
   // 1. Center of stereo bay
   let cx = Number(aiData?.stereo_center?.x);
   let cy = Number(aiData?.stereo_center?.y);
-  if (!Number.isFinite(cx) || cx < 0.1 || cx > 0.9) cx = 0.5;
-  if (!Number.isFinite(cy) || cy < 0.1 || cy > 0.85) cy = 0.44;
+  if (!Number.isFinite(cx) || cx < 0.08 || cx > 0.92) cx = 0.5;
+  if (!Number.isFinite(cy) || cy < 0.08 || cy > 0.88) cy = 0.44;
 
   // 2. Real-world mm-to-px calibration
   let visibleWidthMm = Number(aiData?.visible_dashboard_width_mm);
-  if (!Number.isFinite(visibleWidthMm) || visibleWidthMm < 250 || visibleWidthMm > 2000) {
+  if (!Number.isFinite(visibleWidthMm) || visibleWidthMm < 240 || visibleWidthMm > 2000) {
     visibleWidthMm = w / h < 1.05 ? 620 : 980;
   }
-  visibleWidthMm = clamp(visibleWidthMm, 340, 1350);
+  visibleWidthMm = clamp(visibleWidthMm, 320, 1350);
 
   let pxPerMm = w / visibleWidthMm;
 
@@ -61,11 +62,10 @@ function buildCalibratedTrapezoid(aiData, productId, imgW, imgH) {
   if (Number.isFinite(wheelNorm) && wheelNorm >= 0.14 && wheelNorm <= 0.65) {
     const wheelPx = wheelNorm * w;
     const wheelPxPerMm = (wheelPx / REAL_STEERING_WHEEL_MM) * STEERING_TO_CONSOLE_DEPTH_FACTOR;
-    pxPerMm = wheelPxPerMm * 0.62 + pxPerMm * 0.38;
+    pxPerMm = wheelPxPerMm * 0.60 + pxPerMm * 0.40;
   }
 
-  // Also sanity-check against detected existing stereo box width if present:
-  // Most OEM screens are 175mm-230mm wide, so a 9"-10.1" (229-252mm) unit shouldn't be tiny compared to it.
+  // Blend with existing stereo / infotainment bay width when clearly detected
   const sb = aiData?.stereo_box;
   if (
     sb &&
@@ -74,10 +74,10 @@ function buildCalibratedTrapezoid(aiData, productId, imgW, imgH) {
     Number(sb.x2) > Number(sb.x1)
   ) {
     const oemBoxW = (Number(sb.x2) - Number(sb.x1)) * w;
-    if (oemBoxW > w * 0.12 && oemBoxW < w * 0.82) {
-      // OEM double-DIN / factory screens average ~205mm wide
-      const boxPxPerMm = oemBoxW / 205;
-      pxPerMm = pxPerMm * 0.58 + boxPxPerMm * 0.42;
+    if (oemBoxW > w * 0.12 && oemBoxW < w * 0.84) {
+      // Average OEM factory stereo fascia/screen is ~210mm wide
+      const boxPxPerMm = oemBoxW / 210;
+      pxPerMm = pxPerMm * 0.50 + boxPxPerMm * 0.50;
     }
   }
 
@@ -91,11 +91,11 @@ function buildCalibratedTrapezoid(aiData, productId, imgW, imgH) {
 
   // 4. Compute fixed physical player pixel dimensions (with slight cosine foreshortening for side angles)
   const foreshortenX = Math.max(0.76, Math.cos(yawRad * 0.85));
-  let playerW = clamp(spec.physicalWidthMm * pxPerMm * foreshortenX, w * 0.17, w * 0.82);
+  let playerW = clamp(spec.physicalWidthMm * pxPerMm * foreshortenX, w * 0.17, w * 0.84);
   let playerH = (playerW / foreshortenX) / spec.aspect;
 
-  if (playerH > h * 0.78) {
-    playerH = h * 0.78;
+  if (playerH > h * 0.80) {
+    playerH = h * 0.80;
     playerW = playerH * spec.aspect * foreshortenX;
   }
 
@@ -103,15 +103,15 @@ function buildCalibratedTrapezoid(aiData, productId, imgW, imgH) {
   const halfH = playerH / 2;
 
   // Perspective height taper: positive yaw (camera on right side) -> right edge closer/taller
-  const taper = clamp((yawDeg / 45) * 0.16, -0.16, 0.16);
+  const taper = clamp((yawDeg / 45) * 0.17, -0.17, 0.17);
   const leftHalfH = halfH * (1 - taper);
   const rightHalfH = halfH * (1 + taper);
 
-  // Subtle vertical shear along dashboard horizon line
+  // Vertical shear along dashboard horizon line
   const effectiveSlope = Math.abs(slope) > 0.015 ? slope : (yawDeg / 45) * 0.08;
   const shearY = halfW * effectiveSlope * 0.5;
 
-  // Clamp center so all 4 corners remain inside the image
+  // Clamp center so all 4 corners remain cleanly inside the image
   const maxHalfH = Math.max(leftHalfH, rightHalfH) + Math.abs(shearY);
   const cxPx = clamp(cx * w, halfW + 4, w - halfW - 4);
   const cyPx = clamp(cy * h, maxHalfH + 4, h - maxHalfH - 4);
@@ -133,10 +133,38 @@ function buildCalibratedTrapezoid(aiData, productId, imgW, imgH) {
   };
 }
 
-async function callGeminiVision(apiKey, model, imageBase64, mimeType) {
+async function discoverFlashModels(apiKey) {
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`
+    );
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    const list = (data.models || [])
+      .filter(
+        (m) =>
+          Array.isArray(m.supportedGenerationMethods) &&
+          m.supportedGenerationMethods.includes('generateContent') &&
+          typeof m.name === 'string' &&
+          m.name.includes('gemini') &&
+          m.name.includes('flash') &&
+          !m.name.includes('image') &&
+          !m.name.includes('tts') &&
+          !m.name.includes('audio')
+      )
+      .map((m) => m.name.replace(/^models\//, ''));
+    // Prefer newest version numbers first
+    return list.sort().reverse();
+  } catch {
+    return [];
+  }
+}
+
+async function callGeminiVision(apiKey, model, imageBase64, mimeType, productId) {
+  const spec = PRODUCT_SPECS[productId] || PRODUCT_SPECS['voeux-x80-dual-knob'];
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-  const prompt = `You are an expert automotive interior spatial geometry analyzer for an aftermarket 9-inch / 10.1-inch Android car stereo virtual fitment tool.
+  const prompt = `You are an expert automotive interior spatial geometry analyzer for an aftermarket ${spec.screenLabel} Android car stereo virtual fitment tool.
 
 Inspect this car dashboard photograph carefully and return ONLY a valid JSON object with these exact fields:
 {
@@ -153,13 +181,13 @@ Inspect this car dashboard photograph carefully and return ONLY a valid JSON obj
 Field rules:
 - All x, y coordinates are normalized 0.0 to 1.0 (0,0 is top-left of image; 1,1 is bottom-right).
 - "stereo_center": exact center of the car's center infotainment screen or stereo head-unit bay (between the center AC vents / above climate controls).
-- "stereo_box": tight normalized bounding box around the existing factory stereo/infotainment unit or stereo opening.
+- "stereo_box": tight normalized bounding box around the existing factory stereo/infotainment screen or Double-DIN stereo opening.
 - "steering_wheel_diameter_norm": if the steering wheel is visible, its full outer rim diameter divided by the image width (e.g. 0.28). If not visible (close-up photo), return null.
 - "visible_dashboard_width_mm": real-world horizontal width in millimeters visible across the full width of the photo at the center console depth:
   - Full wide car cabin photo (both doors/A-pillars visible): ~1150 to 1300
   - Standard dashboard photo (steering wheel + center console + part of passenger side): ~900 to 1120
   - Medium shot (center console + edge of steering wheel): ~650 to 850
-  - Zoomed-in close-up of only the center console / AC vents / stereo: ~380 to 600
+  - Zoomed-in close-up of only the center console / AC vents / stereo: ~360 to 580
 - "camera_yaw_deg": horizontal viewing angle of the center console from -42 to +42 degrees.
   - 0 = straight-on front view.
   - Positive (+10 to +38) = photo taken from the right side looking toward the left (right edge of console appears closer/taller than left edge).
@@ -196,7 +224,7 @@ Field rules:
 
   if (!resp.ok) {
     const errText = await resp.text().catch(() => '');
-    throw new Error(`Gemini ${model} HTTP ${resp.status}: ${errText.slice(0, 200)}`);
+    throw new Error(`Gemini ${model} HTTP ${resp.status}: ${errText.slice(0, 220)}`);
   }
 
   const data = await resp.json();
@@ -205,7 +233,6 @@ Field rules:
     throw new Error(`Gemini ${model} returned empty response`);
   }
 
-  // Strip accidental markdown code fences if any
   const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
   return JSON.parse(cleaned);
 }
@@ -236,29 +263,42 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Missing imageBase64 payload' });
     }
 
-    // Try Gemini 2.5 Flash first (best spatial vision accuracy on free tier),
-    // with automatic fallback to Gemini 2.0 Flash if needed.
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    // Try fast current Flash aliases first; if deprecated/unavailable, dynamically discover available Flash models
+    const candidateModels = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-3.8-flash'];
     let aiJson = null;
     let usedModel = null;
-    let lastError = null;
+    const errors = [];
 
-    for (const model of models) {
+    for (const model of candidateModels) {
       try {
-        aiJson = await callGeminiVision(apiKey, model, imageBase64, mimeType);
+        aiJson = await callGeminiVision(apiKey, model, imageBase64, mimeType, productId);
         usedModel = model;
         break;
       } catch (err) {
-        lastError = err;
+        errors.push(err.message);
       }
     }
 
     if (!aiJson) {
-      console.error('Gemini Vision failed:', lastError?.message);
+      const discovered = await discoverFlashModels(apiKey);
+      for (const model of discovered.slice(0, 3)) {
+        if (candidateModels.includes(model)) continue;
+        try {
+          aiJson = await callGeminiVision(apiKey, model, imageBase64, mimeType, productId);
+          usedModel = model;
+          break;
+        } catch (err) {
+          errors.push(err.message);
+        }
+      }
+    }
+
+    if (!aiJson) {
+      console.error('Gemini Vision failed:', errors.join(' | '));
       return res.status(200).json({
         success: false,
         fallback: true,
-        reason: lastError?.message || 'Gemini Vision unavailable',
+        reason: errors[0] || 'Gemini Vision unavailable',
       });
     }
 
