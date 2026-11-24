@@ -456,3 +456,70 @@ export async function compositeInBrowser(file, productId, normCorners) {
     corners: normCorners,
   };
 }
+
+/**
+ * Gemini Flash Vision Spatial AI Detector (via Vercel Serverless Function `/api/virtual-fit-ai`).
+ * Returns calibrated 4-corner 3D perspective trapezoid + car hint, or null if unavailable
+ * so the caller can seamlessly fall back to local CV detection.
+ */
+export async function detectCornersWithGeminiAI(file, productId) {
+  const dashImg = await fileToImage(file);
+  const { width: fullW, height: fullH, dataUrl: originalDataUrl } =
+    renderNormalizedDashboard(dashImg, 1600);
+
+  // Create a lightweight <= 960px JPEG for ultra-fast Gemini Vision API upload (~80-120 KB)
+  const aiMaxDim = 960;
+  let aiW = fullW;
+  let aiH = fullH;
+  if (Math.max(aiW, aiH) > aiMaxDim) {
+    const s = aiMaxDim / Math.max(aiW, aiH);
+    aiW = Math.round(aiW * s);
+    aiH = Math.round(aiH * s);
+  }
+  const aiCanvas = document.createElement('canvas');
+  aiCanvas.width = aiW;
+  aiCanvas.height = aiH;
+  aiCanvas.getContext('2d').drawImage(dashImg, 0, 0, aiW, aiH);
+  const aiDataUrl = aiCanvas.toDataURL('image/jpeg', 0.82);
+  const imageBase64 = aiDataUrl.split(',')[1];
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 14000);
+
+  try {
+    const resp = await fetch('/api/virtual-fit-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        imageBase64,
+        mimeType: 'image/jpeg',
+        imageWidth: fullW,
+        imageHeight: fullH,
+        productId,
+      }),
+    });
+
+    clearTimeout(timeoutId);
+    if (!resp.ok) return null;
+
+    const data = await resp.json();
+    if (!data || !data.success || !Array.isArray(data.corners) || data.corners.length !== 4) {
+      return null;
+    }
+
+    return {
+      success: true,
+      original_image: originalDataUrl,
+      corners: data.corners,
+      confidence: data.confidence ?? 0.9,
+      needs_manual_check: Boolean(data.needs_manual_check),
+      engine: data.engine || 'gemini-flash',
+      car_hint: data.car_hint || null,
+      camera_yaw_deg: data.camera_yaw_deg ?? 0,
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    return null;
+  }
+}

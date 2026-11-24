@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS } from '../data/products';
 import {
+  detectCornersWithGeminiAI,
   detectCornersInBrowser,
   compositeInBrowser,
 } from '../utils/virtualFitClientEngine';
@@ -291,6 +292,7 @@ export const VirtualFitPage = () => {
   const [resultImage, setResultImage] = useState(null);
   const [corners, setCorners] = useState(null); // [{x, y}, ...] normalized 0..1
   const [confidence, setConfidence] = useState(null);
+  const [aiCarHint, setAiCarHint] = useState(null);
   const [needsManualCheck, setNeedsManualCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -319,7 +321,20 @@ export const VirtualFitPage = () => {
   const detectCornersForPreview = useCallback(async (file, productId) => {
     setIsDetectingPreview(true);
     setErrorMessage('');
+    setAiCarHint(null);
     try {
+      // 1. Primary: Gemini Flash Vision AI via free Vercel Serverless Function (/api/virtual-fit-ai)
+      const aiData = await detectCornersWithGeminiAI(file, productId);
+      if (aiData && aiData.success && aiData.corners) {
+        setOriginalImage(aiData.original_image);
+        setCorners(aiData.corners);
+        setConfidence(aiData.confidence);
+        setNeedsManualCheck(Boolean(aiData.needs_manual_check));
+        if (aiData.car_hint) setAiCarHint(aiData.car_hint);
+        return;
+      }
+
+      // 2. Secondary (local dev): Python OWL-ViT backend if running
       if (API_BASE) {
         try {
           const formData = new FormData();
@@ -343,7 +358,7 @@ export const VirtualFitPage = () => {
         }
       }
 
-      // Built-in zero-cost browser computer-vision detector (live on public production)
+      // 3. Final instant fallback: built-in zero-cost browser CV detector
       const localData = await detectCornersInBrowser(file, productId);
       setOriginalImage(localData.original_image);
       setCorners(localData.corners);
@@ -455,13 +470,15 @@ export const VirtualFitPage = () => {
         }
       }
 
-      // 2. Built-in zero-cost browser computer-vision & Canvas compositing engine
+      // 2. Built-in zero-cost browser Canvas compositing engine (using Gemini AI or local CV corners)
       let activeCorners = corners;
       if (!activeCorners || activeCorners.length !== 4) {
-        const detected = await detectCornersInBrowser(selectedFile, activeProduct.id);
+        const aiDetected = await detectCornersWithGeminiAI(selectedFile, activeProduct.id);
+        const detected = aiDetected || (await detectCornersInBrowser(selectedFile, activeProduct.id));
         activeCorners = detected.corners;
         setOriginalImage(detected.original_image);
         setCorners(detected.corners);
+        if (detected.car_hint) setAiCarHint(detected.car_hint);
       }
 
       const comp = await compositeInBrowser(selectedFile, activeProduct.id, activeCorners);
@@ -620,6 +637,7 @@ export const VirtualFitPage = () => {
     setOriginalImage(null);
     setResultImage(null);
     setCorners(null);
+    setAiCarHint(null);
     setIsAdjusting(false);
     setErrorMessage('');
   };
@@ -952,7 +970,7 @@ export const VirtualFitPage = () => {
                       }}
                       className="absolute -translate-x-1/2 -translate-y-7 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90 pointer-events-none"
                     >
-                      {prodMeta.shortLabel} · AUTO SCALE &amp; ANGLE
+                      {prodMeta.shortLabel} · {aiCarHint ? `AI · ${aiCarHint}` : 'AUTO SCALE & ANGLE'}
                     </span>
 
                     {/* Central Circular Target Dot */}
@@ -1207,7 +1225,7 @@ export const VirtualFitPage = () => {
                           }}
                           className="absolute -translate-x-1/2 -translate-y-7 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90 pointer-events-none"
                         >
-                          {prodMeta.shortLabel} · AUTO SCALE &amp; ANGLE
+                          {prodMeta.shortLabel} · {aiCarHint ? `AI · ${aiCarHint}` : 'AUTO SCALE & ANGLE'}
                         </span>
 
                         <div
