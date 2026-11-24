@@ -33,49 +33,62 @@ export const ShopProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Helper to parse page name from URL Hash & Search Params for browser navigation & mobile QR scans
-  const getPageFromHash = () => {
-    const hash = (window.location.hash || '').replace('#', '').trim();
+  // Helper to parse page name & product ID from clean SEO pathname OR legacy URL hash
+  const parseRouteFromLocation = () => {
     const searchParams = new URLSearchParams(window.location.search);
-    
     if (searchParams.has('shelfId') || searchParams.get('page') === 'inventory-qr') {
-      return 'inventory-qr';
+      return { page: 'inventory-qr', productId: null };
     }
-    if (!hash) return 'home';
-    if (hash.startsWith('product-detail')) return 'product-detail';
-    if (hash.startsWith('virtual-fit')) return 'virtual-fit';
-    if (hash.startsWith('inventory-qr') || hash.startsWith('warehouse-qr') || hash.startsWith('qr-inventory')) {
-      return 'inventory-qr';
+
+    const hash = (window.location.hash || '').replace('#', '').trim();
+    if (hash) {
+      if (hash.startsWith('product-detail')) {
+        const pid = new URLSearchParams(hash.split('?')[1] || '').get('id');
+        return { page: 'product-detail', productId: pid };
+      }
+      if (hash.startsWith('virtual-fit')) {
+        const pid = new URLSearchParams(hash.split('?')[1] || '').get('id');
+        return { page: 'virtual-fit', productId: pid };
+      }
+      if (hash.startsWith('inventory-qr') || hash.startsWith('warehouse-qr') || hash.startsWith('qr-inventory')) {
+        return { page: 'inventory-qr', productId: null };
+      }
+      return { page: hash, productId: null };
     }
-    return hash;
+
+    const path = (window.location.pathname || '/').replace(/^\/+|\/+$/g, '').trim();
+    if (!path) return { page: 'home', productId: null };
+
+    if (path.startsWith('product/')) {
+      const pid = decodeURIComponent(path.slice('product/'.length).split('/')[0]);
+      return { page: 'product-detail', productId: pid };
+    }
+    if (path === 'virtual-fit') {
+      return { page: 'virtual-fit', productId: searchParams.get('id') };
+    }
+    return { page: path, productId: null };
   };
+
+  const getPageFromHash = () => parseRouteFromLocation().page;
 
   const [virtualFitProduct, setVirtualFitProduct] = useState(() => {
     try {
-      const hash = (window.location.hash || '').replace('#', '').trim();
-      if (hash.startsWith('virtual-fit')) {
-        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
-        const pid = urlParams.get('id');
-        if (pid) {
-          const found = PRODUCTS.find(p => p.id === pid);
-          if (found) return found;
-        }
+      const route = parseRouteFromLocation();
+      if (route.page === 'virtual-fit' && route.productId) {
+        const found = PRODUCTS.find(p => p.id === route.productId);
+        if (found) return found;
       }
     } catch (e) {}
     return PRODUCTS.find(p => p.id === 'voeux-x80-dual-knob') || PRODUCTS[0];
   });
 
   const [selectedProductModal, _setSelectedProductModal] = useState(() => {
-    // Restore product page on reload from URL hash
+    // Restore product page on reload from clean /product/<id> URL or legacy #product-detail?id=...
     try {
-      const hash = (window.location.hash || '').replace('#', '').trim();
-      if (hash.startsWith('product-detail')) {
-        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
-        const pid = urlParams.get('id');
-        if (pid) {
-          const found = PRODUCTS.find(p => p.id === pid);
-          if (found) return found;
-        }
+      const route = parseRouteFromLocation();
+      if (route.page === 'product-detail' && route.productId) {
+        const found = PRODUCTS.find(p => p.id === route.productId);
+        if (found) return found;
       }
     } catch(e) {}
     return null;
@@ -104,12 +117,15 @@ export const ShopProvider = ({ children }) => {
 
   const setActivePage = (page, skipHistory = false) => {
     _setActivePageState(page);
+    if (page !== 'product-detail') {
+      _setSelectedProductModal(null);
+    }
     setPageTransitionKey(prev => prev + 1);
     if (!skipHistory) {
       if (page === 'home') {
-        window.history.pushState({ page }, '', window.location.pathname);
+        window.history.pushState({ page }, '', '/');
       } else {
-        window.history.pushState({ page }, '', `#${page}`);
+        window.history.pushState({ page }, '', `/${page}`);
       }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -123,27 +139,32 @@ export const ShopProvider = ({ children }) => {
     _setActivePageState('virtual-fit');
     setPageTransitionKey(prev => prev + 1);
     const pid = product?.id || virtualFitProduct?.id || 'voeux-x80-dual-knob';
-    window.history.pushState({ page: 'virtual-fit', productId: pid }, '', `#virtual-fit?id=${pid}`);
+    window.history.pushState({ page: 'virtual-fit', productId: pid }, '', `/virtual-fit?id=${pid}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Sync state when user presses browser Back or Forward buttons
   useEffect(() => {
     const handlePopState = (event) => {
-      const pageFromState = event.state?.page;
-      const hash = (window.location.hash || '').replace('#', '').trim();
-      
-      let targetPage = pageFromState || hash || 'home';
+      const route = parseRouteFromLocation();
+      let targetPage = event.state?.page || route.page || 'home';
       if (targetPage.startsWith('product-detail')) {
         targetPage = 'product-detail';
-        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
-        const pid = urlParams.get('id') || event.state?.productId;
+        const pid = route.productId || event.state?.productId;
         if (pid) {
           const found = PRODUCTS.find(p => p.id === pid);
           if (found) _setSelectedProductModal(found);
         }
       } else {
         _setSelectedProductModal(null);
+      }
+
+      if (targetPage === 'virtual-fit') {
+        const pid = route.productId || event.state?.productId;
+        if (pid) {
+          const found = PRODUCTS.find(p => p.id === pid);
+          if (found) setVirtualFitProduct(found);
+        }
       }
 
       _setActivePageState(targetPage);
@@ -178,7 +199,7 @@ export const ShopProvider = ({ children }) => {
     if (product) {
       _setActivePageState('product-detail');
       setPageTransitionKey(prev => prev + 1);
-      window.history.pushState({ page: 'product-detail', productId: product.id }, '', `#product-detail?id=${product.id}`);
+      window.history.pushState({ page: 'product-detail', productId: product.id }, '', `/product/${product.id}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // Add to recently viewed list

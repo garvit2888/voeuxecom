@@ -134,20 +134,52 @@ const MainContent = () => {
       'join-us': {
         title: 'Become an Authorized VOEUX® Distributor or Dealer | Partner Program',
         desc: 'Partner with VOEUX® Electronics India. Apply for our official car electronics and audio distributor network.'
+      },
+      'virtual-fit': {
+        title: 'VOEUX® Virtual Fit | Preview 9" & 10.1" Android Car Players on Your Dashboard',
+        desc: 'Upload a photo of your car dashboard and preview how VOEUX® 9-inch TS7 or 10.1-inch X80 Dual Knob Android Players look installed inside your vehicle with AI perspective & true physical scaling.'
+      },
+      'about-us': {
+        title: 'About VOEUX® Electronics India | Automotive & Home Audio Engineering',
+        desc: 'Learn about VOEUX® Electronics India — precision-engineered QLED Android Car Players, 160W Convertible Soundbars, Underseat Subwoofers, and Coaxial Car Speakers.'
+      },
+      'contact-us': {
+        title: 'Contact VOEUX® Support & Sales | Official Customer Care India',
+        desc: 'Reach VOEUX® Electronics India customer care for product inquiries, order support, warranty assistance, and installation guidance.'
+      },
+      'support': {
+        title: 'Support & Frequently Asked Questions (FAQ) | VOEUX® Official Store',
+        desc: 'Find answers on Android Car Stereo compatibility, Double-DIN frames, AHD cameras, 1-Year Warranty, shipping, and installation.'
+      },
+      'warranty-policy': {
+        title: '1-Year Domestic Warranty Policy | VOEUX® Electronics India',
+        desc: 'Read complete coverage terms for the VOEUX® 1-Year Domestic Warranty on manufacturing defects across all car & home audio products.'
+      },
+      'installation': {
+        title: 'Car Stereo & Subwoofer Installation Guide & Fitment Support | VOEUX®',
+        desc: 'Step-by-step guidance and certified fitment support for installing VOEUX® Android Car Players, Coaxial Door Speakers, and Underseat Subwoofers.'
+      },
+      'terms': {
+        title: 'Terms & Conditions, Shipping & Return Policy | VOEUX® Official Store',
+        desc: 'Official terms of use, order processing, shipping, and return policies for voeuxtechnologies.in.'
       }
     };
 
     let nextTitle = defaultTitle;
     let nextDesc = defaultDesc;
+    let canonicalPath = '/';
 
     if (selectedProductModal && selectedProductModal.name) {
       nextTitle = `${selectedProductModal.name} – ₹${Number(selectedProductModal.price).toLocaleString('en-IN')} | VOEUX® Official Store`;
       nextDesc = selectedProductModal.description || `${selectedProductModal.name} available at ₹${Number(selectedProductModal.price).toLocaleString('en-IN')} with 1-Year VOEUX® Warranty and Free Delivery across India.`;
+      canonicalPath = `/product/${selectedProductModal.id}`;
     } else if (pageSeoMap[activePage]) {
       nextTitle = pageSeoMap[activePage].title;
       nextDesc = pageSeoMap[activePage].desc;
+      canonicalPath = activePage === 'home' ? '/' : `/${activePage}`;
     }
 
+    const canonicalUrl = `https://voeuxtechnologies.in${canonicalPath}`;
     document.title = nextTitle;
 
     const metaDesc = document.querySelector('meta[name="description"]');
@@ -158,6 +190,12 @@ const MainContent = () => {
 
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', nextDesc);
+
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', canonicalUrl);
+
+    const canonicalEl = document.querySelector('link[rel="canonical"]');
+    if (canonicalEl) canonicalEl.setAttribute('href', canonicalUrl);
 
     // Inject dynamic Product JSON-LD when viewing a product
     let scriptEl = document.getElementById('voeux-dynamic-product-ld');
@@ -185,7 +223,7 @@ const MainContent = () => {
         },
         offers: {
           '@type': 'Offer',
-          url: 'https://voeuxtechnologies.in/',
+          url: canonicalUrl,
           priceCurrency: 'INR',
           price: String(selectedProductModal.price),
           priceValidUntil: '2027-12-31',
