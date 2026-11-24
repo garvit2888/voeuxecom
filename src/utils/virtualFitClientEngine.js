@@ -1,16 +1,16 @@
 /**
  * virtualFitClientEngine.js
- * Zero-cost, 100% browser-side Computer Vision, Camera-Distance Scale Analyzer,
- * and Realistic Compositing Engine for VOEUX® VIRTUAL FIT.
+ * Zero-cost, 100% browser-side Computer Vision, Automatic Camera-Distance &
+ * Side-Angle (3D Perspective) Analyzer + Perspective Warping Compositor
+ * for VOEUX® VIRTUAL FIT.
  *
- * Key Guarantee:
- * - Analyzes how far/zoomed the dashboard photograph was taken (existing console span,
- *   windshield sky visibility, steering-wheel presence, and image orientation) to lock
- *   the TRUE FIXED physical size of the selected VOEUX unit (9" TS7 = 229mm,
- *   10.1" X80 = 252mm, Single Knob Piano = 236mm).
- * - Supports 3 calibrated camera-distance presets (Full Cabin, Medium, Close-Up)
- *   so even tightly zoomed console photos render at realistic true-to-life scale
- *   while preserving the exact 9" vs 10.1" physical difference.
+ * Capabilities:
+ * 1) Automatically detects camera distance / zoom level (continuous scale from
+ *    tightly zoomed close-up console to wide full-cabin dashboard) — no manual zoom buttons.
+ * 2) Automatically detects side-view shooting angle (driver-side / passenger-side / straight-on)
+ *    using dashboard edge-orientation histograms + console horizontal asymmetry.
+ * 3) Renders true 3D perspective-warped trapezoids of the EXACT verified transparent
+ *    VOEUX product PNGs with realistic drop shadows & ambient cabin lighting harmonization.
  */
 
 export const PRODUCT_ASSETS = {
@@ -31,24 +31,6 @@ export const PRODUCT_ASSETS = {
     physicalWidthMm: 236,
     screenLabel: '9.5"',
     aspect: 1.31,
-  },
-};
-
-export const CAMERA_DISTANCE_PRESETS = {
-  full: {
-    id: 'full',
-    label: 'Full Dashboard',
-    visibleWidthMm: 1160,
-  },
-  medium: {
-    id: 'medium',
-    label: 'Medium Shot',
-    visibleWidthMm: 720,
-  },
-  closeup: {
-    id: 'closeup',
-    label: 'Close-Up Console',
-    visibleWidthMm: 440,
   },
 };
 
@@ -108,57 +90,14 @@ function renderNormalizedDashboard(dashImg, maxDim = 1600) {
 }
 
 /**
- * Compute constant fixed-size normalized bounding box centered at (cxNorm, cyNorm)
- * for a given product and camera distance preset ('full' | 'medium' | 'closeup').
+ * Automatic Continuous Zoom / Distance & Side-Angle Analyzer:
+ * - Estimates visible cabin width in mm continuously (390mm close-up .. 1160mm full cabin)
+ *   from windshield sky visibility, steering-wheel presence, and actual dark console span.
+ * - Detects side shooting angle (yaw & perspective taper) from dominant dashboard
+ *   horizon edge orientations + horizontal console asymmetry.
  */
-export function computeFixedCornersForPreset(
-  productId,
-  presetId,
-  cxNorm,
-  cyNorm,
-  imgWidth,
-  imgHeight
-) {
-  const meta = PRODUCT_ASSETS[productId] || PRODUCT_ASSETS['voeux-x80-dual-knob'];
-  const preset = CAMERA_DISTANCE_PRESETS[presetId] || CAMERA_DISTANCE_PRESETS.full;
-
-  let visibleWidthMm = preset.visibleWidthMm;
-  const imgAspect = imgWidth / Math.max(1, imgHeight);
-  // Portrait photos span narrower horizontal cabin width than landscape photos
-  if (imgAspect < 1.1) {
-    visibleWidthMm *= 0.72;
-  }
-
-  const pxPerMm = imgWidth / visibleWidthMm;
-  let boxW = meta.physicalWidthMm * pxPerMm;
-  boxW = Math.max(imgWidth * 0.18, Math.min(imgWidth * 0.78, boxW));
-  let boxH = boxW / meta.aspect;
-
-  if (boxH > imgHeight * 0.76) {
-    boxH = imgHeight * 0.76;
-    boxW = boxH * meta.aspect;
-  }
-
-  const halfW = boxW / (2 * imgWidth);
-  const halfH = boxH / (2 * imgHeight);
-  const cx = Math.max(halfW + 0.005, Math.min(1 - halfW - 0.005, cxNorm));
-  const cy = Math.max(halfH + 0.005, Math.min(1 - halfH - 0.005, cyNorm));
-
-  return [
-    { x: cx - halfW, y: cy - halfH },
-    { x: cx + halfW, y: cy - halfH },
-    { x: cx + halfW, y: cy + halfH },
-    { x: cx - halfW, y: cy + halfH },
-  ];
-}
-
-/**
- * Measure the contiguous dark stereo/console bay width around the center of the photo
- * + bright sky/windshield top band + outer steering wheel presence to accurately
- * classify whether the photo is a Full Dashboard, Medium Shot, or Close-Up Console photo.
- */
-function analyzeDashboardDistancePreset(gray, sw, sh, fullW, fullH) {
-  // 1. Bright sky/windshield band at top 14% (strict > 190 threshold to ignore dashboard glare)
+function analyzeDashboardGeometry(gray, sw, sh, fullW, fullH) {
+  // 1. Bright windshield sky ratio in top 14%
   const topRows = Math.max(8, Math.round(sh * 0.14));
   let brightSky = 0;
   let totalTop = 0;
@@ -170,27 +109,31 @@ function analyzeDashboardDistancePreset(gray, sw, sh, fullW, fullH) {
   }
   const skyRatio = totalTop > 0 ? brightSky / totalTop : 0;
 
-  // 2. Measure dark infotainment / center-console contiguous span across middle horizontal band
-  const midY1 = Math.round(sh * 0.30);
-  const midY2 = Math.round(sh * 0.62);
-  let maxDarkRun = 0;
-  for (let y = midY1; y < midY2; y += 3) {
+  // 2. Measure actual horizontal span of contiguous dark console/stereo region in middle band
+  const midY1 = Math.round(sh * 0.26);
+  const midY2 = Math.round(sh * 0.66);
+  const rowSpans = [];
+  for (let y = midY1; y < midY2; y += 2) {
     let curRun = 0;
     let bestRowRun = 0;
-    for (let x = Math.round(sw * 0.12); x < Math.round(sw * 0.88); x++) {
-      // Dark bezel/screen or high-contrast console interior
-      if (gray[y * sw + x] < 95) {
+    for (let x = Math.round(sw * 0.08); x < Math.round(sw * 0.92); x++) {
+      if (gray[y * sw + x] < 92) {
         curRun++;
         if (curRun > bestRowRun) bestRowRun = curRun;
       } else {
         curRun = 0;
       }
     }
-    if (bestRowRun > maxDarkRun) maxDarkRun = bestRowRun;
+    if (bestRowRun > sw * 0.14) {
+      rowSpans.push(bestRowRun / sw);
+    }
   }
-  const consoleSpanRatio = maxDarkRun / sw;
+  rowSpans.sort((a, b) => a - b);
+  // 75th percentile span is robust against thin cables/vents while capturing true stereo bay width
+  const consoleSpanRatio =
+    rowSpans.length > 0 ? rowSpans[Math.floor(rowSpans.length * 0.75)] : 0.25;
 
-  // 3. Measure steering wheel / dark cabin presence on outer 26% sides
+  // 3. Measure dark steering wheel / cabin side presence on left & right outer 26%
   const sideW = Math.round(sw * 0.26);
   let leftDark = 0;
   let rightDark = 0;
@@ -202,33 +145,127 @@ function analyzeDashboardDistancePreset(gray, sw, sh, fullW, fullH) {
       sideTotal++;
     }
   }
-  const steeringSideDarkness = Math.max(leftDark, rightDark) / Math.max(1, sideTotal);
+  const leftSideRatio = leftDark / Math.max(1, sideTotal);
+  const rightSideRatio = rightDark / Math.max(1, sideTotal);
+  const steeringSideDarkness = Math.max(leftSideRatio, rightSideRatio);
 
-  // Classify photo distance accurately:
-  // - Full Dashboard: clear bright windshield sky across top (>= 24%) + steering wheel visible + stereo span < 38%
-  // - Close-Up Console: little/no sky at top (< 9%) OR dark stereo bezel spans >= 44% of the frame width
-  // - Medium Shot: everything in between
-  if (skyRatio < 0.09 || consoleSpanRatio >= 0.44) {
-    return 'closeup';
+  // 4. Continuous visible cabin width estimation (mm)
+  // Full cabin (Creta/Swift with clear sky + steering wheel + normal stereo span): ~1160mm
+  // Zoomed close-up (no sky or large stereo span >= 0.45): ~400..520mm
+  let visibleWidthMm;
+  if (skyRatio >= 0.22 && steeringSideDarkness >= 0.24 && consoleSpanRatio < 0.36) {
+    visibleWidthMm = 1160;
+  } else {
+    // Combine sky cue and actual console span smoothly
+    const skyWidthEst = 440 + Math.min(1, skyRatio / 0.24) * 700; // 440..1140mm
+    // If existing stereo bay spans `consoleSpanRatio` of the frame, assume stereo is ~245mm wide
+    const spanWidthEst = Math.max(380, Math.min(1180, 245 / Math.max(0.20, consoleSpanRatio)));
+    // On zoomed-in photos (low sky OR large console span), lean strongly toward the closer estimate
+    visibleWidthMm = Math.min(skyWidthEst, spanWidthEst * 1.06);
   }
-  if (skyRatio >= 0.24 && steeringSideDarkness >= 0.25 && consoleSpanRatio < 0.38) {
-    return 'full';
+
+  // Portrait phone photos cover narrower horizontal cabin width
+  const imgAspect = fullW / Math.max(1, fullH);
+  if (imgAspect < 1.1) {
+    visibleWidthMm *= 0.74;
   }
-  return 'medium';
+  visibleWidthMm = Math.max(360, Math.min(1200, visibleWidthMm));
+
+  // 5. Automatic Side-Angle Detection (Dominant Dashboard Horizon Slope via Sobel Gradients)
+  // For near-horizontal edges (|angle| < 22 deg), compute weighted average slope dy/dx.
+  // Positive slope => lines tilt down-right (camera on left/passenger side -> left side closer)
+  // Negative slope => lines tilt up-right (camera on right/driver side -> right side closer)
+  let weightedSlopeSum = 0;
+  let weightTotal = 0;
+  const gY1 = Math.round(sh * 0.16);
+  const gY2 = Math.round(sh * 0.65);
+  const gX1 = Math.round(sw * 0.18);
+  const gX2 = Math.round(sw * 0.82);
+
+  for (let y = gY1; y < gY2; y += 2) {
+    for (let x = gX1; x < gX2; x += 2) {
+      const idx = y * sw + x;
+      const gx =
+        -gray[idx - sw - 1] + gray[idx - sw + 1]
+        - 2 * gray[idx - 1] + 2 * gray[idx + 1]
+        - gray[idx + sw - 1] + gray[idx + sw + 1];
+      const gy =
+        -gray[idx - sw - 1] - 2 * gray[idx - sw] - gray[idx - sw + 1]
+        + gray[idx + sw - 1] + 2 * gray[idx + sw] + gray[idx + sw + 1];
+
+      const mag = Math.hypot(gx, gy);
+      if (mag < 45) continue;
+
+      // Edge tangent direction is perpendicular to gradient: (-gy, gx)
+      // Horizontal edge has |gy| >> |gx|, slope dy/dx = -gx / gy
+      if (Math.abs(gy) > Math.abs(gx) * 2.4) {
+        const slope = -gx / gy; // in range ~(-0.41, +0.41)
+        weightedSlopeSum += slope * mag;
+        weightTotal += mag;
+      }
+    }
+  }
+
+  let detectedSlope = weightTotal > 0 ? weightedSlopeSum / weightTotal : 0;
+  // Deadzone for nearly straight-on shots so straight photos stay dead-level
+  if (Math.abs(detectedSlope) < 0.032) {
+    detectedSlope = 0;
+  }
+  // Clamp to realistic automotive side-view angle range
+  detectedSlope = Math.max(-0.18, Math.min(0.18, detectedSlope));
+
+  return {
+    pxPerMm: fullW / visibleWidthMm,
+    detectedSlope, // negative = right side closer (driver view); positive = left side closer (passenger view)
+  };
 }
 
 /**
- * Browser Computer Vision Analyzer:
- * 1) Classifies photo zoom level ('full' | 'medium' | 'closeup') -> locks true fixed physical size.
- * 2) Locates the best initial center point (cx, cy) on the center console.
+ * Construct a 4-corner perspective trapezoid [TL, TR, BR, BL] centered at (cxNorm, cyNorm)
+ * with fixed physical width/height and automatic side-angle foreshortening.
+ */
+function buildPerspectiveCorners(cxNorm, cyNorm, boxW, boxH, fullW, fullH, slope) {
+  // Subtle perspective horizontal compression when viewed from an angle
+  const yawCompress = Math.max(0.86, 1.0 - Math.abs(slope) * 0.55);
+  const effW = boxW * yawCompress;
+  const halfW = effW / 2;
+  const halfH = boxH / 2;
+
+  // Near edge is taller (+taper), far edge is shorter (-taper)
+  // If slope < 0 (driver/right side closer), right edge is taller & top slopes up-right
+  // If slope > 0 (passenger/left side closer), left edge is taller & top slopes down-right
+  const taperPx = Math.max(-boxH * 0.14, Math.min(boxH * 0.14, slope * boxH * 0.72));
+  const tiltY = slope * halfW * 0.55;
+
+  const leftHalfH = halfH + taperPx;
+  const rightHalfH = halfH - taperPx;
+
+  const maxHalfH = Math.max(leftHalfH, rightHalfH) + Math.abs(tiltY);
+  const cxPx = Math.max(halfW + 4, Math.min(fullW - halfW - 4, cxNorm * fullW));
+  const cyPx = Math.max(maxHalfH + 4, Math.min(fullH - maxHalfH - 4, cyNorm * fullH));
+
+  const tl = { x: (cxPx - halfW) / fullW, y: (cyPx - leftHalfH - tiltY) / fullH };
+  const tr = { x: (cxPx + halfW) / fullW, y: (cyPx - rightHalfH + tiltY) / fullH };
+  const br = { x: (cxPx + halfW) / fullW, y: (cyPx + rightHalfH + tiltY) / fullH };
+  const bl = { x: (cxPx - halfW) / fullW, y: (cyPx + leftHalfH - tiltY) / fullH };
+
+  return [tl, tr, br, bl];
+}
+
+/**
+ * Automatic Browser Computer Vision Analyzer:
+ * 1) Automatically estimates continuous zoom/distance -> locks exact physical size.
+ * 2) Automatically detects side-view angle -> builds true perspective trapezoid.
+ * 3) Locates best initial center point (cx, cy) on the center console.
  */
 export async function detectCornersInBrowser(file, productId) {
+  const meta = PRODUCT_ASSETS[productId] || PRODUCT_ASSETS['voeux-x80-dual-knob'];
   const dashImg = await fileToImage(file);
   const { canvas: fullCanvas, width: w, height: h, dataUrl: originalDataUrl } =
     renderNormalizedDashboard(dashImg);
 
-  const sw = 240;
-  const sh = Math.max(120, Math.round((h / w) * sw));
+  const sw = 280;
+  const sh = Math.max(140, Math.round((h / w) * sw));
   const scanCanvas = document.createElement('canvas');
   scanCanvas.width = sw;
   scanCanvas.height = sh;
@@ -242,21 +279,26 @@ export async function detectCornersInBrowser(file, productId) {
     gray[i] = 0.299 * pixels[p] + 0.587 * pixels[p + 1] + 0.114 * pixels[p + 2];
   }
 
-  const presetId = analyzeDashboardDistancePreset(gray, sw, sh, w, h);
-  const initialBox = computeFixedCornersForPreset(productId, presetId, 0.5, 0.44, w, h);
-  const boxWidthNorm = initialBox[1].x - initialBox[0].x;
-  const boxHeightNorm = initialBox[2].y - initialBox[0].y;
+  const { pxPerMm, detectedSlope } = analyzeDashboardGeometry(gray, sw, sh, w, h);
+
+  let boxW = meta.physicalWidthMm * pxPerMm;
+  boxW = Math.max(w * 0.18, Math.min(w * 0.78, boxW));
+  let boxH = boxW / meta.aspect;
+  if (boxH > h * 0.76) {
+    boxH = h * 0.76;
+    boxW = boxH * meta.aspect;
+  }
 
   // Locate best center point (cx, cy) of the center console stereo bay
-  const winW = Math.max(24, Math.round(sw * boxWidthNorm));
-  const winH = Math.max(16, Math.round(sh * boxHeightNorm));
+  const winW = Math.max(24, Math.round(sw * (boxW / w)));
+  const winH = Math.max(16, Math.round(sh * (boxH / h)));
 
   let bestCx = 0.5;
-  let bestCy = 0.45;
+  let bestCy = 0.44;
   let bestScore = -1e9;
 
-  const minX = Math.round(sw * 0.15);
-  const maxX = Math.max(minX, Math.round(sw * 0.85 - winW));
+  const minX = Math.round(sw * 0.14);
+  const maxX = Math.max(minX, Math.round(sw * 0.86 - winW));
   const minY = Math.round(sh * 0.12);
   const maxY = Math.max(minY, Math.round(sh * 0.78 - winH));
 
@@ -270,7 +312,7 @@ export async function detectCornersInBrowser(file, productId) {
         for (let xx = x; xx < x + winW; xx += 3) {
           const idx = yy * sw + xx;
           const g = gray[idx];
-          if (g < 85) darkCount++;
+          if (g < 88) darkCount++;
           if (xx + 1 < sw && yy + 1 < sh) {
             edgeEnergy += Math.abs(g - gray[idx + 1]) + Math.abs(g - gray[idx + sw]);
           }
@@ -284,7 +326,7 @@ export async function detectCornersInBrowser(file, productId) {
       const cxNorm = (x + winW / 2) / sw;
       const cyNorm = (y + winH / 2) / sh;
 
-      const centerPrior = 1.0 - Math.abs(cxNorm - 0.5) * 1.4 - Math.abs(cyNorm - 0.44) * 0.8;
+      const centerPrior = 1.0 - Math.abs(cxNorm - 0.5) * 1.35 - Math.abs(cyNorm - 0.44) * 0.8;
       const score = avgEdge * 0.55 + darkRatio * 28.0 + centerPrior * 18.0;
       if (score > bestScore) {
         bestScore = score;
@@ -294,24 +336,62 @@ export async function detectCornersInBrowser(file, productId) {
     }
   }
 
-  const corners = computeFixedCornersForPreset(productId, presetId, bestCx, bestCy, w, h);
+  // Refine side-angle subtly using console horizontal offset when shot from an angle
+  let finalSlope = detectedSlope;
+  if (Math.abs(bestCx - 0.5) > 0.08 && Math.abs(finalSlope) < 0.02) {
+    // Console off-center hints at an angled side view
+    finalSlope = Math.max(-0.10, Math.min(0.10, (bestCx - 0.5) * 0.35));
+  }
+
+  const corners = buildPerspectiveCorners(bestCx, bestCy, boxW, boxH, w, h, finalSlope);
 
   return {
     success: true,
     original_image: originalDataUrl,
     corners,
-    confidence: 0.8,
-    detection_method: 'browser_cv',
-    distance_preset: presetId,
+    confidence: 0.82,
+    detection_method: 'browser_cv_perspective',
     dimensions: { width: w, height: h },
     needs_manual_check: false,
   };
 }
 
 /**
- * Browser Canvas Compositor:
- * Places the EXACT verified transparent VOEUX PNG centered on the user's circular
- * dot at the CONSTANT analyzed physical size (zero shrinking, zero stretching).
+ * Draw an image warped onto an arbitrary 4-corner perspective trapezoid [TL, TR, BR, BL]
+ * using high-precision vertical strip interpolation (fast, crisp, works on all browsers).
+ */
+function drawPerspectiveTrapezoid(ctx, img, tl, tr, br, bl, slices = 72) {
+  const sw = img.naturalWidth || img.width;
+  const sh = img.naturalHeight || img.height;
+
+  for (let i = 0; i < slices; i++) {
+    const t0 = i / slices;
+    const t1 = (i + 1) / slices;
+
+    const sx = t0 * sw;
+    const sWidth = Math.max(1, (t1 - t0) * sw);
+
+    const x0Top = tl.x + (tr.x - tl.x) * t0;
+    const y0Top = tl.y + (tr.y - tl.y) * t0;
+    const x1Top = tl.x + (tr.x - tl.x) * t1;
+
+    const y0Bot = bl.y + (br.y - bl.y) * t0;
+    const y1Bot = bl.y + (br.y - bl.y) * t1;
+
+    const dstX = x0Top;
+    const dstW = Math.max(1, x1Top - x0Top + 0.75); // +0.75px overlap prevents subpixel seams
+    const dstY = y0Top;
+    const dstH = Math.max(1, (y0Bot + y1Bot) / 2 - y0Top);
+
+    ctx.drawImage(img, sx, 0, sWidth, sh, dstX, dstY, dstW, dstH);
+  }
+}
+
+/**
+ * Browser Canvas Perspective Compositor:
+ * Warps and composites the EXACT verified transparent VOEUX PNG onto the 4-corner
+ * perspective trapezoid centered on the user's circular dot, with angled drop shadow
+ * and ambient cabin brightness harmonization.
  */
 export async function compositeInBrowser(file, productId, normCorners) {
   const meta = PRODUCT_ASSETS[productId] || PRODUCT_ASSETS['voeux-x80-dual-knob'];
@@ -324,30 +404,21 @@ export async function compositeInBrowser(file, productId, normCorners) {
     renderNormalizedDashboard(dashImg);
   const ctx = canvas.getContext('2d');
 
-  const xs = normCorners.map((c) => c.x * w);
-  const ys = normCorners.map((c) => c.y * h);
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-  const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const [tl, tr, br, bl] = normCorners.map((c) => ({ x: c.x * w, y: c.y * h }));
+  const minX = Math.min(tl.x, bl.x);
+  const maxX = Math.max(tr.x, br.x);
+  const minY = Math.min(tl.y, tr.y);
+  const maxY = Math.max(bl.y, br.y);
+  const boxW = maxX - minX;
+  const boxH = maxY - minY;
 
-  const exactAspect =
-    (prodImg.naturalWidth || prodImg.width) / (prodImg.naturalHeight || prodImg.height);
-  let finalW = Math.max(...xs) - Math.min(...xs);
-  let finalH = finalW / exactAspect;
-
-  if (finalH > h * 0.88) {
-    finalH = h * 0.88;
-    finalW = finalH * exactAspect;
-  }
-
-  const drawX = Math.max(4, Math.min(w - finalW - 4, cx - finalW / 2));
-  const drawY = Math.max(4, Math.min(h - finalH - 4, cy - finalH / 2));
-
+  // Sample ambient cabin brightness around the console
   let ambientBrightness = 1.0;
   try {
-    const sampleX = Math.max(0, Math.round(drawX - 18));
-    const sampleY = Math.max(0, Math.round(drawY - 18));
-    const sampleW = Math.min(w - sampleX, Math.round(finalW + 36));
-    const sampleH = Math.min(h - sampleY, Math.round(finalH + 36));
+    const sampleX = Math.max(0, Math.round(minX - 18));
+    const sampleY = Math.max(0, Math.round(minY - 18));
+    const sampleW = Math.min(w - sampleX, Math.round(boxW + 36));
+    const sampleH = Math.min(h - sampleY, Math.round(boxH + 36));
     const ringData = ctx.getImageData(sampleX, sampleY, sampleW, sampleH).data;
     let sum = 0;
     let cnt = 0;
@@ -359,13 +430,21 @@ export async function compositeInBrowser(file, productId, normCorners) {
     ambientBrightness = Math.max(0.9, Math.min(1.06, 0.94 + (meanL - 85) / 900));
   } catch (e) {}
 
+  // Render perspective-warped product onto an offscreen layer first so drop shadow
+  // applies cleanly to the unified silhouette (zero slice shadow seams!)
+  const layer = document.createElement('canvas');
+  layer.width = w;
+  layer.height = h;
+  const lctx = layer.getContext('2d');
+  drawPerspectiveTrapezoid(lctx, prodImg, tl, tr, br, bl, 80);
+
   ctx.save();
   ctx.shadowColor = 'rgba(0, 0, 0, 0.72)';
-  ctx.shadowBlur = Math.max(12, Math.round(finalW * 0.045));
+  ctx.shadowBlur = Math.max(12, Math.round(boxW * 0.045));
   ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = Math.max(4, Math.round(finalW * 0.014));
+  ctx.shadowOffsetY = Math.max(4, Math.round(boxW * 0.014));
   ctx.filter = `brightness(${ambientBrightness.toFixed(3)}) contrast(1.02)`;
-  ctx.drawImage(prodImg, drawX, drawY, finalW, finalH);
+  ctx.drawImage(layer, 0, 0);
   ctx.restore();
 
   const resultDataUrl = canvas.toDataURL('image/jpeg', 0.93);
@@ -374,11 +453,6 @@ export async function compositeInBrowser(file, productId, normCorners) {
     success: true,
     original_image: originalDataUrl,
     result_image: resultDataUrl,
-    corners: [
-      { x: drawX / w, y: drawY / h },
-      { x: (drawX + finalW) / w, y: drawY / h },
-      { x: (drawX + finalW) / w, y: (drawY + finalH) / h },
-      { x: drawX / w, y: (drawY + finalH) / h },
-    ],
+    corners: normCorners,
   };
 }

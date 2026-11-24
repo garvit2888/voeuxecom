@@ -221,23 +221,94 @@ class VirtualFitPipeline:
             console_px_per_mm = float(np.clip(console_px_per_mm, min_px_mm, max_px_mm))
             return console_px_per_mm, "steering_wheel_calibrated"
 
-        # Secondary zoom/distance cue: check bright windshield band at top 16% of photo
+        # Secondary continuous zoom/distance cue: combine strict windshield sky ratio
+        # + 75th-percentile dark center-console horizontal span so zoomed-in photos
+        # automatically receive the larger true-to-life physical scale.
         gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-        top_strip = gray[: max(8, int(h * 0.16)), :]
-        windshield_ratio = float(np.mean(top_strip > 170))
+        small_w = 320
+        small_h = max(120, int(round(h * (small_w / float(w)))))
+        small_gray = cv2.resize(gray, (small_w, small_h), interpolation=cv2.INTER_AREA)
 
-        if windshield_ratio >= 0.22:
-            visible_width_mm = 1160.0  # Full wide cabin photo
-        elif windshield_ratio >= 0.08:
-            t = min(1.0, (windshield_ratio - 0.08) / 0.14)
-            visible_width_mm = 820.0 + t * 320.0  # Medium distance dashboard shot
+        top_strip = small_gray[: max(8, int(small_h * 0.14)), :]
+        sky_ratio = float(np.mean(top_strip > 190))
+
+        mid_band = small_gray[int(small_h * 0.26) : int(small_h * 0.66), int(small_w * 0.08) : int(small_w * 0.92)]
+        row_spans = []
+        for row in mid_band[::2]:
+            dark = row < 92
+            cur = 0
+            best = 0
+            for val in dark:
+                if val:
+                    cur += 1
+                    if cur > best:
+                        best = cur
+                else:
+                    cur = 0
+            row_spans.append(best / float(small_w))
+        console_span_ratio = float(np.percentile(row_spans, 75)) if row_spans else 0.25
+
+        if sky_ratio >= 0.26:
+            visible_width_mm = 1140.0
+        elif sky_ratio >= 0.09:
+            t = min(1.0, (sky_ratio - 0.09) / 0.17)
+            visible_width_mm = 660.0 + t * 440.0
         else:
-            visible_width_mm = 580.0  # Close-up zoomed console photo
+            visible_width_mm = 520.0
+
+        if console_span_ratio > 0.34:
+            span_est_mm = float(np.clip(265.0 / max(0.32, console_span_ratio), 380.0, 920.0))
+            visible_width_mm = min(visible_width_mm, span_est_mm * 0.72 + visible_width_mm * 0.28)
 
         if (w / max(1.0, float(h))) < 1.1:
-            visible_width_mm *= 0.76  # Portrait framing
+            visible_width_mm *= 0.74  # Portrait framing
 
+        visible_width_mm = float(np.clip(visible_width_mm, 360.0, 1200.0))
         return float(w) / visible_width_mm, "zoom_distance_estimated"
+
+    def _estimate_side_slope(self, img_bgr: np.ndarray, cx_norm: float) -> float:
+        """
+        Automatically estimate horizontal dashboard perspective slope (dy/dx) from
+        near-horizontal Sobel edges in the dashboard band so side-angle photos
+        produce a realistic 3D perspective trapezoid.
+        """
+        h, w = img_bgr.shape[:2]
+        gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        small_w = 320
+        small_h = max(120, int(round(h * (small_w / float(w)))))
+        sg = cv2.resize(gray, (small_w, small_h), interpolation=cv2.INTER_AREA)
+
+        gx = cv2.Sobel(sg, cv2.CV_32F, 1, 0, ksize=3)
+        gy = cv2.Sobel(sg, cv2.CV_32F, 0, 1, ksize=3)
+
+        band_gx = gx[int(small_h * 0.16) : int(small_h * 0.72), int(small_w * 0.08) : int(small_w * 0.92)]
+        band_gy = gy[int(small_h * 0.16) : int(small_h * 0.72), int(small_w * 0.08) : int(small_w * 0.92)]
+
+        mag = np.hypot(band_gx, band_gy)
+        valid = (mag > 45.0) & (np.abs(band_gy) > np.abs(band_gx) * 2.2)
+        if np.sum(valid) < 80:
+            return 0.0
+
+        # For a horizontal edge, tangent direction is (-gy, gx), so dy/dx = -gx / gy
+        slopes = -band_gx[valid] / (band_gy[valid] + 1e-6)
+        weights = mag[valid]
+        in_range = np.abs(slopes) <= 0.32
+        if np.sum(in_range) < 60:
+            return 0.0
+
+        slopes = slopes[in_range]
+        weights = weights[in_range]
+        hist, edges = np.histogram(slopes, bins=25, range=(-0.32, 0.32), weights=weights)
+        best_bin = int(np.argmax(hist))
+        dominant_slope = float((edges[best_bin] + edges[best_bin + 1]) / 2.0)
+
+        # Combine gently with horizontal console offset cue
+        offset_cue = (0.50 - cx_norm) * 0.18
+        if abs(dominant_slope) < 0.028 and abs(offset_cue) < 0.025:
+            return 0.0
+
+        blended = dominant_slope * 0.75 + offset_cue * 0.25
+        return float(np.clip(blended, -0.22, 0.22))
 
     def enforce_symmetric_physical_quad(
         self,
@@ -297,13 +368,20 @@ class VirtualFitPipeline:
         cx = float(np.clip(cx, half_w + 4, w - half_w - 4))
         cy = float(np.clip(cy, half_h + 4, h - half_h - 4))
 
+        # Automatically apply subtle 3D perspective trapezoid if photo is taken from a side angle
+        slope = self._estimate_side_slope(img_bgr, cx / max(1.0, float(w)))
+        taper = float(np.clip(slope * 0.65, -0.14, 0.14))
+        left_half_h = half_h * (1.0 - taper)
+        right_half_h = half_h * (1.0 + taper)
+        shear_y = half_w * slope * 0.45
+
         return order_quad_points(
             np.array(
                 [
-                    [cx - half_w, cy - half_h],
-                    [cx + half_w, cy - half_h],
-                    [cx + half_w, cy + half_h],
-                    [cx - half_w, cy + half_h],
+                    [cx - half_w, cy - left_half_h - shear_y],
+                    [cx + half_w, cy - right_half_h + shear_y],
+                    [cx + half_w, cy + right_half_h + shear_y],
+                    [cx - half_w, cy + left_half_h - shear_y],
                 ],
                 dtype=np.float32,
             )
@@ -565,20 +643,17 @@ class VirtualFitPipeline:
         self, dashboard_bgr: np.ndarray, product_id: str, norm_corners: List[Dict[str, float]]
     ) -> np.ndarray:
         """
-        Re-composite exact VOEUX product using customer-adjusted region while strictly
-        enforcing symmetrical product aspect ratio (no stretching/elongation) and
-        minimum real-world physical size (never shrinks below true 9" or 10.1" scale).
+        Re-composite exact VOEUX product at the user's translated center position while
+        strictly preserving the automatically detected physical scale & 3D perspective trapezoid.
         """
         h, w = dashboard_bgr.shape[:2]
-        pts = np.array(
-            [[c["x"] * w, c["y"] * h] for c in norm_corners],
-            dtype=np.float32,
+        pts = order_quad_points(
+            np.array(
+                [[c["x"] * w, c["y"] * h] for c in norm_corners],
+                dtype=np.float32,
+            )
         )
-        px_per_mm, _ = self._estimate_px_per_mm(dashboard_bgr, None)
-        sym_pts = self.enforce_symmetric_physical_quad(
-            pts, dashboard_bgr, product_id, px_per_mm, allow_larger=True
-        )
-        return self.composite_product(dashboard_bgr, product_id, sym_pts)
+        return self.composite_product(dashboard_bgr, product_id, pts)
 
 
 pipeline = VirtualFitPipeline()

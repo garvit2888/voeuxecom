@@ -4,8 +4,6 @@ import { PRODUCTS } from '../data/products';
 import {
   detectCornersInBrowser,
   compositeInBrowser,
-  CAMERA_DISTANCE_PRESETS,
-  computeFixedCornersForPreset,
 } from '../utils/virtualFitClientEngine';
 import {
   ArrowLeft,
@@ -292,8 +290,6 @@ export const VirtualFitPage = () => {
   const [originalImage, setOriginalImage] = useState(null);
   const [resultImage, setResultImage] = useState(null);
   const [corners, setCorners] = useState(null); // [{x, y}, ...] normalized 0..1
-  const [distancePreset, setDistancePreset] = useState('full'); // 'full' | 'medium' | 'closeup'
-  const [imageDims, setImageDims] = useState({ width: 1600, height: 900 });
   const [confidence, setConfidence] = useState(null);
   const [needsManualCheck, setNeedsManualCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -340,12 +336,6 @@ export const VirtualFitPage = () => {
             setCorners(data.corners);
             setConfidence(data.confidence);
             setNeedsManualCheck(Boolean(data.needs_manual_check));
-            if (data.dimensions) setImageDims(data.dimensions);
-            // Infer preset from detected box width ratio for UI pill sync
-            if (data.corners && data.corners.length === 4) {
-              const wRatio = Math.max(...data.corners.map((c) => c.x)) - Math.min(...data.corners.map((c) => c.x));
-              setDistancePreset(wRatio >= 0.42 ? 'closeup' : wRatio >= 0.27 ? 'medium' : 'full');
-            }
             return;
           }
         } catch (backendErr) {
@@ -359,39 +349,12 @@ export const VirtualFitPage = () => {
       setCorners(localData.corners);
       setConfidence(localData.confidence);
       setNeedsManualCheck(Boolean(localData.needs_manual_check));
-      if (localData.distance_preset) setDistancePreset(localData.distance_preset);
-      if (localData.dimensions) setImageDims(localData.dimensions);
     } catch (err) {
       setErrorMessage(err.message || 'Unable to read this photograph. Please try a clearer image.');
     } finally {
       setIsDetectingPreview(false);
     }
   }, []);
-
-  const handleDistancePresetChange = useCallback(
-    (nextPreset) => {
-      setDistancePreset(nextPreset);
-      setCorners((prev) => {
-        const cx =
-          prev && prev.length === 4
-            ? (Math.min(...prev.map((c) => c.x)) + Math.max(...prev.map((c) => c.x))) / 2
-            : 0.5;
-        const cy =
-          prev && prev.length === 4
-            ? (Math.min(...prev.map((c) => c.y)) + Math.max(...prev.map((c) => c.y))) / 2
-            : 0.44;
-        return computeFixedCornersForPreset(
-          activeProduct.id,
-          nextPreset,
-          cx,
-          cy,
-          imageDims.width,
-          imageDims.height
-        );
-      });
-    },
-    [activeProduct.id, imageDims]
-  );
 
   const handleFileSelected = useCallback((file) => {
     if (!file) return;
@@ -568,29 +531,36 @@ export const VirtualFitPage = () => {
     setSliderPos(Math.max(0, Math.min(100, pct)));
   };
 
-  // Move the constant-size player boundary so its circular center dot sits at (clientX, clientY)
+  // Move the constant-size perspective player boundary rigidly so its circular center dot sits at (clientX, clientY)
+  // while preserving the exact automatically detected 3D side-angle trapezoid shape & physical scale.
   const moveFixedBoxToClientPos = useCallback((clientX, clientY) => {
     if (!adjustContainerRef.current) return;
     const rect = adjustContainerRef.current.getBoundingClientRect();
-    const cxNorm = (clientX - rect.left) / rect.width;
-    const cyNorm = (clientY - rect.top) / rect.height;
+    const targetCx = (clientX - rect.left) / rect.width;
+    const targetCy = (clientY - rect.top) / rect.height;
 
     setCorners((prev) => {
       if (!prev || prev.length !== 4) return prev;
-      const boxW = Math.max(...prev.map((c) => c.x)) - Math.min(...prev.map((c) => c.x));
-      const boxH = Math.max(...prev.map((c) => c.y)) - Math.min(...prev.map((c) => c.y));
-      const halfW = boxW / 2;
-      const halfH = boxH / 2;
+      const curCx = (prev[0].x + prev[1].x + prev[2].x + prev[3].x) / 4;
+      const curCy = (prev[0].y + prev[1].y + prev[2].y + prev[3].y) / 4;
+      const minX = Math.min(...prev.map((c) => c.x));
+      const maxX = Math.max(...prev.map((c) => c.x));
+      const minY = Math.min(...prev.map((c) => c.y));
+      const maxY = Math.max(...prev.map((c) => c.y));
 
-      const clampedCx = Math.max(halfW + 0.005, Math.min(1 - halfW - 0.005, cxNorm));
-      const clampedCy = Math.max(halfH + 0.005, Math.min(1 - halfH - 0.005, cyNorm));
+      let dx = targetCx - curCx;
+      let dy = targetCy - curCy;
 
-      return [
-        { x: clampedCx - halfW, y: clampedCy - halfH },
-        { x: clampedCx + halfW, y: clampedCy - halfH },
-        { x: clampedCx + halfW, y: clampedCy + halfH },
-        { x: clampedCx - halfW, y: clampedCy + halfH },
-      ];
+      // Clamp translation so all 4 perspective corners stay cleanly inside [0.005, 0.995]
+      if (minX + dx < 0.005) dx = 0.005 - minX;
+      if (maxX + dx > 0.995) dx = 0.995 - maxX;
+      if (minY + dy < 0.005) dy = 0.005 - minY;
+      if (maxY + dy > 0.995) dy = 0.995 - maxY;
+
+      return prev.map((c) => ({
+        x: c.x + dx,
+        y: c.y + dy,
+      }));
     });
   }, []);
 
@@ -945,34 +915,45 @@ export const VirtualFitPage = () => {
                 />
               )}
 
-              {/* Constant-Size Fixed Boundary + Circular Center Dot */}
+              {/* Constant-Size Perspective Boundary (SVG Trapezoid) + Circular Center Dot */}
               {!isDetectingPreview && corners && corners.length === 4 && (() => {
-                const minX = Math.min(...corners.map((c) => c.x));
-                const maxX = Math.max(...corners.map((c) => c.x));
+                const cx = (corners[0].x + corners[1].x + corners[2].x + corners[3].x) / 4;
+                const cy = (corners[0].y + corners[1].y + corners[2].y + corners[3].y) / 4;
                 const minY = Math.min(...corners.map((c) => c.y));
-                const maxY = Math.max(...corners.map((c) => c.y));
-                const cx = (minX + maxX) / 2;
-                const cy = (minY + maxY) / 2;
+                const polyPoints = corners
+                  .map((c) => `${(c.x * 100).toFixed(2)},${(c.y * 100).toFixed(2)}`)
+                  .join(' ');
                 const prodMeta =
                   VIRTUAL_FIT_PRODUCT_META[activeProduct.id] ||
                   VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob'];
 
                 return (
                   <>
-                    {/* Fixed Constant-Size Boundary */}
-                    <div
-                      style={{
-                        left: `${minX * 100}%`,
-                        top: `${minY * 100}%`,
-                        width: `${(maxX - minX) * 100}%`,
-                        height: `${(maxY - minY) * 100}%`,
-                      }}
-                      className="absolute border border-white/90 bg-[#3B429F]/20 pointer-events-none shadow-[0_0_25px_rgba(0,0,0,0.65)]"
+                    {/* Fixed Constant-Size 3D Perspective Trapezoid Boundary */}
+                    <svg
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="none"
+                      className="absolute inset-0 w-full h-full pointer-events-none"
                     >
-                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90">
-                        {prodMeta.shortLabel} · FIXED SIZE
-                      </span>
-                    </div>
+                      <polygon
+                        points={polyPoints}
+                        fill="rgba(59, 66, 159, 0.22)"
+                        stroke="rgba(255, 255, 255, 0.92)"
+                        strokeWidth="0.45"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </svg>
+
+                    {/* Auto Scale & Angle Label */}
+                    <span
+                      style={{
+                        left: `${cx * 100}%`,
+                        top: `${Math.max(0.03, minY) * 100}%`,
+                      }}
+                      className="absolute -translate-x-1/2 -translate-y-7 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90 pointer-events-none"
+                    >
+                      {prodMeta.shortLabel} · AUTO SCALE &amp; ANGLE
+                    </span>
 
                     {/* Central Circular Target Dot */}
                     <div
@@ -991,34 +972,6 @@ export const VirtualFitPage = () => {
                 );
               })()}
             </div>
-
-            {/* Camera Distance Scale Presets (Auto-detected; 1-tap override for zoomed photos while keeping 9" vs 10.1" locked) */}
-            {!isDetectingPreview && corners && (
-              <div className="mt-5 w-full flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
-                <span className="text-[10px] uppercase tracking-[0.22em] text-white/45">
-                  Photo Zoom / Distance:
-                </span>
-                <div className="inline-flex items-center border border-white/20">
-                  {Object.values(CAMERA_DISTANCE_PRESETS).map((preset) => {
-                    const active = distancePreset === preset.id;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => handleDistancePresetChange(preset.id)}
-                        className={`px-3.5 sm:px-4 py-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer ${
-                          active
-                            ? 'bg-[#3B429F] text-white'
-                            : 'bg-black text-white/60 hover:text-white'
-                        }`}
-                      >
-                        {preset.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
             {errorMessage && (
               <p className="mt-5 text-xs sm:text-sm font-clean text-red-400 max-w-xl leading-relaxed">
@@ -1221,31 +1174,41 @@ export const VirtualFitPage = () => {
                   />
 
                   {corners && corners.length === 4 && (() => {
-                    const minX = Math.min(...corners.map((c) => c.x));
-                    const maxX = Math.max(...corners.map((c) => c.x));
+                    const cx = (corners[0].x + corners[1].x + corners[2].x + corners[3].x) / 4;
+                    const cy = (corners[0].y + corners[1].y + corners[2].y + corners[3].y) / 4;
                     const minY = Math.min(...corners.map((c) => c.y));
-                    const maxY = Math.max(...corners.map((c) => c.y));
-                    const cx = (minX + maxX) / 2;
-                    const cy = (minY + maxY) / 2;
+                    const polyPoints = corners
+                      .map((c) => `${(c.x * 100).toFixed(2)},${(c.y * 100).toFixed(2)}`)
+                      .join(' ');
                     const prodMeta =
                       VIRTUAL_FIT_PRODUCT_META[activeProduct.id] ||
                       VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob'];
 
                     return (
                       <>
-                        <div
-                          style={{
-                            left: `${minX * 100}%`,
-                            top: `${minY * 100}%`,
-                            width: `${(maxX - minX) * 100}%`,
-                            height: `${(maxY - minY) * 100}%`,
-                          }}
-                          className="absolute border border-white/90 bg-[#3B429F]/20 pointer-events-none shadow-[0_0_25px_rgba(0,0,0,0.65)]"
+                        <svg
+                          viewBox="0 0 100 100"
+                          preserveAspectRatio="none"
+                          className="absolute inset-0 w-full h-full pointer-events-none"
                         >
-                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90">
-                            {prodMeta.shortLabel} · FIXED SIZE
-                          </span>
-                        </div>
+                          <polygon
+                            points={polyPoints}
+                            fill="rgba(59, 66, 159, 0.22)"
+                            stroke="rgba(255, 255, 255, 0.92)"
+                            strokeWidth="0.45"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        </svg>
+
+                        <span
+                          style={{
+                            left: `${cx * 100}%`,
+                            top: `${Math.max(0.03, minY) * 100}%`,
+                          }}
+                          className="absolute -translate-x-1/2 -translate-y-7 whitespace-nowrap px-2 py-0.5 bg-black/80 border border-white/25 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/90 pointer-events-none"
+                        >
+                          {prodMeta.shortLabel} · AUTO SCALE &amp; ANGLE
+                        </span>
 
                         <div
                           style={{
@@ -1262,32 +1225,6 @@ export const VirtualFitPage = () => {
                       </>
                     );
                   })()}
-                </div>
-
-                {/* Photo Zoom / Distance Scale Selector inside Adjust Fit */}
-                <div className="mt-4 w-full flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.22em] text-white/45">
-                    Photo Zoom / Distance:
-                  </span>
-                  <div className="inline-flex items-center border border-white/20">
-                    {Object.values(CAMERA_DISTANCE_PRESETS).map((preset) => {
-                      const active = distancePreset === preset.id;
-                      return (
-                        <button
-                          key={preset.id}
-                          type="button"
-                          onClick={() => handleDistancePresetChange(preset.id)}
-                          className={`px-3.5 sm:px-4 py-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer ${
-                            active
-                              ? 'bg-[#3B429F] text-white'
-                              : 'bg-black text-white/60 hover:text-white'
-                          }`}
-                        >
-                          {preset.label}
-                        </button>
-                      );
-                    })}
-                  </div>
                 </div>
               </div>
             )}
