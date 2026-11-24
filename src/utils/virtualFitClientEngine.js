@@ -4,11 +4,13 @@
  * and Realistic Compositing Engine for VOEUX® VIRTUAL FIT.
  *
  * Key Guarantee:
- * - Analyzes how far/zoomed the dashboard photograph was taken (windshield visibility,
- *   steering-wheel presence, and center-console span) to compute the TRUE FIXED physical
- *   size of the selected VOEUX unit (9" TS7 = 229mm, 10.1" X80 = 252mm, Single Knob = 236mm).
- * - The player boundary stays CONSTANT in size — the customer simply places the circular
- *   center dot on their console so 9" always looks like 9" and 10.1" always looks like 10.1".
+ * - Analyzes how far/zoomed the dashboard photograph was taken (existing console span,
+ *   windshield sky visibility, steering-wheel presence, and image orientation) to lock
+ *   the TRUE FIXED physical size of the selected VOEUX unit (9" TS7 = 229mm,
+ *   10.1" X80 = 252mm, Single Knob Piano = 236mm).
+ * - Supports 3 calibrated camera-distance presets (Full Cabin, Medium, Close-Up)
+ *   so even tightly zoomed console photos render at realistic true-to-life scale
+ *   while preserving the exact 9" vs 10.1" physical difference.
  */
 
 export const PRODUCT_ASSETS = {
@@ -29,6 +31,24 @@ export const PRODUCT_ASSETS = {
     physicalWidthMm: 236,
     screenLabel: '9.5"',
     aspect: 1.31,
+  },
+};
+
+export const CAMERA_DISTANCE_PRESETS = {
+  full: {
+    id: 'full',
+    label: 'Full Dashboard',
+    visibleWidthMm: 1160,
+  },
+  medium: {
+    id: 'medium',
+    label: 'Medium Shot',
+    visibleWidthMm: 720,
+  },
+  closeup: {
+    id: 'closeup',
+    label: 'Close-Up Console',
+    visibleWidthMm: 440,
   },
 };
 
@@ -88,79 +108,39 @@ function renderNormalizedDashboard(dashImg, maxDim = 1600) {
 }
 
 /**
- * Estimate real-world dashboard zoom level (pixels per mm at center console)
- * from the whole dashboard photograph:
- * - Wide full-cabin shots have bright windshield daylight along the top strip and
- *   dark steering wheel mass occupying one outer side (~1350mm full cabin width).
- * - Close-up console shots have little/no windshield at top and dark dashboard/bezel
- *   spanning most of the frame (~550–800mm visible width).
- */
-function analyzeDashboardZoomScale(gray, sw, sh, fullW, fullH) {
-  // 1. Measure bright windshield/sky ratio in the top 16% of the photo
-  const topRows = Math.max(8, Math.round(sh * 0.16));
-  let brightTop = 0;
-  let totalTop = 0;
-  for (let y = 0; y < topRows; y++) {
-    for (let x = 0; x < sw; x++) {
-      if (gray[y * sw + x] > 170) brightTop++;
-      totalTop++;
-    }
-  }
-  const windshieldRatio = totalTop > 0 ? brightTop / totalTop : 0;
-
-  // 2. Measure dark steering wheel / cabin side presence on left & right outer 28%
-  const sideW = Math.round(sw * 0.28);
-  let leftDark = 0;
-  let rightDark = 0;
-  let sideTotal = 0;
-  for (let y = Math.round(sh * 0.15); y < Math.round(sh * 0.85); y++) {
-    for (let x = 0; x < sideW; x++) {
-      if (gray[y * sw + x] < 75) leftDark++;
-      if (gray[y * sw + (sw - 1 - x)] < 75) rightDark++;
-      sideTotal++;
-    }
-  }
-  const steeringSideDarkness = Math.max(leftDark, rightDark) / Math.max(1, sideTotal);
-
-  // 3. Determine visible cabin width in millimeters based on zoom/distance cues
-  // Wide cabin (full windshield + full steering wheel visible): ~1180–1250 mm across frame
-  // Medium cabin shot: ~850–1000 mm across frame
-  // Close-up center console shot (no windshield, zoomed right onto stereo): ~540–680 mm across frame
-  let visibleWidthMm;
-  let zoomLabel;
-
-  if (windshieldRatio >= 0.22 && steeringSideDarkness >= 0.28) {
-    // Classic wide full-dashboard photo (e.g. Creta/Swift full interior shot)
-    visibleWidthMm = 1160;
-    zoomLabel = 'Full dashboard view';
-  } else if (windshieldRatio >= 0.08) {
-    // Medium-distance dashboard shot
-    const t = Math.min(1, (windshieldRatio - 0.08) / 0.14);
-    visibleWidthMm = 820 + t * 320;
-    zoomLabel = 'Medium dashboard view';
-  } else {
-    // Close-up center console shot (zoomed in on stereo bay)
-    visibleWidthMm = 580;
-    zoomLabel = 'Close-up console view';
-  }
-
-  // Portrait phone photos show less horizontal cabin width than landscape photos
-  const imgAspect = fullW / Math.max(1, fullH);
-  if (imgAspect < 1.1) {
-    visibleWidthMm *= 0.76;
-  }
-
-  const pxPerMm = fullW / visibleWidthMm;
-  return { pxPerMm, zoomLabel };
-}
-
-/**
  * Compute constant fixed-size normalized bounding box centered at (cxNorm, cyNorm)
- * using the analyzed dashboard zoom scale and exact VOEUX physical width (mm).
+ * for a given product and camera distance preset ('full' | 'medium' | 'closeup').
  */
-export function buildFixedSizeCorners(cxNorm, cyNorm, boxWidthNorm, boxHeightNorm) {
-  const halfW = boxWidthNorm / 2;
-  const halfH = boxHeightNorm / 2;
+export function computeFixedCornersForPreset(
+  productId,
+  presetId,
+  cxNorm,
+  cyNorm,
+  imgWidth,
+  imgHeight
+) {
+  const meta = PRODUCT_ASSETS[productId] || PRODUCT_ASSETS['voeux-x80-dual-knob'];
+  const preset = CAMERA_DISTANCE_PRESETS[presetId] || CAMERA_DISTANCE_PRESETS.full;
+
+  let visibleWidthMm = preset.visibleWidthMm;
+  const imgAspect = imgWidth / Math.max(1, imgHeight);
+  // Portrait photos span narrower horizontal cabin width than landscape photos
+  if (imgAspect < 1.1) {
+    visibleWidthMm *= 0.72;
+  }
+
+  const pxPerMm = imgWidth / visibleWidthMm;
+  let boxW = meta.physicalWidthMm * pxPerMm;
+  boxW = Math.max(imgWidth * 0.18, Math.min(imgWidth * 0.78, boxW));
+  let boxH = boxW / meta.aspect;
+
+  if (boxH > imgHeight * 0.76) {
+    boxH = imgHeight * 0.76;
+    boxW = boxH * meta.aspect;
+  }
+
+  const halfW = boxW / (2 * imgWidth);
+  const halfH = boxH / (2 * imgHeight);
   const cx = Math.max(halfW + 0.005, Math.min(1 - halfW - 0.005, cxNorm));
   const cy = Math.max(halfH + 0.005, Math.min(1 - halfH - 0.005, cyNorm));
 
@@ -173,13 +153,76 @@ export function buildFixedSizeCorners(cxNorm, cyNorm, boxWidthNorm, boxHeightNor
 }
 
 /**
+ * Measure the contiguous dark stereo/console bay width around the center of the photo
+ * + bright sky/windshield top band + outer steering wheel presence to accurately
+ * classify whether the photo is a Full Dashboard, Medium Shot, or Close-Up Console photo.
+ */
+function analyzeDashboardDistancePreset(gray, sw, sh, fullW, fullH) {
+  // 1. Bright sky/windshield band at top 14% (strict > 190 threshold to ignore dashboard glare)
+  const topRows = Math.max(8, Math.round(sh * 0.14));
+  let brightSky = 0;
+  let totalTop = 0;
+  for (let y = 0; y < topRows; y++) {
+    for (let x = 0; x < sw; x++) {
+      if (gray[y * sw + x] > 190) brightSky++;
+      totalTop++;
+    }
+  }
+  const skyRatio = totalTop > 0 ? brightSky / totalTop : 0;
+
+  // 2. Measure dark infotainment / center-console contiguous span across middle horizontal band
+  const midY1 = Math.round(sh * 0.30);
+  const midY2 = Math.round(sh * 0.62);
+  let maxDarkRun = 0;
+  for (let y = midY1; y < midY2; y += 3) {
+    let curRun = 0;
+    let bestRowRun = 0;
+    for (let x = Math.round(sw * 0.12); x < Math.round(sw * 0.88); x++) {
+      // Dark bezel/screen or high-contrast console interior
+      if (gray[y * sw + x] < 95) {
+        curRun++;
+        if (curRun > bestRowRun) bestRowRun = curRun;
+      } else {
+        curRun = 0;
+      }
+    }
+    if (bestRowRun > maxDarkRun) maxDarkRun = bestRowRun;
+  }
+  const consoleSpanRatio = maxDarkRun / sw;
+
+  // 3. Measure steering wheel / dark cabin presence on outer 26% sides
+  const sideW = Math.round(sw * 0.26);
+  let leftDark = 0;
+  let rightDark = 0;
+  let sideTotal = 0;
+  for (let y = Math.round(sh * 0.15); y < Math.round(sh * 0.85); y++) {
+    for (let x = 0; x < sideW; x++) {
+      if (gray[y * sw + x] < 75) leftDark++;
+      if (gray[y * sw + (sw - 1 - x)] < 75) rightDark++;
+      sideTotal++;
+    }
+  }
+  const steeringSideDarkness = Math.max(leftDark, rightDark) / Math.max(1, sideTotal);
+
+  // Classify photo distance accurately:
+  // - Full Dashboard: clear bright windshield sky across top (>= 24%) + steering wheel visible + stereo span < 38%
+  // - Close-Up Console: little/no sky at top (< 9%) OR dark stereo bezel spans >= 44% of the frame width
+  // - Medium Shot: everything in between
+  if (skyRatio < 0.09 || consoleSpanRatio >= 0.44) {
+    return 'closeup';
+  }
+  if (skyRatio >= 0.24 && steeringSideDarkness >= 0.25 && consoleSpanRatio < 0.38) {
+    return 'full';
+  }
+  return 'medium';
+}
+
+/**
  * Browser Computer Vision Analyzer:
- * 1) Estimates how far/zoomed the dashboard photo was taken -> locks the EXACT fixed
- *    size (boxWidthNorm, boxHeightNorm) for 9" vs 10.1" vs Single Knob Piano.
+ * 1) Classifies photo zoom level ('full' | 'medium' | 'closeup') -> locks true fixed physical size.
  * 2) Locates the best initial center point (cx, cy) on the center console.
  */
 export async function detectCornersInBrowser(file, productId) {
-  const meta = PRODUCT_ASSETS[productId] || PRODUCT_ASSETS['voeux-x80-dual-knob'];
   const dashImg = await fileToImage(file);
   const { canvas: fullCanvas, width: w, height: h, dataUrl: originalDataUrl } =
     renderNormalizedDashboard(dashImg);
@@ -199,32 +242,23 @@ export async function detectCornersInBrowser(file, productId) {
     gray[i] = 0.299 * pixels[p] + 0.587 * pixels[p + 1] + 0.114 * pixels[p + 2];
   }
 
-  // Analyze dashboard camera distance / zoom to lock exact physical player size
-  const { pxPerMm, zoomLabel } = analyzeDashboardZoomScale(gray, sw, sh, w, h);
-
-  let boxW = meta.physicalWidthMm * pxPerMm;
-  boxW = Math.max(w * 0.18, Math.min(w * 0.68, boxW));
-  let boxH = boxW / meta.aspect;
-  if (boxH > h * 0.68) {
-    boxH = h * 0.68;
-    boxW = boxH * meta.aspect;
-  }
-
-  const boxWidthNorm = boxW / w;
-  const boxHeightNorm = boxH / h;
+  const presetId = analyzeDashboardDistancePreset(gray, sw, sh, w, h);
+  const initialBox = computeFixedCornersForPreset(productId, presetId, 0.5, 0.44, w, h);
+  const boxWidthNorm = initialBox[1].x - initialBox[0].x;
+  const boxHeightNorm = initialBox[2].y - initialBox[0].y;
 
   // Locate best center point (cx, cy) of the center console stereo bay
   const winW = Math.max(24, Math.round(sw * boxWidthNorm));
   const winH = Math.max(16, Math.round(sh * boxHeightNorm));
 
   let bestCx = 0.5;
-  let bestCy = 0.43;
+  let bestCy = 0.45;
   let bestScore = -1e9;
 
-  const minX = Math.round(sw * 0.24);
-  const maxX = Math.max(minX, Math.round(sw * 0.76 - winW));
-  const minY = Math.round(sh * 0.16);
-  const maxY = Math.max(minY, Math.round(sh * 0.68 - winH));
+  const minX = Math.round(sw * 0.15);
+  const maxX = Math.max(minX, Math.round(sw * 0.85 - winW));
+  const minY = Math.round(sh * 0.12);
+  const maxY = Math.max(minY, Math.round(sh * 0.78 - winH));
 
   for (let y = minY; y <= maxY; y += 4) {
     for (let x = minX; x <= maxX; x += 4) {
@@ -250,7 +284,7 @@ export async function detectCornersInBrowser(file, productId) {
       const cxNorm = (x + winW / 2) / sw;
       const cyNorm = (y + winH / 2) / sh;
 
-      const centerPrior = 1.0 - Math.abs(cxNorm - 0.5) * 1.4 - Math.abs(cyNorm - 0.42) * 0.8;
+      const centerPrior = 1.0 - Math.abs(cxNorm - 0.5) * 1.4 - Math.abs(cyNorm - 0.44) * 0.8;
       const score = avgEdge * 0.55 + darkRatio * 28.0 + centerPrior * 18.0;
       if (score > bestScore) {
         bestScore = score;
@@ -260,15 +294,16 @@ export async function detectCornersInBrowser(file, productId) {
     }
   }
 
-  const corners = buildFixedSizeCorners(bestCx, bestCy, boxWidthNorm, boxHeightNorm);
+  const corners = computeFixedCornersForPreset(productId, presetId, bestCx, bestCy, w, h);
 
   return {
     success: true,
     original_image: originalDataUrl,
     corners,
-    confidence: 0.78,
+    confidence: 0.8,
     detection_method: 'browser_cv',
-    zoom_label: zoomLabel,
+    distance_preset: presetId,
+    dimensions: { width: w, height: h },
     needs_manual_check: false,
   };
 }
@@ -289,7 +324,6 @@ export async function compositeInBrowser(file, productId, normCorners) {
     renderNormalizedDashboard(dashImg);
   const ctx = canvas.getContext('2d');
 
-  // Use the exact constant dimensions from normCorners centered at the user's dot
   const xs = normCorners.map((c) => c.x * w);
   const ys = normCorners.map((c) => c.y * h);
   const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
@@ -300,15 +334,14 @@ export async function compositeInBrowser(file, productId, normCorners) {
   let finalW = Math.max(...xs) - Math.min(...xs);
   let finalH = finalW / exactAspect;
 
-  if (finalH > h * 0.85) {
-    finalH = h * 0.85;
+  if (finalH > h * 0.88) {
+    finalH = h * 0.88;
     finalW = finalH * exactAspect;
   }
 
   const drawX = Math.max(4, Math.min(w - finalW - 4, cx - finalW / 2));
   const drawY = Math.max(4, Math.min(h - finalH - 4, cy - finalH / 2));
 
-  // Sample ambient cabin brightness around the console for realistic lighting match
   let ambientBrightness = 1.0;
   try {
     const sampleX = Math.max(0, Math.round(drawX - 18));

@@ -4,6 +4,8 @@ import { PRODUCTS } from '../data/products';
 import {
   detectCornersInBrowser,
   compositeInBrowser,
+  CAMERA_DISTANCE_PRESETS,
+  computeFixedCornersForPreset,
 } from '../utils/virtualFitClientEngine';
 import {
   ArrowLeft,
@@ -290,6 +292,8 @@ export const VirtualFitPage = () => {
   const [originalImage, setOriginalImage] = useState(null);
   const [resultImage, setResultImage] = useState(null);
   const [corners, setCorners] = useState(null); // [{x, y}, ...] normalized 0..1
+  const [distancePreset, setDistancePreset] = useState('full'); // 'full' | 'medium' | 'closeup'
+  const [imageDims, setImageDims] = useState({ width: 1600, height: 900 });
   const [confidence, setConfidence] = useState(null);
   const [needsManualCheck, setNeedsManualCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -336,6 +340,12 @@ export const VirtualFitPage = () => {
             setCorners(data.corners);
             setConfidence(data.confidence);
             setNeedsManualCheck(Boolean(data.needs_manual_check));
+            if (data.dimensions) setImageDims(data.dimensions);
+            // Infer preset from detected box width ratio for UI pill sync
+            if (data.corners && data.corners.length === 4) {
+              const wRatio = Math.max(...data.corners.map((c) => c.x)) - Math.min(...data.corners.map((c) => c.x));
+              setDistancePreset(wRatio >= 0.42 ? 'closeup' : wRatio >= 0.27 ? 'medium' : 'full');
+            }
             return;
           }
         } catch (backendErr) {
@@ -349,12 +359,39 @@ export const VirtualFitPage = () => {
       setCorners(localData.corners);
       setConfidence(localData.confidence);
       setNeedsManualCheck(Boolean(localData.needs_manual_check));
+      if (localData.distance_preset) setDistancePreset(localData.distance_preset);
+      if (localData.dimensions) setImageDims(localData.dimensions);
     } catch (err) {
       setErrorMessage(err.message || 'Unable to read this photograph. Please try a clearer image.');
     } finally {
       setIsDetectingPreview(false);
     }
   }, []);
+
+  const handleDistancePresetChange = useCallback(
+    (nextPreset) => {
+      setDistancePreset(nextPreset);
+      setCorners((prev) => {
+        const cx =
+          prev && prev.length === 4
+            ? (Math.min(...prev.map((c) => c.x)) + Math.max(...prev.map((c) => c.x))) / 2
+            : 0.5;
+        const cy =
+          prev && prev.length === 4
+            ? (Math.min(...prev.map((c) => c.y)) + Math.max(...prev.map((c) => c.y))) / 2
+            : 0.44;
+        return computeFixedCornersForPreset(
+          activeProduct.id,
+          nextPreset,
+          cx,
+          cy,
+          imageDims.width,
+          imageDims.height
+        );
+      });
+    },
+    [activeProduct.id, imageDims]
+  );
 
   const handleFileSelected = useCallback((file) => {
     if (!file) return;
@@ -955,6 +992,34 @@ export const VirtualFitPage = () => {
               })()}
             </div>
 
+            {/* Camera Distance Scale Presets (Auto-detected; 1-tap override for zoomed photos while keeping 9" vs 10.1" locked) */}
+            {!isDetectingPreview && corners && (
+              <div className="mt-5 w-full flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
+                <span className="text-[10px] uppercase tracking-[0.22em] text-white/45">
+                  Photo Zoom / Distance:
+                </span>
+                <div className="inline-flex items-center border border-white/20">
+                  {Object.values(CAMERA_DISTANCE_PRESETS).map((preset) => {
+                    const active = distancePreset === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => handleDistancePresetChange(preset.id)}
+                        className={`px-3.5 sm:px-4 py-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer ${
+                          active
+                            ? 'bg-[#3B429F] text-white'
+                            : 'bg-black text-white/60 hover:text-white'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {errorMessage && (
               <p className="mt-5 text-xs sm:text-sm font-clean text-red-400 max-w-xl leading-relaxed">
                 {errorMessage}
@@ -1197,6 +1262,32 @@ export const VirtualFitPage = () => {
                       </>
                     );
                   })()}
+                </div>
+
+                {/* Photo Zoom / Distance Scale Selector inside Adjust Fit */}
+                <div className="mt-4 w-full flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-white/45">
+                    Photo Zoom / Distance:
+                  </span>
+                  <div className="inline-flex items-center border border-white/20">
+                    {Object.values(CAMERA_DISTANCE_PRESETS).map((preset) => {
+                      const active = distancePreset === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => handleDistancePresetChange(preset.id)}
+                          className={`px-3.5 sm:px-4 py-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer ${
+                            active
+                              ? 'bg-[#3B429F] text-white'
+                              : 'bg-black text-white/60 hover:text-white'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
