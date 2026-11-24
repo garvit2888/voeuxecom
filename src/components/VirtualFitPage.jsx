@@ -15,8 +15,12 @@ import {
   Sliders,
   Check,
   Compass,
-  Camera
+  Camera,
+  CheckCircle2,
+  X,
+  Globe
 } from 'lucide-react';
+import { VIRTUAL_FIT_LANGUAGES, VIRTUAL_FIT_COPY } from '../data/virtualFitTranslations';
 
 // Supported Virtual Fit product reference map
 export const VIRTUAL_FIT_SUPPORTED_IDS = [
@@ -281,6 +285,22 @@ export const VirtualFitPage = () => {
 
   const [stage, setStage] = useState('upload'); // 'upload' | 'preview' | 'processing' | 'result'
   const [showTutorial, setShowTutorial] = useState(true); // Always shown on open to guide customers
+  const [showPhotoGuide, setShowPhotoGuide] = useState(false); // Shown before taking/uploading a dashboard photo
+  const [lang, setLang] = useState(() => {
+    try {
+      const saved = localStorage.getItem('voeux_vf_lang');
+      if (saved && VIRTUAL_FIT_COPY[saved]) return saved;
+    } catch (e) {}
+    return 'en';
+  });
+  const handleLanguageChange = (code) => {
+    setLang(code);
+    try {
+      localStorage.setItem('voeux_vf_lang', code);
+    } catch (e) {}
+  };
+  const t = VIRTUAL_FIT_COPY[lang] || VIRTUAL_FIT_COPY.en;
+
   const [loadingSample, setLoadingSample] = useState(false);
   const [isDetectingPreview, setIsDetectingPreview] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -677,91 +697,122 @@ export const VirtualFitPage = () => {
         onChange={(e) => handleFileSelected(e.target.files?.[0])}
       />
 
-      {/* Minimalist Top Bar */}
-      <header className="w-full px-6 sm:px-12 py-6 flex items-center justify-between border-b border-white/10">
+      {/* Minimalist Top Bar with 4-Language Switcher */}
+      <header className="w-full px-4 sm:px-10 py-4 sm:py-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
         <button
           type="button"
           onClick={() => setActivePage('android-players')}
-          className="inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] text-white/60 hover:text-white transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-white/60 hover:text-white transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
+          <span>{t.back}</span>
         </button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <img
             src="/images/voeux_logo.png"
             alt="VOEUX®"
-            className="h-5 sm:h-6 w-auto object-contain opacity-95"
+            className="h-4 sm:h-6 w-auto object-contain opacity-95"
           />
           <span className="h-3.5 w-[1px] bg-white/25" />
-          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-white/75 font-light">
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.26em] text-white/75 font-light">
             VIRTUAL FIT
           </span>
         </div>
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 sm:gap-5">
+          {/* Language Switcher: English / Hindi / Telugu / Marathi */}
+          <div className="inline-flex items-center border border-white/20 bg-white/[0.03]" role="group" aria-label="Select Language">
+            <Globe className="w-3 h-3 text-white/45 ml-2 mr-1 hidden sm:block" />
+            {VIRTUAL_FIT_LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => handleLanguageChange(l.code)}
+                className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] tracking-wide transition-colors cursor-pointer ${
+                  lang === l.code
+                    ? 'bg-[#3B429F] text-white font-medium'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+
           <button
             type="button"
             onClick={() => setShowTutorial(true)}
-            className="text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-white/55 hover:text-white transition-colors cursor-pointer"
+            className="hidden md:inline-block text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-white/55 hover:text-white transition-colors cursor-pointer"
           >
-            How It Works
+            {t.howItWorks}
           </button>
-          <div className="hidden sm:flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/50">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3B429F]" />
-            <span className="truncate max-w-[200px]">
-              {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).shortLabel}
-            </span>
-          </div>
         </div>
       </header>
 
       {/* Editorial Tutorial Overlay (Shown Every Time Virtual Fit Opens) */}
       {showTutorial && (
         <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center px-4 py-6 overflow-y-auto">
-          <div className="w-full max-w-xl max-h-[90dvh] overflow-y-auto border border-white/20 bg-black px-6 sm:px-10 py-7 sm:py-11 text-left">
-            <div className="flex items-center justify-between pb-5 border-b border-white/10">
-              <div className="flex items-center gap-3">
+          <div className="w-full max-w-xl max-h-[90dvh] overflow-y-auto border border-white/20 bg-black px-6 sm:px-10 py-7 sm:py-10 text-left">
+            <div className="flex items-center justify-between gap-2 pb-4 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
                 <img
                   src="/images/voeux_logo.png"
                   alt="VOEUX®"
                   className="h-4 w-auto object-contain opacity-90"
                 />
                 <span className="h-3 w-[1px] bg-white/25" />
-                <span className="text-[10px] uppercase tracking-[0.28em] text-[#7c85ff]">
-                  QUICK GUIDE
+                <span className="text-[10px] uppercase tracking-[0.22em] text-[#7c85ff]">
+                  {t.quickGuide}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowTutorial(false)}
-                className="text-[10px] uppercase tracking-[0.22em] text-white/50 hover:text-white cursor-pointer"
+                className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white cursor-pointer"
               >
-                Skip
+                {t.skip}
               </button>
             </div>
 
-            <h2 className="mt-6 text-2xl sm:text-3xl font-light uppercase tracking-[0.14em] text-white">
-              HOW VIRTUAL FIT WORKS
+            {/* Instant Language Bar inside Tutorial */}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {VIRTUAL_FIT_LANGUAGES.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => handleLanguageChange(l.code)}
+                  className={`px-3 py-1 border text-[11px] transition-colors cursor-pointer ${
+                    lang === l.code
+                      ? 'border-[#3B429F] bg-[#3B429F] text-white'
+                      : 'border-white/20 text-white/65 hover:text-white hover:border-white/50'
+                  }`}
+                >
+                  {l.nativeLabel}
+                </button>
+              ))}
+            </div>
+
+            <h2 className="mt-5 text-xl sm:text-3xl font-light uppercase tracking-[0.1em] text-white">
+              {t.tutTitle}
             </h2>
             <p className="mt-2 text-xs sm:text-sm font-clean text-white/55 leading-relaxed">
-              Visualize the exact{' '}
+              {t.tutSubtitlePrefix}{' '}
               <span className="text-white/90">
                 {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
               </span>{' '}
-              installed inside your vehicle in three simple steps.
+              {t.tutSubtitleSuffix}
             </p>
 
-            <div className="mt-7 space-y-5">
+            <div className="mt-6 space-y-4">
               <div className="flex items-start gap-4">
                 <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">01</span>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white">
-                    Upload a Clear Dashboard Photo
+                  <p className="text-xs uppercase tracking-[0.14em] text-white">
+                    {t.step1Title}
                   </p>
                   <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
-                    Take a straight-on, well-lit photograph of your car&apos;s center dashboard — or try our sample dashboard if you don&apos;t have a photo handy right now.
+                    {t.step1Desc}
                   </p>
                 </div>
               </div>
@@ -771,11 +822,11 @@ export const VirtualFitPage = () => {
               <div className="flex items-start gap-4">
                 <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">02</span>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white">
-                    Automatic Stereo Detection &amp; True-Scale Fit
+                  <p className="text-xs uppercase tracking-[0.14em] text-white">
+                    {t.step2Title}
                   </p>
                   <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
-                    Our vision engine automatically locates your stereo opening and fits the real VOEUX unit to scale (10.1&quot; vs 9&quot;) with realistic perspective and lighting.
+                    {t.step2Desc}
                   </p>
                 </div>
               </div>
@@ -785,31 +836,156 @@ export const VirtualFitPage = () => {
               <div className="flex items-start gap-4">
                 <span className="text-xs tracking-[0.22em] text-[#7c85ff] font-medium pt-0.5">03</span>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white">
-                    Place Center Dot, Compare &amp; Download
+                  <p className="text-xs uppercase tracking-[0.14em] text-white">
+                    {t.step3Title}
                   </p>
                   <p className="mt-1 text-xs font-clean text-white/55 leading-relaxed">
-                    Tap or drag the circular dot to the center of your console — the boundary stays locked to true fixed 9&quot; / 10.1&quot; physical size for your dashboard photo. Then slide Before &amp; After, download, or add directly to cart.
+                    {t.step3Desc}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-9 flex flex-col sm:flex-row items-center gap-3.5">
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-3.5">
               <button
                 type="button"
                 onClick={() => setShowTutorial(false)}
-                className="w-full sm:flex-1 py-3.5 px-6 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-[11px] uppercase tracking-[0.26em] font-medium transition-all cursor-pointer"
+                className="w-full sm:flex-1 py-3.5 px-6 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-[11px] uppercase tracking-[0.2em] font-medium transition-all cursor-pointer"
               >
-                GOT IT, LET&apos;S BEGIN
+                {t.gotItBtn}
               </button>
               <button
                 type="button"
                 onClick={handleUseSampleDashboard}
                 disabled={loadingSample}
-                className="w-full sm:w-auto py-3.5 px-6 border border-white/35 hover:border-[#3B429F] text-white/85 hover:text-white text-[11px] uppercase tracking-[0.2em] font-light transition-all cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto py-3.5 px-6 border border-white/35 hover:border-[#3B429F] text-white/85 hover:text-white text-[11px] uppercase tracking-[0.16em] font-light transition-all cursor-pointer disabled:opacity-50"
               >
-                {loadingSample ? 'LOADING...' : 'TRY SAMPLE DASHBOARD'}
+                {loadingSample ? t.loadingSample : t.trySampleBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Clicking Instructions Modal (Shown Before Clicking / Uploading Dashboard Photo) */}
+      {showPhotoGuide && (
+        <div className="fixed inset-0 z-[115] bg-black/92 backdrop-blur-md flex items-center justify-center px-4 py-5 overflow-y-auto">
+          <div className="w-full max-w-2xl max-h-[92dvh] overflow-y-auto border border-white/25 bg-black px-5 sm:px-8 py-6 sm:py-8 text-left relative">
+            <button
+              type="button"
+              onClick={() => setShowPhotoGuide(false)}
+              aria-label="Close photo guide"
+              className="absolute top-4 right-4 text-white/50 hover:text-white p-1.5 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <p className="text-[10px] uppercase tracking-[0.26em] text-[#7c85ff]">
+              {t.photoGuideTag}
+            </p>
+            <h2 className="mt-1.5 text-lg sm:text-2xl font-light uppercase tracking-[0.1em] text-white pr-8">
+              {t.photoGuideTitle}
+            </h2>
+
+            {/* Language Switcher inside Photo Guide */}
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              {VIRTUAL_FIT_LANGUAGES.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => handleLanguageChange(l.code)}
+                  className={`px-2.5 py-1 border text-[10px] transition-colors cursor-pointer ${
+                    lang === l.code
+                      ? 'border-[#3B429F] bg-[#3B429F] text-white'
+                      : 'border-white/20 text-white/60 hover:text-white'
+                  }`}
+                >
+                  {l.nativeLabel}
+                </button>
+              ))}
+            </div>
+
+            {/* Sample Dashboard Reference Image */}
+            <div className="mt-4 relative border border-white/20 overflow-hidden bg-black">
+              <img
+                src="/images/virtual-fit/sample_dashboard.jpg"
+                alt="Ideal front-view car dashboard photo with steering wheel visible"
+                className="w-full h-44 sm:h-60 object-cover block"
+              />
+              <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/80 border border-emerald-400/60 text-[10px] uppercase tracking-[0.18em] text-emerald-300">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{t.photoGuideIdealBadge}</span>
+              </span>
+            </div>
+
+            {/* 3 Crystal-Clear Shooting Rules */}
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3.5 border border-white/15 bg-white/[0.03]">
+                <p className="text-[11px] font-medium text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>{t.rule1Title}</span>
+                </p>
+                <p className="mt-1.5 text-[11px] font-clean text-white/60 leading-relaxed">
+                  {t.rule1Desc}
+                </p>
+              </div>
+              <div className="p-3.5 border border-white/15 bg-white/[0.03]">
+                <p className="text-[11px] font-medium text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>{t.rule2Title}</span>
+                </p>
+                <p className="mt-1.5 text-[11px] font-clean text-white/60 leading-relaxed">
+                  {t.rule2Desc}
+                </p>
+              </div>
+              <div className="p-3.5 border border-white/15 bg-white/[0.03]">
+                <p className="text-[11px] font-medium text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>{t.rule3Title}</span>
+                </p>
+                <p className="mt-1.5 text-[11px] font-clean text-white/60 leading-relaxed">
+                  {t.rule3Desc}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons: Gallery, Camera, or Sample */}
+            <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPhotoGuide(false);
+                  fileInputRef.current?.click();
+                }}
+                className="w-full sm:flex-1 py-3.5 px-5 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-[11px] uppercase tracking-[0.2em] font-medium transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>{t.chooseFromGallery}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPhotoGuide(false);
+                  cameraInputRef.current?.click();
+                }}
+                className="w-full sm:flex-1 py-3.5 px-5 border border-white/60 hover:border-[#3B429F] hover:bg-[#3B429F]/20 text-white text-[11px] uppercase tracking-[0.2em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>{t.openCamera}</span>
+              </button>
+            </div>
+
+            <div className="mt-3 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPhotoGuide(false);
+                  handleUseSampleDashboard();
+                }}
+                className="text-[11px] uppercase tracking-[0.18em] text-white/50 hover:text-white underline underline-offset-4 cursor-pointer"
+              >
+                {t.trySampleBtn}
               </button>
             </div>
           </div>
@@ -831,19 +1007,19 @@ export const VirtualFitPage = () => {
             </div>
 
             {/* Editorial Typography */}
-            <h1 className="text-2xl sm:text-5xl md:text-[54px] font-light tracking-[0.14em] sm:tracking-[0.16em] text-white uppercase leading-tight px-2">
-              YOUR DASHBOARD. YOUR VOEUX.
+            <h1 className="text-2xl sm:text-5xl md:text-[54px] font-light tracking-[0.1em] sm:tracking-[0.14em] text-white uppercase leading-tight px-2">
+              {t.heroTitle}
             </h1>
 
             <p className="mt-3 sm:mt-4 text-xs sm:text-base font-clean font-light text-white/65 tracking-wide max-w-xl leading-relaxed px-2">
-              See how your favourite VOEUX Android Player could look inside your car.
+              {t.heroSubtitle}
             </p>
 
             {/* Carried-Forward Selected Product Indicator */}
-            <div className="mt-4 sm:mt-5 inline-flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.22em] text-white/50">
+            <div className="mt-4 sm:mt-5 inline-flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.2em] text-white/50">
               <span className="w-4 sm:w-6 h-[1px] bg-[#3B429F]" />
               <span>
-                Selected:{' '}
+                {t.selectedLabel}{' '}
                 <strong className="text-white/90 font-normal">
                   {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
                 </strong>
@@ -851,43 +1027,43 @@ export const VirtualFitPage = () => {
               <span className="w-4 sm:w-6 h-[1px] bg-[#3B429F]" />
             </div>
 
-            {/* Minimalist Upload & Sample Dashboard Buttons (Full-width stacked on mobile) */}
+            {/* Minimalist Upload & Sample Dashboard Buttons (Opens Photo Guide with Sample Reference first) */}
             <div className="mt-7 sm:mt-9 w-full sm:w-auto flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 px-2 sm:px-0">
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full sm:w-auto group relative px-8 sm:px-10 py-4 border border-white/80 hover:border-[#3B429F] text-white text-xs sm:text-[13px] uppercase tracking-[0.24em] sm:tracking-[0.26em] font-light transition-all duration-300 hover:bg-[#3B429F]/15 cursor-pointer inline-flex items-center justify-center gap-3"
+                onClick={() => setShowPhotoGuide(true)}
+                className="w-full sm:w-auto group relative px-8 sm:px-10 py-4 border border-white/80 hover:border-[#3B429F] text-white text-xs sm:text-[13px] uppercase tracking-[0.2em] font-light transition-all duration-300 hover:bg-[#3B429F]/15 cursor-pointer inline-flex items-center justify-center gap-3"
               >
                 <Upload className="w-4 h-4 text-white/80 group-hover:text-[#7c85ff] transition-colors" />
-                <span>UPLOAD YOUR DASHBOARD</span>
+                <span>{t.uploadBtn}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleUseSampleDashboard}
                 disabled={loadingSample}
-                className="w-full sm:w-auto px-8 py-4 border border-white/25 hover:border-white/75 text-white/75 hover:text-white text-xs uppercase tracking-[0.22em] font-light transition-all duration-300 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-8 py-4 border border-white/25 hover:border-white/75 text-white/75 hover:text-white text-xs uppercase tracking-[0.18em] font-light transition-all duration-300 cursor-pointer disabled:opacity-50"
               >
-                {loadingSample ? 'LOADING SAMPLE...' : 'TRY SAMPLE DASHBOARD'}
+                {loadingSample ? t.loadingSample : t.trySampleBtn}
               </button>
 
               <button
                 type="button"
-                onClick={() => cameraInputRef.current?.click()}
-                className="w-full sm:hidden px-8 py-3.5 border border-white/30 text-white/80 text-[11px] uppercase tracking-[0.22em] font-light inline-flex items-center justify-center gap-2.5 cursor-pointer"
+                onClick={() => setShowPhotoGuide(true)}
+                className="w-full sm:hidden px-8 py-3.5 border border-white/30 text-white/80 text-[11px] uppercase tracking-[0.18em] font-light inline-flex items-center justify-center gap-2.5 cursor-pointer"
               >
                 <Camera className="w-3.5 h-3.5" />
-                <span>USE CAMERA</span>
+                <span>{t.useCameraBtn}</span>
               </button>
             </div>
 
-            <p className="mt-4 text-xs font-clean text-white/45 tracking-wide">
-              Upload a clear photograph of your car&apos;s dashboard to get started.
+            <p className="mt-4 text-xs font-clean text-white/45 tracking-wide max-w-lg px-2">
+              {t.uploadHelper}
             </p>
 
             {isDragOver && (
-              <p className="mt-4 text-xs uppercase tracking-[0.25em] text-[#7c85ff]">
-                Drop your dashboard photograph anywhere
+              <p className="mt-4 text-xs uppercase tracking-[0.22em] text-[#7c85ff]">
+                {t.dropHint}
               </p>
             )}
 
@@ -902,15 +1078,11 @@ export const VirtualFitPage = () => {
         {/* ================= STAGE 2: PHOTO PREVIEW + PLACE CENTER DOT + CONTINUE ================= */}
         {stage === 'preview' && previewUrl && (
           <div className="w-full max-w-4xl flex flex-col items-center text-center">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#7c85ff] mb-2">
-              {isDetectingPreview
-                ? 'ANALYZING DASHBOARD SCALE & CONSOLE...'
-                : 'PLACE CIRCULAR DOT ON CONSOLE CENTER'}
+            <p className="text-[11px] uppercase tracking-[0.22em] text-[#7c85ff] mb-2">
+              {isDetectingPreview ? t.analyzingTag : t.placeDotTag}
             </p>
             <p className="text-xs sm:text-sm font-clean text-white/60 mb-5 max-w-xl">
-              {isDetectingPreview
-                ? 'Analyzing dashboard distance & zoom to lock the exact physical player size...'
-                : 'Tap or drag the circular dot to the center of your car\'s stereo console. The boundary reflects the fixed real-world size of this VOEUX player.'}
+              {isDetectingPreview ? t.analyzingDesc : t.placeDotDesc}
             </p>
 
             <div
@@ -1030,17 +1202,17 @@ export const VirtualFitPage = () => {
                 type="button"
                 onClick={runVirtualFitPipeline}
                 disabled={isDetectingPreview}
-                className="px-12 py-4 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-xs sm:text-[13px] uppercase tracking-[0.28em] font-medium transition-all duration-300 cursor-pointer disabled:opacity-50"
+                className="px-12 py-4 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-xs sm:text-[13px] uppercase tracking-[0.22em] font-medium transition-all duration-300 cursor-pointer disabled:opacity-50"
               >
-                {isDetectingPreview ? 'DETECTING...' : 'CONTINUE'}
+                {isDetectingPreview ? t.detectingBtn : t.continueBtn}
               </button>
 
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-7 py-4 border border-white/30 hover:border-white/70 text-white/75 hover:text-white text-xs uppercase tracking-[0.22em] font-light transition-all duration-300 cursor-pointer"
+                onClick={() => setShowPhotoGuide(true)}
+                className="px-7 py-4 border border-white/30 hover:border-white/70 text-white/75 hover:text-white text-xs uppercase tracking-[0.18em] font-light transition-all duration-300 cursor-pointer"
               >
-                CHANGE PHOTO
+                {t.changePhotoBtn}
               </button>
             </div>
           </div>
@@ -1072,11 +1244,11 @@ export const VirtualFitPage = () => {
               `}</style>
             </div>
 
-            <p className="text-lg sm:text-xl font-light uppercase tracking-[0.28em] text-white">
-              FITTING YOUR VOEUX
+            <p className="text-lg sm:text-xl font-light uppercase tracking-[0.22em] text-white">
+              {t.fittingTitle}
             </p>
             <p className="mt-3 text-xs font-clean text-white/50 tracking-wide">
-              Detecting stereo boundaries, estimating perspective, and placing your exact VOEUX unit...
+              {t.fittingDesc}
             </p>
           </div>
         )}
@@ -1087,8 +1259,8 @@ export const VirtualFitPage = () => {
             {/* Top Result Header */}
             <div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
               <div className="text-left">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-[#7c85ff] mb-1">
-                  VOEUX VIRTUAL FIT PREVIEW
+                <p className="text-[10px] uppercase tracking-[0.26em] text-[#7c85ff] mb-1">
+                  {t.previewTag}
                 </p>
                 <h2 className="text-xl sm:text-2xl font-light uppercase tracking-[0.12em] text-white">
                   {(VIRTUAL_FIT_PRODUCT_META[activeProduct.id] || VIRTUAL_FIT_PRODUCT_META['voeux-x80-dual-knob']).fullLabel}
@@ -1101,10 +1273,10 @@ export const VirtualFitPage = () => {
                   <button
                     type="button"
                     onClick={() => setIsAdjusting(true)}
-                    className="px-5 py-2.5 border border-white/35 hover:border-[#3B429F] text-white/85 hover:text-white text-[11px] uppercase tracking-[0.22em] transition-all cursor-pointer inline-flex items-center gap-2"
+                    className="px-5 py-2.5 border border-white/35 hover:border-[#3B429F] text-white/85 hover:text-white text-[11px] uppercase tracking-[0.18em] transition-all cursor-pointer inline-flex items-center gap-2"
                   >
                     <Sliders className="w-3.5 h-3.5" />
-                    <span>ADJUST FIT</span>
+                    <span>{t.adjustFitBtn}</span>
                   </button>
                 ) : (
                   <>
@@ -1112,17 +1284,17 @@ export const VirtualFitPage = () => {
                       type="button"
                       onClick={applyManualCorners}
                       disabled={isRefitting}
-                      className="px-5 py-2.5 border border-[#3B429F] bg-[#3B429F] hover:bg-[#4c54ba] text-white text-[11px] uppercase tracking-[0.22em] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
+                      className="px-5 py-2.5 border border-[#3B429F] bg-[#3B429F] hover:bg-[#4c54ba] text-white text-[11px] uppercase tracking-[0.18em] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
                     >
                       <Check className="w-3.5 h-3.5" />
-                      <span>{isRefitting ? 'UPDATING...' : 'APPLY ADJUSTMENT'}</span>
+                      <span>{isRefitting ? t.updatingBtn : t.applyAdjustmentBtn}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsAdjusting(false)}
-                      className="px-4 py-2.5 border border-white/25 text-white/65 hover:text-white text-[11px] uppercase tracking-[0.2em] cursor-pointer"
+                      className="px-4 py-2.5 border border-white/25 text-white/65 hover:text-white text-[11px] uppercase tracking-[0.18em] cursor-pointer"
                     >
-                      CANCEL
+                      {t.cancel}
                     </button>
                   </>
                 )}
@@ -1131,10 +1303,7 @@ export const VirtualFitPage = () => {
 
             {needsManualCheck && !isAdjusting && (
               <div className="w-full mb-4 px-4 py-2.5 border-l-2 border-[#3B429F] bg-white/[0.03] text-xs font-clean text-white/75 flex items-center justify-between gap-4">
-                <span>
-                  Automatic stereo detection had low contrast on this dashboard. Click{' '}
-                  <strong className="text-white">ADJUST FIT</strong> to fine-tune the 4 corners for exact placement.
-                </span>
+                <span>{t.lowContrastNotice}</span>
               </div>
             )}
 
@@ -1186,18 +1355,18 @@ export const VirtualFitPage = () => {
                 </div>
 
                 {/* Minimalist Before / After Labels */}
-                <span className="absolute top-3.5 left-4 px-2.5 py-1 bg-black/70 border border-white/15 text-[10px] uppercase tracking-[0.22em] text-white/80 pointer-events-none">
-                  BEFORE
+                <span className="absolute top-3.5 left-4 px-2.5 py-1 bg-black/70 border border-white/15 text-[10px] uppercase tracking-[0.18em] text-white/80 pointer-events-none">
+                  {t.beforeLabel}
                 </span>
-                <span className="absolute top-3.5 right-4 px-2.5 py-1 bg-black/70 border border-[#3B429F]/70 text-[10px] uppercase tracking-[0.22em] text-white pointer-events-none">
-                  WITH VOEUX
+                <span className="absolute top-3.5 right-4 px-2.5 py-1 bg-black/70 border border-[#3B429F]/70 text-[10px] uppercase tracking-[0.18em] text-white pointer-events-none">
+                  {t.withVoeuxLabel}
                 </span>
               </div>
             ) : (
               /* === FIXED-SIZE CENTER DOT REPOSITIONING === */
               <div className="w-full flex flex-col items-center">
                 <p className="w-full text-left text-xs font-clean text-white/60 mb-3">
-                  Tap or drag the circular dot to the center of your stereo console, then click <strong className="text-white">APPLY ADJUSTMENT</strong>. The player size remains fixed to true physical scale.
+                  {t.adjustHint}
                 </p>
                 <div
                   ref={adjustContainerRef}
@@ -1280,43 +1449,43 @@ export const VirtualFitPage = () => {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="py-4 px-5 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-[11px] uppercase tracking-[0.22em] font-medium transition-all cursor-pointer inline-flex items-center justify-center gap-2.5"
+                className="py-4 px-5 border border-white bg-white text-black hover:bg-[#3B429F] hover:border-[#3B429F] hover:text-white text-[11px] uppercase tracking-[0.18em] font-medium transition-all cursor-pointer inline-flex items-center justify-center gap-2.5"
               >
                 <ShoppingCart className="w-3.5 h-3.5" />
-                <span>ADD TO CART</span>
+                <span>{t.addToCartBtn}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadPreview}
-                className="py-4 px-5 border border-white/60 hover:border-white text-white text-[11px] uppercase tracking-[0.22em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2.5"
+                className="py-4 px-5 border border-white/60 hover:border-white text-white text-[11px] uppercase tracking-[0.18em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2.5"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>DOWNLOAD PREVIEW</span>
+                <span>{t.downloadBtn}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActivePage('android-players')}
-                className="py-4 px-5 border border-white/25 hover:border-white/70 text-white/80 hover:text-white text-[11px] uppercase tracking-[0.2em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+                className="py-4 px-5 border border-white/25 hover:border-white/70 text-white/80 hover:text-white text-[11px] uppercase tracking-[0.16em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2"
               >
                 <Compass className="w-3.5 h-3.5" />
-                <span>EXPLORE OTHER PLAYERS</span>
+                <span>{t.exploreOtherBtn}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleReset}
-                className="py-4 px-5 border border-white/25 hover:border-white/70 text-white/75 hover:text-white text-[11px] uppercase tracking-[0.22em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+                className="py-4 px-5 border border-white/25 hover:border-white/70 text-white/75 hover:text-white text-[11px] uppercase tracking-[0.18em] font-light transition-all cursor-pointer inline-flex items-center justify-center gap-2"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>TRY AGAIN</span>
+                <span>{t.tryAgainBtn}</span>
               </button>
             </div>
 
             {/* Subtle Model Switcher (X80 <-> 9" TS7) so customer can also compare both */}
-            <div className="mt-7 flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] text-white/45">
-              <span>Compare unit:</span>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-4 text-[11px] uppercase tracking-[0.16em] text-white/45">
+              <span>{t.compareUnitLabel}</span>
               {VIRTUAL_FIT_SUPPORTED_IDS.map((pid) => {
                 const prod = (productsList || PRODUCTS).find((p) => p.id === pid);
                 if (!prod) return null;
@@ -1351,7 +1520,7 @@ export const VirtualFitPage = () => {
       {/* Understated Footer Disclaimer */}
       <footer className="w-full px-6 py-5 border-t border-white/10 text-center">
         <p className="text-[11px] font-clean text-white/40 tracking-wide">
-          Visual preview only. Physical installation compatibility and fascia fitment must be verified separately. Uploaded photographs are processed securely and never stored permanently.
+          {t.disclaimer}
         </p>
       </footer>
     </div>
