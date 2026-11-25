@@ -452,3 +452,70 @@ for (const page of staticPages) {
 
 console.log(`✓ Pre-rendered static SEO HTML for ${count} routes in dist/`);
 
+// 6. Generate Google Merchant Center XML Product Feed (dist/merchant-feed.xml + public/merchant-feed.xml)
+const GOOGLE_TAXONOMY_MAP = {
+  'android-players': 'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Electronics > Motor Vehicle Audio',
+  'speakers-soundbars': 'Electronics > Audio > Audio Components > Speakers > Soundbars',
+  'car-speakers': 'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Electronics > Motor Vehicle Audio > Car Speakers',
+  subwoofers: 'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Electronics > Motor Vehicle Audio > Car Subwoofers',
+  amplifiers: 'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Electronics > Motor Vehicle Audio > Car Amplifiers',
+  bundles: 'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Electronics > Motor Vehicle Audio',
+};
+
+const feedItems = PRODUCTS.map((product) => {
+  const link = `${SITE_URL}/product/${product.id}`;
+  const mainImage = product.image?.startsWith('http') ? product.image : `${SITE_URL}${product.image}`;
+  const extraImages = (product.gallery || [])
+    .filter((img) => img && img !== product.image)
+    .slice(0, 9)
+    .map((img) => (img.startsWith('http') ? img : `${SITE_URL}${img}`));
+
+  const priceNum = Number(product.price) || 0;
+  const origNum = Number(product.originalPrice) || priceNum;
+  const hasDiscount = origNum > priceNum;
+  const regularPrice = (hasDiscount ? origNum : priceNum).toFixed(2);
+  const salePrice = priceNum.toFixed(2);
+  const shippingFee = product.id === 'voeux-160w-separable-soundbar' ? '399.00' : '0.00';
+  const taxonomy =
+    GOOGLE_TAXONOMY_MAP[product.category] ||
+    'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Electronics > Motor Vehicle Audio';
+  const cleanTitle = (product.name || '').slice(0, 150);
+  const cleanDesc = (product.description || product.name || '').slice(0, 4900);
+
+  return `    <item>
+      <g:id>${escapeHtml(product.id)}</g:id>
+      <g:title>${escapeHtml(cleanTitle)}</g:title>
+      <g:description>${escapeHtml(cleanDesc)}</g:description>
+      <g:link>${escapeHtml(link)}</g:link>
+      <g:image_link>${escapeHtml(mainImage)}</g:image_link>
+${extraImages.map((img) => `      <g:additional_image_link>${escapeHtml(img)}</g:additional_image_link>`).join('\n')}${extraImages.length ? '\n' : ''}      <g:availability>in_stock</g:availability>
+      <g:price>${regularPrice} INR</g:price>
+${hasDiscount ? `      <g:sale_price>${salePrice} INR</g:sale_price>\n` : ''}      <g:brand>VOEUX</g:brand>
+      <g:mpn>${escapeHtml(product.id)}</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:condition>new</g:condition>
+      <g:google_product_category>${escapeHtml(taxonomy)}</g:google_product_category>
+      <g:product_type>${escapeHtml(product.category || 'Car Audio')}</g:product_type>
+      <g:shipping>
+        <g:country>IN</g:country>
+        <g:service>Standard Pan-India Delivery</g:service>
+        <g:price>${shippingFee} INR</g:price>
+      </g:shipping>
+    </item>`;
+}).join('\n');
+
+const merchantFeedXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <title>VOEUX® Official Store Product Feed</title>
+    <link>${SITE_URL}</link>
+    <description>Official VOEUX® Car Android Players, 160W Soundbars, Underseat Subwoofers, Coaxial Car Speakers &amp; Amplifiers in India</description>
+${feedItems}
+  </channel>
+</rss>
+`;
+
+fs.writeFileSync(path.join(DIST_DIR, 'merchant-feed.xml'), merchantFeedXml, 'utf-8');
+fs.writeFileSync(path.resolve(__dirname, '..', 'public', 'merchant-feed.xml'), merchantFeedXml, 'utf-8');
+console.log(`✓ Generated Google Merchant Center XML feed with ${PRODUCTS.length} products (merchant-feed.xml)`);
+
