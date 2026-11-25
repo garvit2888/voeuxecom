@@ -235,9 +235,35 @@ const MainContent = () => {
           url: canonicalUrl,
           priceCurrency: 'INR',
           price: String(selectedProductModal.price),
+          validFrom: '2026-01-01',
           priceValidUntil: '2027-12-31',
           itemCondition: 'https://schema.org/NewCondition',
-          availability: 'https://schema.org/InStock'
+          availability: 'https://schema.org/InStock',
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'IN',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            merchantReturnDays: 7,
+            returnMethod: 'https://schema.org/ReturnByMail',
+            returnFees: 'https://schema.org/FreeReturn'
+          },
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingRate: {
+              '@type': 'MonetaryAmount',
+              value: selectedProductModal.id === 'voeux-160w-separable-soundbar' ? '399' : '0',
+              currency: 'INR'
+            },
+            shippingDestination: {
+              '@type': 'DefinedRegion',
+              addressCountry: 'IN'
+            },
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+              transitTime: { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' }
+            }
+          }
         }
       });
     } else if (scriptEl) {

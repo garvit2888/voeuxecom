@@ -250,6 +250,7 @@ for (const product of PRODUCTS) {
   const specsHtml = (product.shortSpecs || []).map((s) => `<li>${escapeHtml(s)}</li>`).join('');
   const featuresHtml = (product.features || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('');
 
+  const shippingCost = product.id === 'voeux-160w-separable-soundbar' ? '399' : '0';
   const productLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -265,9 +266,28 @@ for (const product of PRODUCTS) {
       url: `${SITE_URL}/product/${product.id}`,
       priceCurrency: 'INR',
       price: String(product.price),
+      validFrom: '2026-01-01',
       priceValidUntil: '2027-12-31',
       itemCondition: 'https://schema.org/NewCondition',
       availability: 'https://schema.org/InStock',
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'IN',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 7,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: shippingCost, currency: 'INR' },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IN' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
+        },
+      },
     },
   };
 
@@ -431,3 +451,4 @@ for (const page of staticPages) {
 }
 
 console.log(`✓ Pre-rendered static SEO HTML for ${count} routes in dist/`);
+
