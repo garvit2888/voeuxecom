@@ -147,10 +147,9 @@ export const Footer = () => {
               <div className="flex items-center gap-4 pt-1">
                 <MarketplaceLogo
                   candidates={[
+                    '/images/instagram.jpeg',
                     '/images/instagram_logo.png',
-                    '/images/instagram_logo.jpg',
-                    '/images/instagram_logo.jpeg',
-                    '/images/instagram_logo.webp'
+                    '/images/instagram_logo.jpg'
                   ]}
                   href="https://www.instagram.com/voeux_in/?__d=1%2F"
                   alt="Instagram"
@@ -160,10 +159,9 @@ export const Footer = () => {
                 />
                 <MarketplaceLogo
                   candidates={[
+                    '/images/linkedin.jpeg',
                     '/images/linkedin_logo.png',
-                    '/images/linkedin_logo.jpg',
-                    '/images/linkedin_logo.jpeg',
-                    '/images/linkedin_logo.webp'
+                    '/images/linkedin_logo.jpg'
                   ]}
                   href="https://www.linkedin.com/search/results/all/?keywords=voeux&origin=RICH_QUERY_SUGGESTION&spellCorrectionEnabled=false&heroEntityKey=urn%3Ali%3Aorganization%3A117045090&position=0"
                   alt="LinkedIn"
