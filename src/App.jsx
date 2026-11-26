@@ -33,6 +33,7 @@ import { AdminTestPaymentPage } from './components/AdminTestPaymentPage';
 import { CustomerAssistanceReviews } from './components/CustomerAssistanceReviews';
 import { VirtualFitPage, AutomotiveDashboardOutline } from './components/VirtualFitPage';
 import { CarFitmentGuidePage } from './components/CarFitmentGuidePage';
+import { VoeuxBlogIndexPage } from './components/VoeuxBlogIndexPage';
 import { getCarGuideBySlug } from './data/carGuides';
 
 
@@ -164,6 +165,10 @@ const MainContent = () => {
       'terms': {
         title: 'Terms & Conditions, Shipping & Return Policy | VOEUX® Official Store',
         desc: 'Official terms of use, order processing, shipping, and return policies for voeuxtechnologies.in.'
+      },
+      'blog': {
+        title: 'Voeux.Blog | 52 Indian Car Android Player Fitment & Audio Upgrade Guides',
+        desc: 'Read Voeux.Blog car-specific Android Player fitment guides for India’s top 52 cars including Hyundai Creta, Maruti Swift, Tata Nexon, Mahindra Thar, Kia Seltos, Honda City & Toyota Fortuner.'
       }
     };
 
@@ -329,6 +334,8 @@ const MainContent = () => {
         return selectedProductModal?.isBundle ? <BundleDetailPage bundle={selectedProductModal} /> : <ProductDetailPage />;
       case 'virtual-fit':
         return <VirtualFitPage />;
+      case 'blog':
+        return <VoeuxBlogIndexPage />;
       case 'profile':
       case 'my-orders':
         return <CustomerProfilePage />;

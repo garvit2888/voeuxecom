@@ -3,480 +3,714 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
 >
-  <!-- ==================== HOMEPAGE ==================== -->
   <url>
     <loc>https://voeuxtechnologies.in/</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_x80_hero_bg.jpg</image:loc>
-      <image:title>VOEUX® Official Store – Car Android Players, Soundbars &amp; Subwoofers</image:title>
-      <image:caption>Official VOEUX® Electronics India store for QLED Car Android Players, 160W 2-in-1 Soundbars, Underseat Subwoofers, Coaxial Car Speakers and Class AB Amplifiers</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_main.jpg</image:loc>
-      <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
-      <image:caption>VOEUX 160W 2.1 Channel Convertible Dual Tower and Horizontal Soundbar with Dedicated Subwoofer</image:caption>
-    </image:image>
   </url>
-
-  <!-- ==================== INTERACTIVE VIRTUAL FIT ==================== -->
   <url>
     <loc>https://voeuxtechnologies.in/virtual-fit</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/virtual-fit/sample_dashboard.jpg</image:loc>
-      <image:title>VOEUX® Virtual Fit – Preview Android Car Players on Your Dashboard</image:title>
-      <image:caption>Upload your car dashboard photo to preview 9-inch TS7, 9.5-inch Single Knob, and 10.1-inch X80 Dual Knob VOEUX Android Players installed to true physical scale</image:caption>
-    </image:image>
   </url>
-
-  <!-- ==================== CATEGORY PAGES ==================== -->
+  <url>
+    <loc>https://voeuxtechnologies.in/blog</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
   <url>
     <loc>https://voeuxtechnologies.in/android-players</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/android_player_1.png</image:loc>
-      <image:title>VOEUX® Car Android Players (9" &amp; 10.1" QLED, 4GB+64GB)</image:title>
-      <image:caption>Shop 9-inch and 10.1-inch QLED Android Car Stereos with Wireless Apple CarPlay, Android Auto, Dual Knobs and AHD Reverse Camera support</image:caption>
-    </image:image>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/speakers-soundbars</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/soundbar_1.png</image:loc>
-      <image:title>VOEUX® Speakers &amp; 160W Separable Soundbars</image:title>
-      <image:caption>VOEUX 160W RMS 2-in-1 Convertible Bluetooth 5.0 Soundbar with Dedicated External Subwoofer and HDMI ARC</image:caption>
-    </image:image>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/car-speakers</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_coaxial_speakers.png</image:loc>
-      <image:title>VOEUX® 6" &amp; 6.5" Coaxial Car Door Speakers</image:title>
-      <image:caption>High-bass 380W and 460W 2-Way Coaxial Car Door Speakers with Dual Voice Coil technology</image:caption>
-    </image:image>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
   </url>
-
-  <url>
-    <loc>https://voeuxtechnologies.in/subwoofers</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_hero.jpg</image:loc>
-      <image:title>VOEUX® 10-Inch Active Underseat Car Subwoofer (SVX-UND001)</image:title>
-      <image:caption>Ultra-slim 6.8 cm powered 10-inch underseat car subwoofer with 120W RMS / 900W Peak output and wired bass remote</image:caption>
-    </image:image>
-  </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/amplifiers</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_board.jpg</image:loc>
-      <image:title>VOEUX® 150W Mono Class AB Car Amplifier Board</image:title>
-      <image:caption>150W RMS Mono Class AB Car Amplifier Board for Basstubes and Subwoofers with 40Hz–200Hz crossover and 25A fuse protection</image:caption>
-    </image:image>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
   </url>
-
+  <url>
+    <loc>https://voeuxtechnologies.in/subwoofers</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
   <url>
     <loc>https://voeuxtechnologies.in/bundles</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/bundle_x80.png</image:loc>
-      <image:title>VOEUX® Car Android Player + 4 Speakers + Frame Combo Bundles</image:title>
-      <image:caption>Complete car audio upgrade combos with 9-inch or 10.1-inch VOEUX Android Player, 4 coaxial speakers, and custom fitting frame</image:caption>
-    </image:image>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
   </url>
-
-  <!-- ==================== INDIVIDUAL PRODUCT PAGES ==================== -->
-
-  <!-- 1. VOEUX X80 Diamond 10.1" Dual Knob Android Car Stereo -->
   <url>
     <loc>https://voeuxtechnologies.in/product/voeux-x80-dual-knob</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_x80_stereo.jpg</image:loc>
-      <image:title>Voeux X80 Diamond Premium 10.1" Dual Knob Android Car Stereo (4GB+64GB)</image:title>
-      <image:caption>VOEUX X80 Diamond 10.1-inch IPS Touchscreen Android Car Stereo with 4GB RAM, 64GB Storage, Dual Rotary Knobs, Bluetooth, Wi-Fi and GPS</image:caption>
+      <image:title>Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_x80_gallery_1.jpg</image:loc>
-      <image:title>VOEUX X80 Diamond 10.1" Dual Knob Front Interface View</image:title>
+      <image:title>Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_x80_gallery_2.jpg</image:loc>
-      <image:title>VOEUX X80 Diamond Android Car Stereo Connectivity &amp; Ports</image:title>
+      <image:title>Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_x80_gallery_3.jpg</image:loc>
-      <image:title>VOEUX X80 Diamond 10.1" Dashboard Fitment View</image:title>
+      <image:title>Voeux X80 Diamond Premium Android Car Stereo (4GB+64GB)</image:title>
     </image:image>
   </url>
-
-  <!-- 2. VOEUX 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer -->
   <url>
     <loc>https://voeuxtechnologies.in/product/voeux-160w-separable-soundbar</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_main.jpg</image:loc>
       <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
-      <image:caption>VOEUX 160W RMS 2.1 Channel Convertible Dual Tower and Horizontal Bluetooth 5.0 Soundbar with Dedicated Subwoofer and HDMI ARC</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_gallery_1.jpg</image:loc>
-      <image:title>VOEUX 160W Soundbar Dual Tower &amp; Horizontal Configurations</image:title>
+      <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_gallery_2.png</image:loc>
-      <image:title>VOEUX 160W Soundbar Dedicated Bass Subwoofer Detail</image:title>
+      <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_gallery_3.png</image:loc>
-      <image:title>VOEUX 160W Soundbar HDMI ARC, Optical, USB &amp; Bluetooth 5.0</image:title>
+      <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_soundbar_gallery_4.png</image:loc>
-      <image:title>VOEUX 160W 2-in-1 Soundbar Home Theater Setup</image:title>
+      <image:title>VOEUX® 160W 2-in-1 Separable Bluetooth Soundbar with Subwoofer</image:title>
     </image:image>
   </url>
-
-  <!-- 3. VOEUX Carbon Black Series 9" QLED Android TS7 Car Stereo -->
+  <url>
+    <loc>https://voeuxtechnologies.in/product/voeux-150w-amp-board</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_board.jpg</image:loc>
+      <image:title>VOEUX® AMP Board 150W Mono Class AB Car Amplifier</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_gallery_1.jpg</image:loc>
+      <image:title>VOEUX® AMP Board 150W Mono Class AB Car Amplifier</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_gallery_2.jpg</image:loc>
+      <image:title>VOEUX® AMP Board 150W Mono Class AB Car Amplifier</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/product/voeux-hyperdrive-lite-9</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_dual_knob_piano_stereo.jpg</image:loc>
+      <image:title>Voeux Android 10.1&quot; Dual Knob Piano Buttons (4GB/64GB) Android Car Multimedia Player Car Stereo (Double Din) with Apple CarPlay &amp; Android Auto</image:title>
+    </image:image>
+  </url>
   <url>
     <loc>https://voeuxtechnologies.in/product/voeux-carbon-black-ts7-4-64</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_carbon_black_ts7.jpg</image:loc>
-      <image:title>VOEUX® Carbon Black Series 9" QLED Android TS7 4+64GB Car Stereo</image:title>
-      <image:caption>VOEUX 9-inch QLED Touchscreen Android TS7 6th Gen 4-Core Car Stereo with Wireless Apple CarPlay, Android Auto and AHD Reverse Camera</image:caption>
+      <image:title>Voeux Android 4+64GB, 6th Gen, 4 Core Car Stereo with Apple CarPlay &amp; Android Auto</image:title>
     </image:image>
   </url>
-
-  <!-- 4. VOEUX 10.1" Dual Knob Piano Buttons Android Car Stereo -->
-  <url>
-    <loc>https://voeuxtechnologies.in/product/voeux-hyperdrive-lite-9</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_dual_knob_piano_stereo.jpg</image:loc>
-      <image:title>VOEUX® Android 10.1" Dual Knob &amp; Piano Buttons Car Multimedia Player (4GB+64GB)</image:title>
-      <image:caption>10.1-inch QLED Touchscreen Android Car Stereo with Dual Knobs, Piano Buttons, AHD Rear View Camera, Apple CarPlay and Android Auto</image:caption>
-    </image:image>
-  </url>
-
-  <!-- 5. VOEUX Single Knob Piano Series Android Car Stereo -->
   <url>
     <loc>https://voeuxtechnologies.in/product/voeux-single-knob-piano-4-64</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_single_knob_piano_stereo.png</image:loc>
-      <image:title>VOEUX® Single Knob Piano Series Android Car Stereo (4GB+64GB)</image:title>
-      <image:caption>Single Rotary Knob and Physical Piano Buttons Android Car Stereo with 4GB RAM, 64GB Storage, Wireless Apple CarPlay and Android Auto</image:caption>
+      <image:title>Voeux Single Knob Piano Series Android Stereo (4GB+64GB)</image:title>
     </image:image>
   </url>
-
-  <!-- 6. VOEUX SVX-UND001 10-Inch Underseat Active Subwoofer -->
-  <url>
-    <loc>https://voeuxtechnologies.in/product/voeux-svx-und001-underseat-subwoofer</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_hero.jpg</image:loc>
-      <image:title>VOEUX® SVX-UND001 10-Inch Powered Underseat Car Subwoofer (120W RMS / 900W Peak)</image:title>
-      <image:caption>Ultra-slim 6.8 cm active 10-inch underseat car subwoofer with built-in amplifier and wired bass volume remote</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_box_accessories.jpg</image:loc>
-      <image:title>VOEUX SVX-UND001 Underseat Subwoofer In-the-Box Accessories</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_panel.jpg</image:loc>
-      <image:title>VOEUX SVX-UND001 Subwoofer Control &amp; Input Panel</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_remote.jpg</image:loc>
-      <image:title>VOEUX SVX-UND001 Wired Bass Remote Controller</image:title>
-    </image:image>
-  </url>
-
-  <!-- 7. VOEUX VE-CS606PT2 6.5" 2-Way Coaxial Car Speakers (460W) -->
-  <url>
-    <loc>https://voeuxtechnologies.in/product/voeux-svx005-6-5inch-speakers</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_main.png</image:loc>
-      <image:title>VOEUX® VE-CS606PT2 6.5" 2-Way Coaxial Car Speakers (460W Peak / 75W RMS)</image:title>
-      <image:caption>Premium 6.5-inch 2-Way Coaxial Car Door Speakers with Dual Voice Coil Technology and 93 dB High Sensitivity</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_front.png</image:loc>
-      <image:title>VOEUX VE-CS606PT2 6.5" Coaxial Speaker Front View</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_side.png</image:loc>
-      <image:title>VOEUX VE-CS606PT2 Slim Profile Side View</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_back.png</image:loc>
-      <image:title>VOEUX VE-CS606PT2 Heavy-Duty Ferrite Magnet Back View</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_box.png</image:loc>
-      <image:title>VOEUX VE-CS606PT2 Retail Packaging</image:title>
-    </image:image>
-  </url>
-
-  <!-- 8. VOEUX VE-CS606 6" 2-Way Coaxial Car Speakers (380W) -->
   <url>
     <loc>https://voeuxtechnologies.in/product/voeux-svx001-6inch-speakers</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_coaxial_speakers.png</image:loc>
-      <image:title>VOEUX® VE-CS606 6" 2-Way Coaxial Car Speakers (380W High Bass)</image:title>
-      <image:caption>6-inch 2-Way Coaxial High-Bass Car Speakers with Dual Voice Coil, 91 dB Sensitivity and Polypropylene Cone</image:caption>
+      <image:title>Voeux 6&quot; 2-Way Coaxial Car Speakers, 380W High Bass (VE-CS606)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_front.png</image:loc>
-      <image:title>VOEUX VE-CS606 6" Coaxial Speaker Front View</image:title>
+      <image:title>Voeux 6&quot; 2-Way Coaxial Car Speakers, 380W High Bass (VE-CS606)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_side.png</image:loc>
-      <image:title>VOEUX VE-CS606 6" Coaxial Speaker Side Profile</image:title>
+      <image:title>Voeux 6&quot; 2-Way Coaxial Car Speakers, 380W High Bass (VE-CS606)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_back.png</image:loc>
-      <image:title>VOEUX VE-CS606 6" Speaker Ferrite Magnet Back View</image:title>
+      <image:title>Voeux 6&quot; 2-Way Coaxial Car Speakers, 380W High Bass (VE-CS606)</image:title>
     </image:image>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/voeux_svx001_box.png</image:loc>
-      <image:title>VOEUX VE-CS606 6" Speakers Box Pack of 2</image:title>
+      <image:title>Voeux 6&quot; 2-Way Coaxial Car Speakers, 380W High Bass (VE-CS606)</image:title>
     </image:image>
   </url>
-
-  <!-- 9. VOEUX 150W Mono Class AB Car Amplifier Board -->
   <url>
-    <loc>https://voeuxtechnologies.in/product/voeux-150w-amp-board</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <loc>https://voeuxtechnologies.in/product/voeux-svx005-6-5inch-speakers</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
     <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_board.jpg</image:loc>
-      <image:title>VOEUX® AMP Board 150W Mono Class AB Car Amplifier</image:title>
-      <image:caption>150W RMS Mono Class AB Car Amplifier Board for Basstubes and Subwoofers with Variable Bass Crossover and 25A Fuse</image:caption>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_main.png</image:loc>
+      <image:title>Voeux Premium 2 Way 6.5&quot; 75W RMS Coaxial Speaker (460W) (VE-CS606PT2)</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_gallery_1.jpg</image:loc>
-      <image:title>VOEUX 150W Mono Class AB Amplifier Board Knobs &amp; Terminals</image:title>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_front.png</image:loc>
+      <image:title>Voeux Premium 2 Way 6.5&quot; 75W RMS Coaxial Speaker (460W) (VE-CS606PT2)</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://voeuxtechnologies.in/images/voeux_amp_gallery_2.jpg</image:loc>
-      <image:title>VOEUX 150W Mono Class AB Amplifier Board Heatsink Architecture</image:title>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_side.png</image:loc>
+      <image:title>Voeux Premium 2 Way 6.5&quot; 75W RMS Coaxial Speaker (460W) (VE-CS606PT2)</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_back.png</image:loc>
+      <image:title>Voeux Premium 2 Way 6.5&quot; 75W RMS Coaxial Speaker (460W) (VE-CS606PT2)</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_cs606pt2_box.png</image:loc>
+      <image:title>Voeux Premium 2 Way 6.5&quot; 75W RMS Coaxial Speaker (460W) (VE-CS606PT2)</image:title>
     </image:image>
   </url>
-
-  <!-- 10. Combo Bundle: X80 + 4 Speakers + Frame -->
   <url>
     <loc>https://voeuxtechnologies.in/product/bundle-x80-4-speakers-frame</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/bundle_x80.png</image:loc>
       <image:title>Voeux X80 Android Player + 4 Speakers + Frame Combo</image:title>
-      <image:caption>Complete car audio upgrade bundle with Voeux X80 10.1" Dual Knob Android Stereo, 4 coaxial speakers and custom dashboard fitting frame</image:caption>
     </image:image>
   </url>
-
-  <!-- 11. Combo Bundle: 9" TS7 + 4 Speakers + Frame -->
   <url>
     <loc>https://voeuxtechnologies.in/product/bundle-ts7-4-speakers-frame</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/bundle_ts7.png</image:loc>
-      <image:title>Voeux 9" TS7 Android Player + 4 Speakers + Frame Combo</image:title>
-      <image:caption>Complete car audio upgrade bundle with Voeux 9" TS7 QLED Android Stereo, 4 coaxial speakers and custom fitting frame</image:caption>
+      <image:title>Voeux 9&quot; TS7 Android Player + 4 Speakers + Frame Combo</image:title>
     </image:image>
   </url>
-
-  <!-- 12. Combo Bundle: Single Knob + 4 Speakers + Frame -->
   <url>
     <loc>https://voeuxtechnologies.in/product/bundle-single-knob-4-speakers-frame</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://voeuxtechnologies.in/images/bundle_single_knob.png</image:loc>
       <image:title>Voeux Single Knob Android Player + 4 Speakers + Frame Combo</image:title>
-      <image:caption>Complete car audio upgrade bundle with Voeux Single Knob Piano Series Android Stereo, 4 coaxial speakers and custom fitting frame</image:caption>
     </image:image>
   </url>
-
-  <!-- ==================== CAR-SPECIFIC ANDROID PLAYER FITMENT GUIDES ==================== -->
   <url>
-    <loc>https://voeuxtechnologies.in/car/hyundai-creta-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://voeuxtechnologies.in/product/voeux-svx-und001-underseat-subwoofer</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_hero.jpg</image:loc>
+      <image:title>Voeux SVX-UND001 10-Inch Underseat Powerful Subwoofer(Powered,RMS Power 120) Subwoofer (Powered , RMS Power: 120 W)</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_box_accessories.jpg</image:loc>
+      <image:title>Voeux SVX-UND001 10-Inch Underseat Powerful Subwoofer(Powered,RMS Power 120) Subwoofer (Powered , RMS Power: 120 W)</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_panel.jpg</image:loc>
+      <image:title>Voeux SVX-UND001 10-Inch Underseat Powerful Subwoofer(Powered,RMS Power 120) Subwoofer (Powered , RMS Power: 120 W)</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://voeuxtechnologies.in/images/voeux_subwoofer_und001_remote.jpg</image:loc>
+      <image:title>Voeux SVX-UND001 10-Inch Underseat Powerful Subwoofer(Powered,RMS Power 120) Subwoofer (Powered , RMS Power: 120 W)</image:title>
+    </image:image>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/car/maruti-swift-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.85</priority>
   </url>
-
-  <url>
-    <loc>https://voeuxtechnologies.in/car/tata-nexon-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://voeuxtechnologies.in/car/mahindra-thar-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://voeuxtechnologies.in/car/kia-seltos-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/car/maruti-brezza-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.85</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/car/maruti-baleno-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
-
   <url>
-    <loc>https://voeuxtechnologies.in/car/honda-city-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
+    <loc>https://voeuxtechnologies.in/car/maruti-wagon-r-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
-
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-dzire-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-ertiga-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-fronx-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-grand-vitara-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-alto-k10-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-ignis-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-ciaz-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-xl6-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-creta-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-venue-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-i20-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-grand-i10-nios-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-verna-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-exter-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-aura-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-alcazar-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-nexon-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-punch-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-tiago-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-altroz-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-harrier-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-safari-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-tigor-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-thar-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
   <url>
     <loc>https://voeuxtechnologies.in/car/mahindra-scorpio-n-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
-
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-xuv700-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-xuv300-3xo-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-bolero-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-xuv500-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mahindra-marazzo-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/kia-seltos-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/kia-sonet-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/kia-carens-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/honda-city-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/honda-amaze-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/honda-elevate-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/honda-jazz-wrv-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
   <url>
     <loc>https://voeuxtechnologies.in/car/toyota-fortuner-android-player</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
-
-  <!-- ==================== SUPPORT, WARRANTY, DEALERS & BRAND PAGES ==================== -->
+  <url>
+    <loc>https://voeuxtechnologies.in/car/toyota-innova-crysta-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/toyota-glanza-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/toyota-hyryder-taisor-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/renault-kwid-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/renault-triber-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/renault-kiger-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/nissan-magnite-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/volkswagen-polo-vento-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/volkswagen-virtus-taigun-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/skoda-slavia-kushaq-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/skoda-rapid-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/ford-ecosport-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/ford-figo-aspire-freestyle-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/mg-hector-astor-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-celerio-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-spresso-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-eeco-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/maruti-jimny-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/hyundai-santro-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/tata-curvv-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/toyota-etios-liva-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/toyota-rumion-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/honda-brio-mobilio-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/citroen-c3-aircross-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://voeuxtechnologies.in/car/renault-duster-android-player</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
   <url>
     <loc>https://voeuxtechnologies.in/dealers</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/installation</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/warranty</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/warranty-policy</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
+    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/support</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/about-us</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/contact-us</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/join-us</loc>
-    <lastmod>2026-11-24</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://voeuxtechnologies.in/terms</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

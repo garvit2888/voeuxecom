@@ -1,378 +1,1010 @@
 /**
  * carGuides.js
- * Rich car-specific SEO fitment & buying guides for India's top-selling cars.
- * Targets high-intent buyer searches like "best android player for Hyundai Creta",
- * "9 inch android car stereo for Maruti Swift", "car android player India", etc.
+ * Voeux.Blog — 52 dedicated, factual car-specific Android Player & Car Audio upgrade
+ * articles for India's most popular vehicles.
+ *
+ * Strictly factual brand & product details only (1-Year Domestic Warranty on
+ * manufacturing defects, Universal Double-DIN fitment, 4GB+64GB QLED/IPS Android
+ * Players, Wireless Apple CarPlay & Android Auto, Pan-India delivery, Virtual Fit).
  */
 
-export const CAR_FITMENT_GUIDES = [
-  {
-    slug: 'hyundai-creta-android-player',
-    carName: 'Hyundai Creta',
-    make: 'Hyundai',
-    modelYears: '2015 – 2026 (All Variants: E, EX, S, SX)',
-    recommendedSize: '9-Inch or 10.1-Inch QLED',
-    seoTitle: 'Best Android Player for Hyundai Creta (9" & 10.1" QLED, Wireless CarPlay) | VOEUX®',
-    seoDescription:
-      'Upgrade your Hyundai Creta with a VOEUX® 9-inch TS7 or 10.1-inch X80 Dual Knob Android Car Player (4GB+64GB). Wireless Apple CarPlay, Android Auto, Steering Controls, Plug & Play Fitment & 1-Year Warranty.',
-    keywords:
-      'android player for Hyundai Creta, Hyundai Creta car stereo, Creta 10.1 inch android player, Creta 9 inch QLED stereo, best car android player India, VOEUX X80 Creta',
-    heroSummary:
-      'The Hyundai Creta dashboard features a wide, recessed center fascia that fits both 9-inch QLED and 10.1-inch Dual Knob VOEUX® Android Car Players cleanly with a standard Creta Double-DIN fascia frame and coupler-to-coupler wiring harness — zero wire cutting required.',
-    fitmentNotes: [
-      'Coupler-to-coupler OEM socket compatibility preserves factory warranty with zero wire cutting.',
-      'Retains original Hyundai steering wheel audio, call, and track controls natively.',
-      'Supports factory and aftermarket AHD night-vision reverse parking cameras with dynamic guidelines.',
-      'Available in 9-inch flush OEM-style fit (VOEUX TS7) or 10.1-inch tactile Dual Knob upgrade (VOEUX X80 Diamond).',
-    ],
-    whyUpgrade:
-      'Base and mid variants of the Hyundai Creta (E, EX, S) either lack a touchscreen or come with a basic display without Wireless Apple CarPlay, Android Auto, or high-clarity QLED navigation. Upgrading to a VOEUX® 4GB RAM + 64GB ROM Android Car Stereo adds Google Maps, YouTube, Spotify, split-screen multitasking, MOSFET 50W×4 amplifier output, and crisp daylight visibility.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-carbon-black-ts7-4-64',
-      'voeux-single-knob-piano-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Which screen size is best for Hyundai Creta — 9 inch or 10.1 inch?',
-        a: 'Both 9-inch and 10.1-inch VOEUX® Android players fit the Hyundai Creta cleanly. Choose the 9-inch Carbon Black TS7 for a flush factory-style fit, or the 10.1-inch X80 Diamond if you prefer a larger display with tactile Dual Rotary Knobs for volume and tuning.',
-      },
-      {
-        q: 'Will my Hyundai Creta steering wheel controls work with VOEUX Android Player?',
-        a: 'Yes, all VOEUX® Android Car Players support OEM steering wheel controls (volume, track skip, mute, and call answer) using the standard Creta wiring coupler.',
-      },
-      {
-        q: 'Does installation require cutting any original car wires in Creta?',
-        a: 'No. Using a Hyundai Creta coupler-to-coupler harness and Double-DIN fascia frame, installation is 100% plug-and-play and reversible.',
-      },
-      {
-        q: 'Can I preview how the 9-inch or 10.1-inch player will look on my Creta dashboard?',
-        a: 'Yes! Use VOEUX® Virtual Fit to upload a photo of your Creta dashboard and preview both the 9" TS7 and 10.1" X80 installed to exact physical scale.',
-      },
-    ],
-  },
+const RAW_CAR_PROFILES = [
+  // ================= MARUTI SUZUKI (12) =================
   {
     slug: 'maruti-swift-android-player',
     carName: 'Maruti Swift',
     make: 'Maruti Suzuki',
-    modelYears: '2011 – 2026 (Gen 2, Gen 3 & New Swift LXi, VXi, ZXi)',
-    recommendedSize: '9-Inch QLED (or 10.1-Inch Floating)',
-    seoTitle: 'Best Android Player for Maruti Swift (9" QLED & 10.1" Dual Knob, 4+64GB) | VOEUX®',
-    seoDescription:
-      'Shop the best Android Car Player for Maruti Swift in India. VOEUX® 9" Carbon Black TS7 & 10.1" X80 Dual Knob with Wireless CarPlay, Android Auto, AHD Camera & Plug-and-Play Suzuki Coupler.',
-    keywords:
-      'android player for Maruti Swift, Swift car android stereo, 9 inch android player for Swift, Swift VXi touchscreen upgrade, car android player India',
-    heroSummary:
-      'The Maruti Suzuki Swift is India’s most popular hatchback for infotainment upgrades. A 9-inch VOEUX® Carbon Black TS7 QLED Android Stereo sits flush inside the Swift’s angled center console, while the 10.1-inch X80 Dual Knob brings premium tactile rotary dials to LXi and VXi dashboards.',
-    fitmentNotes: [
-      'Direct Suzuki 20-pin coupler compatibility for quick 30-minute plug-and-play installation.',
-      'Full support for Swift VXi/ZXi steering-mounted audio and Bluetooth call controls.',
-      'Crisp 9" QLED panel resists afternoon windshield glare on the Swift’s slightly tilted console.',
-      'Pairs seamlessly with VOEUX® 6.5" VE-CS606PT2 door speakers and 10" underseat subwoofer.',
-    ],
-    whyUpgrade:
-      'Maruti Swift LXi and VXi owners frequently upgrade from basic 2-DIN button units to a 4GB+64GB VOEUX® Android Player for Wireless Apple CarPlay, Android Auto, live Google Maps navigation, reverse parking camera clarity, and noticeably louder, cleaner audio output.',
-    recommendedProductIds: [
-      'voeux-carbon-black-ts7-4-64',
-      'voeux-x80-dual-knob',
-      'voeux-single-knob-piano-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Does a 9-inch Android player fit Maruti Swift VXi without dashboard modification?',
-        a: 'Yes. With a standard Maruti Swift 9-inch fascia frame, the VOEUX® 9-inch TS7 QLED Android Player installs cleanly without cutting or modifying your dashboard.',
-      },
-      {
-        q: 'Is Wireless Apple CarPlay and Android Auto supported on VOEUX players for Swift?',
-        a: 'Yes, both Wireless Apple CarPlay and Android Auto are built-in, letting you mirror Google Maps, Spotify, WhatsApp calls, and Siri/Google Assistant wirelessly.',
-      },
-      {
-        q: 'Can I upgrade Swift door speakers along with the Android player?',
-        a: 'Yes! Our VOEUX® Combo Bundles include a 9" or 10.1" Android Player + 4 High-Bass Coaxial Door Speakers + Custom Fitting Frame at a discounted bundle price.',
-      },
-    ],
-  },
-  {
-    slug: 'tata-nexon-android-player',
-    carName: 'Tata Nexon',
-    make: 'Tata Motors',
-    modelYears: '2017 – 2026 (XE, XM, XMA, Smart, Pure Variants)',
-    recommendedSize: '9-Inch or 10.1-Inch QLED Floating',
-    seoTitle: 'Best Android Player for Tata Nexon (9" & 10.1" QLED, Wireless CarPlay) | VOEUX®',
-    seoDescription:
-      'Buy the best Android Car Player for Tata Nexon (XE, XM, Smart, Pure). VOEUX® 10.1" X80 Dual Knob & 9" TS7 QLED with Wireless CarPlay, Android Auto, Canbus Steering Controls & AHD Camera.',
-    keywords:
-      'android player for Tata Nexon, Tata Nexon XM touchscreen upgrade, Nexon 10 inch android stereo, best car android player for Nexon India',
-    heroSummary:
-      'Tata Nexon’s elevated floating-display dashboard layout is tailor-made for a 9-inch or 10.1-inch VOEUX® QLED Android Car Player. Upgrade XE, XM, or Smart variants to a bright 4GB+64GB touchscreen with Wireless CarPlay, Android Auto, and crisp AHD reverse camera support.',
-    fitmentNotes: [
-      'Matches the Tata Nexon’s signature floating dashboard binnacle with a dedicated Nexon fascia frame.',
-      'Compatible with Tata Canbus decoders to retain steering wheel controls and reverse camera triggers.',
-      'High-brightness QLED & IPS screens stay sharp under bright sunlight through the Nexon windshield.',
-      'Powerful 4×50W MOSFET amplifier drives Tata’s stock door speakers with richer bass and vocal clarity.',
-    ],
-    whyUpgrade:
-      'Many Tata Nexon XE, XM, and Smart owners want the modern large-screen experience of top trims without paying dealership prices. VOEUX® Android Players deliver fast 4GB RAM + 64GB ROM performance, smooth navigation, YouTube/OTT apps, and a 1-Year Domestic Warranty.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-carbon-black-ts7-4-64',
-      'voeux-hyperdrive-lite-9',
-    ],
-    faqs: [
-      {
-        q: 'Can I install a 10.1-inch Android player in Tata Nexon XM or XE?',
-        a: 'Yes, the Nexon’s floating center bay easily accommodates both 9-inch and 10.1-inch VOEUX® Android players using a Nexon-specific frame and Canbus coupler.',
-      },
-      {
-        q: 'Does VOEUX Android Player support AHD reverse parking camera in Tata Nexon?',
-        a: 'Yes, VOEUX® TS7 and Dual Knob Piano models include an AHD night-vision camera in the box, and the X80 Diamond supports AHD reverse cameras natively.',
-      },
-    ],
-  },
-  {
-    slug: 'mahindra-thar-android-player',
-    carName: 'Mahindra Thar',
-    make: 'Mahindra',
-    modelYears: '2020 – 2026 (AX, AX Opt, LX & Thar Roxx)',
-    recommendedSize: '9-Inch or 10.1-Inch Dual Knob',
-    seoTitle: 'Best Android Player for Mahindra Thar (10.1" Dual Knob & 9" QLED) | VOEUX®',
-    seoDescription:
-      'Upgrade your Mahindra Thar with a rugged VOEUX® 10.1" X80 Dual Knob or 9" TS7 QLED Android Car Player (4GB+64GB). Tactile rotary knobs, Wireless CarPlay, Android Auto & offline GPS.',
-    keywords:
-      'android player for Mahindra Thar, Mahindra Thar 10 inch stereo, Thar dual knob android player, best car stereo for Thar India',
-    heroSummary:
-      'The Mahindra Thar’s rugged upright dashboard looks extraordinary with the VOEUX® X80 Diamond 10.1" Dual Knob Android Car Player. Physical rotary volume/tuning knobs make adjusting audio effortless even on off-road trails and rough highways.',
-    fitmentNotes: [
-      'Tactile Dual Rotary Knobs on the VOEUX® X80 & Single Knob Piano series are ideal for bumpy roads.',
-      'Built-in GPS antenna supports offline & online trail navigation alongside Wireless Apple CarPlay & Android Auto.',
-      '4V RCA subwoofer pre-amp output lets you easily add a VOEUX® SVX-UND001 10" Underseat Subwoofer or Mono Amp.',
-      'Plug-and-play installation with a Mahindra Thar Double-DIN dashboard frame.',
-    ],
-    whyUpgrade:
-      'The factory 7-inch screen on the Thar feels small on a tall SUV dashboard. Upgrading to a 9-inch or 10.1-inch VOEUX® QLED stereo transforms cabin aesthetics while adding split-screen maps, Bluetooth 5.0 calling, and punchier sound.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-single-knob-piano-4-64',
-      'voeux-carbon-black-ts7-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Why is the Dual Knob Android Player popular for Mahindra Thar?',
-        a: 'When driving on uneven terrain or highways, physical rotary knobs let you change volume or mute instantly without taking your eyes off the road to hunt for touch buttons.',
-      },
-      {
-        q: 'Can I connect a subwoofer and amplifier to the VOEUX player in my Thar?',
-        a: 'Yes! VOEUX® Android players feature dedicated 4V RCA Front, Rear, and Subwoofer pre-amp outputs for seamless subwoofer and amplifier upgrades.',
-      },
-    ],
-  },
-  {
-    slug: 'kia-seltos-android-player',
-    carName: 'Kia Seltos',
-    make: 'Kia',
-    modelYears: '2019 – 2026 (HTE, HTK, HTK+ Variants)',
-    recommendedSize: '10.1-Inch QLED / Dual Knob',
-    seoTitle: 'Best Android Player for Kia Seltos (10.1" QLED & 9" TS7, Wireless CarPlay) | VOEUX®',
-    seoDescription:
-      'Upgrade your Kia Seltos HTE/HTK with a VOEUX® 10.1-inch X80 Dual Knob or 9-inch QLED Android Car Stereo (4GB+64GB). Wireless CarPlay, Android Auto, Steering Controls & 1-Year Warranty.',
-    keywords:
-      'android player for Kia Seltos, Kia Seltos HTE touchscreen upgrade, Seltos 10.1 inch android stereo, best car android player India',
-    heroSummary:
-      'Give your Kia Seltos HTE or HTK the flagship connected-cockpit look with a VOEUX® 10.1-inch X80 Diamond or 9-inch Carbon Black TS7 QLED Android Car Player — complete with Wireless Apple CarPlay, Android Auto, and seamless steering wheel control integration.',
-    fitmentNotes: [
-      'Seamless OEM-style fit inside the Kia Seltos dashboard bezel using a standard Seltos fascia frame.',
-      'Retains factory steering wheel controls and reverse parking camera integration.',
-      '4GB RAM + 64GB Storage runs Google Maps, Spotify, YouTube, and Waze smoothly without lag.',
-      'Built-in equalizer presets (Pop, Jazz, Rock, Bass Boost) elevate stock Kia cabin acoustics.',
-    ],
-    whyUpgrade:
-      'Seltos HTE and base trims miss out on wireless smartphone projection and high-resolution QLED visuals. A VOEUX® Android Stereo delivers flagship performance at a fraction of OEM upgrade cost.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-carbon-black-ts7-4-64',
-      'voeux-hyperdrive-lite-9',
-    ],
-    faqs: [
-      {
-        q: 'Does the VOEUX 10.1-inch player fit Kia Seltos HTE cleanly?',
-        a: 'Yes, using a Kia Seltos 9"/10.1" frame and Kia coupler harness, installation is completely plug-and-play with zero wire cutting.',
-      },
-      {
-        q: 'Does it include a warranty in India?',
-        a: 'Yes, every official VOEUX® Car Android Player comes with a 1-Year Domestic Warranty on manufacturing defects and dedicated India customer support.',
-      },
-    ],
+    segment: 'Sporty Hatchback',
+    modelYears: '2011 – 2026 (Gen 2, Gen 3 & New Swift: LXi, VXi, ZXi)',
+    recommendedSize: '9-Inch QLED (or 10.1-Inch Dual Knob)',
+    dashLayout: 'slightly tilted driver-focused center console with twin central AC vents above the stereo bay',
+    couplerNote: 'standard Suzuki 20-pin plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch front & rear door slots',
+    bestUpgradeReason:
+      'LXi and VXi trims either ship without a touchscreen or use basic 2-DIN button units. Upgrading to a 4GB+64GB VOEUX® Android Player brings Wireless Apple CarPlay, Android Auto, live Google Maps, and clear reverse camera guidance to daily city commutes.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
   },
   {
     slug: 'maruti-brezza-android-player',
     carName: 'Maruti Brezza',
     make: 'Maruti Suzuki',
-    modelYears: '2016 – 2026 (Vitara Brezza & New Brezza LXi, VXi)',
+    segment: 'Compact SUV',
+    modelYears: '2016 – 2026 (Vitara Brezza & New Brezza: LXi, VXi)',
     recommendedSize: '9-Inch or 10.1-Inch QLED',
-    seoTitle: 'Best Android Player for Maruti Brezza (9" & 10.1" QLED, 4GB+64GB) | VOEUX®',
-    seoDescription:
-      'Shop VOEUX® Android Car Players for Maruti Brezza LXi & VXi. 9-inch TS7 QLED & 10.1-inch X80 Dual Knob with Wireless Apple CarPlay, Android Auto, AHD Camera & Plug-and-Play Fit.',
-    keywords:
-      'android player for Maruti Brezza, Brezza LXi touchscreen upgrade, Brezza 9 inch android player, car android stereo India',
-    heroSummary:
-      'Whether you drive a Vitara Brezza or the new Maruti Brezza LXi/VXi, a VOEUX® 9-inch QLED or 10.1-inch Dual Knob Android Car Player snaps cleanly into the center console for Wireless CarPlay, Android Auto, and crystal-clear reverse camera parking.',
-    fitmentNotes: [
-      'Direct Suzuki plug-and-play wiring coupler keeps factory warranty intact.',
-      'Supports Brezza steering-mounted controls and rear AHD night-vision camera.',
-      'Available as standalone head unit or complete 4-Speaker + Frame Combo Bundle.',
-      '4GB RAM + 64GB internal storage ensures lag-free daily navigation.',
-    ],
-    whyUpgrade:
-      'Brezza LXi buyers save lakhs over top variants by pairing the base SUV with a VOEUX® QLED Android Player and 4 Coaxial Door Speakers — getting superior audio and a larger, faster display.',
-    recommendedProductIds: [
-      'voeux-carbon-black-ts7-4-64',
-      'voeux-x80-dual-knob',
-      'voeux-single-knob-piano-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Which VOEUX stereo is best for Maruti Brezza LXi?',
-        a: 'The VOEUX® 9-inch Carbon Black TS7 (with AHD camera included) is the best value flush fit, while the 10.1-inch X80 Dual Knob offers a larger screen with premium physical knobs.',
-      },
-      {
-        q: 'Do you offer a complete Brezza stereo + speakers combo?',
-        a: 'Yes! Visit our Combo Bundles section for an Android Player + 4 High-Bass Coaxial Speakers + Custom Fitting Frame package.',
-      },
-    ],
+    dashLayout: 'upright SUV center fascia with elevated infotainment bay designed for wide-angle visibility',
+    couplerNote: 'plug-and-play Suzuki OEM socket harness',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Brezza LXi buyers frequently choose an aftermarket QLED Android stereo over top-trim dealership upgrades, gaining a larger high-contrast screen, steering-control compatibility, and stronger 4×50W MOSFET audio output.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
   },
   {
     slug: 'maruti-baleno-android-player',
     carName: 'Maruti Baleno',
     make: 'Maruti Suzuki',
+    segment: 'Premium Hatchback',
     modelYears: '2015 – 2026 (Sigma, Delta, Zeta Variants)',
     recommendedSize: '9-Inch QLED Touchscreen',
-    seoTitle: 'Best Android Player for Maruti Baleno (9" QLED & 10.1" Dual Knob) | VOEUX®',
-    seoDescription:
-      'Upgrade your Maruti Baleno Sigma or Delta with a VOEUX® 9-inch TS7 QLED or 10.1-inch X80 Android Car Player (4GB+64GB). Wireless CarPlay, Android Auto & Plug-and-Play Fitment.',
-    keywords:
-      'android player for Maruti Baleno, Baleno Sigma touchscreen upgrade, Baleno 9 inch android stereo, car android player India',
-    heroSummary:
-      'Maruti Baleno Sigma and Delta interiors look factory-finished with a 9-inch VOEUX® QLED Android Car Player. Enjoy Wireless Apple CarPlay, Android Auto, Google Maps, and high-power 4×50W MOSFET sound in a sleek black bezel.',
-    fitmentNotes: [
-      '9-inch Carbon Black TS7 sits seamlessly inside the Baleno’s modern floating dash mount.',
-      'Plug-and-play Suzuki harness retains steering controls without cutting any factory wires.',
-      'Supports AHD wide-angle night-vision reverse camera for tight city parking.',
-      'Anti-glare QLED glass delivers vivid colours even in bright Indian summers.',
-    ],
-    whyUpgrade:
-      'Upgrading a Baleno Sigma with a VOEUX® Android Player + VE-CS606PT2 6.5" door speakers delivers a richer cabin entertainment system than stock top-trim units.',
-    recommendedProductIds: [
-      'voeux-carbon-black-ts7-4-64',
-      'voeux-x80-dual-knob',
-      'voeux-single-knob-piano-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Will a 9-inch Android player fit the new Maruti Baleno Sigma?',
-        a: 'Yes, using the standard Baleno 9-inch floating fascia frame and Suzuki coupler, installation is clean and plug-and-play.',
-      },
-    ],
+    dashLayout: 'modern layered dashboard with a prominent center display housing above climate controls',
+    couplerNote: 'Suzuki plug-and-play wiring coupler retaining factory steering audio keys',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Baleno Sigma and Delta owners upgrade to a VOEUX® 9-inch QLED TS7 or 10.1-inch X80 for crisp anti-glare daylight readability, Wireless CarPlay/Android Auto, and clean AHD reverse parking camera support.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
   },
   {
-    slug: 'honda-city-android-player',
-    carName: 'Honda City',
-    make: 'Honda',
-    modelYears: '2014 – 2026 (4th Gen & 5th Gen Honda City)',
+    slug: 'maruti-wagon-r-android-player',
+    carName: 'Maruti Wagon R',
+    make: 'Maruti Suzuki',
+    segment: 'Tall-Boy Hatchback',
+    modelYears: '2010 – 2026 (LXi, VXi, ZXi & Stingray)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'high-mounted vertical center console that keeps navigation comfortably within the driver’s line of sight',
+    couplerNote: 'standard Suzuki 20-pin coupler harness with zero wire cutting',
+    doorSpeakerSize: '6-inch front & rear door speaker mounts',
+    bestUpgradeReason:
+      'Because Wagon R is a high-mileage family and city commuter, adding a responsive 4GB+64GB Android Player with Google Maps, hands-free Bluetooth 5.0 calling, and a night-vision reverse camera makes tight urban parking effortless.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'maruti-dzire-android-player',
+    carName: 'Maruti Dzire',
+    make: 'Maruti Suzuki',
+    segment: 'Compact Sedan',
+    modelYears: '2012 – 2026 (LXi, VXi, Tour S & New Dzire)',
     recommendedSize: '9-Inch or 10.1-Inch QLED',
-    seoTitle: 'Best Android Player for Honda City (9" & 10.1" QLED, Wireless CarPlay) | VOEUX®',
-    seoDescription:
-      'Buy the best Android Car Player for Honda City (4th & 5th Gen). VOEUX® 10.1" X80 Dual Knob & 9" TS7 QLED with 4GB+64GB, Wireless Apple CarPlay, Android Auto & Steering Controls.',
-    keywords:
-      'android player for Honda City, Honda City 4th gen android stereo, Honda City 10.1 inch player, best car android player India',
-    heroSummary:
-      'Modernize your 4th-Gen or 5th-Gen Honda City cabin with a VOEUX® 9-inch QLED or 10.1-inch Dual Knob Android Car Stereo. Get Wireless Apple CarPlay, Android Auto, crisp navigation, and rich 4V RCA audio pre-outs.',
-    fitmentNotes: [
-      'Dedicated Honda City fascia frames give a sleek OEM-integrated finish on both 4th & 5th Gen models.',
-      'Supports Honda steering wheel controls and reverse parking camera display.',
-      '4V RCA audio outputs make it easy to pair with amplifiers and subwoofers.',
-      '4GB RAM + 64GB ROM provides fast boot times and smooth app switching.',
-    ],
-    whyUpgrade:
-      'Older Honda City head units lack Wireless CarPlay, modern touch responsiveness, and sharp QLED contrast. VOEUX® brings 2026-grade connectivity to your sedan in under an hour.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-single-knob-piano-4-64',
-      'voeux-carbon-black-ts7-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Can I upgrade my 4th Gen Honda City Digipad to a VOEUX Android Player?',
-        a: 'Yes! Both the 9-inch TS7 and 10.1-inch X80 Dual Knob replace the older Honda City Digipad cleanly with a Honda coupler and frame.',
-      },
-    ],
+    dashLayout: 'dual-tone sedan center console with clean Double-DIN bezel integration',
+    couplerNote: 'Suzuki OEM plug-and-play socket adapter',
+    doorSpeakerSize: '6.5-inch door speaker bays',
+    bestUpgradeReason:
+      'Dzire LXi and VXi sedans benefit hugely from a 9-inch TS7 or 10.1-inch X80 Dual Knob stereo — adding Wireless Apple CarPlay, Android Auto, rear camera safety for the sedan boot, and clear highway audio.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'maruti-ertiga-android-player',
+    carName: 'Maruti Ertiga',
+    make: 'Maruti Suzuki',
+    segment: '7-Seater Family MPV',
+    modelYears: '2012 – 2026 (LXi, VXi, ZXi & Tour M)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'sculpted wide MPV dashboard with wood/metallic trim framing the central stereo bay',
+    couplerNote: 'Suzuki plug-and-play coupler supporting steering controls and reverse trigger',
+    doorSpeakerSize: '6.5-inch front & middle door slots',
+    bestUpgradeReason:
+      'On long 7-seater family road trips, a 10.1-inch VOEUX® X80 Dual Knob or 9-inch TS7 keeps everyone entertained with YouTube, Spotify, split-screen Google Maps, and clear reverse parking assistance for the longer MPV body.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'maruti-fronx-android-player',
+    carName: 'Maruti Fronx',
+    make: 'Maruti Suzuki',
+    segment: 'Coupe Crossover SUV',
+    modelYears: '2023 – 2026 (Sigma, Delta Variants)',
+    recommendedSize: '9-Inch QLED Floating Fit',
+    dashLayout: 'floating-mount center screen housing matching the Fronx’s sporty dual-tone cabin',
+    couplerNote: 'Suzuki OEM coupler preserving factory steering controls',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Fronx Sigma buyers get a sharp, factory-style infotainment upgrade with a 9-inch VOEUX® Carbon Black TS7 QLED stereo, unlocking Wireless CarPlay, Android Auto, and AHD reverse camera clarity.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'maruti-grand-vitara-android-player',
+    carName: 'Maruti Grand Vitara',
+    make: 'Maruti Suzuki',
+    segment: 'Mid-Size SUV',
+    modelYears: '2022 – 2026 (Sigma, Delta Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'wide upright SUV dashboard with a prominent floating central infotainment bay',
+    couplerNote: 'Suzuki plug-and-play harness with steering wheel control retention',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Grand Vitara Sigma comes without a factory touchscreen. Installing a 9-inch QLED or 10.1-inch X80 Dual Knob VOEUX® stereo completes the cabin with Wireless CarPlay, Android Auto, and 4V RCA subwoofer pre-outs.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+  {
+    slug: 'maruti-alto-k10-android-player',
+    carName: 'Maruti Alto K10 & Alto 800',
+    make: 'Maruti Suzuki',
+    segment: 'Entry City Hatchback',
+    modelYears: '2012 – 2026 (Std, LXi, VXi Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'compact central dashboard console suited for a flush 9-inch fascia frame',
+    couplerNote: 'simple Suzuki coupler wiring with zero dashboard cutting',
+    doorSpeakerSize: '6-inch front door mounts',
+    bestUpgradeReason:
+      'Transforming an Alto K10 or Alto 800 with a 9-inch VOEUX® Android Player adds turn-by-turn Google Maps, hands-free Bluetooth calling, reverse camera confidence, and modern touchscreen convenience.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'maruti-ignis-android-player',
+    carName: 'Maruti Ignis',
+    make: 'Maruti Suzuki',
+    segment: 'Urban Compact Crossover',
+    modelYears: '2017 – 2026 (Sigma, Delta, Zeta)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'distinctive tablet-style floating center binnacle above toggle climate switches',
+    couplerNote: 'Suzuki plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'The Ignis’s clean floating center dash looks tailor-made for the 9-inch VOEUX® Carbon Black TS7 QLED stereo, bringing Wireless CarPlay, Android Auto, and richer cabin sound to Sigma and Delta trims.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'maruti-ciaz-android-player',
+    carName: 'Maruti Ciaz',
+    make: 'Maruti Suzuki',
+    segment: 'Executive Sedan',
+    modelYears: '2014 – 2026 (Sigma, Delta, Zeta)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'wide executive sedan center console with clean flush bezel symmetry',
+    couplerNote: 'Suzuki OEM wiring coupler retaining steering buttons',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Replacing the older button stereo or dated SmartPlay unit in a Ciaz with a 10.1-inch VOEUX® X80 Dual Knob or 9-inch TS7 brings Wireless Apple CarPlay, Android Auto, and crisp 4V RCA audio output for rear-seat comfort.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'maruti-xl6-android-player',
+    carName: 'Maruti XL6',
+    make: 'Maruti Suzuki',
+    segment: '6-Seater Premium MPV',
+    modelYears: '2019 – 2026 (Zeta, Alpha Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'all-black Nexa MPV dashboard with wide center display surround',
+    couplerNote: 'Suzuki plug-and-play harness with steering wheel controls',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'XL6 owners upgrading from the smaller 7-inch stock unit gain a brighter 9-inch QLED or 10.1-inch Dual Knob display with Wireless CarPlay, split-screen navigation, and seamless subwoofer expansion.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+
+  // ================= HYUNDAI (8) =================
+  {
+    slug: 'hyundai-creta-android-player',
+    carName: 'Hyundai Creta',
+    make: 'Hyundai',
+    segment: 'Mid-Size SUV',
+    modelYears: '2015 – 2026 (All Variants: E, EX, S, SX)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'wide recessed SUV center fascia flanking vertical or horizontal AC vents',
+    couplerNote: 'Hyundai OEM coupler-to-coupler harness with native steering control support',
+    doorSpeakerSize: '6.5-inch front & rear door mounts',
+    bestUpgradeReason:
+      'Base and mid variants of the Hyundai Creta (E, EX, S) gain a flagship connected cabin with a VOEUX® 10.1-inch X80 Dual Knob or 9-inch TS7 QLED stereo — adding Wireless Apple CarPlay, Android Auto, and crisp AHD reverse camera support.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'hyundai-venue-android-player',
+    carName: 'Hyundai Venue',
+    make: 'Hyundai',
+    segment: 'Sub-Compact SUV',
+    modelYears: '2019 – 2026 (E, S, S(O) Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'compact elevated center console with clean floating bezel framing',
+    couplerNote: 'Hyundai plug-and-play coupler preserving steering controls',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Venue E and S owners upgrade to a VOEUX® 9-inch QLED TS7 or 10.1-inch X80 for smooth 4GB+64GB Google Maps navigation, Wireless CarPlay/Android Auto, and stronger 50W×4 audio clarity.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'hyundai-i20-android-player',
+    carName: 'Hyundai i20 & Elite i20',
+    make: 'Hyundai',
+    segment: 'Premium Hatchback',
+    modelYears: '2014 – 2026 (Era, Magna, Sportz Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'sculpted wide hatchback center console with angled display integration',
+    couplerNote: 'Hyundai OEM socket harness with zero wire splicing',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Both Elite i20 and new-gen i20 Era/Magna models gain a modern QLED touchscreen, Wireless Apple CarPlay, Android Auto, and 4V RCA subwoofer pre-outs for audiophile-grade hatchback sound.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'hyundai-grand-i10-nios-android-player',
+    carName: 'Hyundai Grand i10 & Nios',
+    make: 'Hyundai',
+    segment: 'City Hatchback',
+    modelYears: '2013 – 2026 (Era, Magna, Corporate, Sportz)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'integrated curved dash housing sitting neatly alongside the instrument cluster',
+    couplerNote: 'Hyundai plug-and-play coupler harness',
+    doorSpeakerSize: '6-inch / 6.5-inch door mounts',
+    bestUpgradeReason:
+      'Grand i10 and Nios Era/Magna owners get reliable Bluetooth 5.0 calling, Google Maps, Wireless CarPlay, and night-vision reverse camera assistance in a clean 9-inch flush bezel.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'hyundai-verna-android-player',
+    carName: 'Hyundai Verna',
+    make: 'Hyundai',
+    segment: 'Mid-Size Sedan',
+    modelYears: '2011 – 2026 (Fluidic, Next-Gen & New Verna EX/S)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'driver-angled sedan console that frames a 9" or 10.1" display cleanly',
+    couplerNote: 'Hyundai plug-and-play harness supporting OEM steering buttons',
+    doorSpeakerSize: '6.5-inch door speaker bays',
+    bestUpgradeReason:
+      'Upgrading Fluidic or base-trim Verna head units to a VOEUX® 10.1-inch X80 Dual Knob or 9-inch TS7 restores modern Wireless CarPlay, crisp QLED contrast, and punchy highway audio.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'hyundai-exter-android-player',
+    carName: 'Hyundai Exter',
+    make: 'Hyundai',
+    segment: 'Micro SUV',
+    modelYears: '2023 – 2026 (EX, S Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'textured modern micro-SUV dashboard with high-set central stereo recess',
+    couplerNote: 'Hyundai OEM coupler harness with steering control compatibility',
+    doorSpeakerSize: '6.5-inch door slots',
+    bestUpgradeReason:
+      'Exter EX comes without a factory infotainment display. A 9-inch VOEUX® Carbon Black TS7 QLED stereo drops right in with Wireless CarPlay, Android Auto, and included AHD reverse camera.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'hyundai-aura-android-player',
+    carName: 'Hyundai Aura',
+    make: 'Hyundai',
+    segment: 'Compact Sedan',
+    modelYears: '2020 – 2026 (E, S, SX Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'satin-finished curved center console shared with the Nios platform',
+    couplerNote: 'Hyundai plug-and-play socket coupler',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Aura E and S owners (including high-mileage CNG commuters) rely on a VOEUX® 4GB+64GB Android Player for smooth daily navigation, hands-free calling, and clear sedan rear-camera visibility.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'hyundai-alcazar-android-player',
+    carName: 'Hyundai Alcazar',
+    make: 'Hyundai',
+    segment: '6/7-Seater Family SUV',
+    modelYears: '2021 – 2026 (Executive, Prestige Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'broad dual-tone SUV dashboard built to carry a 10.1-inch widescreen display',
+    couplerNote: 'Hyundai coupler-to-coupler harness retaining steering controls',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'On long highway trips in a 3-row Alcazar, a 10.1-inch VOEUX® X80 Dual Knob provides tactile rotary controls, split-screen navigation, Wireless CarPlay, and dedicated 4V subwoofer outputs.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-hyperdrive-lite-9', 'voeux-carbon-black-ts7-4-64'],
+  },
+
+  // ================= TATA MOTORS (7) =================
+  {
+    slug: 'tata-nexon-android-player',
+    carName: 'Tata Nexon',
+    make: 'Tata Motors',
+    segment: 'Compact SUV',
+    modelYears: '2017 – 2026 (XE, XM, XMA, Smart, Pure Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED Floating',
+    dashLayout: 'elevated floating-display dashboard binnacle built for wide touchscreen visibility',
+    couplerNote: 'Tata coupler harness & Canbus adapter for steering controls and reverse camera',
+    doorSpeakerSize: '6.5-inch front & rear door mounts',
+    bestUpgradeReason:
+      'Nexon XE, XM, and Smart trims either lack a touchscreen or feature smaller stock displays. Upgrading to a VOEUX® 9-inch TS7 or 10.1-inch X80 brings bright QLED clarity, Wireless CarPlay, Android Auto, and 4×50W MOSFET power.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+  {
+    slug: 'tata-punch-android-player',
+    carName: 'Tata Punch',
+    make: 'Tata Motors',
+    segment: 'Micro SUV',
+    modelYears: '2021 – 2026 (Pure, Pure Rhythm, Adventure Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'upright dual-tone micro-SUV dashboard with a dedicated floating top stereo bay',
+    couplerNote: 'Tata plug-and-play coupler harness with steering control support',
+    doorSpeakerSize: '6.5-inch door speaker slots',
+    bestUpgradeReason:
+      'Tata Punch Pure and Adventure buyers upgrade to the 9-inch VOEUX® Carbon Black TS7 QLED (with AHD camera included) or 10.1-inch X80 Dual Knob for Wireless CarPlay, Google Maps, and punchier bass.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'tata-tiago-android-player',
+    carName: 'Tata Tiago',
+    make: 'Tata Motors',
+    segment: 'City Hatchback',
+    modelYears: '2016 – 2026 (XE, XM, XT, NRG Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'clean recessed center fascia right between the AC vents',
+    couplerNote: 'Tata plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Tiago XE and XM owners transform their daily drive with a responsive 4GB+64GB VOEUX® Android Player — adding Wireless CarPlay, Android Auto, reverse camera safety, and crisp equalizer control.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'tata-altroz-android-player',
+    carName: 'Tata Altroz',
+    make: 'Tata Motors',
+    segment: 'Premium Hatchback',
+    modelYears: '2020 – 2026 (XE, XM, XM+, XT Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'layered premium hatchback dashboard with a freestanding central display plinth',
+    couplerNote: 'Tata coupler & Canbus harness retaining steering buttons',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Altroz XE and XM variants look factory-upgraded with a 9-inch VOEUX® QLED TS7 or 10.1-inch X80 Dual Knob, delivering smooth Wireless CarPlay, Android Auto, and 4V RCA audio expansion.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'tata-harrier-android-player',
+    carName: 'Tata Harrier',
+    make: 'Tata Motors',
+    segment: 'Mid-Size SUV',
+    modelYears: '2019 – 2026 (XE, XM, Smart, Pure Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'broad, commanding SUV dashboard with generous central screen real estate',
+    couplerNote: 'Tata Canbus-compatible wiring harness for steering & vehicle alerts',
+    doorSpeakerSize: '6.5-inch door speaker bays',
+    bestUpgradeReason:
+      'A full-size SUV like the Harrier deserves a 10.1-inch VOEUX® X80 Dual Knob or Dual Knob Piano display — pairing tactile volume dials with Wireless CarPlay, AHD reverse camera support, and deep bass tuning.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-hyperdrive-lite-9', 'voeux-carbon-black-ts7-4-64'],
+  },
+  {
+    slug: 'tata-safari-android-player',
+    carName: 'Tata Safari',
+    make: 'Tata Motors',
+    segment: 'Flagship 7-Seater SUV',
+    modelYears: '2021 – 2026 (XE, XM, Smart, Pure Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'wide flagship SUV cockpit tailored for a 10.1-inch floating screen',
+    couplerNote: 'Tata Canbus-ready plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Safari Smart and Pure owners enjoy highway-ready Wireless Apple CarPlay, Android Auto, split-screen maps, and 4V subwoofer outputs with the VOEUX® 10.1-inch X80 Diamond stereo.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-hyperdrive-lite-9', 'voeux-carbon-black-ts7-4-64'],
+  },
+  {
+    slug: 'tata-tigor-android-player',
+    carName: 'Tata Tigor',
+    make: 'Tata Motors',
+    segment: 'Compact Sedan',
+    modelYears: '2017 – 2026 (XE, XM, XT Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'compact center console shared with the Tiago, ideal for a flush 9-inch frame',
+    couplerNote: 'Tata OEM plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Tigor XE and XM sedan owners get essential rear-camera parking visibility, Wireless CarPlay, Android Auto, and crisp 4×50W MOSFET sound in a clean plug-and-play package.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+
+  // ================= MAHINDRA (7) =================
+  {
+    slug: 'mahindra-thar-android-player',
+    carName: 'Mahindra Thar',
+    make: 'Mahindra',
+    segment: '4×4 Lifestyle Off-Road SUV',
+    modelYears: '2020 – 2026 (AX, AX Opt, LX & Thar Roxx)',
+    recommendedSize: '9-Inch or 10.1-Inch Dual Knob',
+    dashLayout: 'rugged upright dashboard designed for high durability and quick-reach controls',
+    couplerNote: 'Mahindra plug-and-play coupler harness with steering control support',
+    doorSpeakerSize: '6-inch / 6.5-inch speaker pods',
+    bestUpgradeReason:
+      'On rough trails and highways, the physical rotary volume & tuning knobs on the VOEUX® X80 Diamond 10.1" or Single Knob Piano make audio control effortless without hunting for small touch icons.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64', 'voeux-carbon-black-ts7-4-64'],
   },
   {
     slug: 'mahindra-scorpio-n-android-player',
     carName: 'Mahindra Scorpio & Scorpio-N',
     make: 'Mahindra',
+    segment: 'Full-Size Ladder-Frame SUV',
     modelYears: '2015 – 2026 (Scorpio Classic S, S11 & Scorpio-N Z2, Z4)',
     recommendedSize: '9-Inch or 10.1-Inch Dual Knob',
-    seoTitle: 'Best Android Player for Mahindra Scorpio & Scorpio-N (10.1" & 9" QLED) | VOEUX®',
-    seoDescription:
-      'Upgrade your Mahindra Scorpio Classic or Scorpio-N Z2/Z4 with a VOEUX® 10.1" X80 Dual Knob or 9" TS7 QLED Android Car Player (4GB+64GB). Wireless CarPlay, Android Auto & AHD Camera.',
-    keywords:
-      'android player for Mahindra Scorpio, Scorpio Classic 10 inch stereo, Scorpio N Z2 android player, car android player India',
-    heroSummary:
-      'The commanding dashboard of the Mahindra Scorpio Classic and Scorpio-N pairs perfectly with the VOEUX® X80 Diamond 10.1" Dual Knob or Single Knob Piano Android Car Player — combining bold styling, physical rotary controls, and Wireless CarPlay.',
-    fitmentNotes: [
-      'Tactile Dual Knobs & Piano Buttons complement the Scorpio’s rugged SUV interior.',
-      'Full support for AHD night-vision reverse camera — essential for parking a full-size SUV.',
-      'Compatible with Mahindra steering controls via standard coupler.',
-      'High-output 50W×4 MOSFET amplifier plus 4V subwoofer output for deep highway bass.',
-    ],
-    whyUpgrade:
-      'Scorpio Classic S and Scorpio-N Z2/Z4 owners gain a massive leap in daily comfort with live Google Maps, Wireless Apple CarPlay, Android Auto, and crystal-clear reverse camera visibility.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-single-knob-piano-4-64',
-      'voeux-carbon-black-ts7-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Which Android player is recommended for Mahindra Scorpio Classic S?',
-        a: 'The VOEUX® X80 Diamond 10.1" Dual Knob and Single Knob Piano Series are top choices for Scorpio Classic S thanks to their tactile rotary dials and bold 10.1" display.',
-      },
-    ],
+    dashLayout: 'tall, commanding center console with generous vertical space for a 9" or 10.1" display',
+    couplerNote: 'Mahindra OEM coupler harness retaining steering buttons and reverse trigger',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Scorpio Classic S and Scorpio-N Z2/Z4 owners gain essential AHD night-vision reverse camera visibility, Wireless Apple CarPlay, Android Auto, and bold rotary-knob ergonomics.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64', 'voeux-carbon-black-ts7-4-64'],
   },
   {
-    slug: 'toyota-fortuner-android-player',
-    carName: 'Toyota Fortuner & Innova',
-    make: 'Toyota',
-    modelYears: '2012 – 2026 (Fortuner, Innova Crysta & Hycross)',
+    slug: 'mahindra-xuv700-android-player',
+    carName: 'Mahindra XUV700',
+    make: 'Mahindra',
+    segment: 'Flagship SUV',
+    modelYears: '2021 – 2026 (MX Variant)',
     recommendedSize: '10.1-Inch QLED / Dual Knob',
-    seoTitle: 'Best Android Player for Toyota Fortuner & Innova (10.1" QLED, Wireless CarPlay) | VOEUX®',
-    seoDescription:
-      'Upgrade your Toyota Fortuner or Innova Crysta with a VOEUX® 10.1" X80 Dual Knob or 9" QLED Android Car Player (4GB+64GB). Wireless Apple CarPlay, Android Auto, GPS & 1-Year Warranty.',
-    keywords:
-      'android player for Toyota Fortuner, Innova Crysta android stereo, Toyota 10.1 inch car android player, best car android player India',
-    heroSummary:
-      'Refresh your Toyota Fortuner or Innova Crysta with a crisp 10.1-inch VOEUX® X80 Dual Knob or 9-inch Carbon Black TS7 QLED Android Stereo. Built for long highway drives with Wireless Apple CarPlay, Android Auto, split-screen maps, and 4V subwoofer pre-outs.',
-    fitmentNotes: [
-      'Plug-and-play Toyota wiring harness preserves steering wheel controls with zero wire splicing.',
-      'Large 10.1-inch display matches the wide Fortuner and Innova Crysta dashboard proportions.',
-      'Built-in Wi-Fi, Bluetooth 5.0/5.1, GPS navigation, and full HD 1080p video playback.',
-      'Pairs cleanly with VOEUX® 6.5" Coaxial Speakers and 10" Underseat Subwoofer.',
-    ],
-    whyUpgrade:
-      'Earlier Toyota Fortuner and Innova Crysta head units often feel dated and lack Wireless CarPlay. A VOEUX® 4GB+64GB Android Player modernizes the entire cabin experience instantly.',
-    recommendedProductIds: [
-      'voeux-x80-dual-knob',
-      'voeux-hyperdrive-lite-9',
-      'voeux-carbon-black-ts7-4-64',
-    ],
-    faqs: [
-      {
-        q: 'Does the VOEUX 10.1-inch Android Player work with Toyota Fortuner steering controls?',
-        a: 'Yes, using a standard Toyota coupler harness, your steering wheel volume, mode, and track buttons work seamlessly.',
-      },
-    ],
+    dashLayout: 'wide modern SUV dash where MX trims benefit from a crisp 10.1-inch infotainment upgrade',
+    couplerNote: 'Mahindra Canbus-compatible plug-and-play wiring harness',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'XUV700 MX buyers upgrade to a 10.1-inch VOEUX® X80 or 9-inch TS7 QLED for Wireless Apple CarPlay, Android Auto, Google Maps, and high-power MOSFET sound.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-hyperdrive-lite-9', 'voeux-carbon-black-ts7-4-64'],
+  },
+  {
+    slug: 'mahindra-xuv300-3xo-android-player',
+    carName: 'Mahindra XUV300 & XUV 3XO',
+    make: 'Mahindra',
+    segment: 'Compact SUV',
+    modelYears: '2019 – 2026 (W4, W6 & 3XO MX1, MX2)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'wide sub-4m SUV center fascia accommodating a clean 9-inch or 10.1-inch bezel',
+    couplerNote: 'Mahindra OEM plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'XUV300 W4/W6 and XUV 3XO MX1 variants ship without a touchscreen. A VOEUX® 9-inch QLED TS7 or 10.1-inch X80 unlocks Wireless CarPlay, Android Auto, and crisp AHD reverse camera guidance.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'mahindra-bolero-android-player',
+    carName: 'Mahindra Bolero & Bolero Neo',
+    make: 'Mahindra',
+    segment: 'Rugged Utility SUV',
+    modelYears: '2012 – 2026 (B4, B6 & Bolero Neo N4, N8)',
+    recommendedSize: '9-Inch QLED or Single Knob',
+    dashLayout: 'vertical utilitarian center dash suited for a sturdy 9-inch fascia frame',
+    couplerNote: 'Mahindra plug-and-play wiring harness',
+    doorSpeakerSize: '6-inch front & rear door mounts',
+    bestUpgradeReason:
+      'Bolero and Bolero Neo owners drive tough urban and rural roads where tactile buttons, offline/online GPS navigation, Bluetooth calling, and a rugged AHD reverse camera make a huge daily difference.',
+    recommendedProductIds: ['voeux-single-knob-piano-4-64', 'voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'mahindra-xuv500-android-player',
+    carName: 'Mahindra XUV500',
+    make: 'Mahindra',
+    segment: '7-Seater SUV',
+    modelYears: '2011 – 2021 (W4, W6, W8, W10 Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'sculpted wide SUV console that modernizes dramatically with a 9" or 10.1" QLED frame',
+    couplerNote: 'Mahindra XUV500 Canbus-ready coupler harness',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Earlier XUV500 models have slow, dated factory screens without Wireless CarPlay. Upgrading to a VOEUX® 4GB+64GB Android Stereo makes the cabin feel brand new.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'mahindra-marazzo-android-player',
+    carName: 'Mahindra Marazzo',
+    make: 'Mahindra',
+    segment: 'Family MPV',
+    modelYears: '2018 – 2024 (M2, M4+ Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'piano-black MPV center console designed for flush infotainment mounting',
+    couplerNote: 'Mahindra plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door speaker slots',
+    bestUpgradeReason:
+      'Marazzo M2 and M4+ families gain Wireless Apple CarPlay, Android Auto, rear-seat entertainment playback, and wide-angle reverse camera safety.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+
+  // ================= KIA (3) =================
+  {
+    slug: 'kia-seltos-android-player',
+    carName: 'Kia Seltos',
+    make: 'Kia',
+    segment: 'Mid-Size SUV',
+    modelYears: '2019 – 2026 (HTE, HTK, HTK+ Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'connected horizontal cockpit surround built to house a 9" or 10.1" widescreen display',
+    couplerNote: 'Kia/Hyundai plug-and-play socket coupler preserving steering wheel controls',
+    doorSpeakerSize: '6.5-inch front & rear door mounts',
+    bestUpgradeReason:
+      'Seltos HTE and HTK buyers upgrade to a VOEUX® 10.1-inch X80 Dual Knob or 9-inch TS7 QLED for flagship Wireless CarPlay, Android Auto, and crisp daylight navigation.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+  {
+    slug: 'kia-sonet-android-player',
+    carName: 'Kia Sonet',
+    make: 'Kia',
+    segment: 'Sub-Compact SUV',
+    modelYears: '2020 – 2026 (HTE, HTE(O), HTK Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'sporty driver-oriented console framed by vertical chrome-accented AC vents',
+    couplerNote: 'Kia OEM plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Sonet HTE ships without a touchscreen. Installing a 9-inch VOEUX® TS7 QLED or 10.1-inch X80 brings Wireless Apple CarPlay, Android Auto, and AHD reverse camera support cleanly.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'kia-carens-android-player',
+    carName: 'Kia Carens',
+    make: 'Kia',
+    segment: '7-Seater Recreational Vehicle / MPV',
+    modelYears: '2022 – 2026 (Premium, Prestige Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'wrap-around glossy black dash panel seamlessly integrating a 9" or 10.1" fascia',
+    couplerNote: 'Kia plug-and-play coupler retaining steering wheel buttons',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Carens Premium owners upgrade to a 10.1-inch VOEUX® X80 or 9-inch TS7 for smooth Google Maps, Wireless CarPlay, YouTube/Spotify, and clear reverse parking assistance.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+
+  // ================= HONDA (4) =================
+  {
+    slug: 'honda-city-android-player',
+    carName: 'Honda City',
+    make: 'Honda',
+    segment: 'Mid-Size Sedan',
+    modelYears: '2014 – 2026 (4th Gen & 5th Gen: SV, V, VX)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'sleek asymmetric sedan center fascia replacing older Digipad or button units cleanly',
+    couplerNote: 'Honda plug-and-play coupler retaining steering wheel audio & call keys',
+    doorSpeakerSize: '6.5-inch front & rear door mounts',
+    bestUpgradeReason:
+      'Upgrading a 4th-Gen or 5th-Gen Honda City to a VOEUX® 10.1-inch X80 Dual Knob or 9-inch TS7 QLED adds fast 4GB+64GB performance, Wireless Apple CarPlay, Android Auto, and 4V RCA audio pre-outs.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64', 'voeux-carbon-black-ts7-4-64'],
+  },
+  {
+    slug: 'honda-amaze-android-player',
+    carName: 'Honda Amaze',
+    make: 'Honda',
+    segment: 'Compact Sedan',
+    modelYears: '2013 – 2026 (E, S, VX & New Amaze)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'clean upright dual-tone center console that fits a 9-inch flush fascia seamlessly',
+    couplerNote: 'Honda OEM socket harness with zero wire cutting',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Amaze E and S trims benefit from a bright 9-inch VOEUX® QLED TS7 stereo with Wireless CarPlay, Android Auto, and included AHD reverse camera for stress-free city parking.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'honda-elevate-android-player',
+    carName: 'Honda Elevate',
+    make: 'Honda',
+    segment: 'Mid-Size SUV',
+    modelYears: '2023 – 2026 (SV, V Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'flat upright SUV dashboard with a prominent floating top infotainment mount',
+    couplerNote: 'Honda plug-and-play harness with steering control support',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Elevate SV ships without a touchscreen. A 10.1-inch VOEUX® X80 Dual Knob or 9-inch TS7 completes the SUV cabin with Wireless CarPlay, Android Auto, and rich equalizer tuning.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+  {
+    slug: 'honda-jazz-wrv-android-player',
+    carName: 'Honda Jazz & WR-V',
+    make: 'Honda',
+    segment: 'Spacious Hatchback / Crossover',
+    modelYears: '2015 – 2023 (E, S, SV, V Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'driver-tilted glossy center bezel ideal for a 9-inch flush QLED display',
+    couplerNote: 'Honda plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Jazz and WR-V owners replace aging Digipad units with a VOEUX® 4GB+64GB QLED Android Stereo for instant Wireless Apple CarPlay, Android Auto, and smooth Google Maps navigation.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+
+  // ================= TOYOTA (4) =================
+  {
+    slug: 'toyota-fortuner-android-player',
+    carName: 'Toyota Fortuner',
+    make: 'Toyota',
+    segment: 'Full-Size Premium SUV',
+    modelYears: '2009 – 2026 (Type 1, Type 2 & New-Gen Fortuner)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'bold vertical luxury SUV console sized to carry a 10.1-inch widescreen display cleanly',
+    couplerNote: 'Toyota plug-and-play wiring harness retaining steering wheel controls',
+    doorSpeakerSize: '6.5-inch front & rear door bays',
+    bestUpgradeReason:
+      'Earlier Fortuner head units lack Wireless CarPlay and crisp QLED contrast. Upgrading to a VOEUX® 10.1-inch X80 Dual Knob brings tactile rotary dials, split-screen maps, and 4V subwoofer outputs.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-hyperdrive-lite-9', 'voeux-carbon-black-ts7-4-64'],
+  },
+  {
+    slug: 'toyota-innova-crysta-android-player',
+    carName: 'Toyota Innova, Crysta & Hycross',
+    make: 'Toyota',
+    segment: 'Executive MPV',
+    modelYears: '2008 – 2026 (G, GX, VX Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'sweeping MPV center console with generous room for 9" flush or 10.1" Dual Knob fitment',
+    couplerNote: 'Toyota OEM socket coupler with steering control retention',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Built for lakh-kilometre highway touring, Innova and Crysta G/GX models gain Wireless Apple CarPlay, Android Auto, crisp AHD reverse camera support, and clear 4×50W cabin sound.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'toyota-glanza-android-player',
+    carName: 'Toyota Glanza',
+    make: 'Toyota',
+    segment: 'Premium Hatchback',
+    modelYears: '2019 – 2026 (E, S, G Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'modern layered floating dash shared with the Baleno platform',
+    couplerNote: 'plug-and-play OEM socket harness with zero wire splicing',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Glanza E buyers upgrade from a blank stereo bay to a 9-inch VOEUX® Carbon Black TS7 QLED with Wireless CarPlay, Android Auto, and included night-vision AHD camera.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'toyota-hyryder-taisor-android-player',
+    carName: 'Toyota Hyryder & Taisor',
+    make: 'Toyota',
+    segment: 'Hybrid SUV & Crossover',
+    modelYears: '2022 – 2026 (Hyryder E/S & Taisor E/S)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'elevated floating central infotainment plinth',
+    couplerNote: 'plug-and-play coupler retaining steering wheel controls',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Hyryder E and Taisor E variants gain a flagship 9-inch QLED or 10.1-inch Dual Knob VOEUX® Android stereo with Wireless CarPlay, Android Auto, and crisp daylight navigation.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+
+  // ================= RENAULT & NISSAN (4) =================
+  {
+    slug: 'renault-kwid-android-player',
+    carName: 'Renault Kwid',
+    make: 'Renault',
+    segment: 'Entry Crossover Hatchback',
+    modelYears: '2015 – 2026 (RXE, RXL, RXT Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'vertical glossy piano-black center stack designed for flush screen mounting',
+    couplerNote: 'Renault ISO plug-and-play wiring harness',
+    doorSpeakerSize: '6-inch speaker mounts',
+    bestUpgradeReason:
+      'Kwid RXE and RXL owners upgrade to a 9-inch VOEUX® Carbon Black TS7 QLED for smooth Google Maps, Wireless Apple CarPlay, Android Auto, and clear reverse parking assistance.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'renault-triber-android-player',
+    carName: 'Renault Triber',
+    make: 'Renault',
+    segment: 'Modular 7-Seater MPV',
+    modelYears: '2019 – 2026 (RXE, RXL, RXT Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'dual-tone upright MPV console with clean center recess above rotary AC dials',
+    couplerNote: 'Renault plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Triber RXE and RXL families gain Wireless CarPlay, Android Auto, rear-camera safety, and stronger 4×50W MOSFET audio for all three rows.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'renault-kiger-android-player',
+    carName: 'Renault Kiger',
+    make: 'Renault',
+    segment: 'Compact SUV',
+    modelYears: '2021 – 2026 (RXE, RXL Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'elevated floating center screen mount angled cleanly toward the driver',
+    couplerNote: 'Renault plug-and-play socket adapter',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Kiger RXE and RXL trims come without a touchscreen. A 9-inch VOEUX® TS7 QLED brings Wireless CarPlay, Android Auto, and included AHD camera in one clean upgrade.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'nissan-magnite-android-player',
+    carName: 'Nissan Magnite',
+    make: 'Nissan',
+    segment: 'Compact SUV',
+    modelYears: '2020 – 2026 (XE, XL / Visia, Acenta Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'sporty driver-angled center console flanked by hexagonal AC vents',
+    couplerNote: 'Nissan plug-and-play coupler harness preserving steering audio controls',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Magnite XE/Visia and XL owners transform their cabin with a 9-inch VOEUX® TS7 QLED or 10.1-inch X80 Dual Knob — unlocking Wireless Apple CarPlay, Android Auto, and crisp reverse camera visuals.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+
+  // ================= VOLKSWAGEN, SKODA, MG & FORD (14 MORE TO EXCEED 50!) =================
+  {
+    slug: 'volkswagen-polo-vento-android-player',
+    carName: 'Volkswagen Polo & Vento',
+    make: 'Volkswagen',
+    segment: 'European Hatchback & Sedan',
+    modelYears: '2010 – 2022 (Trendline, Comfortline, Highline)',
+    recommendedSize: '9-Inch QLED or Single Knob',
+    dashLayout: 'minimalist German recessed Double-DIN center fascia with clean horizontal lines',
+    couplerNote: 'VW Quadlock Canbus coupler retaining steering controls and ignition logic',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Polo and Vento enthusiasts keep their beloved European driving dynamics while upgrading aging RCD head units to a VOEUX® 9-inch QLED or Single Knob Piano stereo with Wireless CarPlay and 4V RCA audio.',
+    recommendedProductIds: ['voeux-single-knob-piano-4-64', 'voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'volkswagen-virtus-taigun-android-player',
+    carName: 'Volkswagen Virtus & Taigun',
+    make: 'Volkswagen',
+    segment: 'Premium Sedan & SUV',
+    modelYears: '2021 – 2026 (Comfortline Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'driver-tilted modern VW cockpit designed for a sharp widescreen display',
+    couplerNote: 'VW Canbus-ready plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Virtus and Taigun Comfortline owners upgrade from smaller stock displays to a crisp 10.1-inch VOEUX® X80 or 9-inch TS7 QLED with Wireless CarPlay and custom equalizer control.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'skoda-slavia-kushaq-android-player',
+    carName: 'Skoda Slavia & Kushaq',
+    make: 'Skoda',
+    segment: 'European Sedan & SUV',
+    modelYears: '2021 – 2026 (Active, Classic Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'clean European floating central screen mount above sculpted dash vents',
+    couplerNote: 'Skoda/VW Canbus plug-and-play harness',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Slavia and Kushaq base trims gain Wireless Apple CarPlay, Android Auto, bright QLED navigation, and clear AHD reverse parking camera integration with VOEUX®.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'skoda-rapid-android-player',
+    carName: 'Skoda Rapid',
+    make: 'Skoda',
+    segment: 'Mid-Size Sedan',
+    modelYears: '2011 – 2021 (Rider, Ambition, Style)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'classic recessed European Double-DIN center stack',
+    couplerNote: 'Skoda Quadlock Canbus coupler harness',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Skoda Rapid Rider and Ambition owners modernize their sedan effortlessly with a 9-inch VOEUX® TS7 QLED or Single Knob Piano stereo featuring Wireless CarPlay and AHD reverse camera support.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'ford-ecosport-android-player',
+    carName: 'Ford EcoSport',
+    make: 'Ford',
+    segment: 'Compact SUV',
+    modelYears: '2013 – 2021 (Ambiente, Trend, Titanium)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'sculpted floating or recessed Ford center fascia depending on pre/post-facelift year',
+    couplerNote: 'Ford Canbus-compatible plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door speaker bays',
+    bestUpgradeReason:
+      'EcoSport owners breathe new life into their rugged compact SUV with a VOEUX® 9-inch QLED TS7 or 10.1-inch X80 Dual Knob — adding Wireless CarPlay, Android Auto, and crisp navigation.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'ford-figo-aspire-freestyle-android-player',
+    carName: 'Ford Figo, Aspire & Freestyle',
+    make: 'Ford',
+    segment: 'Hatchback & Compact Sedan',
+    modelYears: '2015 – 2021 (Ambiente, Trend Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'angled Ford center console replacing older dock or small screen units cleanly',
+    couplerNote: 'Ford plug-and-play wiring harness',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Replacing the older MyFord Dock or basic stereo with a 9-inch VOEUX® Android Player brings modern Wireless CarPlay, Google Maps, and clear reverse parking assistance.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'mg-hector-astor-android-player',
+    carName: 'MG Astor & ZS',
+    make: 'MG Motor',
+    segment: 'Mid-Size SUV',
+    modelYears: '2021 – 2026 (Style, Sprint Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'contemporary soft-touch SUV dash with a broad recessed central infotainment bay',
+    couplerNote: 'MG plug-and-play Canbus coupler harness',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Upgrade base MG trims to a responsive 4GB+64GB VOEUX® 10.1-inch Dual Knob or 9-inch QLED stereo with Wireless Apple CarPlay, Android Auto, and 4V subwoofer outputs.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+  {
+    slug: 'maruti-celerio-android-player',
+    carName: 'Maruti Celerio',
+    make: 'Maruti Suzuki',
+    segment: 'Fuel-Efficient City Hatchback',
+    modelYears: '2014 – 2026 (LXi, VXi Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'clean upright center console with vertical vents framing a 9-inch bezel',
+    couplerNote: 'Suzuki 20-pin plug-and-play wiring coupler',
+    doorSpeakerSize: '6-inch / 6.5-inch door mounts',
+    bestUpgradeReason:
+      'Celerio LXi and VXi city commuters gain Wireless CarPlay, Android Auto, live traffic on Google Maps, and an AHD reverse camera for tight parking spots.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'maruti-spresso-android-player',
+    carName: 'Maruti S-Presso',
+    make: 'Maruti Suzuki',
+    segment: 'Micro Hatchback',
+    modelYears: '2019 – 2026 (Std, LXi, VXi Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'signature circular central console housing that integrates a 9-inch S-Presso frame neatly',
+    couplerNote: 'Suzuki plug-and-play wiring coupler',
+    doorSpeakerSize: '6-inch front door mounts',
+    bestUpgradeReason:
+      'S-Presso LXi and VXi owners get a crisp 9-inch QLED display with Bluetooth calling, Google Maps, and clear reverse parking camera support.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'maruti-eeco-android-player',
+    carName: 'Maruti Eeco',
+    make: 'Maruti Suzuki',
+    segment: 'Utility Van & Family Carrier',
+    modelYears: '2010 – 2026 (5-Seater & 7-Seater Variants)',
+    recommendedSize: '9-Inch QLED or Single Knob',
+    dashLayout: 'straight utility dashboard accommodating a dedicated Eeco 9-inch fascia frame',
+    couplerNote: 'standard Suzuki wiring coupler with simple plug-and-play power & speaker hookup',
+    doorSpeakerSize: '6-inch front door / pod mounts',
+    bestUpgradeReason:
+      'Eeco owners rely on turn-by-turn Google Maps, hands-free Bluetooth calls, and a reliable AHD reverse camera every single day — all built into VOEUX® 4GB+64GB players.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'maruti-jimny-android-player',
+    carName: 'Maruti Jimny',
+    make: 'Maruti Suzuki',
+    segment: '4×4 Compact Off-Roader',
+    modelYears: '2023 – 2026 (Zeta Variant)',
+    recommendedSize: '9-Inch QLED or Single Knob',
+    dashLayout: 'rugged boxy off-road dashboard with a prominent top-mounted floating display',
+    couplerNote: 'Suzuki plug-and-play coupler retaining steering wheel controls',
+    doorSpeakerSize: '6-inch / 6.5-inch door panels',
+    bestUpgradeReason:
+      'Jimny Zeta owners upgrade from the smaller 7-inch screen to a brighter 9-inch VOEUX® QLED or tactile Single Knob Piano unit for trail navigation, Wireless CarPlay, and stronger audio.',
+    recommendedProductIds: ['voeux-single-knob-piano-4-64', 'voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'hyundai-santro-android-player',
+    carName: 'Hyundai Santro',
+    make: 'Hyundai',
+    segment: 'Compact City Hatchback',
+    modelYears: '2018 – 2022 (Era, Magna, Sportz)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'compact central bezel flanked by turbine-style air vents',
+    couplerNote: 'Hyundai plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Santro Era and Magna owners easily upgrade to Wireless Apple CarPlay, Android Auto, Google Maps, and clear reverse camera parking with a flush 9-inch VOEUX® TS7 QLED.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'tata-curvv-android-player',
+    carName: 'Tata Curvv',
+    make: 'Tata Motors',
+    segment: 'SUV Coupe',
+    modelYears: '2024 – 2026 (Smart, Pure+ Variants)',
+    recommendedSize: '10.1-Inch QLED / Dual Knob',
+    dashLayout: 'sleek coupe-SUV layered dash built around a prominent floating infotainment display',
+    couplerNote: 'Tata Canbus plug-and-play coupler harness',
+    doorSpeakerSize: '6.5-inch door speaker mounts',
+    bestUpgradeReason:
+      'Curvv Smart buyers upgrade from the entry audio setup to a 10.1-inch VOEUX® X80 Dual Knob or 9-inch TS7 QLED with Wireless CarPlay, Android Auto, and crisp reverse camera visibility.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-hyperdrive-lite-9'],
+  },
+  {
+    slug: 'toyota-etios-liva-android-player',
+    carName: 'Toyota Etios & Etios Liva',
+    make: 'Toyota',
+    segment: 'Reliable Sedan & Hatchback',
+    modelYears: '2010 – 2020 (G, GD, V, VD, Cross)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'straightforward central console below the center-mounted instrument cluster',
+    couplerNote: 'Toyota plug-and-play socket harness',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Etios and Liva cars are famous for running 2+ lakh km reliably — adding a 9-inch VOEUX® QLED Android Player gives these dependable cars modern Wireless CarPlay, Google Maps, and reverse camera safety.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'toyota-rumion-android-player',
+    carName: 'Toyota Rumion',
+    make: 'Toyota',
+    segment: '7-Seater Family MPV',
+    modelYears: '2023 – 2026 (S, G Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'wide sculpted MPV dashboard with clean 9" / 10.1" fascia integration',
+    couplerNote: 'plug-and-play OEM socket harness retaining steering controls',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Rumion S and G families upgrade to a 10.1-inch VOEUX® X80 Dual Knob or 9-inch TS7 for Wireless CarPlay, split-screen navigation, and rear-camera confidence.',
+    recommendedProductIds: ['voeux-x80-dual-knob', 'voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'honda-brio-mobilio-android-player',
+    carName: 'Honda Brio, Amaze Gen 1 & Mobilio',
+    make: 'Honda',
+    segment: 'Compact Hatchback & MPV',
+    modelYears: '2011 – 2019 (E, S, V Variants)',
+    recommendedSize: '9-Inch QLED Touchscreen',
+    dashLayout: 'clean circular-accented Honda center fascia fitting a dedicated 9-inch frame',
+    couplerNote: 'Honda plug-and-play wiring coupler',
+    doorSpeakerSize: '6.5-inch door panels',
+    bestUpgradeReason:
+      'Brio and Mobilio owners easily replace dated single/double-DIN button stereos with a 9-inch VOEUX® QLED Android Player featuring Wireless CarPlay, Bluetooth 5.0, and reverse camera support.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
+  },
+  {
+    slug: 'citroen-c3-aircross-android-player',
+    carName: 'Citroen C3 & C3 Aircross',
+    make: 'Citroen',
+    segment: 'Urban Hatchback & SUV',
+    modelYears: '2022 – 2026 (Live, Feel Variants)',
+    recommendedSize: '9-Inch or 10.1-Inch QLED',
+    dashLayout: 'bold horizontal textured dash panel with a high-mounted central stereo opening',
+    couplerNote: 'ISO plug-and-play wiring adapter with steering control support',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Citroen C3 Live and Aircross base trims ship without a touchscreen. A VOEUX® 9-inch TS7 or 10.1-inch X80 delivers Wireless Apple CarPlay, Android Auto, and crisp AHD reverse camera parking.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-x80-dual-knob', 'voeux-single-knob-piano-4-64'],
+  },
+  {
+    slug: 'renault-duster-android-player',
+    carName: 'Renault Duster',
+    make: 'Renault',
+    segment: 'Rugged Compact SUV',
+    modelYears: '2012 – 2022 (RXE, RXL, RXS, RXZ)',
+    recommendedSize: '9-Inch QLED or Single Knob',
+    dashLayout: 'recessed center console that cleanly accepts a 9-inch Duster fascia frame',
+    couplerNote: 'Renault ISO plug-and-play harness supporting stalk audio controls',
+    doorSpeakerSize: '6.5-inch door mounts',
+    bestUpgradeReason:
+      'Duster owners love the SUV’s highway ride quality — upgrading the dated MediaNAV screen to a 9-inch VOEUX® QLED or Single Knob Piano brings Wireless CarPlay, Google Maps, and clear audio.',
+    recommendedProductIds: ['voeux-carbon-black-ts7-4-64', 'voeux-single-knob-piano-4-64', 'voeux-x80-dual-knob'],
   },
 ];
+
+// Expand each car profile into a full, richly structured Voeux.Blog article
+export const CAR_FITMENT_GUIDES = RAW_CAR_PROFILES.map((c) => ({
+  ...c,
+  seoTitle: `Best Android Player for ${c.carName} (${c.recommendedSize}, Wireless CarPlay) | Voeux.Blog`,
+  seoDescription: `Complete Voeux.Blog fitment & buying guide for ${c.carName} (${c.modelYears}). Upgrade to a VOEUX® 9" QLED TS7 or 10.1" X80 Dual Knob Android Car Player (4GB+64GB) with Wireless Apple CarPlay, Android Auto & 1-Year Domestic Warranty.`,
+  keywords: `android player for ${c.carName}, ${c.carName} car stereo, ${c.carName} android player price India, best car android player for ${c.carName}, ${c.make} android car stereo, VOEUX ${c.carName}`,
+  heroSummary: `Looking to upgrade your ${c.carName} (${c.segment}) infotainment system? The ${c.carName} features a ${c.dashLayout}, making it an ideal match for a VOEUX® ${c.recommendedSize} Android Car Player using a ${c.couplerNote} with zero wire cutting.`,
+  fitmentNotes: [
+    `Uses a ${c.couplerNote} — plug-and-play installation with zero cutting of original ${c.make} wiring.`,
+    `Supports steering wheel audio & call controls on equipped ${c.carName} variants.`,
+    `Supports AHD night-vision reverse parking cameras for safer city & highway parking.`,
+    `Compatible with ${c.doorSpeakerSize} — pair with VOEUX® VE-CS606 (6") or VE-CS606PT2 (6.5") coaxial speakers and our 10" underseat subwoofer for a complete cabin audio upgrade.`,
+  ],
+  whyUpgrade: c.bestUpgradeReason,
+  brandReliability: [
+    '1-Year Domestic Warranty on manufacturing defects across every official VOEUX® Car Android Player, Speaker, Subwoofer, and Amplifier — backed by online registration at voeuxtechnologies.in/warranty.',
+    'Transparent, verified hardware specifications: genuine 4GB RAM + 64GB storage, Wireless Apple CarPlay & Android Auto, MOSFET 50W×4 amplification, and 4V RCA pre-amp outputs.',
+    'Direct-from-brand official store (plus verified presence on Flipkart) with Pan-India delivery and dedicated pre-purchase visualization through VOEUX® Virtual Fit.',
+    'Designed for Indian driving conditions with bright QLED/IPS daylight-readable displays and optional tactile Dual Rotary Knobs & Piano Buttons for safe, eyes-on-the-road control.',
+  ],
+  faqs: [
+    {
+      q: `Which VOEUX® Android Player size fits the ${c.carName} best?`,
+      a: `For the ${c.carName} (${c.modelYears}), we recommend ${c.recommendedSize}. Choose the 9-inch Carbon Black TS7 QLED for a clean flush OEM look, or the 10.1-inch X80 Diamond Dual Knob if you want a larger screen with physical rotary knobs.`,
+    },
+    {
+      q: `Does installing a VOEUX® Android Player in ${c.carName} require cutting original wires?`,
+      a: `No. Using a ${c.couplerNote} and a ${c.carName}-compatible Double-DIN fascia frame, installation is plug-and-play and completely reversible.`,
+    },
+    {
+      q: `Will Wireless Apple CarPlay and Android Auto work in my ${c.carName}?`,
+      a: `Yes. VOEUX® 4GB+64GB Android Car Players support Wireless Apple CarPlay, Android Auto, Google Maps, Bluetooth hands-free calling, Wi-Fi streaming, and steering wheel controls.`,
+    },
+    {
+      q: `Can I see how a 9-inch or 10.1-inch VOEUX® player looks on my ${c.carName} dashboard before buying?`,
+      a: `Yes! Open VOEUX® Virtual Fit, upload a front-view photo of your ${c.carName} dashboard with the steering wheel visible, and preview the exact 9" TS7 or 10.1" X80 unit installed to true physical scale.`,
+    },
+  ],
+}));
 
 export const getCarGuideBySlug = (slug) =>
   CAR_FITMENT_GUIDES.find((g) => g.slug === slug) || null;

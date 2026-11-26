@@ -81,6 +81,7 @@ export const Footer = () => {
               <li><button onClick={() => setActivePage('speakers-soundbars')} className="hover:text-cyan-400 transition cursor-pointer">Speakers & Soundbars</button></li>
               <li><button onClick={() => setActivePage('amplifiers')} className="hover:text-cyan-400 transition cursor-pointer">Car Amplifiers</button></li>
               <li><button onClick={() => setActivePage('subwoofers')} className="hover:text-cyan-400 transition cursor-pointer">Subwoofers</button></li>
+              <li><a href="/blog" onClick={(e) => { e.preventDefault(); setActivePage('blog'); }} className="hover:text-cyan-400 transition cursor-pointer">Voeux.Blog (Car Fitment Guides)</a></li>
             </ul>
           </div>
 

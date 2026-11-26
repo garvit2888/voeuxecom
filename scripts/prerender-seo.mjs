@@ -315,8 +315,53 @@ for (const product of PRODUCTS) {
   count++;
 }
 
-// 4. All 10 Car-Specific SEO Fitment Guide Pages
+// 4. Voeux.Blog Index Page (/blog) + All 52 Car-Specific Voeux.Blog Articles
+writeRoute(
+  'blog',
+  buildRouteHtml({
+    routePath: 'blog',
+    title: 'Voeux.Blog | 52 Indian Car Android Player Fitment & Audio Upgrade Guides',
+    description:
+      'Explore Voeux.Blog for accurate, model-specific Car Android Player fitment guides across 52 popular Indian cars — Hyundai Creta, Maruti Swift, Tata Nexon, Mahindra Thar, Kia Seltos, Honda City, Toyota Fortuner & more.',
+    keywords:
+      'Voeux Blog, car android player fitment guide India, best android stereo for Indian cars, Hyundai Creta android player, Maruti Swift android player, Mahindra Thar android player',
+    image: '/images/voeux_x80_stereo.jpg',
+    jsonLdList: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        name: 'Voeux.Blog',
+        url: `${SITE_URL}/blog`,
+        description: 'Official VOEUX® Car Android Player & Car Audio Fitment Blog for Indian Vehicles',
+      },
+    ],
+    bodyHtml: `
+      <p><strong>Voeux.Blog</strong></p>
+      <h1>Voeux.Blog — Car Android Player Fitment &amp; Upgrade Guides for India’s Top ${CAR_FITMENT_GUIDES.length} Cars</h1>
+      <p>Model-specific dashboard fitment details, plug-and-play coupler guides, and honest 9-inch vs 10.1-inch screen recommendations backed by VOEUX® 1-Year Domestic Warranty.</p>
+      <ul>${carLinksHtml}</ul>
+    `,
+  })
+);
+count++;
+
 for (const guide of CAR_FITMENT_GUIDES) {
+  const articleLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: `Best Android Player for ${guide.carName}: Fitment, Screen Size & Buying Guide`,
+    description: guide.seoDescription,
+    author: { '@type': 'Organization', name: 'VOEUX® Electronics' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'VOEUX® Electronics',
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/images/voeux_logo.png` },
+    },
+    mainEntityOfPage: `${SITE_URL}/car/${guide.slug}`,
+    datePublished: '2026-11-26',
+    dateModified: '2026-11-26',
+  };
+
   const faqLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -332,7 +377,7 @@ for (const guide of CAR_FITMENT_GUIDES) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
-      { '@type': 'ListItem', position: 2, name: 'Car Android Players', item: `${SITE_URL}/android-players` },
+      { '@type': 'ListItem', position: 2, name: 'Voeux.Blog', item: `${SITE_URL}/blog` },
       { '@type': 'ListItem', position: 3, name: `Android Player for ${guide.carName}`, item: `${SITE_URL}/car/${guide.slug}` },
     ],
   };
@@ -347,6 +392,10 @@ for (const guide of CAR_FITMENT_GUIDES) {
     .map((f) => `<h3>${escapeHtml(f.q)}</h3><p>${escapeHtml(f.a)}</p>`)
     .join('');
 
+  const reliabilityHtml = (guide.brandReliability || [])
+    .map((r) => `<li>${escapeHtml(r)}</li>`)
+    .join('');
+
   writeRoute(
     `car/${guide.slug}`,
     buildRouteHtml({
@@ -355,21 +404,22 @@ for (const guide of CAR_FITMENT_GUIDES) {
       description: guide.seoDescription,
       keywords: guide.keywords,
       image: '/images/voeux_x80_stereo.jpg',
-      jsonLdList: [faqLd, breadcrumbLd],
+      jsonLdList: [articleLd, faqLd, breadcrumbLd],
       bodyHtml: `
+        <p><a href="/blog"><strong>Voeux.Blog</strong></a> · ${escapeHtml(guide.make)} · ${escapeHtml(guide.segment)}</p>
         <h1>Best Android Player for ${escapeHtml(guide.carName)} (${escapeHtml(guide.recommendedSize)})</h1>
         <p>${escapeHtml(guide.heroSummary)}</p>
-        <p><strong>Compatible Model Years:</strong> ${escapeHtml(guide.modelYears)}</p>
+        <p><strong>Compatible Model Years:</strong> ${escapeHtml(guide.modelYears)} | <strong>Door Speakers:</strong> ${escapeHtml(guide.doorSpeakerSize)}</p>
+        <h2>How VOEUX® Upgrades Your ${escapeHtml(guide.carName)}</h2>
+        <p>${escapeHtml(guide.whyUpgrade)}</p>
+        <ul>${guide.fitmentNotes.map((n) => `<li>${escapeHtml(n)}</li>`).join('')}</ul>
         <h2>Top Recommended VOEUX® Android Car Players for ${escapeHtml(guide.carName)}</h2>
         <ul>${recProductsHtml}</ul>
-        <h2>${escapeHtml(guide.carName)} Fitment &amp; Installation Checklist</h2>
-        <ul>${guide.fitmentNotes.map((n) => `<li>${escapeHtml(n)}</li>`).join('')}</ul>
-        <h2>Why Upgrade Your ${escapeHtml(guide.carName)} Stereo?</h2>
-        <p>${escapeHtml(guide.whyUpgrade)}</p>
-        <h2>Frequently Asked Questions</h2>
+        <h2>Why Choose Official VOEUX® Electronics</h2>
+        <ul>${reliabilityHtml}</ul>
+        <h2>${escapeHtml(guide.carName)} Android Player FAQs</h2>
         ${faqsHtml}
-        <h2>More Car Android Player Fitment Guides</h2>
-        <ul>${carLinksHtml}</ul>
+        <p><a href="/virtual-fit">Preview on Your ${escapeHtml(guide.carName)} Dashboard with VOEUX® Virtual Fit</a> | <a href="/blog">Browse All ${CAR_FITMENT_GUIDES.length} Car Guides on Voeux.Blog</a></p>
       `,
     })
   );
@@ -518,4 +568,95 @@ ${feedItems}
 fs.writeFileSync(path.join(DIST_DIR, 'merchant-feed.xml'), merchantFeedXml, 'utf-8');
 fs.writeFileSync(path.resolve(__dirname, '..', 'public', 'merchant-feed.xml'), merchantFeedXml, 'utf-8');
 console.log(`✓ Generated Google Merchant Center XML feed with ${PRODUCTS.length} products (merchant-feed.xml)`);
+
+// 7. Auto-Generate Complete XML Sitemap (dist/sitemap.xml + public/sitemap.xml)
+const TODAY = '2026-11-26';
+const sitemapEntries = [];
+
+// Homepage
+sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>`);
+
+// Virtual Fit & Voeux.Blog Index
+sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/virtual-fit</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>`);
+sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/blog</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`);
+
+// Categories
+for (const cat of CATEGORIES) {
+  sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/${cat.id}</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>`);
+}
+
+// All Products & Bundles with verified gallery images
+for (const product of PRODUCTS) {
+  const imgs = Array.from(new Set([product.image, ...(product.gallery || [])].filter(Boolean)));
+  const imgXml = imgs
+    .map((img) => {
+      const loc = img.startsWith('http') ? img : `${SITE_URL}${img}`;
+      return `    <image:image>
+      <image:loc>${escapeHtml(loc)}</image:loc>
+      <image:title>${escapeHtml(product.name)}</image:title>
+    </image:image>`;
+    })
+    .join('\n');
+
+  sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/product/${product.id}</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+${imgXml}
+  </url>`);
+}
+
+// All 52 Voeux.Blog Car Fitment Articles
+for (const guide of CAR_FITMENT_GUIDES) {
+  sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/car/${guide.slug}</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>`);
+}
+
+// Support, Warranty, Dealer & Legal Pages
+for (const page of staticPages) {
+  sitemapEntries.push(`  <url>
+    <loc>${SITE_URL}/${page.routePath}</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+}
+
+const fullSitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
+${sitemapEntries.join('\n')}
+</urlset>
+`;
+
+fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), fullSitemapXml, 'utf-8');
+fs.writeFileSync(path.resolve(__dirname, '..', 'public', 'sitemap.xml'), fullSitemapXml, 'utf-8');
+console.log(`✓ Generated complete sitemap.xml with ${sitemapEntries.length} URLs (including ${CAR_FITMENT_GUIDES.length} Voeux.Blog car pages)`);
 
