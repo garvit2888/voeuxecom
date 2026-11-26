@@ -110,34 +110,68 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Marketplace Circular Store Logos */}
-          <div className="space-y-2.5">
-            <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Find Us On</h4>
-            <div className="flex items-center gap-4 pt-1">
-              <MarketplaceLogo
-                candidates={[
-                  '/images/amazon_logo.png',
-                  '/images/amazon_logo.jpg',
-                  '/images/amazon_logo.jpeg'
-                ]}
-                href="https://www.amazon.in/s?k=Voeux&ref=bl_dp_s_web_0"
-                alt="Amazon"
-                title="VOEUX on Amazon"
-                containerClassName="bg-white"
-                imgClassName="scale-[1.10]"
-              />
-              <MarketplaceLogo
-                candidates={[
-                  '/images/flipkart_logo.png',
-                  '/images/flipkart_logo.jpg',
-                  '/images/flipkart_logo.jpeg'
-                ]}
-                href="https://www.flipkart.com/search?q=voeux&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off"
-                alt="Flipkart"
-                title="VOEUX on Flipkart"
-                containerClassName="bg-[#2874F0]"
-                imgClassName="scale-[1.38]"
-              />
+          {/* Marketplace & Social Circular Logos */}
+          <div className="space-y-6">
+            <div className="space-y-2.5">
+              <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Find Us On</h4>
+              <div className="flex items-center gap-4 pt-1">
+                <MarketplaceLogo
+                  candidates={[
+                    '/images/amazon_logo.png',
+                    '/images/amazon_logo.jpg',
+                    '/images/amazon_logo.jpeg'
+                  ]}
+                  href="https://www.amazon.in/s?k=Voeux&ref=bl_dp_s_web_0"
+                  alt="Amazon"
+                  title="VOEUX on Amazon"
+                  containerClassName="bg-white"
+                  imgClassName="scale-[1.10]"
+                />
+                <MarketplaceLogo
+                  candidates={[
+                    '/images/flipkart_logo.png',
+                    '/images/flipkart_logo.jpg',
+                    '/images/flipkart_logo.jpeg'
+                  ]}
+                  href="https://www.flipkart.com/search?q=voeux&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off"
+                  alt="Flipkart"
+                  title="VOEUX on Flipkart"
+                  containerClassName="bg-[#2874F0]"
+                  imgClassName="scale-[1.38]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2.5">
+              <h4 className="font-extrabold text-white uppercase text-xs tracking-wider">Social Links</h4>
+              <div className="flex items-center gap-4 pt-1">
+                <MarketplaceLogo
+                  candidates={[
+                    '/images/instagram_logo.png',
+                    '/images/instagram_logo.jpg',
+                    '/images/instagram_logo.jpeg',
+                    '/images/instagram_logo.webp'
+                  ]}
+                  href="https://www.instagram.com/voeux_in/?__d=1%2F"
+                  alt="Instagram"
+                  title="VOEUX on Instagram"
+                  containerClassName="bg-white"
+                  imgClassName="scale-[1.08]"
+                />
+                <MarketplaceLogo
+                  candidates={[
+                    '/images/linkedin_logo.png',
+                    '/images/linkedin_logo.jpg',
+                    '/images/linkedin_logo.jpeg',
+                    '/images/linkedin_logo.webp'
+                  ]}
+                  href="https://www.linkedin.com/search/results/all/?keywords=voeux&origin=RICH_QUERY_SUGGESTION&spellCorrectionEnabled=false&heroEntityKey=urn%3Ali%3Aorganization%3A117045090&position=0"
+                  alt="LinkedIn"
+                  title="VOEUX on LinkedIn"
+                  containerClassName="bg-[#0A66C2]"
+                  imgClassName="scale-[1.08]"
+                />
+              </div>
             </div>
           </div>
         </div>
